@@ -1,0 +1,28 @@
+{
+    "name": "makscraft/mv-core",
+    "description": "MV - content management framework for developing internet sites and applications",
+    "version": "3.0.0",
+    "type": "project",
+    "keywords": ["php", "framework", "mvc", "adminpanel", "crud"],
+    "homepage": "https://mv-framework.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maxim Zaykov"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "config/autoload.php"
+        ],
+        "classmap": [
+            "core/"
+        ]
+    },
+    "scripts": {
+        "post-autoload-dump": "\\Installation::postAutoloadDump"
+    },
+    "require": {
+        "php": ">=8.0"
+    }
+}
