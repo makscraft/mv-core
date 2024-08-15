@@ -166,14 +166,14 @@ class Filemanager
 	}
 	
 	public function displayPath()
-	{
-		$p1 = $this -> registry -> getSetting('FilesPath');
+	{		
+		$root = str_replace('\\', '/', Registry :: get('FilesPath'));
+		$root = preg_replace('/\/userfiles\/?$/', '', $root);
 		
-		$p1 = $p2 = preg_replace("/.*(\/.*\/$)/", "$1", $p1);
-		$p2 = str_replace('/', '\/', $p2);
-		$p2 = preg_replace("/.*".$p2."(.*)/", "$1", $this -> path);
-		
-		return str_replace('/', ' / ', $p1.$p2);
+		$path = str_replace('\\', '/', $this -> path);
+		$path = str_replace($root, '', $path); 
+
+		return str_replace('/', ' / ', $path);
 	}	
 		
 	public function display()
@@ -370,7 +370,7 @@ class Filemanager
 	{
 		//We use Imager object to display the small copy of image in file manager.
 		$file = $this -> path.$file;
-		$html = "";
+		$html = '';
 
 		//We don't resize svg images
 	    if(is_file($file) && Service :: getExtension($file) == "svg" && mime_content_type($file) == "image/svg+xml")
@@ -387,6 +387,7 @@ class Filemanager
 			
 			@copy($file, $tmp_file);
 			$tmp_file = $this -> imager -> compress($tmp_file, "filemanager", 230, 230); //Resize the image
+			
 			$html .= "<img src=\"".$tmp_file."\" alt=\"".basename($file)."\" />\n";
 		}
 		else

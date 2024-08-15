@@ -12,40 +12,56 @@ if(version_compare(phpversion(), '8.0', '<'))
 
 ini_set('display_errors', 1);
 
-$mvIncludePath = preg_replace('/config\/?$/', '',  dirname(__FILE__));
-$mvIncludePath = str_replace('\\', '/', $mvIncludePath);
+if(is_dir(__DIR__.'/../../../../vendor'))
+{
+	$mvIncludePath = realpath(__DIR__.'/../../../..').DIRECTORY_SEPARATOR;
+	$mvCorePath = realpath(__DIR__.'/../core').DIRECTORY_SEPARATOR;	
+}
+else
+{
+	$mvIncludePath = preg_replace('/config\/?$/', '',  dirname(__FILE__));
+	$mvIncludePath = $mvCorePath = str_replace('\\', '/', $mvIncludePath);
+}
+
+// exit(__DIR__);
+//exit($mvIncludePath);
+echo __DIR__.'<br>';
+echo $mvIncludePath.'<br>';
+exit($_SERVER['DOCUMENT_ROOT']);
+//$mvIncludePath = str_replace('\\', '/', $mvIncludePath);
+//echo $mvIncludePath;
 
 require_once $mvIncludePath.'config/setup.php';
-require_once $mvIncludePath.'core/datatypes/base.type.php';
-require_once $mvIncludePath.'core/datatypes/bool.type.php';
-require_once $mvIncludePath.'core/datatypes/char.type.php';
-require_once $mvIncludePath.'core/datatypes/url.type.php';
-require_once $mvIncludePath.'core/datatypes/enum.type.php';
-require_once $mvIncludePath.'core/datatypes/file.type.php';
-require_once $mvIncludePath.'core/datatypes/image.type.php';
-require_once $mvIncludePath.'core/datatypes/int.type.php';
-require_once $mvIncludePath.'core/datatypes/order.type.php';
-require_once $mvIncludePath.'core/datatypes/text.type.php';
-require_once $mvIncludePath.'core/registry.class.php';
-require_once $mvIncludePath.'core/i18n.class.php';
-require_once $mvIncludePath.'core/service.class.php';
-require_once $mvIncludePath.'core/cache.class.php';
-require_once $mvIncludePath.'core/debug.class.php';
-require_once $mvIncludePath.'core/database.class.php';
-require_once $mvIncludePath.'core/cache.class.php';
-require_once $mvIncludePath.'core/cache_media.class.php';
-require_once $mvIncludePath.'core/model_initial.class.php';
-require_once $mvIncludePath.'core/model_base.class.php';
-require_once $mvIncludePath.'core/model.class.php';
-require_once $mvIncludePath.'core/model_simple.class.php';
-require_once $mvIncludePath.'core/plugin.class.php';
-require_once $mvIncludePath.'core/log.class.php';
-require_once $mvIncludePath.'core/router.class.php';
-require_once $mvIncludePath.'core/builder.class.php';
-require_once $mvIncludePath.'core/imager.class.php';
-require_once $mvIncludePath.'core/content.class.php';
-require_once $mvIncludePath.'core/record.class.php';
-require_once $mvIncludePath.'core/paginator.class.php';
+require_once $mvCorePath.'datatypes/base.type.php';
+require_once $mvCorePath.'datatypes/bool.type.php';
+require_once $mvCorePath.'datatypes/char.type.php';
+require_once $mvCorePath.'datatypes/url.type.php';
+require_once $mvCorePath.'datatypes/enum.type.php';
+require_once $mvCorePath.'datatypes/file.type.php';
+require_once $mvCorePath.'datatypes/image.type.php';
+require_once $mvCorePath.'datatypes/int.type.php';
+require_once $mvCorePath.'datatypes/order.type.php';
+require_once $mvCorePath.'datatypes/text.type.php';
+require_once $mvCorePath.'registry.class.php';
+require_once $mvCorePath.'i18n.class.php';
+require_once $mvCorePath.'service.class.php';
+require_once $mvCorePath.'cache.class.php';
+require_once $mvCorePath.'debug.class.php';
+require_once $mvCorePath.'database.class.php';
+require_once $mvCorePath.'cache.class.php';
+require_once $mvCorePath.'cache_media.class.php';
+require_once $mvCorePath.'model_initial.class.php';
+require_once $mvCorePath.'model_base.class.php';
+require_once $mvCorePath.'model.class.php';
+require_once $mvCorePath.'model_simple.class.php';
+require_once $mvCorePath.'plugin.class.php';
+require_once $mvCorePath.'log.class.php';
+require_once $mvCorePath.'router.class.php';
+require_once $mvCorePath.'builder.class.php';
+require_once $mvCorePath.'imager.class.php';
+require_once $mvCorePath.'content.class.php';
+require_once $mvCorePath.'record.class.php';
+require_once $mvCorePath.'paginator.class.php';
 
 $mvConfigFiles = [
 	$mvIncludePath.'config/setup.php',
@@ -84,13 +100,14 @@ if(isset($mvSetupSettings['Build']))
 //Creating settings list if cache has not being found
 if(!isset($mvSetupSettings['LoadedFromCache']))
 {
-	require_once 'settings.php';
-	require_once 'models.php';
-	require_once 'plugins.php';
+	require_once $mvIncludePath.'config/settings.php';
+	require_once $mvIncludePath.'config/models.php';
+	require_once $mvIncludePath.'config/plugins.php';
 	
 	$mvSetupSettings['Models'] = $mvActiveModels;
 	$mvSetupSettings['Plugins'] = $mvActivePlugins;
 	$mvSetupSettings['IncludePath'] = $mvIncludePath;
+	$mvSetupSettings['CorePath'] = $mvCorePath;
 }
 
 //Runs main settings storage object
@@ -139,7 +156,7 @@ spl_autoload_register(function($class_name)
 		if(array_key_exists($class_name, $mvAutoloadData['datatypes_lower']))
 			$class_name = $mvAutoloadData['datatypes_lower'][$class_name];
 		
-		require_once $mvSetupSettings['IncludePath'].'core/datatypes/'.$class_name.'.type.php';
+		require_once $mvSetupSettings['IncludePath'].'datatypes/'.$class_name.'.type.php';
 	}
 	else if(in_array($class_lower, $mvAutoloadData['models_lower']))
 		require_once $mvSetupSettings['IncludePath'].'models/'.$class_lower.'.model.php';
@@ -149,8 +166,8 @@ spl_autoload_register(function($class_name)
 		require_once $mvSetupSettings['IncludePath'].'plugins/'.$class_lower.'.plugin.php';
 	else if(array_key_exists($class_lower, $mvAutoloadData['plugins_lower']))
 		require_once $mvSetupSettings['IncludePath'].'plugins/'.$mvAutoloadData['plugins_lower'][$class_lower].'.plugin.php';
-	else if(is_file($mvSetupSettings['IncludePath'].'core/'.$class_lower.'.class.php'))
-		require_once $mvSetupSettings['IncludePath'].'core/'.$class_lower.'.class.php';
+	else if(is_file($mvSetupSettings['IncludePath'].''.$class_lower.'.class.php'))
+		require_once $mvSetupSettings['IncludePath'].''.$class_lower.'.class.php';
 });
 
 //Sets up current localization region of the application

@@ -74,8 +74,8 @@ class Database
 			}
 			 
 			self :: $engine = $db_engine;
-			$base_db_adapter = self :: $registry -> getSetting("IncludePath")."core/db/base.adapter.php";
-			$db_adapter_file = self :: $registry -> getSetting("IncludePath")."core/db/".$db_engine.".adapter.php";
+			$base_db_adapter = self :: $registry -> getSetting("CorePath")."db/base.adapter.php";
+			$db_adapter_file = self :: $registry -> getSetting("CorePath")."db/".$db_engine.".adapter.php";
 			
 			if(file_exists($db_adapter_file))
 			{
