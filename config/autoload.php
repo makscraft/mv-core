@@ -12,24 +12,18 @@ if(version_compare(phpversion(), '8.0', '<'))
 
 ini_set('display_errors', 1);
 
-if(is_dir(__DIR__.'/../../../../vendor'))
+if(is_file(__DIR__.'/../../../../vendor/autoload.php'))
 {
 	$mvIncludePath = realpath(__DIR__.'/../../../..').DIRECTORY_SEPARATOR;
-	$mvCorePath = realpath(__DIR__.'/../core').DIRECTORY_SEPARATOR;	
+	$mvCorePath = realpath(__DIR__.'/../core').DIRECTORY_SEPARATOR;
 }
 else
 {
 	$mvIncludePath = preg_replace('/config\/?$/', '',  dirname(__FILE__));
-	$mvIncludePath = $mvCorePath = str_replace('\\', '/', $mvIncludePath);
+	$mvCorePath = str_replace('\\', '/', $mvIncludePath);
 }
 
-// exit(__DIR__);
-//exit($mvIncludePath);
-echo __DIR__.'<br>';
-echo $mvIncludePath.'<br>';
-exit($_SERVER['DOCUMENT_ROOT']);
-//$mvIncludePath = str_replace('\\', '/', $mvIncludePath);
-//echo $mvIncludePath;
+$mvIncludePath = str_replace('\\', '/', $mvIncludePath);
 
 require_once $mvIncludePath.'config/setup.php';
 require_once $mvCorePath.'datatypes/base.type.php';
@@ -156,7 +150,7 @@ spl_autoload_register(function($class_name)
 		if(array_key_exists($class_name, $mvAutoloadData['datatypes_lower']))
 			$class_name = $mvAutoloadData['datatypes_lower'][$class_name];
 		
-		require_once $mvSetupSettings['IncludePath'].'datatypes/'.$class_name.'.type.php';
+		require_once $mvSetupSettings['CorePath'].'datatypes/'.$class_name.'.type.php';
 	}
 	else if(in_array($class_lower, $mvAutoloadData['models_lower']))
 		require_once $mvSetupSettings['IncludePath'].'models/'.$class_lower.'.model.php';
@@ -166,8 +160,8 @@ spl_autoload_register(function($class_name)
 		require_once $mvSetupSettings['IncludePath'].'plugins/'.$class_lower.'.plugin.php';
 	else if(array_key_exists($class_lower, $mvAutoloadData['plugins_lower']))
 		require_once $mvSetupSettings['IncludePath'].'plugins/'.$mvAutoloadData['plugins_lower'][$class_lower].'.plugin.php';
-	else if(is_file($mvSetupSettings['IncludePath'].''.$class_lower.'.class.php'))
-		require_once $mvSetupSettings['IncludePath'].''.$class_lower.'.class.php';
+	else if(is_file($mvSetupSettings['CorePath'].''.$class_lower.'.class.php'))
+		require_once $mvSetupSettings['CorePath'].''.$class_lower.'.class.php';
 });
 
 //Sets up current localization region of the application

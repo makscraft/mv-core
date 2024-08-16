@@ -20,7 +20,7 @@ class Service
 	 */
 	static public function removeFileRoot(string $path = '')
 	{
-		$root = str_replace(['\\', '/'], ['\\\\', '\/'], Registry :: get("IncludePath"));
+		$root = str_replace(['\\', '/'], '\/', Registry :: get('IncludePath'));
 		return preg_replace("/^".$root."/", '', $path);
 	}
 	
@@ -31,12 +31,7 @@ class Service
 	 */
 	static public function removeDocumentRoot(string $path = '')
 	{
-		$root = str_replace(['\\', '/'], ['\\\\', '\/'], Registry :: get("DocumentRoot"));
-		echo Registry :: get("IncludePath").'<br>';
-		echo Registry :: get("DocumentRoot").'<br>';
-		echo $_SERVER['DOCUMENT_ROOT'].'<br>';
-		echo $path.'<br>';
-		echo $root.'<br>';
+		$root = str_replace(['\\', '/'], '\/', Registry :: get('DocumentRoot'));
 		return preg_replace("/^".$root."/", '', $path);
 	}
 	
@@ -46,7 +41,7 @@ class Service
 	 */
 	static public function addRootPath(string $path = '')
 	{
-		return Registry :: get("MainPath").self :: removeFileRoot($path);
+		return Registry :: get('MainPath').self :: removeFileRoot($path);
 	}
 
 	/**
@@ -55,8 +50,8 @@ class Service
 	 */
 	static public function removeRootPath(string $path = '')
 	{
-		$root = str_replace("/", "\/", Registry :: get("MainPath"));
-		return preg_replace("/^".$root."/", "", $path);
+		$root = str_replace('/', '\/', Registry :: get('MainPath'));
+		return preg_replace("/^".$root."/", '', $path);
 	}
 	
 	/**

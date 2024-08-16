@@ -18,10 +18,7 @@
         "classmap": [
             "core/"
         ]
-    },
-    "scripts": {
-        "post-autoload-dump": "\\Installation::postAutoloadDump"
-    },
+    }
     "require": {
         "php": ">=8.0"
     }

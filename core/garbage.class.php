@@ -6,20 +6,20 @@
  */
 class Garbage extends Model
 {
-	protected $name = "{garbage}";
+	protected $name = '{garbage}';
 	
-	protected $model_elements = array(
-		array("{module}", "enum", "module"),
-		array("{row_id}", "int", "row_id"),
-		array("{name}", "char", "name"),
-		array("{content}", "text", "content"),
-		array("{date}", "date_time", "date")
-	);
-			
-	protected $model_display_params = array(		
-		"hidden_fields" => array('row_id','content'),
-		"create_actions" => false
-	);
+	protected $model_elements = [
+		['{module}', 'enum', 'module'],
+		['{row_id}', 'int', 'row_id'],
+		['{name}', 'char', 'name'],
+		['{content}', 'text', 'content'],
+		['{date}', 'date_time', 'date']
+	];
+	
+	protected $model_display_params = [
+		'hidden_fields' => ['row_id','content'],
+		'create_actions' => false
+	];
 	
 	public function __construct()
 	{

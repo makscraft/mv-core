@@ -5,34 +5,36 @@
  */ 
 class Users extends Model
 {
-	protected $name = "{users}";
+	protected $name = '{users}';
 
+	/**
+	 * List of application's models to manage user's rights.
+	 */
 	private $models_list = [];
 	
-	protected $model_elements = array(
-		array("{active}", "bool", "active", array("on_create" => true)),
-		array("{name-person}", "char", "name", array("required" => true, "unique" => true)),
-		array("{email}", "email", "email", array("required" => true, "unique" => true)),
-		array("{login}", "char", "login", array("required" => true, "unique" => true)),
-		array("{password}", "password", "password", array("required" => true,
-														  "letters_required" => true, 
-														  "digits_required" => true)),
+	protected $model_elements = [
+		['{active}', 'bool', 'active', ['on_create' => true]],
+		['{name-person}', 'char', 'name', ['required' => true, 'unique' => true]],
+		['{email}', 'email', 'email', ['required' => true, 'unique' => true]],
+		['{login}', 'char', 'login', ['required' => true, 'unique' => true]],
+		['{password}', 'password', 'password', ['required' => true,
+												'letters_required' => true, 
+												'digits_required' => true]],
 				
-		array("{password-repeat}", "password", "password_repeat", array("required" => true, 
-														  				"letters_required" => true, 
-														 				"digits_required" => true)),
+		['{password-repeat}', 'password', 'password_repeat', ['required' => true, 
+															  'letters_required' => true, 
+														 	  'digits_required' => true]],
 			
-		array("{date-registered}", "date_time", "date_registered"),
-		array("{date-last-visit}", "date_time", "date_last_visit"),
-		array("{operations}", "many_to_one", "operations", array("related_model" => "Log"))
-	);
+		['{date-registered}', 'date_time', 'date_registered'],
+		['{date-last-visit}', 'date_time', 'date_last_visit'],
+		['{operations}', 'many_to_one', 'operations', ['related_model' => 'Log']]
+	];
 			
-	protected $model_display_params = array(		
-		
-		"not_editable_fields" => array('date_registered', 'date_last_visit')
-	);		
+	protected $model_display_params = [		
+		'not_editable_fields' => ['date_registered', 'date_last_visit']
+	];
 			
-	private $rights_table = "users_rights";
+	private $rights_table = 'users_rights';
 	
 	private $users_rights = false;
 			

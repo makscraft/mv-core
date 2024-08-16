@@ -94,8 +94,8 @@ class Filemanager
 		$this -> total = $this -> countFiles($this -> path); //Total number of files in current dir
 		$limit = isset($_SESSION['mv']['settings']['pager-limit']) ? intval($_SESSION['mv']['settings']['pager-limit']) : 10;
 		
-		$this -> imager = new Imager();
-		$this -> pager = new Paginator($this -> total, $limit); //To split the whole list into pages
+		$this -> imager = new Imager(); //To resize images
+		$this -> pager = new Paginator($this -> total, $limit); //To split the list into pages
 	}
 
 	public function getPath() { return $this -> path; }

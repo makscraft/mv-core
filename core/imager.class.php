@@ -163,11 +163,12 @@ class Imager
       }
    }
    
+   /**
+    * Main function which executes the resize process with image.
+    * It creates new image or copies old one if it is smaller than we need.
+    */
    public function compress($location, $prefix, $width, $height)
    {
-      //Main function which executes the resize process with image
-      //It creates new image or copies old one if it is smaller than we need
-
       if(!$location || !is_file($location))
          return '';
 
@@ -198,6 +199,7 @@ class Imager
       else if($this -> type) //If our image is smaller than the potential frame we just copy it whitout resizing
       {
          @copy($this -> image, $new_file);
+         
          return Service :: removeDocumentRoot($new_file);
       }
       else
@@ -246,7 +248,7 @@ class Imager
    {
       if(!$location || !is_file($location))
          return '';
-
+      
       if(Service :: getExtension($location) == "svg" && mime_content_type($location) == "image/svg+xml")
          return Service :: removeDocumentRoot($location); //We don't resize svg images
             
@@ -303,7 +305,7 @@ class Imager
       
       imagedestroy($pattern); //Delete used patterns
       imagedestroy($croped_image);
-	  
+	   
       return Service :: removeDocumentRoot($new_file);
    }
    

@@ -88,16 +88,16 @@ class Builder
       	$this -> router = new Router(); //Object to analyze the requested page
       	
       	if(count($this -> router -> getUrlParts()) == 1) //Redirect to index page in some cases
-      		if($this -> router -> getUrlPart(0) == "index" || $this -> router -> getUrlPart(0) == "index.php")
+      		if($this -> router -> getUrlPart(0) == 'index' || $this -> router -> getUrlPart(0) == 'index.php')
       		{
-      			header($_SERVER["SERVER_PROTOCOL"]." 301 Moved Permanently");
-      			header("Location: ".$this -> registry -> get('MainPath'));
+      			header($_SERVER['SERVER_PROTOCOL'].' 301 Moved Permanently');
+      			header('Location: '.$this -> registry -> get('MainPath'));
       			exit(); 
       		}
       
 		//Popular pathes setting
       	$this -> include_path = $this -> registry -> get('IncludePath');
-      	$this -> views_path = $this -> include_path."views/";      	
+      	$this -> views_path = $this -> include_path.'views/';      	
       	$this -> root_path = $this -> registry -> get('MainPath');
       	$this -> media_path = $this -> root_path.'media/';
       	$this -> domain = $this -> registry -> get('DomainName');

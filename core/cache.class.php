@@ -302,7 +302,7 @@ class Cache
 	static public function saveConfigCacheIntoFile(array $data, string $file_key)
 	{
 		$cache_folder = Registry:: get('IncludePath').'userfiles/cache/';
-
+		
 		if(!is_dir($cache_folder))
 			mkdir($cache_folder);
 
