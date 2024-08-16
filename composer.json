@@ -19,9 +19,6 @@
             "core/"
         ]
     },
-    "scripts": {
-        "post-update-cmd": "\\Installation::postUpdate"
-    },
     "require": {
         "php": ">=8.0"
     }

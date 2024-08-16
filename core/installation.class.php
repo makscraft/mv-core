@@ -172,7 +172,7 @@ class Installation
      */
     static public function postUpdate(Event $event)
     {
-        self :: displayDoneMessage(__FUNCTION__);
+        self :: moveAdminPanelDirectory();
     }
 
     /**
@@ -289,7 +289,7 @@ class Installation
     /**
      * Creates a copy of admin panel at the root directory of the application.
      * Removes old directory.
-     * Check actual admin directory name in config/setup.php
+     * Checks actual admin directory name in config/setup.php
      */
     static public function moveAdminPanelDirectory()
     {
@@ -298,6 +298,9 @@ class Installation
         
         $from = realpath(__DIR__.'/../adminpanel');
         $to = Registry :: get('IncludePath').Registry :: get('AdminFolder');
+
+        if(!is_dir($from))
+            return;
 
         self :: removeDirectory($to);
         self :: copyDirectory($from, $to);
