@@ -102,7 +102,10 @@ class Installation
         file_put_contents($env_file, $env);
     }
 
-    static public function removeDirectory($directory)
+    /**
+     * Removes directory recursively.
+     */
+    static public function removeDirectory(string $directory)
     {
         if($directory == '/' || strpos($directory, '..') !== false)
             return;
@@ -124,7 +127,35 @@ class Installation
           
             rmdir($directory);
         } 
-      }
+    }
+
+    /**
+     * Copies es directory recursively.
+     */
+    static public function copyDirectory(string $from, string $to)
+    {
+        if($from == '/' || strpos($from, '..') !== false || strpos($to, '..') !== false)
+            return;
+
+        if(!is_dir($to))
+            @mkdir($to);
+
+        $objects = scandir($from);
+
+        foreach($objects as $object)
+        {
+            if($object != '.' && $object != '..')
+            {
+                $one_from = $from.DIRECTORY_SEPARATOR.$object;
+                $one_to = $to.DIRECTORY_SEPARATOR.$object;
+
+                if(is_dir($one_from))
+                    self :: copyDirectory($one_from, $one_to);
+                else
+                    copy($one_from, $one_to);
+            }
+        }
+    }    
 
     //Installation process
 
@@ -133,7 +164,15 @@ class Installation
      */
     static public function postAutoloadDump(Event $event)
     {
+        
+    }
 
+    /**
+     * Post "composer install / update" event.
+     */
+    static public function postUpdate(Event $event)
+    {
+        self :: displayDoneMessage(__FUNCTION__);
     }
 
     /**
@@ -147,6 +186,7 @@ class Installation
 
         self :: changeAutoloaderString('/index.php');
         self :: displaySuccessMessage('index.php file has been configurated.');
+        self :: moveAdminPanelDirectory();
 
         if(true === self :: configureDatabase())
             self :: displayFinalInstallationMessage();
@@ -158,6 +198,10 @@ class Installation
     static public function changeAutoloaderString(string $file)
     {
         $file = realpath(self :: $instance['directory'].$file);
+
+        if(!file_exists($file))
+            return;
+
         $code = file_get_contents($file);
         $code = str_replace('config/autoload.php', 'vendor/autoload.php', $code);
 
@@ -242,6 +286,27 @@ class Installation
         self :: displaySuccessMessage('Security token has been generated.');   
     }
 
+    /**
+     * Creates a copy of admin panel at the root directory of the application.
+     * Removes old directory.
+     * Check actual admin directory name in config/setup.php
+     */
+    static public function moveAdminPanelDirectory()
+    {
+        self :: instance();
+        self :: boot();
+        
+        $from = realpath(__DIR__.'/../adminpanel');
+        $to = Registry :: get('IncludePath').Registry :: get('AdminFolder');
+
+        self :: removeDirectory($to);
+        self :: copyDirectory($from, $to);
+        self :: displaySuccessMessage('Admin panel folder has been moved.');
+    }
+
+    /**
+     * Final message after successfull installation.
+     */
     static public function displayFinalInstallationMessage()
     {
         Installation :: instance(['directory' => __DIR__.'/..']);
