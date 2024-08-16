@@ -22,7 +22,7 @@ class Installation
 
         self :: $instance = [
             'directory' => realpath($params['directory'] ?? __DIR__.'/../../../..'),
-            'package' => $params['package'] ?? 'mv'
+            'package' => $params['package'] ?? ''
         ];
     }
 
@@ -428,7 +428,7 @@ class Installation
 
         self :: displayDoneMessage('MySQL database has been successfully configurated.');
 
-        if(self :: $instance['package'] === 'mv')
+        if(self :: $instance['package'] === '')
             self :: displayFinalInstallationMessage();
     }
 
@@ -550,7 +550,7 @@ class Installation
      */
     static public function commandConfigureDatabase(Event $event)
     {
-        self :: instance(['package' => 'mv']);
+        self :: instance();
         $env = parse_ini_file(self :: $instance['directory'].'/.env');
 
         if($env['DATABASE_ENGINE'] === 'mysql')
