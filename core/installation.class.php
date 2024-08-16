@@ -38,6 +38,7 @@ class Installation
         include self :: $instance['directory'].'/config/models.php';
         include self :: $instance['directory'].'/config/plugins.php';
 
+        $mvSetupSettings['BootFromCLI'] = true;
         $mvSetupSettings['IncludePath'] = self :: $instance['directory'].'/';
         $mvSetupSettings['CorePath'] = __DIR__.DIRECTORY_SEPARATOR;
         $mvSetupSettings['Models'] = $mvActiveModels;

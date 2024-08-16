@@ -198,6 +198,12 @@ class Debug
 		if(ob_get_length()) //In case of cache enabled
 			ob_end_clean();
 
+		if(Registry :: get('BootFromCLI'))
+		{
+			Installation :: displayErrorMessage($error);
+			exit();
+		}
+
 		if(Registry :: get('Mode') !== 'production')
 		{
 			$debug_error = $error;
