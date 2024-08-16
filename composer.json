@@ -18,7 +18,7 @@
         "classmap": [
             "core/"
         ]
-    }
+    },
     "require": {
         "php": ">=8.0"
     }
