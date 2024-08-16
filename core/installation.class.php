@@ -21,8 +21,8 @@ class Installation
             return;
 
         self :: $instance = [
-            'directory' => realpath($params['directory'] ?? __DIR__.'/..'),
-            'package' => $params['package'] ?? ''
+            'directory' => realpath($params['directory'] ?? __DIR__.'/../../../..'),
+            'package' => $params['package'] ?? 'mv'
         ];
     }
 
@@ -38,7 +38,8 @@ class Installation
         include self :: $instance['directory'].'/config/models.php';
         include self :: $instance['directory'].'/config/plugins.php';
 
-        $mvSetupSettings['IncludePath'] = realpath(self :: $instance['directory']).'/';
+        $mvSetupSettings['IncludePath'] = self :: $instance['directory'].'/';
+        $mvSetupSettings['CorePath'] = __DIR__.DIRECTORY_SEPARATOR;
         $mvSetupSettings['Models'] = $mvActiveModels;
         $mvSetupSettings['Plugins'] = $mvActivePlugins;
 
@@ -132,7 +133,7 @@ class Installation
      */
     static public function postAutoloadDump(Event $event)
     {
-        
+
     }
 
     /**
@@ -534,7 +535,7 @@ class Installation
         if($answer == '' || $answer == 'yes' || $answer == 'y')
         {
             $migrations -> runMigrations('all');
-            self :: displayDoneMessage('Migrations have been executed. Your database is up to date.');
+            self :: displayDoneMessage('Migrations have been executed. Your database now is up to date.');
         }
     }
 }
