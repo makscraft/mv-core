@@ -589,7 +589,7 @@ class Filemanager
 			if(file_exists($this -> path.$new_name))
 				return "error=file-exists";
 			else if(!$this -> checkFileExtension($new_name))
-				return "error=bad-extetsion";
+				return "error=bad-extension";
 			else if(preg_match("/[^\w-\.]/", $new_name))
 				return "error=bad-file-name";
 				

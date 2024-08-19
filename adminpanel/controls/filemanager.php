@@ -97,7 +97,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	            	
 	            	$error_keys = array('folder-not-created','file-exists','folder-exists','upload-file-error',
 			            				'wrong-filemanager-type','not-deleted','bad-folder-name','bad-file-name',
-			            				'error-failed','bad-extetsion','error-wrong-token');
+			            				'error-failed','bad-extension','error-wrong-token');
 	            	
 	            	if(isset($_SESSION["message"]['done']) && in_array($_SESSION["message"]['done'], $done_keys))
           				echo "<div class=\"form-no-errors\"><p>".I18n :: locale($_SESSION["message"]['done'])."</p></div>\n";

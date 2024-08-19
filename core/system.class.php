@@ -252,7 +252,7 @@ class System
 	
 	public function displayInternalError(string $error_key = '')
 	{
-		$error_key = $error_key === '' ? 'error-occured' : $error_key;
+		$error_key = $error_key === '' ? 'error-occurred' : $error_key;
 		$this -> error = I18n :: locale($error_key);
 		
         include $this -> registry -> getSetting("IncludeAdminPath")."controls/internal-error.php";

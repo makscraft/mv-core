@@ -72,7 +72,7 @@ else if(isset($upload_result))
 {
 	if(count($upload_result["created_ids"]) || count($upload_result["updated_ids"])) //Update was done
 	{
-		$result["message"] = I18n :: locale('update-was-sucessfull');
+		$result["message"] = I18n :: locale('update-was-successful');
 		
 		if(count($upload_result["created_ids"]))
 			$result["message"] .= "<br />".I18n :: locale('created-records').": ".count($upload_result["created_ids"]);

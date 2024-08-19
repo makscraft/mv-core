@@ -486,7 +486,7 @@ class I18n
 		$url = preg_replace("/-+/", "-", $url);
 		$url = preg_replace("/^-?(.*[^-]+)-?$/", "$1", $url);
 			 
-		return ($url == "-") ? "" : $url;		
+		return ($url == '-') ? '' : $url;		
 	}
 	
 	/**

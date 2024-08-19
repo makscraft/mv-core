@@ -75,7 +75,7 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
                      <input type="hidden" name="admin-login-csrf-token" value="<? echo Login :: getTokenCSRF(); ?>" />
                   </div>
                   <div class="remind">
-                     <a href="<? echo $registry -> getSetting('AdminPanelPath'); ?>login/remind.php" class="fogot-password"><? echo I18n :: locale('fogot-password'); ?></a>
+                     <a href="<? echo $registry -> getSetting('AdminPanelPath'); ?>login/remind.php" class="forgot-password"><? echo I18n :: locale('forgot-password'); ?></a>
                   </div>
                   <div class="line">
                      <div class="name"><? echo I18n :: locale('language'); ?></div>

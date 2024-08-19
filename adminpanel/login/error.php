@@ -9,7 +9,7 @@ $i18n -> setRegion($region);
 if(isset($_GET['reason']) && in_array($_GET['reason'], array("ie", "js")))
 	$reason = "error-".$_GET['reason'];
 else
-	$reason = "error-occured";
+	$reason = "error-occurred";
 
 include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
 ?>
