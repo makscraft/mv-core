@@ -19,8 +19,8 @@ if(is_file(__DIR__.'/../../../../vendor/autoload.php'))
 }
 else
 {
-	$mvIncludePath = preg_replace('/config\/?$/', '',  dirname(__FILE__));
-	$mvCorePath = str_replace('\\', '/', $mvIncludePath);
+	$mvIncludePath = str_replace('\\', '/', realpath(__DIR__.'/..')).'/';
+	$mvCorePath = $mvIncludePath.'core/';
 }
 
 $mvIncludePath = str_replace('\\', '/', $mvIncludePath);
