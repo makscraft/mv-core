@@ -16,14 +16,14 @@ if(is_file(__DIR__.'/../../../../vendor/autoload.php'))
 {
 	$mvIncludePath = realpath(__DIR__.'/../../../..').DIRECTORY_SEPARATOR;
 	$mvCorePath = realpath(__DIR__.'/../core').DIRECTORY_SEPARATOR;
+
+	$mvIncludePath = str_replace('\\', '/', $mvIncludePath);
 }
 else
 {
 	$mvIncludePath = str_replace('\\', '/', realpath(__DIR__.'/..')).'/';
 	$mvCorePath = $mvIncludePath.'core/';
 }
-
-$mvIncludePath = str_replace('\\', '/', $mvIncludePath);
 
 require_once $mvIncludePath.'config/setup.php';
 require_once $mvCorePath.'datatypes/base.type.php';
