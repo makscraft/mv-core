@@ -502,7 +502,7 @@ class I18n
 		if(!is_array($regions) || !count($regions))
 		{
 			$region = $registry -> getSetting('Region');
-			$regions = ($region == "en" && $registry -> getSetting('AmericanFix')) ? ['am'] : [$region];
+			$regions = ($region == 'en' && $registry -> getSetting('AmericanFix')) ? ['us'] : [$region];
 		}
 		
 		foreach($regions as $region)
@@ -582,7 +582,7 @@ class I18n
 		{
 			$region = Registry :: get('Region');
 
-			return ($region == 'en' && Registry :: get('AmericanFix')) ? 'am' : $region;
+			return ($region == 'en' && Registry :: get('AmericanFix')) ? 'us' : $region;
 		}
 	}
 	
