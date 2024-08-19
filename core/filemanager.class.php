@@ -731,10 +731,10 @@ class Filemanager
 		if($dir)
 			while(false !== ($file = readdir($dir)))
 			{
-				if($file == "." || $file == "..")
+				if($file == '.' || $file == '..' || preg_match('/^\./', $file))
 					continue;
 					
-				if(filetype($path.$file) == "file" && (time() - filemtime($path.$file)) >= 10800)
+				if(filetype($path.$file) == 'file' && (time() - filemtime($path.$file)) >= 10800)
 					@unlink($path.$file);
 			}
 	}

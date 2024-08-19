@@ -607,4 +607,28 @@ class Installation
             self :: displayDoneMessage('Migrations have been executed. Your database now is up to date.');
         }
     }
+
+    /**
+     * Cleans cache folder and deletes old files from userfiles/ directory. 
+     */
+    static public function commandCleanup()
+    {
+        self :: instance();
+        self :: boot();
+        
+        $userfiles = Registry :: get('FilesPath');
+        self :: removeDirectory($userfiles.'cache');
+        mkdir($userfiles.'cache');
+        self :: displaySuccessMessage('Cache directory has been cleared.');
+
+        $folders = ['tmp/', 'tmp/admin/', 'tmp/redactor/', 'tmp/filemanager/'];
+
+        foreach($folders as $folder)
+            Filemanager :: deleteOldFiles($userfiles.$folder);
+
+        self :: displaySuccessMessage('Temporary files have been removed.');
+
+        Filemanager :: makeModelsFilesCleanUp();
+        self :: displaySuccessMessage('Models files have been optimized.');
+    }
 }

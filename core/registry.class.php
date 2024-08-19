@@ -231,7 +231,7 @@ class Registry
 	 */
 	static public function getDatabaseSetting(string $key)
 	{
-		$db = DataBase :: instance();
+		$db = Database :: instance();
 
 		return $db -> getCell("SELECT `value` FROM `settings` 
 							   WHERE `key`=".$db -> secure($key));
@@ -243,7 +243,7 @@ class Registry
 	 */	
 	static public function setDatabaseSetting(string $key, mixed $value)
 	{
-		$db = DataBase :: instance();
+		$db = Database :: instance();
 		
 		if(!$db -> getCount("settings", "`key`=".$db -> secure($key)))
 			return $db -> query("INSERT INTO `settings`(`key`,`value`) 
