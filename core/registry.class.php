@@ -151,7 +151,7 @@ class Registry
 			$data['APP_DOMAIN'] = preg_replace('/\/$/', '', $data['APP_DOMAIN']);
 
 		$settings = ['Mode' => 'APP_ENV', 'TimeZone' => 'APP_TIMEZONE', 'DomainName' => 'APP_DOMAIN', 
-					 'MainPath' => 'APP_FOLDER', 'SecretCode' => 'APP_TOKEN',
+					 'MainPath' => 'APP_FOLDER', 'SecretCode' => 'APP_TOKEN', 'Region' => 'APP_REGION',
 					 'DbEngine' => 'DATABASE_ENGINE', 'DbHost' => 'DATABASE_HOST', 'DbUser' => 'DATABASE_USER', 
 					 'DbPassword' => 'DATABASE_PASSWORD', 'DbName' => 'DATABASE_NAME', 
 					 'EmailMode' => 'EMAIL_SENDER', 'SMTPHost' => 'EMAIL_HOST', 'SMTPPort' => 'EMAIL_PORT', 

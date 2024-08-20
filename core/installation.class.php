@@ -186,7 +186,7 @@ class Installation
         self :: generateSecurityToken();
 
         self :: changeAutoloaderString('/index.php');
-        self :: displaySuccessMessage('index.php file has been configurated.');
+        self :: displaySuccessMessage(' - index.php file has been configurated.');
         self :: moveAdminPanelDirectory();
 
         if(true === self :: configureDatabase())
@@ -270,11 +270,11 @@ class Installation
             $htaccess = preg_replace('/RewriteBase\s+\/[\/\w]*/', 'RewriteBase '.$directory, $htaccess);
             file_put_contents($htaccess_file, $htaccess);
 
-            self :: displaySuccessMessage('.htaccess file has been configurated.');
+            self :: displaySuccessMessage(' - .htaccess file has been configurated.');
         }
 
         self :: setEnvFileParameter('APP_FOLDER', $directory);
-        self :: displaySuccessMessage('.env file has been configurated.');   
+        self :: displaySuccessMessage(' - .env file has been configurated.');
     }
 
     /**
@@ -284,7 +284,7 @@ class Installation
     {
         $value = Service :: strongRandomString(40);
         self :: setEnvFileParameter('APP_TOKEN', $value);
-        self :: displaySuccessMessage('Security token has been generated.');   
+        self :: displaySuccessMessage(' - Security token has been generated.');   
     }
 
     /**
@@ -305,7 +305,7 @@ class Installation
 
         self :: removeDirectory($to);
         self :: copyDirectory($from, $to);
-        self :: displaySuccessMessage('Admin panel folder has been moved.');
+        self :: displaySuccessMessage(' - Admin panel folder has been moved.');
     }
 
     /**
@@ -416,13 +416,13 @@ class Installation
         $tables = $query -> fetchAll(PDO :: FETCH_COLUMN);
     
         if(is_array($tables) && in_array('versions', $tables))
-            self :: displaySuccessMessage('MySQL initial dump has been already imported before.');
+            self :: displaySuccessMessage(' - MySQL initial dump has been already imported before.');
         else
         {        
             $dump_file = self :: $instance['directory'].'/userfiles/database/mysql-dump.sql';
 
             if(true === self :: loadMysqlDump($dump_file, $pdo))
-                self :: displaySuccessMessage('MySQL initial dump has been imported.');
+                self :: displaySuccessMessage(' - MySQL initial dump has been imported.');
         }
 
         self :: setRootUserLogin($pdo);
@@ -493,7 +493,7 @@ class Installation
 
         if($total > 1)
         {
-            self :: displaySuccessMessage('Database has been already configurated.');
+            self :: displaySuccessMessage(' - Database has been already configurated.');
             return;
         }
 
@@ -541,7 +541,7 @@ class Installation
         }
 
         if($query -> execute())
-            self :: displaySuccessMessage('Root user of admin panel has been successfully created.');
+            self :: displaySuccessMessage(' - Root user of admin panel has been successfully created.');
     }
 
     //Commands
@@ -585,6 +585,17 @@ class Installation
         self :: instance();
         self :: boot();
 
+        $tables = Database :: instance() -> getTables();
+
+        if(!in_array('versions', $tables) || !in_array('users', $tables))
+        {
+            $message = "Unable to run migrations. Initial database dump was not imported.".PHP_EOL;
+            $message .= " Probably you need to execute \"composer database\" before.";
+
+            self :: displayErrorMessage($message);
+            return;
+        }
+
         $migrations = new Migrations(true);
         $migrations -> scanModels();
         $available = $migrations -> getMigrationsQuantity();
@@ -619,16 +630,105 @@ class Installation
         $userfiles = Registry :: get('FilesPath');
         self :: removeDirectory($userfiles.'cache');
         mkdir($userfiles.'cache');
-        self :: displaySuccessMessage('Cache directory has been cleared.');
+        self :: displaySuccessMessage(' - Env and media cache have been cleared.');
 
         $folders = ['tmp/', 'tmp/admin/', 'tmp/redactor/', 'tmp/filemanager/'];
 
         foreach($folders as $folder)
             Filemanager :: deleteOldFiles($userfiles.$folder);
 
-        self :: displaySuccessMessage('Temporary files have been removed.');
+        self :: displaySuccessMessage(' - Temporary files have been removed.');
 
+        Filemanager :: setCleanupLimit(1000000);
         Filemanager :: makeModelsFilesCleanUp();
-        self :: displaySuccessMessage('Models files have been optimized.');
+        self :: displaySuccessMessage(' - Models files have been optimized.');
+
+        Cache :: cleanByLifetime();
+        self :: displaySuccessMessage(' - Database cache has been cleared by lifetime.');
+    }
+
+    /**
+     * Sets the application regional localization (env, initial models, views, and database pages)
+     */
+    static public function commandRegion(Event $event)
+    {
+        self :: instance();
+        self :: boot();
+
+        $arguments = $event -> getArguments();
+        $region = strtolower(trim($arguments[0])) ?? '';
+        $supported = Registry :: get('SupportedRegions');
+
+        if($region === '')
+        {
+            $message = 'Region value has not been passed. Pass it like "composer region -- en"';
+            $message .= PHP_EOL.' Supported regions are: '.implode(', ', $supported);
+            self :: displayErrorMessage($message);
+
+            return;
+        }
+
+        if(!in_array($region, Registry :: get('SupportedRegions')))
+        {
+            $message = 'Undefined region passed "'.$region.'"';
+            $message .= PHP_EOL.' Supported regions are: '.implode(', ', $supported);
+            self :: displayErrorMessage($message);
+
+            return;
+        }
+
+        self :: setEnvFileParameter('APP_REGION', $region);
+        self :: displaySuccessMessage(' - .env file has been configurated.');
+
+        $region = $region === 'us' ? 'en' : $region;
+        $package = self :: $instance['directory'].'/customs/regions/'.$region;
+
+        if(is_dir($package))
+        {
+            if(is_dir($package.'/models') && count(scandir($package.'/models')) > 2)
+            {
+                self :: copyDirectory($package.'/models', self :: $instance['directory'].'/models');
+                self :: displaySuccessMessage(' - Models files have been copied.');
+            }
+
+            if(is_dir($package.'/views') && count(scandir($package.'/views')) > 2)
+            {
+                self :: copyDirectory($package.'/views', self :: $instance['directory'].'/views');
+                self :: displaySuccessMessage(' - Views files have been copied.');
+            }
+
+            $file = $package.'/package-'.$region.'.php';
+            $data = is_file($file) ? include $file : null;
+            $imported = 0;
+
+            if(is_array($data))
+            {
+                foreach($data['database'] as $model_name => $items)
+                {
+                    if(Registry :: checkModel($model_name) !== true)
+                        continue;
+
+                    $model = new $model_name;
+                    $model -> clearTable();
+
+                    foreach($items as $item)
+                    {
+                        $record = $model -> getEmptyRecord();
+                        $record -> setValues($item) -> create();
+                        $imported ++;
+                    }                    
+                }
+                
+                if($imported > 0)
+                    self :: displaySuccessMessage(' - Database data has been imported.');
+            }
+        }
+
+        $message = 'Region settings "'.$region.'" have been configurated.';
+
+        if(isset($data['hello']) && $data['hello'] !== '')
+            $message .= PHP_EOL.' '.$data['hello'];
+    
+        self :: displayDoneMessage($message);
     }
 }

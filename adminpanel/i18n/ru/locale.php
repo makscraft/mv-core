@@ -28,6 +28,7 @@ $regionalData = array(
 	'translation' => array(
 		
 		'mv' => 'MV framework',
+		'admin-panel' => 'Административная панель',
 		'welcome' => 'Добро пожаловать в административную панель MV',
 		'index-users-icon' => 'Управление доступом к административной панели',
 		'index-garbage-icon' => 'Восстановление удаленных данных',

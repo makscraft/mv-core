@@ -26,6 +26,7 @@ $regionalData = array(
    'translation' => array(
       
       'mv' => 'MV framework',
+      'admin-panel' => 'Verwaltungs-panel',
       'welcome' => 'Willkommen auf der Verwaltungs-Panel MV',
  	   'index-users-icon' => 'Verwalten des Zugangs zu Administrations-Bereich',
 	   'index-garbage-icon' => 'Wiederherstellen von gelöschten Dateien',

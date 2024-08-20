@@ -66,7 +66,7 @@ class Filemanager
 	private static $cleanup_limit = 10000;
 
 	/**
-	 * Process files of current cleaup run.
+	 * Process files of current cleanup interval.
 	 * @var int
 	 */ 
 	private static $cleanup_count;
@@ -121,6 +121,17 @@ class Filemanager
 		$this -> token = $token;
 		return $this;
 	}
+
+	static public function setCleanupLimit(int $limit)
+	{
+		self :: $cleanup_limit = $limit;
+	}
+
+	static public function getCleanupLimit(): int
+	{
+		return self :: $cleanup_limit;
+	}
+
 	
 	public function openFolder()
 	{
@@ -628,7 +639,7 @@ class Filemanager
 	static public function cleanModelImages($path) 
 	{
 		//Deletes temporary images which are not reladted to any image from main folder
-		//There must be dir with initial images and dirs like tmp, tmpsmall with tumbs
+		//There must be dir with initial images and dirs like tmp, tmpsmall with thumbs
 
 		if(!is_dir($path))
 			return;
@@ -639,7 +650,7 @@ class Filemanager
 		$dir = opendir($path);
 
 		$registry = Registry :: instance();
-		$step = (int) $registry -> getDatabaseSetting("admin_cleanup_step");
+		$step = (int) $registry -> getDatabaseSetting('admin_cleanup_step');
 		$start = $step * self :: $cleanup_limit;
 		$stop = $start + self :: $cleanup_limit;
 		
