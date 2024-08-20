@@ -602,12 +602,12 @@ class Installation
 
         if($available == 0)
         {
-            self :: displaySuccessMessage('No migrations available.');
+            self :: displaySuccessMessage(' - No new migrations available.');
             return;
         }
 
         echo PHP_EOL;
-        self :: displaySuccessMessage('Found available migrations ('.$available.'):');
+        self :: displaySuccessMessage(' - Found available migrations ('.$available.'):');
         echo implode("\n", $migrations -> getMigrationsShortList()).PHP_EOL;
         
         $answer = self :: typePrompt('Do you want to run the migrations now? [yes]');
