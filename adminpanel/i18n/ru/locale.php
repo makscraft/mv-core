@@ -1,5 +1,7 @@
-<? 
-//Russian PHP regional translations and standarts for MV framework
+<?php 
+/**
+ * Russian PHP regional translations and standarts for MV framework
+ */
 $regionalData = array(
 
 	'caption' => 'Русский',
@@ -350,4 +352,3 @@ $regionalData = array(
 		'choose-skin' => "Выберите тему оформления административной панели."
 	)
 );
-?>

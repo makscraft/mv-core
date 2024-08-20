@@ -1,8 +1,8 @@
-<?
+<?php
 include "../../config/autoload.php";
 
+Http :: isAjaxRequest('post', true);
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
 
 $time_limit = $system -> registry -> getSetting("CsvUploadTimeLimit");
 $time_limit = $time_limit ? $time_limit : 300;
@@ -109,6 +109,4 @@ else if(isset($upload_result))
 	}
 }
 
-header('Content-Type: application/json');
-echo json_encode($result);
-?>
+Http :: responseJson($result);

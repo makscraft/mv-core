@@ -1,7 +1,6 @@
 <?php
 /**
  * MV - content management framework for developing internet sites and applications.
- * Released under the terms of BSD License.
  * 
  * http://mv-framework.com
  * http://mv-framework.ru
@@ -15,9 +14,9 @@ ini_set('display_errors', 1);
 if(is_file(__DIR__.'/../../../../vendor/autoload.php'))
 {
 	$mvIncludePath = realpath(__DIR__.'/../../../..').DIRECTORY_SEPARATOR;
-	$mvCorePath = realpath(__DIR__.'/../core').DIRECTORY_SEPARATOR;
-
 	$mvIncludePath = str_replace('\\', '/', $mvIncludePath);
+
+	$mvCorePath = realpath(__DIR__.'/../core').DIRECTORY_SEPARATOR;
 }
 else
 {

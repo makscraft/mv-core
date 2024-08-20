@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../../config/autoload.php";
 $system = new System();
 
@@ -39,25 +39,25 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 ?>
 <div id="columns-wrapper">
     <div id="index-search" class="search-page">
-         <h3 class="column-header"><? echo I18n :: locale('search'); ?>
-            <span class="header-info"><? echo I18n :: locale('results-found'); ?>: <? echo $result["number"]; ?></span>
+         <h3 class="column-header"><?php echo I18n :: locale('search'); ?>
+            <span class="header-info"><?php echo I18n :: locale('results-found'); ?>: <?php echo $result["number"]; ?></span>
          </h3>
          <div id="search-results">
-            <? echo $html; ?>
+            <?php echo $html; ?>
          </div>
          <div id="search-pager">
             <div class="pager-limit">
-	            <span><? echo I18n :: locale('pager-limit'); ?></span>
+	            <span><?php echo I18n :: locale('pager-limit'); ?></span>
 	            <select>
-	            	<? echo $pager -> displayPagerLimits($allowed_limits); ?>
+	            	<?php echo $pager -> displayPagerLimits($allowed_limits); ?>
 	            </select>
-                <input type="hidden" value="controls/search.php?<? echo $url_params; ?>" />
+                <input type="hidden" value="controls/search.php?<?php echo $url_params; ?>" />
 	         </div>
-             <? echo $pager -> displayPagesAdmin(); ?>
+             <?php echo $pager -> displayPagesAdmin(); ?>
              <div class="clear"></div>	         
          </div>    
     </div>            
 </div>
-<?
+<?php
 include $registry -> getSetting('IncludeAdminPath')."includes/footer.php";
 ?>

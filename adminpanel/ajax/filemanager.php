@@ -1,9 +1,9 @@
-<?
+<?php
 include "../../config/autoload.php";
 
+Http :: isAjaxRequest('post', true);
+
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
-	
 $filemanager = new Filemanager();
 $filemanager -> setUser($system -> user);
 
@@ -11,7 +11,7 @@ if(isset($_POST['number_files']) && intval($_POST['number_files']))
 {
 	header("Content-Type: text/plain");
 
-	//Translates the string with plural rules
+	//Translates the string according to plural rules
 	echo I18n :: locale('number-files', array('number' => intval($_POST['number_files']), 'files' => '*number'));
 	exit();
 }
@@ -41,4 +41,3 @@ if(isset($_POST['type'], $_POST['value']))
 	
 	echo "1";
 }
-?>

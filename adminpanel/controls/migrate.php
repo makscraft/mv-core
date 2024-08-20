@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../../config/autoload.php";
 $system = new System();
 
@@ -45,15 +45,15 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 <div id="columns-wrapper">
 	<div id="model-form" class="one-column migrations-page">
 		<h3 class="column-header with-navigation">Migrations
-		<? if($number): ?>
-			<span class="header-info"><? echo $number." migration".($number == 1 ? "" : "s"); ?> available</span>
+		<?php if($number): ?>
+			<span class="header-info"><?php echo $number." migration".($number == 1 ? "" : "s"); ?> available</span>
 			<span id="header-navigation">
 				<input class="button-light run-all-migrations" type="button" value="Run all migrations" />
-				<input class="button-dark button-back" type="button" onclick="location.href='<? echo $back_path; ?>'" value="Cancel" />
+				<input class="button-dark button-back" type="button" onclick="location.href='<?php echo $back_path; ?>'" value="Cancel" />
 			</span>
-		<? endif; ?>
+		<?php endif; ?>
 		</h3>
-        <?	
+        <?php
 	      	if($errors)
 	      		echo "<div class=\"form-errors\"><p>".$errors."</p></div>\n";
 	      	else if(isset($_SESSION["message"]["done"]))
@@ -63,21 +63,21 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	      	}
 	    ?>
 	    <div class="migrations">
-		   <? echo $migrations -> displayMigrationsList(); ?>
+		   <?php echo $migrations -> displayMigrationsList(); ?>
 		</div>
-		<form method="post" id="run-migrations-form" action="<? echo $path; ?>">
+		<form method="post" id="run-migrations-form" action="<?php echo $path; ?>">
 		   <input type="hidden" name="migrations" id="current-migration-value" value="" />
-           <input type="hidden" name="migrations-csrf-token" value="<? echo $migrations -> createAllMigrationsToken(); ?>" />
+           <input type="hidden" name="migrations-csrf-token" value="<?php echo $migrations -> createAllMigrationsToken(); ?>" />
 		</form>
-		<? $css = $number ? "dark" : "light"; ?>
+		<?php $css = $number ? "dark" : "light"; ?>
 		<div class="migrations-bottom">
-			<? if($number): ?>
+			<?php if($number): ?>
 			<input class="button-light run-all-migrations" type="button" id="submit-button" value="Run all migrations" />
-			<? endif; ?>
-			<input class="button-<? echo $css; ?> button-back" type="button" onclick="location.href='<? echo $back_path; ?>'" value="Cancel" />
+			<?php endif; ?>
+			<input class="button-<?php echo $css; ?> button-back" type="button" onclick="location.href='<?php echo $back_path; ?>'" value="Cancel" />
 		</div>
     </div>
 </div>
-<?
+<?php
 include $registry -> getSetting('IncludeAdminPath')."includes/footer.php";
 ?>

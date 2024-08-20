@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../../config/autoload.php";
 $system = new System();
 
@@ -61,8 +61,8 @@ $(document).ready(function()
 
 <div id="columns-wrapper">
     <div id="model-form" class="one-column">
-         <h3 class="column-header with-navigation"><? echo I18n :: locale('my-settings'); ?></h3>
-         <?
+         <h3 class="column-header with-navigation"><?php echo I18n :: locale('my-settings'); ?></h3>
+         <?php
           	  if(isset($form_errors) && $form_errors)
 		          echo $system -> model -> displayFormErrors();
 		      else if(isset($_SESSION["message"]["done"]))
@@ -70,29 +70,29 @@ $(document).ready(function()
 			          
 		      unset($_SESSION["message"]);
          ?>
-	     <form method="post" id="<? echo $system -> model -> getModelClass(); ?>" enctype="multipart/form-data" action="?action=update" class="model-elements-form">
+	     <form method="post" id="<?php echo $system -> model -> getModelClass(); ?>" enctype="multipart/form-data" action="?action=update" class="model-elements-form">
 	          <table>
-		          <? echo $system -> model -> displayModelFormInAdminPanel(); ?>
+		          <?php echo $system -> model -> displayModelFormInAdminPanel(); ?>
                   <tr>
-                     <td class="field-name"><? echo I18n :: locale("admin-panel-skin"); ?></td>
+                     <td class="field-name"><?php echo I18n :: locale("admin-panel-skin"); ?></td>
                      <td class="field-content">                        
-                        <? echo $system -> user -> displayUserSkinSelect(); ?>
+                        <?php echo $system -> user -> displayUserSkinSelect(); ?>
                      </td>
                   </tr>
                   <tr>
 	                  <td colspan="2" class="bottom-navigation">
-				         <? if($system -> user -> getId() == 1): ?>
-				            <input class="button-light" type="button" onclick="location.href='<? echo $migrations_path; ?>'" value="Migrations" />
-				         <? endif; ?>
-                         <input class="button-light" type="button" id="submit-button" value="<? echo I18n :: locale('save'); ?>" />
-                         <input class="button-dark" onclick="location.href='<? echo $registry -> getSetting('AdminPanelPath'); ?>'" type="button" value="<? echo I18n :: locale('cancel'); ?>" />
-                         <input type="hidden" name="admin-panel-csrf-token" value="<? echo $system -> getToken(); ?>" />
+				         <?php if($system -> user -> getId() == 1): ?>
+				            <input class="button-light" type="button" onclick="location.href='<?php echo $migrations_path; ?>'" value="Migrations" />
+				         <?php endif; ?>
+                         <input class="button-light" type="button" id="submit-button" value="<?php echo I18n :: locale('save'); ?>" />
+                         <input class="button-dark" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath'); ?>'" type="button" value="<?php echo I18n :: locale('cancel'); ?>" />
+                         <input type="hidden" name="admin-panel-csrf-token" value="<?php echo $system -> getToken(); ?>" />
 	                  </td>
                   </tr>                  
 	         </table>
          </form>
     </div>         
  </div>
-<?
+<?php
 include $registry -> getSetting('IncludeAdminPath')."includes/footer.php";
 ?>

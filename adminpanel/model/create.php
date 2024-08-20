@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../../config/autoload.php";
 
 $system = new System();
@@ -63,21 +63,20 @@ if(isset($_GET['action']) && $_GET['action'] == 'create' && !empty($_POST))
 
 include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 ?>
-
 <div id="columns-wrapper">
 	<div id="model-form">
        <div class="column-inner">
 	       <h3 class="column-header with-navigation">
-                <? 
+                <?php 
                 	echo $system -> model -> getName();
                 	echo "<span class=\"header-info\">".I18n :: locale("create-record")."</span>\n";
                 ?>
 				<span id="header-navigation">
-                	<input class="button-light" type="button" id="top-save-button" value="<? echo I18n :: locale('save'); ?>" />
-                	<input class="button-dark button-back" type="button" onclick="location.href='<? echo $registry -> getSetting('AdminPanelPath').'model/?'.$back_url_params; ?>'" value="<? echo I18n :: locale('cancel'); ?>" />
+                	<input class="button-light" type="button" id="top-save-button" value="<?php echo I18n :: locale('save'); ?>" />
+                	<input class="button-dark button-back" type="button" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath').'model/?'.$back_url_params; ?>'" value="<?php echo I18n :: locale('cancel'); ?>" />
 				</span>
            </h3>
-           <?      
+           <?php      
 	           if(isset($form_errors) && $form_errors)
     	          echo $system -> model -> displayFormErrors();
     	       else if(isset($_SESSION["message"]["created"]))
@@ -92,15 +91,15 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 			   if($file_name = $system -> model -> checkIncludeCode("action-top.php"))
 			   		include $file_name;
            ?>
-		   <form method="post" id="<? echo $system -> model -> getModelClass(); ?>" enctype="multipart/form-data" action="?<? echo $url_params; ?>&action=create" class="model-elements-form">
-              <?
+		   <form method="post" id="<?php echo $system -> model -> getModelClass(); ?>" enctype="multipart/form-data" action="?<?php echo $url_params; ?>&action=create" class="model-elements-form">
+              <?php
               	  $form_html = $system -> model -> displayModelFormInAdminPanel('create', $current_tab);
 			  	  
               	  if(is_array($form_html))
               	  	  echo $form_html[1];
               ?>
 		      <table>
-		         <?
+		         <?php
 			   		 echo is_array($form_html) ? $form_html[0] : $form_html;
 			   		 
 			   		 if($file_name = $system -> model -> checkIncludeCode("create-form.php"))
@@ -111,16 +110,16 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 			  	 ?>
 		         <tr class="model-form-navigation">
 			         <td colspan="2" class="bottom-navigation">
-			            <input class="button-light" type="button" id="submit-button" value="<? echo I18n :: locale('save'); ?>" />
-	                    <input class="button-light" type="button" id="continue-button" value="<? echo I18n :: locale('create-and-continue'); ?>" />
-	                    <input class="button-light" type="button" id="create-edit-button" value="<? echo I18n :: locale('create-and-edit'); ?>" />
-                        <input class="button-dark" id="model-cancel" type="button" rel="<? echo $registry -> getSetting('AdminPanelPath')."model/?".$back_url_params; ?>" value="<? echo I18n :: locale('cancel'); ?>" />
-                        <input type="hidden" name="admin-panel-csrf-token" value="<? echo $system -> getToken(); ?>" />
+			            <input class="button-light" type="button" id="submit-button" value="<?php echo I18n :: locale('save'); ?>" />
+	                    <input class="button-light" type="button" id="continue-button" value="<?php echo I18n :: locale('create-and-continue'); ?>" />
+	                    <input class="button-light" type="button" id="create-edit-button" value="<?php echo I18n :: locale('create-and-edit'); ?>" />
+                        <input class="button-dark" id="model-cancel" type="button" rel="<?php echo $registry -> getSetting('AdminPanelPath')."model/?".$back_url_params; ?>" value="<?php echo I18n :: locale('cancel'); ?>" />
+                        <input type="hidden" name="admin-panel-csrf-token" value="<?php echo $system -> getToken(); ?>" />
 			         </td>
 		         </tr>
 		      </table>
 		   </form>
-           <?
+           <?php
 		       if($file_name = $system -> model -> checkIncludeCode("create-bottom.php"))
 			       include $file_name;
 			   
@@ -131,12 +130,12 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	</div>
 	<div id="model-versions">
 	   <div class="column-inner">
-	      <h3><? echo I18n :: locale('versions-history'); ?></h3>
-	      <p><? echo $system -> model -> getVersionsLimit() ? I18n :: locale('versions-history-new') : I18n :: locale("versions-disabled"); ?></p>
+	      <h3><?php echo I18n :: locale('versions-history'); ?></h3>
+	      <p><?php echo $system -> model -> getVersionsLimit() ? I18n :: locale('versions-history-new') : I18n :: locale("versions-disabled"); ?></p>
 	   </div>
 	</div>
     <div class="clear"></div>
 </div>
-<?
+<?php
 include $registry -> getSetting('IncludeAdminPath')."includes/footer.php";
 ?>

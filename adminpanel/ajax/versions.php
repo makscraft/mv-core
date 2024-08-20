@@ -1,8 +1,8 @@
-<?
+<?php
 include "../../config/autoload.php";
 
+Http :: isAjaxRequest('post', true);
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
 
 if(isset($_POST['model'], $_POST['id']) && $system -> registry -> checkModel($_POST['model']))
 {			
@@ -33,4 +33,3 @@ if(isset($_POST['model'], $_POST['id']) && $system -> registry -> checkModel($_P
 	header('Content-Type: text/html');
 	include $system -> registry -> getSetting('IncludeAdminPath')."includes/versions.php";
 }
-?>

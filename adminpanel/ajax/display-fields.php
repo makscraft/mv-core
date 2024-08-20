@@ -1,8 +1,8 @@
-<?
+<?php
 include "../../config/autoload.php";
 
+Http :: isAjaxRequest('post', true);
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
 
 if(isset($_POST['model'], $_POST['model_display_fields']) && $system -> registry -> checkModel($_POST['model']))
 {
@@ -22,4 +22,3 @@ if(isset($_POST['model'], $_POST['model_display_fields']) && $system -> registry
 }
 else if(isset($_POST['set-user-skin']) && $_POST['set-user-skin'])
 	echo $system -> user -> setUserSkin($_POST['set-user-skin']);
-?>

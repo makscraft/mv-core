@@ -1,4 +1,4 @@
-<?
+<?php
 global $system;
 $db = DataBase :: instance();
 $registry = Registry :: instance();
@@ -14,10 +14,10 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 <div id="columns-wrapper">
    <div id="model-table">
       <div class="column-inner">
-         <h3 class="column-header"><? echo I18n :: locale("caution"); ?></h3>
+         <h3 class="column-header"><?php echo I18n :: locale("caution"); ?></h3>
             <div class="form-errors">
                <p>
-	         	<? 
+	         	<?php 
 	         		if($system -> user -> getError())
 	         			echo $system -> user -> getError();
 	         		else if($system -> getError())
@@ -25,11 +25,11 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	         	?>
                </p> 
             </div>
-            <input class="button-light" onclick="location.href='<? echo $path; ?>'" type="button" value="<? echo I18n :: locale('back'); ?>" />
+            <input class="button-light" onclick="location.href='<?php echo $path; ?>'" type="button" value="<?php echo I18n :: locale('back'); ?>" />
        </div>
    </div>
 </div>
-<?
+<?php
 include $registry -> getSetting('IncludeAdminPath')."includes/footer.php";
 exit();
 ?>

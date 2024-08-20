@@ -1,5 +1,7 @@
-<? 
-//English PHP regional translations and standards for MV framework
+<?php 
+/**
+ * English PHP regional translations and standards for MV framework
+ */
 $regionalData = array(
 
 	'caption' => 'English (UK)',
@@ -348,4 +350,3 @@ $regionalData = array(
 		'choose-skin' => "Select admin panel interface theme."
 	)
 );
-?>

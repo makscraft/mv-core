@@ -1,9 +1,10 @@
-<?
-//German-english transliteration file for MV framework
-$translitRules = array(
+<?php
+/**
+ * German-english transliteration file for MV framework
+ */
+$translitRules = [
 
-	"Ä" => "Ae", "Ö" => "Oe", "Ü" => "Ue", 
-	"ä" => "ae", "ö" => "oe", "ü" => "ue",
-	" " => "-", "." => "", "/" => "-"
-);
-?>
+	'Ä' => 'Ae', 'Ö' => 'Oe', 'Ü' => 'Ue', 
+	'ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue',
+	' ' => '-', '.' => '', '/' => '-'
+];

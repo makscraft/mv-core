@@ -1,8 +1,8 @@
-<?
+<?php
 include "../../config/autoload.php";
 
+Http :: isAjaxRequest('post', true);
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
 		
 if(isset($_POST['model'], $_POST['add-filter']) && $system -> registry -> checkModel($_POST['model']))
 {
@@ -16,4 +16,3 @@ else if(isset($_POST['model'], $_POST['show-filters']) && $system -> registry ->
 	$system -> runModel($_POST['model']);
 	$_SESSION['mv']['settings'][$system -> model -> getModelClass()]['show-filters'] = $_POST['show-filters'] ? 1 : 0;	
 }
-?>

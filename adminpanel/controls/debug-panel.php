@@ -1,4 +1,4 @@
-<?
+<?php
 $cache_drop = CacheMedia :: getDropMark();
 $admin_panel_path = Registry :: get('AdminPanelPath');
 $version = Registry :: getVersion();
@@ -8,24 +8,24 @@ $route = '~/views/'.$GLOBALS['mv'] -> router -> getRoute();
 $cookie_path = Registry :: get('MainPath');
 $wrapped = isset($_COOKIE['_mv_debug_panel']) && $_COOKIE['_mv_debug_panel'] == 'wrapped' ? ' wrapped' : '';
 ?>
-<link rel="stylesheet" type="text/css" href="<? echo $admin_panel_path; ?>interface/css/style-debug.css<? echo $cache_drop; ?>" />
-<div class="mv-debug-panel<? echo $wrapped; ?>">
-    <img id="mv-debug-panel-logo" src="<? echo $admin_panel_path; ?>interface/images/logo.svg<? echo $cache_drop; ?>" alt="MV logo" />
-    <div>Build: <? echo (int) Registry :: get('Build'); ?></div>
-    <div>Worktime: <? echo round($worktime, 4); ?> sec.</div>
-    <div>View: <? echo $route; ?></div>
+<link rel="stylesheet" type="text/css" href="<?php echo $admin_panel_path; ?>interface/css/style-debug.css<?php echo $cache_drop; ?>" />
+<div class="mv-debug-panel<?php echo $wrapped; ?>">
+    <img id="mv-debug-panel-logo" src="<?php echo $admin_panel_path; ?>interface/images/logo.svg<?php echo $cache_drop; ?>" alt="MV logo" />
+    <div>Build: <?php echo (int) Registry :: get('Build'); ?></div>
+    <div>Worktime: <?php echo round($worktime, 4); ?> sec.</div>
+    <div>View: <?php echo $route; ?></div>
     <div class="sql-section">
-        <span class="number">SQL queries: <? echo count(Database :: $total); ?></span>
+        <span class="number">SQL queries: <?php echo count(Database :: $total); ?></span>
         <span id="mv-debug-panel-queries" class="mv-debug-panel-button">view all</span>
     </div>
-    <div>Memory peak: <? echo I18n :: convertFileSize(memory_get_peak_usage()); ?></div>
-    <div>MV version: <? echo number_format($version, 1); ?></div>
+    <div>Memory peak: <?php echo I18n :: convertFileSize(memory_get_peak_usage()); ?></div>
+    <div>MV version: <?php echo number_format($version, 1); ?></div>
     <div id="mv-debug-panel-queries-list">
-        <? foreach(Database :: $total as $count => $query): ?>
-            <div><span><? echo $count + 1; ?></span><div><? echo $query; ?></div></div>
-        <? endforeach; ?>
+        <?php foreach(Database :: $total as $count => $query): ?>
+            <div><span><?php echo $count + 1; ?></span><div><?php echo $query; ?></div></div>
+        <?php endforeach; ?>
     </div>
-    <div>PHP: <? echo PHP_VERSION; ?></div>
+    <div>PHP: <?php echo PHP_VERSION; ?></div>
 </div>
 <script>
     window.onload = function()
@@ -52,7 +52,7 @@ $wrapped = isset($_COOKIE['_mv_debug_panel']) && $_COOKIE['_mv_debug_panel'] == 
                     current = cookies[index].split('=')[1].replace(' ', '');
 
             current = current == '' ? 'wrapped' : '';
-            document.cookie = '_mv_debug_panel=' + current + expires + '; path=<? echo $cookie_path; ?>';
+            document.cookie = '_mv_debug_panel=' + current + expires + '; path=<?php echo $cookie_path; ?>';
 
             panel = document.getElementsByClassName('mv-debug-panel')[0].classList.toggle('wrapped');
         }

@@ -1,4 +1,4 @@
-<?
+<?php
 include "../../config/autoload.php";
 
 $system = new System('ajax');
@@ -13,7 +13,7 @@ if(isset($_GET["locale"]) && I18n :: getRegion() == $_GET["locale"])
 				  "search-by-name", "add-edit-comment", "move-left", "move-right", "move-first", "move-last", "delete",
 				  "not-defined", "no-images", "cancel");
 	
-	$data = array();
+	$data = [];
 	
 	header("Content-Type: application/javascript; charset=utf-8");
 
@@ -71,9 +71,7 @@ if(isset($_GET['model'], $_GET['field'], $_GET['query']) && $system -> registry 
 			
 		if(isset($result["query"]))
 			$result["query"] = htmlspecialchars_decode($result["query"], ENT_QUOTES);
-			
-		header('Content-Type: application/json');
-		echo json_encode($result);
+		
+		Http :: responseJson($result);
 	}
 }
-?>

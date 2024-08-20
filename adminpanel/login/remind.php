@@ -1,4 +1,4 @@
-<? 
+<?php 
 include_once "../../config/autoload.php";
 
 $login = new Login();
@@ -56,8 +56,8 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
 	   <div id="login-area">
            <div id="login-top"></div>
            <div id="login-middle">
-	           <div id="header"><? echo I18n :: locale('password-restore'); ?></div>
-               <? 
+	           <div id="header"><?php echo I18n :: locale('password-restore'); ?></div>
+               <?php 
                		if(isset($_SESSION['login']['remind']) && $_SESSION['login']['remind'])
                		{
                			echo "<div class=\"success\"><p>".I18n :: locale("change-password-sent")."</p></div>\n";

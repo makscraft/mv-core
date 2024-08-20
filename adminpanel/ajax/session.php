@@ -1,17 +1,13 @@
-<?
-if(isset($_POST["check"]) || isset($_POST["continue"]) || isset($_POST["get-online-users"]))
+<?php
+include '../../config/autoload.php';
+Http :: isAjaxRequest('post', true);
+
+if(isset($_POST['check']) || isset($_POST['continue']) || isset($_POST['get-online-users']))
 {
-	include "../../config/autoload.php";
-	$system = new System("ajax");
+	$system = new System('ajax');
 
-	if(isset($_POST["check"]))
-		echo $system -> ajaxRequestCheck() ? "1" : "";
-	else if(isset($_POST["get-online-users"]))
-	{
-		$system -> ajaxRequestContinueOrExit();
-
-		header('Content-Type: application/json');
-		echo json_encode($system -> user -> session -> checkOnlineUsers());
-	}
+	if(isset($_POST['check']))
+		echo $system -> ajaxRequestCheck() ? '1' : '';
+	else if(isset($_POST['get-online-users']))
+		Http :: responseJson($system -> user -> session -> checkOnlineUsers());
 }
-?>

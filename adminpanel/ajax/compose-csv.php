@@ -1,5 +1,8 @@
-<?
+<?php
 include "../../config/autoload.php";
+
+Http :: isAjaxRequest('get', true);
+
 $registry = Registry :: instance();
 $system = new System('ajax');
 
@@ -35,4 +38,3 @@ if(isset($_GET["model"], $_GET["csv_fields"], $_GET["csv_separator"], $_GET["csv
 				
 				echo $file;
 			}
-?>

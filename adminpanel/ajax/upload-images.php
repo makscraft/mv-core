@@ -1,8 +1,8 @@
-<? 
-include "../../config/autoload.php";
+<?php 
+include '../../config/autoload.php';
 
+Http :: isAjaxRequest('post', true);
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
 $json = [];
 
 if(isset($_POST['model'], $_POST['current_multi_images_field']) && !empty($_FILES))
@@ -12,7 +12,6 @@ if(isset($_POST['model'], $_POST['current_multi_images_field']) && !empty($_FILE
 		$json = $system -> model -> uploadMultiImages($_POST['current_multi_images_field']);
 	}
 	else
-		$json = array("error" => I18n :: locale('upload-file-error'));
+		$json = array('error' => I18n :: locale('upload-file-error'));
 
 Http :: responseJson($json);
-?>

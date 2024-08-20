@@ -1,4 +1,4 @@
-<?
+<?php
 session_start();
 
 $_SESSION["login"]["captcha"] = "";
@@ -31,4 +31,3 @@ header("Content-type: image/png");
 	
 imagepng($image);
 imagedestroy($image);
-?>

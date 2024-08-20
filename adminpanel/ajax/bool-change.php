@@ -1,8 +1,8 @@
-<? 
+<?php 
 include "../../config/autoload.php";
 
+Http :: isAjaxRequest('post', true);
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
 
 if(isset($_POST["id"], $_POST["admin-panel-csrf-token"]) && $_POST["admin-panel-csrf-token"] == $system -> getToken())
 {
@@ -38,12 +38,10 @@ if(isset($_POST["id"], $_POST["admin-panel-csrf-token"]) && $_POST["admin-panel-
 			$css_class = $value ? "bool-true" : "bool-false";
 			$bool_title = $value ? "switch-off" : "switch-on";
 			
-			header('Content-Type: application/json');
-			echo json_encode([
+			Http :: responseJson([
 				'css_class' => $css_class,
 				'title' => I18n :: locale($bool_title)
 			]);
 		}
 	}
 }
-?>

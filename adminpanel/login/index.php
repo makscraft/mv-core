@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../../config/autoload.php";
 
 $registry = Registry :: instance();
@@ -42,9 +42,9 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
 	<div id="container">
 	   <div id="login-area">
            <div id="login-middle">
-	           <div id="header"><? echo I18n :: locale('authorization'); ?></div>
+	           <div id="header"><?php echo I18n :: locale('authorization'); ?></div>
 	           <form method="post" class="login-form">
-                   <?
+                   <?php
                        if(isset($_SESSION['login']['message']) && $_SESSION['login']['message'])
                        {
                            echo "<div class=\"".$_SESSION['login']['message-css']."\">\n";
@@ -54,33 +54,33 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
                        unset($_SESSION['login']['message'], $_SESSION['login']['message-css']);
                    ?>              
                   <div class="line">
-                     <div class="name"><? echo I18n :: locale('login'); ?></div>
+                     <div class="name"><?php echo I18n :: locale('login'); ?></div>
                      <input type="text" name="login" value="" autocomplete="off" />
                   </div>
                   <div class="line">
-                     <div class="name"><? echo I18n :: locale('password'); ?></div>
+                     <div class="name"><?php echo I18n :: locale('password'); ?></div>
                      <input class="password" type="password" name="password" autocomplete="off" />
                   </div>
-                  <?
+                  <?php
                   	$hide_captcha = $login -> checkAllAttemptsFromIp() < Login :: ATTEMPTS_NUMBER;
 
 							include $registry -> getSetting('IncludeAdminPath')."login/captcha.php";
                   ?>
                   <div id="remember">
                      <input id="remember-login" type="checkbox" name="remember" />
-                     <label for="remember-login"><? echo I18n :: locale('remember-me'); ?></label>                              
+                     <label for="remember-login"><?php echo I18n :: locale('remember-me'); ?></label>                              
                   </div>
                   <div class="submit">
-                     <input class="submit" type="button" value="<? echo I18n :: locale('login-action'); ?>" />
-                     <input type="hidden" name="admin-login-csrf-token" value="<? echo Login :: getTokenCSRF(); ?>" />
+                     <input class="submit" type="button" value="<?php echo I18n :: locale('login-action'); ?>" />
+                     <input type="hidden" name="admin-login-csrf-token" value="<?php echo Login :: getTokenCSRF(); ?>" />
                   </div>
                   <div class="remind">
-                     <a href="<? echo $registry -> getSetting('AdminPanelPath'); ?>login/remind.php" class="forgot-password"><? echo I18n :: locale('forgot-password'); ?></a>
+                     <a href="<?php echo $registry -> getSetting('AdminPanelPath'); ?>login/remind.php" class="forgot-password"><?php echo I18n :: locale('forgot-password'); ?></a>
                   </div>
                   <div class="line">
-                     <div class="name"><? echo I18n :: locale('language'); ?></div>
+                     <div class="name"><?php echo I18n :: locale('language'); ?></div>
                      <select name="region" id="select-login-region">
-                         <? echo I18n :: displayRegionsSelect($region); ?>
+                         <?php echo I18n :: displayRegionsSelect($region); ?>
                      </select>
                   </div>
 	           </form>               

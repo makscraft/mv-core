@@ -1,8 +1,8 @@
-<?
+<?php
 include "../../config/autoload.php";
 
+Http :: isAjaxRequest('get', true);
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
 
 if(isset($_GET['model'], $_GET['field'], $_GET['query']) && $registry -> checkModel($_GET['model']))
 {
@@ -21,4 +21,3 @@ if(isset($_GET['model'], $_GET['field'], $_GET['query']) && $registry -> checkMo
 	if($object)
 		echo $object -> getOptionsForSearch($request, $ids, $self_id);
 };
-?>

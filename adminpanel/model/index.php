@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../../config/autoload.php";
 $system = new System();
 
@@ -156,10 +156,10 @@ $system -> model -> createSqlForTable();
 include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 ?>
 <div id="columns-wrapper">
-  <div id="model-table-wrapper"<? if(!$show_filters_column) echo ' class="hidden-filters"'; ?>>
+  <div id="model-table-wrapper"<?php if(!$show_filters_column) echo ' class="hidden-filters"'; ?>>
    <div id="model-table">
          <h3 class="column-header">
-             <? 
+             <?php 
                	 echo $system -> model -> getName();
                          	 	
             	 if($system -> model -> filter -> ifAnyFilterApplied())
@@ -198,7 +198,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
          			include $registry -> getSetting('IncludeAdminPath')."includes/create.php";
              ?>
          </h3>
-         <?
+         <?php
          	if(isset($_SESSION["message"]["done"]) && in_array($_SESSION["message"]["done"], array('create','update','delete','restore')))
           		echo "<div class=\"form-no-errors\"><p>".I18n :: locale('done-'.$_SESSION["message"]["done"])."</p></div>\n";
 			else if(isset($_SESSION["message"]['not-deleted']))
@@ -242,7 +242,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 				include $file_name;
          ?>
          <div id="top-navigation">
-	         <?
+	         <?php
 	         	$multi_actions_menu = $system -> menu -> displayMultiActionMenu($system -> model, $system -> user);
 	         	$model_class = $system -> model -> getModelClass();
 	         	
@@ -271,60 +271,60 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	         		echo $multi_actions_menu;
 	         ?>
             <div id="fields-list">
-               <input class="button-light<? if($show_filters_column) echo " no-display"; ?>" type="button" id="show-filters" value="<? echo I18n :: locale('filters'); ?>" />
-               <input class="button-list" type="button" id="fields-list-button" value="<? echo I18n :: locale('display-fields'); ?>" />
+               <input class="button-light<?php if($show_filters_column) echo " no-display"; ?>" type="button" id="show-filters" value="<?php echo I18n :: locale('filters'); ?>" />
+               <input class="button-list" type="button" id="fields-list-button" value="<?php echo I18n :: locale('display-fields'); ?>" />
                <div class="list">
                      <div class="m2m-wrapper">
                         <div class="column">
-					       <div class="header"><? echo I18n :: locale("not-selected"); ?></div>
+					       <div class="header"><?php echo I18n :: locale("not-selected"); ?></div>
 		                   <select class="m2m-not-selected" multiple="multiple">
-		                           <? 
+		                           <?php 
 		                              $selects_html = $system -> menu -> displayTableFields($system -> model);
 		                              echo $selects_html['not-selected'];
 		                           ?>
 		                   </select>                      
                         </div>					    
 					    <div class="m2m-buttons">
-						    <span class="m2m-right" title="<? echo I18n :: locale('move-selected'); ?>"></span>
-						    <span class="m2m-left" title="<? echo I18n :: locale('move-not-selected'); ?>"></span>						
+						    <span class="m2m-right" title="<?php echo I18n :: locale('move-selected'); ?>"></span>
+						    <span class="m2m-left" title="<?php echo I18n :: locale('move-not-selected'); ?>"></span>						
                         </div>
                         <div class="column">
-                           <div class="header"><? echo I18n :: locale("selected"); ?></div>
+                           <div class="header"><?php echo I18n :: locale("selected"); ?></div>
 					       <select class="m2m-selected" multiple="multiple">
-                              <? echo $selects_html['selected']; ?>
+                              <?php echo $selects_html['selected']; ?>
 					       </select>
                         </div>
                         <div class="m2m-buttons">
-                           <span class="m2m-up" title="<? echo I18n :: locale('move-up'); ?>"></span>
-                           <span class="m2m-down" title="<? echo I18n :: locale('move-down'); ?>"></span>						
+                           <span class="m2m-up" title="<?php echo I18n :: locale('move-up'); ?>"></span>
+                           <span class="m2m-down" title="<?php echo I18n :: locale('move-down'); ?>"></span>						
                         </div>
 					    <input type="hidden" value="" name="display-table-fields" />
 					 </div>
                      <div class="controls">
-                        <input class="apply button-light" type="button" value="<? echo I18n :: locale('apply') ?>" />
-                        <input class="cancel button-dark" value="<? echo I18n :: locale('cancel') ?>" type="button" />
+                        <input class="apply button-light" type="button" value="<?php echo I18n :: locale('apply') ?>" />
+                        <input class="cancel button-dark" value="<?php echo I18n :: locale('cancel') ?>" type="button" />
                      </div>
                </div>
-               <?
+               <?php
                		if($system -> model -> getModelClass() != "log" && $system -> model -> getModelClass() != "garbage")
                			include $registry -> getSetting('IncludeAdminPath')."includes/operations.php";
                ?>
             </div>
          </div>         
-         <form id="model-table-form" method="post" action="?<? echo $system -> model -> getAllUrlParams(array('model','parent','filter','pager')); ?>">
-            <? echo $system -> model -> displaySortableTable(); ?>
-            <input type="hidden" name="admin-panel-csrf-token" value="<? echo $system -> getToken(); ?>" />
+         <form id="model-table-form" method="post" action="?<?php echo $system -> model -> getAllUrlParams(array('model','parent','filter','pager')); ?>">
+            <?php echo $system -> model -> displaySortableTable(); ?>
+            <input type="hidden" name="admin-panel-csrf-token" value="<?php echo $system -> getToken(); ?>" />
          </form>
-         <? echo str_replace('class="multi-actions-menu"', 'class="multi-actions-menu" id="bottom-actions-menu"', $multi_actions_menu); ?>
+         <?php echo str_replace('class="multi-actions-menu"', 'class="multi-actions-menu" id="bottom-actions-menu"', $multi_actions_menu); ?>
        <div class="pager-limit">
-         <span><? echo I18n :: locale('pager-limit'); ?></span>
+         <span><?php echo I18n :: locale('pager-limit'); ?></span>
          <select>
-            <? echo $system -> model -> pager -> displayPagerLimits($allowed_limits); ?>
+            <?php echo $system -> model -> pager -> displayPagerLimits($allowed_limits); ?>
          </select>
-         <input type="hidden" value="<? echo $system -> model -> getAllUrlParams(array('model','parent','filter')); ?>" />
+         <input type="hidden" value="<?php echo $system -> model -> getAllUrlParams(array('model','parent','filter')); ?>" />
        </div>
        <div class="clear"></div>
-         <?
+         <?php
 			echo $system -> model -> pager -> displayPagesAdmin();
 			
 		   	if($file_name = $system -> model -> checkIncludeCode("index-bottom.php"))
@@ -332,12 +332,12 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
          ?>
        </div>
     </div>	
-	<div id="model-filters"<? if(!$show_filters_column) echo ' class="no-display"'; ?>>
-	       <h3><? echo I18n :: locale('filters'); ?>
-               <span><input id="hide-filters" type="button" value="<? echo I18n :: locale('hide') ?>" /></span>
+	<div id="model-filters"<?php if(!$show_filters_column) echo ' class="no-display"'; ?>>
+	       <h3><?php echo I18n :: locale('filters'); ?>
+               <span><input id="hide-filters" type="button" value="<?php echo I18n :: locale('hide') ?>" /></span>
            </h3>
 		   <div id="admin-filters">
-		      <? 
+		      <?php 
 		            $system -> model -> filter -> setAllowedCountFilter($system -> model -> sorter -> getField());
 		            $default_filters = $system -> model -> getDisplayParam("default_filters");
 		            $show_empty_default_filters = $system -> model -> getDisplayParam("show_empty_default_filters");
@@ -346,13 +346,13 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 		            include $registry -> getSetting('IncludeAdminPath')."includes/filters-manager.php";
 		      ?>
 		      <div class="controls">
-		         <input type="hidden" name="initial-form-params" value="<? echo $system -> model -> getAllUrlParams(array('sorter','model','parent')); ?>" />
-                 <input class="button-light" type="button" id="filters-submit" value="<? echo I18n :: locale('apply-filters'); ?>" />
-		         <input class="button-dark" type="button" id="filters-reset" value="<? echo I18n :: locale('reset'); ?>" />
+		         <input type="hidden" name="initial-form-params" value="<?php echo $system -> model -> getAllUrlParams(array('sorter','model','parent')); ?>" />
+                 <input class="button-light" type="button" id="filters-submit" value="<?php echo I18n :: locale('apply-filters'); ?>" />
+		         <input class="button-dark" type="button" id="filters-reset" value="<?php echo I18n :: locale('reset'); ?>" />
 		      </div>
 		   </div>         
 	</div>
 </div>
-<?
+<?php
 include $registry -> getSetting('IncludeAdminPath')."includes/footer.php";
 ?>

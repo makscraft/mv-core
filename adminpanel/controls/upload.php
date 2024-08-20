@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../../config/autoload.php";
 $system = new System("ajax");
 
@@ -23,6 +23,4 @@ else
 		$result = ['url' => Service :: addRootPath($object -> copyFile())];
 }
 
-header('Content-Type: application/json');
-echo json_encode($result);
-?>
+Http :: responseJson($result);

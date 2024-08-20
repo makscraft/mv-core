@@ -1,8 +1,7 @@
-<?
+<?php
 include "../../config/autoload.php";
 
-if(!isset($_SERVER['HTTP_X_REQUESTED_WITH']))
-	exit();
+Http :: isAjaxRequest('post', true);
 
 if(!empty($_POST))
 	session_start();
@@ -88,7 +87,5 @@ if(isset($_POST["login"], $_POST["password"]))
 	if(count($errors))
 		$result["errors"] = $login -> displayLoginErrors($errors);
 
-	header('Content-Type: application/json');
-	echo json_encode($result, JSON_UNESCAPED_UNICODE);
+	Http :: responseJson($result);
 }
-?>

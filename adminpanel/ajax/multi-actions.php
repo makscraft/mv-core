@@ -1,8 +1,8 @@
-<? 
+<?php 
 include "../../config/autoload.php";
 
+Http :: isAjaxRequest('post', true);
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
 
 //Process of garbage cleaup
 if(isset($_POST['empty-recycle-bin']))
@@ -108,4 +108,3 @@ else
 $xml .= "</response>\n";
 
 Http :: responseXml($xml);
-?>

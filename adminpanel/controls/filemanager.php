@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../../config/autoload.php";
 
 $system = new System();
@@ -90,8 +90,8 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 <div id="columns-wrapper">
     <div id="files-table">
          <div class="column-inner">
-            <h3 class="column-header"><? echo I18n :: locale('file-manager'); ?></h3>
-	            <?
+            <h3 class="column-header"><?php echo I18n :: locale('file-manager'); ?></h3>
+	            <?php
 	            	$done_keys = array('folder-created','file-uploaded','file-deleted','folder-deleted',
 	            					   'done-delete','done-operation');
 	            	
@@ -107,80 +107,80 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
          			unset($_SESSION["message"]);
 	            ?>
                <div id="path">
-                  <? echo $filemanager -> displayPath(); ?>
+                  <?php echo $filemanager -> displayPath(); ?>
                </div>
-               <form id="filemanager-form" method="post" action="?delete-many<? echo $url_params."&token=".$system -> getToken(); ?>">
+               <form id="filemanager-form" method="post" action="?delete-many<?php echo $url_params."&token=".$system -> getToken(); ?>">
 		            <table class="model-table filemanager">
 						<tr>
 		                  <th class="check-all"><input type="checkbox" /></th>
-						  <th class="middle"><? echo I18n :: locale('name'); ?></th>
-						  <th class="middle"><? echo I18n :: locale('size'); ?></th>
-						  <th class="middle"><? echo I18n :: locale('last-change'); ?></th>
+						  <th class="middle"><?php echo I18n :: locale('name'); ?></th>
+						  <th class="middle"><?php echo I18n :: locale('size'); ?></th>
+						  <th class="middle"><?php echo I18n :: locale('last-change'); ?></th>
 						</tr>
-                        <? echo $filemanager -> display(); ?>
+                        <?php echo $filemanager -> display(); ?>
 		            </table>
 	                <div id="navigation">
-		                 <? 
+		                 <?php 
 		                     if($system -> user -> checkModelRights("file_manager", "delete"))
 		                        $submit_button = " onclick=\"dialogs.showDeleteFilesMessage()\"";
 		                     else
 		                        $submit_button = " onclick=\"$.modalWindow.open(mVobject.locale('no_rights'), {css_class: 'alert'});\"";
 		                 ?>
 	                     <div class="buttons">
-	                        <input class="button-light" type="button" <? echo $submit_button; ?> value="<? echo I18n :: locale('delete-checked'); ?>" />
-                            <input type="hidden" name="admin-panel-csrf-token" value="<? echo $system -> getToken(); ?>" />
+	                        <input class="button-light" type="button" <?php echo $submit_button; ?> value="<?php echo I18n :: locale('delete-checked'); ?>" />
+                            <input type="hidden" name="admin-panel-csrf-token" value="<?php echo $system -> getToken(); ?>" />
 	                     </div>
 	                     <div class="pager-limit">
-	                        <span><? echo I18n :: locale('pager-limit'); ?></span>
+	                        <span><?php echo I18n :: locale('pager-limit'); ?></span>
 					        <select>
-					            <? echo $filemanager -> pager -> displayPagerLimits($allowed_limits); ?>
+					            <?php echo $filemanager -> pager -> displayPagerLimits($allowed_limits); ?>
 					        </select>
 	                        <input type="hidden" value="filemanager" />
 	                     </div>
-	                     <? echo $filemanager -> pager -> displayPagesAdmin(); ?>
+	                     <?php echo $filemanager -> pager -> displayPagesAdmin(); ?>
 	                </div>
                     <div class="clear"></div>
                 </form>
-                <? 
+                <?php 
                      if($system -> user -> checkModelRights("file_manager", "create"))
                          $submit_button = "type=\"submit\"";
                      else
                          $submit_button = "type=\"button\" onclick=\"$.modalWindow.open(mVobject.locale('no_rights'), {css_class: 'alert'});\"";
                 ?>
                 <div id="upload-file">
-                     <h3><? echo I18n :: locale('upload-file'); ?></h3>
-                     <form action="?upload-file&token=<? echo $system -> getToken().$url_params; ?>" method="post" enctype="multipart/form-data">
+                     <h3><?php echo I18n :: locale('upload-file'); ?></h3>
+                     <form action="?upload-file&token=<?php echo $system -> getToken().$url_params; ?>" method="post" enctype="multipart/form-data">
                         <div>
                            <input type="file" name="new-file" />
-                           <p><input class="button-light" <? echo $submit_button; ?> value="<? echo I18n :: locale('upload'); ?>" /></p>
+                           <p><input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n :: locale('upload'); ?>" /></p>
                         </div>
                      </form>
                 </div>
                 <div id="create-folder">
-                     <h3><? echo I18n :: locale('create-folder'); ?></h3>
-                     <form action="?create-folder&token=<? echo $system -> getToken().$url_params; ?>" method="post">
+                     <h3><?php echo I18n :: locale('create-folder'); ?></h3>
+                     <form action="?create-folder&token=<?php echo $system -> getToken().$url_params; ?>" method="post">
                         <div>
                            <input type="text" class="borderd" name="new-folder" />
-                           <p><input class="button-light" <? echo $submit_button; ?> value="<? echo I18n :: locale('create'); ?>" /></p>
+                           <p><input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n :: locale('create'); ?>" /></p>
                         </div>
                      </form>                     
                 </div>
 		        <ul id="filemanager-menu" class="context-menu">
-		           <li class="view"><a href="#view"><? echo I18n :: locale('read'); ?></a></li>
-		           <li class="cut"><a href="#cut"><? echo I18n :: locale('cut'); ?></a></li>
-		           <li class="copy"><a href="#copy"><? echo I18n :: locale('copy'); ?></a></li>
-		           <li class="paste"><a href="#paste"><? echo I18n :: locale('paste'); ?></a></li>
-		           <li class="rename"><a href="#rename"><? echo I18n :: locale('rename'); ?></a></li>
-		           <li class="delete"><a href="#delete"><? echo I18n :: locale('delete'); ?></a></li>
+		           <li class="view"><a href="#view"><?php echo I18n :: locale('read'); ?></a></li>
+		           <li class="cut"><a href="#cut"><?php echo I18n :: locale('cut'); ?></a></li>
+		           <li class="copy"><a href="#copy"><?php echo I18n :: locale('copy'); ?></a></li>
+		           <li class="paste"><a href="#paste"><?php echo I18n :: locale('paste'); ?></a></li>
+		           <li class="rename"><a href="#rename"><?php echo I18n :: locale('rename'); ?></a></li>
+		           <li class="delete"><a href="#delete"><?php echo I18n :: locale('delete'); ?></a></li>
 		        </ul>                
          </div>
     </div>
     <div id="files-params">
-            <h3><? echo I18n :: locale('file-params'); ?></h3>
+            <h3><?php echo I18n :: locale('file-params'); ?></h3>
             <table id="file-params-table">
                <tr>
                   <td colspan="2" id="file-image">
-                     <?
+                     <?php
                          if(isset($_SESSION['mv']['just-uploaded-file']))
                          {
                          	$filemanager -> setFirstFile($_SESSION['mv']['just-uploaded-file']);
@@ -195,7 +195,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
                <tr>
                   <td colspan="2" id="file-data">
                      <table>
-	                     <?
+	                     <?php
 							if($filemanager -> getFirstFile())
 	                     		echo $filemanager -> displayFileParams($filemanager -> getFirstFile());
 	                     ?>                        
@@ -206,6 +206,6 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
     </div>
     <div class="clear"></div>
  </div>
-<?
+<?php
 include $registry -> getSetting('IncludeAdminPath')."includes/footer.php";
 ?>

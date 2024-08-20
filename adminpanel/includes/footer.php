@@ -18,14 +18,14 @@
             <div class="message"></div>
             <div class="buttons">
                 <input type="button" value="OK" class="button-light" id="butt-ok" />
-                <input type="button" value="<? echo I18n :: locale("cancel"); ?>" class="button-dark close" />
+                <input type="button" value="<?php echo I18n :: locale("cancel"); ?>" class="button-dark close" />
             </div>
         </div>
     </div>
     <div id="footer">
         <div class="footer-title">
-            <a href="http://mv-framework.<? echo ($region == "ru") ? "ru" : "com"; ?>" target="_blank">
-                <? echo I18n :: locale("mv")." ".number_format(Registry :: getVersion(), 1); ?>
+            <a href="http://mv-framework.<?php echo ($region == "ru") ? "ru" : "com"; ?>" target="_blank">
+                <?php echo I18n :: locale("mv")." ".number_format(Registry :: getVersion(), 1); ?>
             </a>
         </div>
     </div>  

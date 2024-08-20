@@ -1,4 +1,4 @@
-<? 
+<?php 
 	if(isset($_SESSION['mv']['settings']['versions-pager-limit']))
 		$system -> versions -> pager -> setLimit($_SESSION['mv']['settings']['versions-pager-limit']);	          
 	          	  
@@ -11,17 +11,17 @@
 ?>
 
 <table id="versions-table">
-	<?
+	<?php
 		if($versions_limit)
 			echo $system -> versions -> display(); 
 	?>
 </table>
-<div id="versions-limit"<? echo $versions_limit ? "" : ' class="versions-disabled"'; ?>>
-	<? echo $versions_limit ? I18n :: locale("versions-limit").": ".$versions_limit : I18n :: locale("versions-disabled"); ?>
+<div id="versions-limit"<?php echo $versions_limit ? "" : ' class="versions-disabled"'; ?>>
+	<?php echo $versions_limit ? I18n :: locale("versions-limit").": ".$versions_limit : I18n :: locale("versions-disabled"); ?>
 </div>
 <div id="versions-pager">
 	<div class="limit">
-      <?
+      <?php
       	  if($versions_limit)
       	  {
       	  	  echo "<span>".I18n :: locale('pager-limit')."</span>\n";
@@ -29,7 +29,7 @@
       	  }
       ?>
 	</div>
-	<?
+	<?php
 		if($versions_limit)
 			echo $system -> versions -> displayPager(); 
 	?>

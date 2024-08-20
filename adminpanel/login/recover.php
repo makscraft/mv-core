@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../../config/autoload.php";
 sleep(1);
 
@@ -66,23 +66,23 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
 	   <div id="login-area">
            <div id="login-top"></div>
            <div id="login-middle">
-	           <div id="header"><? echo I18n :: locale('password-restore'); ?></div>
+	           <div id="header"><?php echo I18n :: locale('password-restore'); ?></div>
                <form method="post" class="login-form">
-                  <? echo $login -> displayLoginErrors($errors); ?>
+                  <?php echo $login -> displayLoginErrors($errors); ?>
                   <div class="line">
-                     <div class="name"><? echo I18n :: locale('new-password'); ?></div>
-                     <input class="password" type="password" name="password" value="<? echo $form -> password; ?>" autocomplete="off" />
+                     <div class="name"><?php echo I18n :: locale('new-password'); ?></div>
+                     <input class="password" type="password" name="password" value="<?php echo $form -> password; ?>" autocomplete="off" />
                   </div>
                   <div class="line">
-                     <div class="name"><? echo I18n :: locale('password-repeat'); ?></div>
-                     <input class="password" type="password" name="password_repeat" value="<? echo $form -> password_repeat; ?>" autocomplete="off" />
+                     <div class="name"><?php echo I18n :: locale('password-repeat'); ?></div>
+                     <input class="password" type="password" name="password_repeat" value="<?php echo $form -> password_repeat; ?>" autocomplete="off" />
                   </div>
                   <div class="submit">
-                     <input class="submit" type="submit" value="<? echo I18n :: locale('restore'); ?>" />
-                     <input type="hidden" name="admin-login-csrf-token" value="<? echo $login -> getTokenCSRF(); ?>" />
+                     <input class="submit" type="submit" value="<?php echo I18n :: locale('restore'); ?>" />
+                     <input type="hidden" name="admin-login-csrf-token" value="<?php echo $login -> getTokenCSRF(); ?>" />
                   </div>
                   <div class="cancel">
-                     <a href="<? echo $registry -> getSetting('AdminPanelPath'); ?>login/"><? echo I18n :: locale('cancel'); ?></a>
+                     <a href="<?php echo $registry -> getSetting('AdminPanelPath'); ?>login/"><?php echo I18n :: locale('cancel'); ?></a>
                   </div>               
                </form>
            </div>

@@ -1,8 +1,8 @@
-<?
+<?php
 include "../../config/autoload.php";
 
+Http :: isAjaxRequest('get', true);
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
 
 if(isset($_GET['query']))
 {
@@ -19,4 +19,3 @@ if(isset($_GET['query']))
 	
 	Http :: responseJson($result);
 }
-?>

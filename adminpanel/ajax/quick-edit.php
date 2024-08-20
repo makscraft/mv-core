@@ -1,8 +1,8 @@
-<?
+<?php
 include "../../config/autoload.php";
 
+Http :: isAjaxRequest('post', true);
 $system = new System('ajax');
-$system -> ajaxRequestContinueOrExit();
 	
 if(isset($_POST['model'], $_POST['admin-panel-csrf-token']) && $system -> registry -> checkModel($_POST['model']) && 
    trim($_POST['model']) != "users")
@@ -111,7 +111,5 @@ if(isset($_POST['model'], $_POST['admin-panel-csrf-token']) && $system -> regist
 	
 	$result["wrong_fields"] = implode(",", $result["wrong_fields"]);
 
-	header('Content-Type: application/json');
-	echo json_encode($result);
+	Http :: responseJson($result);
 }
-?>
