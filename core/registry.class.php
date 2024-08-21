@@ -76,6 +76,18 @@ class Registry
 			Debug :: displayError($message);
 		}
 
+		$supported = self :: $settings['SupportedRegions'];
+
+		if(!in_array(self :: $settings['Region'], $supported))
+		{
+			$message = "Settings 'APP_REGION' and 'Region' must have values from the list ";
+			$message .= "of supported regions from config/settings.php file.";
+			$message .= "<br>The actual setting name is 'SupportedRegions'.<br>";
+			$message .= "Available values are: ".implode(', ', $supported);
+
+			Debug :: displayError($message);
+		}
+
 		return $this;
 	}
 

@@ -68,6 +68,27 @@ class Installation
     }
 
     /**
+     * Displays promopt message and checks the result value, which must be equal to one of the choices.
+     * @return mixed selected value or null if no choices
+     */
+    static public function typePromptWithCoices(string $message, array $choices): mixed
+    {
+        if(count($choices) === 0)
+        {
+            self :: displayErrorMessage('You must provide choices array for message "'.$message.'"');
+            return null;
+        }
+
+        do{
+            $answer = self :: typePrompt($message);
+
+            if(in_array($answer, $choices))
+                return $answer;
+        }
+        while(true);
+    }
+
+    /**
      * Displays CLI error message with red background.
      */
     static public function displayErrorMessage(string $message)
@@ -131,7 +152,7 @@ class Installation
     }
 
     /**
-     * Copies es directory recursively.
+     * Copies the directory recursively.
      */
     static public function copyDirectory(string $from, string $to)
     {
@@ -376,12 +397,8 @@ class Installation
      */
     static public function configureDatabase()
     {
-        $driver = '';
-
-        do{
-            $driver = self :: typePrompt('Please type database driver [mysql / sqlite]');
-        }
-        while($driver !== 'mysql' && $driver !== 'sqlite');
+        $message = 'Please provide database driver [mysql / sqlite]';
+        $driver = self :: typePromptWithCoices($message, ['mysql', 'sqlite']);
 
         self :: setEnvFileParameter('DATABASE_ENGINE', $driver);
         self :: setEnvFileParameter('DATABASE_HOST', $driver === 'mysql' ? 'localhost' : '');
@@ -580,7 +597,7 @@ class Installation
     /**
      * Check and runs database migrations via CLI composer command.
      */
-    static public function commandMigrations()
+    static public function commandMigrations(Event $event)
     {
         self :: instance();
         self :: boot();
@@ -622,7 +639,7 @@ class Installation
     /**
      * Cleans cache folder and deletes old files from userfiles/ directory. 
      */
-    static public function commandCleanup()
+    static public function commandCleanup(Event $event)
     {
         self :: instance();
         self :: boot();
@@ -677,9 +694,27 @@ class Installation
             return;
         }
 
+        $env = parse_ini_file(self :: $instance['directory'].'/.env');
+        $env_region = $env['APP_REGION'] ?? '';
+        $versions = Database :: instance() -> getCount('versions');
+        $logs = Database :: instance() -> getCount('log');
+
+        if($env_region !== '' || $versions > 0 || $logs > 0)
+        {
+            $message = "Changing of the region will cause overwriting files of 3 base models, views ";
+            $message .= "and content of table 'pages' in database.".PHP_EOL;
+            $message .= "Do you want to proceed? [yes / no]";
+
+            $answer = self :: typePromptWithCoices($message, ['yes', 'y', 'no', 'n', '']);
+            
+            if($answer !== 'yes' && $answer !== 'y')
+                return;
+        }
+
         self :: setEnvFileParameter('APP_REGION', $region);
         self :: displaySuccessMessage(' - .env file has been configurated.');
 
+        $region_initial = $region;
         $region = $region === 'us' ? 'en' : $region;
         $package = self :: $instance['directory'].'/customs/regions/'.$region;
 
@@ -702,33 +737,56 @@ class Installation
             $imported = 0;
 
             if(is_array($data))
-            {
-                foreach($data['database'] as $model_name => $items)
-                {
-                    if(Registry :: checkModel($model_name) !== true)
-                        continue;
-
-                    $model = new $model_name;
-                    $model -> clearTable();
-
-                    foreach($items as $item)
-                    {
-                        $record = $model -> getEmptyRecord();
-                        $record -> setValues($item) -> create();
-                        $imported ++;
-                    }                    
-                }
-                
-                if($imported > 0)
+                if(0 < self :: importInitialDatabaseData($data['database']))
                     self :: displaySuccessMessage(' - Database data has been imported.');
-            }
         }
 
-        $message = 'Region settings "'.$region.'" have been configurated.';
+        $message = 'Region settings from "'.$region_initial.'" package have been configurated.';
 
         if(isset($data['hello']) && $data['hello'] !== '')
             $message .= PHP_EOL.' '.$data['hello'];
     
         self :: displayDoneMessage($message);
+    }
+
+    /**
+     * Imports data into database from initial configuration files.
+     * @param array $data keys - models classnames, values - arrays with data for db records
+     * @return int total number of inserted rows
+     */
+    static public function importInitialDatabaseData(array $data): int
+    {
+        $imported = 0;
+
+        if(count($data) === 0)
+            return $imported;
+
+        foreach($data as $model_name => $items)
+        {
+            if(Registry :: checkModel($model_name) !== true)
+                continue;
+
+            $model = new $model_name;
+            $model -> clearTable();
+
+            foreach($items as $item)
+            {
+                $record = $model -> getEmptyRecord();
+                $record -> setValues($item) -> create();
+                $imported ++;
+            }                    
+        }
+
+        return $imported;
+    }
+
+    /**
+     * General common command to extend functionality.
+     */
+    static public function commandService(Event $event)
+    {
+        $arguments = $event -> getArguments();
+
+        //for the future ...
     }
 }
