@@ -151,8 +151,6 @@ if(isset($_SESSION['mv']['settings'][$system -> model -> getModelClass()]['displ
 else
 	$system -> model -> defineTableFields();
 
-$system -> model -> createSqlForTable();
-
 include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 ?>
 <div id="columns-wrapper">

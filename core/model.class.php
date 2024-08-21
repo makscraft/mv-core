@@ -294,8 +294,8 @@ class Model extends ModelBase
 			
 			if($object -> getType() == "text" && $object -> getProperty("display_method"))
 				continue;
-			else if($object -> getType() == 'many_to_one' || $object -> getType() == 'many_to_many')
-				continue;
+			//else if($object -> getType() == 'many_to_one' || $object -> getType() == 'many_to_many')
+			//	continue;
 			
 			if($this -> checkIfFieldVisible($name))
 				$filters_data[$name] = ['type' => $type, 'caption' => $object -> getCaption()];
@@ -332,7 +332,6 @@ class Model extends ModelBase
 					$filters_data[$name]['table'] = $this -> getTable();
 				}
 			}
-			/*
 			else if($type == 'many_to_many')
 			{
 				$filters_data[$name]['long_list'] = $object -> getProperty('long_list');
@@ -342,7 +341,6 @@ class Model extends ModelBase
 					
 				$filters_data[$name]['element'] = $object;
 			}
-			*/
 		}
 		
 		$sorter_data['id'] = 'int';
@@ -1251,14 +1249,64 @@ class Model extends ModelBase
 				  LEFT JOIN `".$other_table."` 
 				  ON ".$this -> table.".`id`=".$other_table.".`".$other_field."`";
 		
-		$query .= $group_by ? "GROUP BY ".$this -> table.".`id`" : "";
+		//$query .= $group_by ? "GROUP BY ".$this -> table.".`id`" : "";
 		
 		return $query;
+	}
+
+	public function composeQueryPartForM2M(string $query)
+	{
+		$filters = $this -> filter -> getComplexFilters();
+		$params = [];
+
+		//Preparing params for processing
+		foreach($filters as $field => $data)
+		{
+			if($data['type'] == 'many_to_many')
+				if(isset($data['value']) && $data['value'] != '')
+				{
+					if($data['value'] == '*')
+						$params[$field.'->m2m'] = -1000000;
+					else if($data['value'] == '-')
+						$params[$field.'->m2m'] = -2000000;
+					else
+						$params[$field.'->m2m'] = $data['value'];
+				}
+		}
+
+		Debug :: pre($params);
+
+		//Getting joins and wheres
+		$params_m2m = $this -> processParametersM2M($this -> table, $params);
+
+		foreach($params_m2m['where'] as $key => $where)
+		{
+			if(strpos($where, '-1000000') !== false)
+				$params_m2m['where'][$key] = preg_replace('/=\'?-1000000\'?/', ' IS NOT NULL', $where);
+			else if(strpos($where, '-2000000') !== false)
+			{
+				$params_m2m['join'][$key] = 'LEFT '.$params_m2m['join'][$key];
+				$params_m2m['where'][$key] = preg_replace('/=\'?-2000000\'?/', ' IS NULL', $where);
+			}
+		}
+
+		//Removing double join of tables
+		foreach($params_m2m['join'] as $key => $join)
+		{
+			$table = preg_replace('/.*join\s+`?(\w+)`?\s+.*/ui', '$1', $join);
+			
+			if(preg_match('/join\s+`?'.$table.'`?\s+ on/ui', $query))
+				unset($params_m2m['join'][$key]);
+		}
+
+		Debug :: pre($params);
+		Debug :: pre($params_m2m);
+
+		return $params_m2m;
 	}
 	
 	public function createSqlForTable()
 	{
-		$complex_filters = $this -> filter -> getComplexFilters();
 		$sort_field_type = $this -> sorter -> getFieldType();
 		$sort_field_name = $this -> sorter -> getField();
 		$filter_params = $this -> filter -> getParamsForSQL();
@@ -1281,21 +1329,44 @@ class Model extends ModelBase
 		}
 		else //Normal sorting by regular simple fields
 			$query = "SELECT * FROM `".$this -> table."`";
-				
-		$query .= $filter_params ? " WHERE ".$filter_params : ""; //Adds all filters into sql query
+
+		//M2m conditions processing
+		$params_m2m = $this -> composeQueryPartForM2M($query);
+
+		if(count($params_m2m['join']))
+			$query .= ' '.implode(' ', $params_m2m['join']);
+
+		if(count($params_m2m['where']))
+		{
+			$filter_params .= $filter_params ? ' AND ' : '';
+			$filter_params .= implode(' AND ', $params_m2m['where']);
+		}
+			
+		//Adds regular filters conditions into sql query
+		$query .= $filter_params ? ' WHERE '.$filter_params : '';
 		
-		if($this -> parent_field && $this -> parent_id) //Adds parent field as condition if it was passed
+		//Adds parent field as condition if it was passed
+		if($this -> parent_field && $this -> parent_id)
 		{
 			$query .= $filter_params ? " AND " : " WHERE ";
 			$query .= " ".$this -> table.".`".$this -> parent_field."`='".$this -> parent_id."'";
 		}
 				
-		if(($sort_field_type == 'many_to_many' || $sort_field_type == 'many_to_one'))
+		//if(($sort_field_type == 'many_to_many' || $sort_field_type == 'many_to_one'))
 			$query .= " GROUP BY ".$this -> table.".`id`"; //Some sql for complex fields
 		
 		if($filter_params) //If we have any filters we must recount the number of rows to display
 		{
-			$this -> total = $this -> db -> getCount($this -> table, $this -> filter -> getParamsForSQL());
+			//.preg_replace('/^.*\s+from\s+/ui', ' FROM ', $query);
+			$query_count =  'SELECT COUNT(*) from ';
+			$query_count .= preg_replace('/^.*\s+from\s+/ui', '', $query);
+			$query_count = preg_replace('/\sgroup\sby\s.*$/ui', '', $query_count);
+			//$query_count =  'SELECT COUNT(services.id) from services'; //.preg_replace('/^.*\s+from\s+/ui', ' FROM ', $query);
+			//str_replace('SELECT ', 'SELECT COUNT(*), ', $query);
+			echo $query_count.'<br><br>';
+			Debug :: pre($this -> db -> getAll($query_count));
+			//echo $this -> db -> getCell($query_count).'<br><br>';
+			//$this -> total = $this -> db -> getCount($this -> table, $this -> filter -> getParamsForSQL());
 			$this -> paginator -> setTotal($this -> total);	 //Passes new total number of rows into pager
 		}
 		
@@ -1308,6 +1379,7 @@ class Model extends ModelBase
 		$query .= $this -> paginator -> getParamsForSQL(); //Adds pager limits for sql query
 
 		$this -> sql_for_table = $query;
+		echo $this -> sql_for_table;
 
 		return $this;
 	}

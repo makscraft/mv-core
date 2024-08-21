@@ -149,12 +149,12 @@ abstract class ModelInitial
 		$params_m2m = ['join' => [], 'where' => []];
 
 		foreach($params as $key => $value)
-			if(strpos($key, "->m2m") !== false && $value !== '' && $value != 0)
+			if(strpos($key, '->m2m') !== false && $value !== '' && $value != 0)
 			{
 				if(is_array($value) && !count($value))
 					continue;
 
-				$name = str_replace("->m2m", "", $key);
+				$name = str_replace('->m2m', '', $key);
 				
 				if(array_key_exists('table->', $params))
 				{

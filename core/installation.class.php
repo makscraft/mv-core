@@ -667,8 +667,8 @@ class Installation
         Filemanager :: makeModelsFilesCleanUp();
         self :: displaySuccessMessage(' - Models files have been optimized.');
 
-        Cache :: cleanByLifetime();
-        self :: displaySuccessMessage(' - Database cache has been cleared by lifetime.');
+        Cache :: cleanAll();
+        self :: displaySuccessMessage(' - Database cache has been cleared.');
     }
 
     /**

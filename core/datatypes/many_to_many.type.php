@@ -484,4 +484,10 @@ class ManyToManyModelElement extends ModelElement
 
 		return $this;
 	}
+
+	public function displayAdminFilter(mixed $data)
+	{
+		$data['value_title'] = $this -> checkValue($data['value'] ?? 0);
+		return EnumModelElement :: createAdminFilterHtml($this -> name, $data);
+	}
 }

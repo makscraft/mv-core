@@ -348,8 +348,8 @@ height: 30px;}
 .form-date-time-field{background: #fff url("../images/icon-date.svg") center right 7px no-repeat; border-radius: 4px; 
 -moz-border-radius: 4px; -webkit-border-radius: 4px;}
 .autocomplete-input, .m2m-not-selected-search, .m2m-selected-search, .autocomplete-multi{
-background: #fff url("../images/icon-search.svg") center right 7px no-repeat;}
-.autocomplete-multi{padding-right: 25px !important;}
+background: #fff url("../images/icon-search.svg") center right 7px no-repeat; padding-right: 30px !important;}
+.autocomplete-multi{padding-right: 30px !important;}
 .ui-datepicker{border: none !important;}
 .ck.ck-editor{z-index: 100;}
 

@@ -512,8 +512,8 @@ class Filter
 			
 		$default_filters = (is_array($default_filters) && count($default_filters)) ? $default_filters : false;
 		
-		if($only_filter) //Only one filter (adding in AJAX)
-			$filters_to_show = array($only_filter);
+		if($only_filter) //Only one filter (adding by AJAX request from admin panel)
+			$filters_to_show = [$only_filter];
 		else //Many filters to show
 		{
 			$filters_to_show = []; //Array of current filters

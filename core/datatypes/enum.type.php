@@ -564,6 +564,8 @@ class EnumModelElement extends ModelElement
 					if($name_of_parent = $object -> getNameOfParentOfForeignKey($value))
 						$value_name .= ' ('.$name_of_parent.')';
 			}
+			else if($data['type'] == 'many_to_many' && $value)
+				$value_name = $data['value_title'];
 
 			$html .= "<input class=\"autocomplete-input\" type=\"text\" value=\"".$value_name."\" />\n";
 			$html .= "<input type=\"hidden\" name=\"".$name."\" value=\"".$value."\" />\n";

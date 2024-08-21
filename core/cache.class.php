@@ -31,7 +31,7 @@ class Cache
 
 	public function __construct()
 	{
-      	$this -> db = DataBase :: instance();
+      	$this -> db = Database :: instance();
 	}
 	
 	/**
@@ -160,7 +160,7 @@ class Cache
 		if(!self :: checkIfEnabled())
 			return;
 		
-		$db = DataBase :: instance();
+		$db = Database :: instance();
 		
 		$db -> query("DELETE FROM `".self :: CONTENT_TABLE."` WHERE `key`=".$db -> secure($key));
 		$db -> query("DELETE FROM `".self :: CLEANUP_TABLE."` WHERE `key`=".$db -> secure($key));
@@ -174,7 +174,7 @@ class Cache
 		if(!self :: checkIfEnabled())
 			return;
 		
-		$keys = DataBase :: instance() -> getColumn("SELECT `key` FROM `".self :: CLEANUP_TABLE."` 
+		$keys = Database :: instance() -> getColumn("SELECT `key` FROM `".self :: CLEANUP_TABLE."` 
 								 					 WHERE `model`='*' OR `model`='".$model."'");
 
 		foreach($keys as $key)
@@ -186,7 +186,7 @@ class Cache
 	 */
 	static public function cleanByLifetime()
 	{
-		$keys = DataBase :: instance() -> getColumn("SELECT `key` FROM `".self :: CONTENT_TABLE."` 
+		$keys = Database :: instance() -> getColumn("SELECT `key` FROM `".self :: CONTENT_TABLE."` 
 								 					 WHERE `until`>'0' AND `until`<='".time()."'");
 
 		foreach($keys as $key)
