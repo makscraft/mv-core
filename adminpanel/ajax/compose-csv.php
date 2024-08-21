@@ -1,7 +1,8 @@
 <?php
 include "../../config/autoload.php";
 
-Http :: isAjaxRequest('get', true);
+if(!Http :: isGetRequest())
+	exit();
 
 $registry = Registry :: instance();
 $system = new System('ajax');

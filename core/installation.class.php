@@ -48,6 +48,7 @@ class Installation
         $registry -> loadSettings($mvMainSettings);
         $registry -> loadSettings($mvSetupSettings);
         $registry -> loadEnvironmentSettings() -> lowerCaseConfigNames();
+        $registry -> createClassesAliases();
     }
 
     //Heplers
@@ -656,7 +657,7 @@ class Installation
 
         self :: displaySuccessMessage(' - Temporary files have been removed.');
 
-        Filemanager :: setCleanupLimit(1000000);
+        Filemanager :: setCleanupLimit(100000);
         Filemanager :: makeModelsFilesCleanUp();
         self :: displaySuccessMessage(' - Models files have been optimized.');
 
