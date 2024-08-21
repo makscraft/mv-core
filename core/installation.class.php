@@ -22,7 +22,8 @@ class Installation
 
         self :: $instance = [
             'directory' => realpath($params['directory'] ?? __DIR__.'/../../../..'),
-            'package' => $params['package'] ?? ''
+            'package' => $params['package'] ?? '',
+            'boot' => false
         ];
     }
 
@@ -31,6 +32,9 @@ class Installation
      */
     static public function boot()
     {
+        if(self :: $instance['boot'] === true)
+            return;
+
         $registry = Registry :: instance();
 
         include self :: $instance['directory'].'/config/setup.php';
@@ -49,6 +53,8 @@ class Installation
         $registry -> loadSettings($mvSetupSettings);
         $registry -> loadEnvironmentSettings() -> lowerCaseConfigNames();
         $registry -> createClassesAliases();
+
+        self :: $instance['boot'] = true;
     }
 
     //Heplers
