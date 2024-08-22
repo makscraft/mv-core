@@ -268,7 +268,7 @@ class Database
 	/**
 	 * Counts the number of rows in SQL query result with parameters (optional).
 	 */
-	public function getCount(string $table, string $where = '')
+	public function getCount(string $table, string $where = ''): int
 	{
 		$query = "SELECT COUNT(*) FROM `".$table."`";
 		
@@ -278,6 +278,23 @@ class Database
 		$result = $this -> getCell($query);
 		
 		return $result ? $result : 0;
+	}
+
+	/**
+	 * Counts rows affected by sql query using PDO functions.
+	 */
+	public function countRows(string $query): int
+	{
+		if(Registry :: get('AdminPanelEnvironment'))
+			$query = preg_replace('/\.\*/ui', '.`id`', $query);
+
+		$statement = self :: $pdo -> prepare($query);
+		$statement -> execute();
+
+		if(Registry :: get('DbEngine') == 'sqlite')
+			return count($statement -> fetchAll(PDO :: FETCH_ASSOC));
+				
+		return (int) $statement -> rowCount();
 	}
 
 	/**

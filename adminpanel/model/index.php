@@ -151,6 +151,9 @@ if(isset($_SESSION['mv']['settings'][$system -> model -> getModelClass()]['displ
 else
 	$system -> model -> defineTableFields();
 
+//Counts records to show the number near header
+$system -> model -> createSqlForTable();
+
 include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 ?>
 <div id="columns-wrapper">

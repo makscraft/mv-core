@@ -294,8 +294,8 @@ class Model extends ModelBase
 			
 			if($object -> getType() == "text" && $object -> getProperty("display_method"))
 				continue;
-			//else if($object -> getType() == 'many_to_one' || $object -> getType() == 'many_to_many')
-			//	continue;
+			else if($object -> getType() == 'many_to_one')
+				continue;
 			
 			if($this -> checkIfFieldVisible($name))
 				$filters_data[$name] = ['type' => $type, 'caption' => $object -> getCaption()];
@@ -1243,13 +1243,11 @@ class Model extends ModelBase
 			$other_field = $other_field -> getName();
 		}
 
-		//Sql query gets fields of current table and counts related fields of other related table
-		$query = "SELECT ".$this -> table.".*, COUNT(".$other_table.".`".$other_field."`) AS `".$name."` 
+		//Sql query gets fields of current table and counts related fields of other related table 
+		$query = "SELECT ".$this -> table.".*, COUNT(".$other_table.".`".$other_field."`) AS `current_sorting_by_count` 
 				  FROM `".$this -> table."` 
 				  LEFT JOIN `".$other_table."` 
 				  ON ".$this -> table.".`id`=".$other_table.".`".$other_field."`";
-		
-		//$query .= $group_by ? "GROUP BY ".$this -> table.".`id`" : "";
 		
 		return $query;
 	}
@@ -1257,24 +1255,27 @@ class Model extends ModelBase
 	public function composeQueryPartForM2M(string $query)
 	{
 		$filters = $this -> filter -> getComplexFilters();
-		$params = [];
+		$params = $params_m2m = $params_m2o = [];
 
 		//Preparing params for processing
 		foreach($filters as $field => $data)
 		{
-			if($data['type'] == 'many_to_many')
-				if(isset($data['value']) && $data['value'] != '')
-				{
-					if($data['value'] == '*')
-						$params[$field.'->m2m'] = -1000000;
-					else if($data['value'] == '-')
-						$params[$field.'->m2m'] = -2000000;
-					else
-						$params[$field.'->m2m'] = $data['value'];
-				}
+			if($data['type'] == 'many_to_many' && isset($data['value']) && $data['value'] != '')
+			{
+				if($data['value'] == '*')
+					$params[$field.'->m2m'] = -1000000;
+				else if($data['value'] == '-')
+					$params[$field.'->m2m'] = -2000000;
+				else
+					$params[$field.'->m2m'] = $data['value'];
+			}
+			else if($data['type'] == 'many_to_one')
+			{
+				$condition = Filter :: NUMERIC_CONDITIONS;
+				
+				// ...
+			}
 		}
-
-		Debug :: pre($params);
 
 		//Getting joins and wheres
 		$params_m2m = $this -> processParametersM2M($this -> table, $params);
@@ -1285,6 +1286,7 @@ class Model extends ModelBase
 				$params_m2m['where'][$key] = preg_replace('/=\'?-1000000\'?/', ' IS NOT NULL', $where);
 			else if(strpos($where, '-2000000') !== false)
 			{
+				$params_m2m['join'][$key] = preg_replace('/^(left|right)\s*join/ui', '', $params_m2m['join'][$key]);
 				$params_m2m['join'][$key] = 'LEFT '.$params_m2m['join'][$key];
 				$params_m2m['where'][$key] = preg_replace('/=\'?-2000000\'?/', ' IS NULL', $where);
 			}
@@ -1295,12 +1297,9 @@ class Model extends ModelBase
 		{
 			$table = preg_replace('/.*join\s+`?(\w+)`?\s+.*/ui', '$1', $join);
 			
-			if(preg_match('/join\s+`?'.$table.'`?\s+ on/ui', $query))
+			if(preg_match('/\sjoin\s+`?'.$table.'`?\s+ on/ui', $query))
 				unset($params_m2m['join'][$key]);
 		}
-
-		Debug :: pre($params);
-		Debug :: pre($params_m2m);
 
 		return $params_m2m;
 	}
@@ -1352,26 +1351,18 @@ class Model extends ModelBase
 			$query .= " ".$this -> table.".`".$this -> parent_field."`='".$this -> parent_id."'";
 		}
 				
-		//if(($sort_field_type == 'many_to_many' || $sort_field_type == 'many_to_one'))
-			$query .= " GROUP BY ".$this -> table.".`id`"; //Some sql for complex fields
+		$query .= " GROUP BY ".$this -> table.".`id`";
 		
 		if($filter_params) //If we have any filters we must recount the number of rows to display
 		{
-			//.preg_replace('/^.*\s+from\s+/ui', ' FROM ', $query);
-			$query_count =  'SELECT COUNT(*) from ';
-			$query_count .= preg_replace('/^.*\s+from\s+/ui', '', $query);
-			$query_count = preg_replace('/\sgroup\sby\s.*$/ui', '', $query_count);
-			//$query_count =  'SELECT COUNT(services.id) from services'; //.preg_replace('/^.*\s+from\s+/ui', ' FROM ', $query);
-			//str_replace('SELECT ', 'SELECT COUNT(*), ', $query);
-			echo $query_count.'<br><br>';
-			Debug :: pre($this -> db -> getAll($query_count));
-			//echo $this -> db -> getCell($query_count).'<br><br>';
-			//$this -> total = $this -> db -> getCount($this -> table, $this -> filter -> getParamsForSQL());
+			$this -> total = $this -> db -> countRows($query);
 			$this -> paginator -> setTotal($this -> total);	 //Passes new total number of rows into pager
 		}
 		
 		if($sorter_params) //Order of sorting for sql result
-			if(isset($foreign_sort_field) && $foreign_sort_field) //If we sort by foreign key
+			if($sort_field_type == 'many_to_many' || $sort_field_type == 'many_to_one')
+				$query .= preg_replace("/`\w+`/", '`current_sorting_by_count`', $sorter_params);
+			else if(isset($foreign_sort_field) && $foreign_sort_field) //If we sort by foreign key
 				$query .= preg_replace("/`\w+`/", $foreign_sort_field, $sorter_params);
 			else
 				$query .= $sorter_params;
@@ -1379,7 +1370,6 @@ class Model extends ModelBase
 		$query .= $this -> paginator -> getParamsForSQL(); //Adds pager limits for sql query
 
 		$this -> sql_for_table = $query;
-		echo $this -> sql_for_table;
 
 		return $this;
 	}

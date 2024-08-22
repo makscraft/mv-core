@@ -62,6 +62,7 @@ class System
 		$this -> registry = Registry :: instance();
 		
 		$time_zone = $this -> registry -> getSetting('TimeZone');
+		Registry :: set('AdminPanelEnvironment', true);
 		
 		if($time_zone)
 			date_default_timezone_set($time_zone);
