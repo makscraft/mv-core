@@ -116,7 +116,7 @@ class Installation
      */
     static public function displayDoneMessage(string $message)
     {
-        echo "\033[42m\r\n\r\n ".$message." \r\n \033[0m".PHP_EOL.PHP_EOL;
+        echo "\033[42m\r\n\r\n \033[30m".$message." \r\n \033[0m".PHP_EOL.PHP_EOL;
     }
 
     /**
@@ -680,7 +680,7 @@ class Installation
         self :: boot();
 
         $arguments = $event -> getArguments();
-        $region = strtolower(trim($arguments[0])) ?? '';
+        $region = strtolower(trim($arguments[0] ?? ''));
         $supported = Registry :: get('SupportedRegions');
 
         if($region === '')
