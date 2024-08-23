@@ -1,7 +1,7 @@
 {
     "name": "makscraft/mv-core",
     "description": "MV - content management framework for developing internet sites and applications",
-    "version": "3.0.1",
+    "version": "3.0.2",
     "type": "project",
     "keywords": ["php", "framework", "mvc", "adminpanel", "crud"],
     "homepage": "https://mv-framework.com",
