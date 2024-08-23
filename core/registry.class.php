@@ -350,6 +350,24 @@ class Registry
 	}
 
 	/**
+	 * Returns actual composer package version of MV core.
+	 * @return float
+	 */	
+	static public function getCorePackageVersion()
+	{
+		//If MV was installed via composer
+		$package = 'makscraft/mv-core';
+
+		if(class_exists('\Composer\InstalledVersions'))
+			if(\Composer\InstalledVersions::isInstalled($package))
+				if($version = \Composer\InstalledVersions::getPrettyVersion($package))
+					return $version;
+
+		//If MV was installed manually without composer
+		return number_format(self :: $version, 1);
+	}
+
+	/**
 	 * Checks if the application works on development environment.
 	 * @return bool
 	 */

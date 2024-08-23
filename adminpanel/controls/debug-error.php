@@ -1,6 +1,7 @@
 <?php
 $cache_drop = CacheMedia :: getDropMark();
 $admin_panel_path = Registry :: get('AdminPanelPath');
+$version_package = Registry :: getCorePackageVersion();
 $version = Registry :: getVersion();
 $engine = ', '.Registry :: get('DbEngine');
 $version_initial = Registry :: getInitialVersion();
@@ -29,7 +30,7 @@ foreach($backtrace as $key => $data)
 			<header>
 				<div class="inner">
 					<img src="<?php echo $admin_panel_path; ?>interface/images/logo.svg<?php echo $cache_drop; ?>" alt="MV logo" />
-					<div class="version">MV framework, version <?php echo number_format($version, 1).$engine; ?></div>
+					<div class="version">MV framework, version <?php echo $version_package.$engine; ?></div>
 					<?php if($version_initial): ?>
 						<div class="version-initial">updated from version <?php echo number_format($version_initial, 1); ?></div>
 					<?php endif; ?>

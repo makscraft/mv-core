@@ -1,10 +1,10 @@
 <?php
 $cache_drop = CacheMedia :: getDropMark();
 $admin_panel_path = Registry :: get('AdminPanelPath');
-$version = Registry :: getVersion();
+$version = Registry :: getCorePackageVersion();
 $engine = Registry :: get('DbEngine');
 $worktime = Debug :: getWorkTime();
-$route = '~/views/'.$GLOBALS['mv'] -> router -> getRoute();
+$route = 'views/'.$GLOBALS['mv'] -> router -> getRoute();
 $cookie_path = Registry :: get('MainPath');
 $wrapped = isset($_COOKIE['_mv_debug_panel']) && $_COOKIE['_mv_debug_panel'] == 'wrapped' ? ' wrapped' : '';
 ?>
@@ -19,7 +19,7 @@ $wrapped = isset($_COOKIE['_mv_debug_panel']) && $_COOKIE['_mv_debug_panel'] == 
         <span id="mv-debug-panel-queries" class="mv-debug-panel-button">view all</span>
     </div>
     <div>Memory peak: <?php echo I18n :: convertFileSize(memory_get_peak_usage()); ?></div>
-    <div>MV version: <?php echo number_format($version, 1); ?></div>
+    <div>MV <?php echo $version.', '.$engine; ?></div>
     <div id="mv-debug-panel-queries-list">
         <?php foreach(Database :: $total as $count => $query): ?>
             <div><span><?php echo $count + 1; ?></span><div><?php echo $query; ?></div></div>

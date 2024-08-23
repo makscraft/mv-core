@@ -741,14 +741,13 @@ class Installation
 
             $file = $package.'/package-'.$region.'.php';
             $data = is_file($file) ? include $file : null;
-            $imported = 0;
-
+            
             if(is_array($data))
                 if(0 < self :: importInitialDatabaseData($data['database']))
                     self :: displaySuccessMessage(' - Database data has been imported.');
         }
 
-        $message = 'Region settings from "'.$region_initial.'" package have been configurated.';
+        $message = 'Region settings from the "'.$region_initial.'" package have been installed.';
 
         if(isset($data['hello']) && $data['hello'] !== '')
             $message .= PHP_EOL.' '.$data['hello'];
