@@ -586,7 +586,7 @@ class Installation
     }
 
     /**
-     * Chack and runs all migrations if they exist.
+     * Checks and runs all migrations if they exist (from CLI).
      */
     static public function findAndExecuteAllAvailableMigartions()
     {
