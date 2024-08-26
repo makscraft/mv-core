@@ -1,6 +1,5 @@
 <?php
 use Composer\Script\Event;
-use Composer\Installer\PackageEvent;
 
 /**
  * Class for installation of the framework via composer CLI.
@@ -43,7 +42,7 @@ class Installation
         include self :: $instance['directory'].'/config/plugins.php';
 
         $mvSetupSettings['BootFromCLI'] = true;
-        $mvSetupSettings['IncludePath'] = self :: $instance['directory'].'/';
+        $mvSetupSettings['IncludePath'] = str_replace('\\', '/', self :: $instance['directory']).'/';
         $mvSetupSettings['CorePath'] = __DIR__.DIRECTORY_SEPARATOR;
         $mvSetupSettings['Models'] = $mvActiveModels;
         $mvSetupSettings['Plugins'] = $mvActivePlugins;
@@ -416,7 +415,7 @@ class Installation
             return true;
         }
         else if($driver === 'mysql')
-            self :: displaySuccessMessage('Now please fill database settings for MySQL in .env file and run "composer database" in your project directory.');
+            self :: displaySuccessMessage(' - Now please fill database settings for MySQL in .env file and run "composer database" in your project directory.');
     }
 
     /**
@@ -568,6 +567,44 @@ class Installation
             self :: displaySuccessMessage(' - Root user of admin panel has been successfully created.');
     }
 
+    /**
+     * Inserts initial records into database.
+     */
+    static public function insertInitionDatabaseContent(string $region)
+    {
+        self :: boot();
+
+        $region = $region === 'us' ? 'en' : $region;
+        $package = self :: $instance['directory'].'/customs/regions/'.$region;
+
+        $file = $package.'/package-'.$region.'.php';
+        $data = is_file($file) ? include $file : null;
+        
+        if(is_array($data))
+            if(0 < self :: importInitialDatabaseData($data['database']))
+                self :: displaySuccessMessage(' - Database data has been imported.');
+    }
+
+    /**
+     * Chack and runs all migrations if they exist.
+     */
+    static public function findAndExecuteAllAvailableMigartions()
+    {
+        self :: boot();
+
+        $migrations = new Migrations(true);
+        $migrations -> scanModels();
+        $available = $migrations -> getMigrationsQuantity();
+        
+        if($available)
+        {
+            self :: displaySuccessMessage(' - Found available migrations ('.$available.'):');
+
+            $migrations -> runMigrations('all');
+            self :: displaySuccessMessage(' - Migrations have been executed.');
+        }
+    }
+
     //Commands
 
     /**
@@ -701,6 +738,9 @@ class Installation
             return;
         }
 
+        if(self :: $instance['package'] !== '')
+            return $region;
+
         $env = parse_ini_file(self :: $instance['directory'].'/.env');
         $env_region = $env['APP_REGION'] ?? '';
         $versions = Database :: instance() -> getCount('versions');
@@ -708,9 +748,12 @@ class Installation
 
         if($env_region !== '' || $versions > 0 || $logs > 0)
         {
-            $message = "Changing of the region will cause overwriting files of 3 base models, views ";
+            $message = "Attention! Changing of the region will cause overwriting files of 3 base models, views ";
             $message .= "and content of table 'pages' in database.".PHP_EOL;
-            $message .= "Do you want to proceed? [yes / no]";
+            
+            self :: displayErrorMessage($message);
+
+            $message = "Do you want to proceed? [yes / no]";
 
             $answer = self :: typePromptWithCoices($message, ['yes', 'y', 'no', 'n', '']);
             
