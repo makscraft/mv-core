@@ -31,10 +31,10 @@ class Installation
      */
     static public function boot()
     {
-        echo __FUNCTION__.PHP_EOL;
-        
         if(static :: $instance['boot'] === true)
             return;
+            
+        echo ' -------- '.__FUNCTION__.PHP_EOL;
 
         $registry = Registry :: instance();
 
