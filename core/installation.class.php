@@ -53,8 +53,6 @@ class Installation
         $registry -> loadEnvironmentSettings() -> lowerCaseConfigNames();
         $registry -> createClassesAliases();
 
-        //Database :: instance();
-
         self :: $instance['boot'] = true;
     }
 
@@ -574,6 +572,7 @@ class Installation
      */
     static public function insertInitionDatabaseContent(string $region)
     {
+        echo __FUNCTION__.PHP_EOL;
         self :: boot();
 
         $region = $region === 'us' ? 'en' : $region;
@@ -592,6 +591,7 @@ class Installation
      */
     static public function findAndExecuteAllAvailableMigartions()
     {
+        echo __FUNCTION__.PHP_EOL;
         self :: boot();
 
         $migrations = new Migrations(true);
