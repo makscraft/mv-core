@@ -31,7 +31,7 @@ class Installation
      */
     static public function boot()
     {
-        if(self :: $instance['boot'] === true)
+        if(static :: $instance['boot'] === true)
             return;
 
         $registry = Registry :: instance();
@@ -53,7 +53,7 @@ class Installation
         $registry -> loadEnvironmentSettings() -> lowerCaseConfigNames();
         $registry -> createClassesAliases();
 
-        self :: $instance['boot'] = true;
+        static :: $instance['boot'] = true;
     }
 
     //Heplers
