@@ -53,6 +53,8 @@ class Installation
         $registry -> loadEnvironmentSettings() -> lowerCaseConfigNames();
         $registry -> createClassesAliases();
 
+        Database :: instance();
+
         self :: $instance['boot'] = true;
     }
 
