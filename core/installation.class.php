@@ -592,7 +592,7 @@ class Installation
     static public function findAndExecuteAllAvailableMigartions()
     {
         echo __FUNCTION__.PHP_EOL;
-        self :: boot();
+        static :: boot();
 
         $migrations = new Migrations(true);
         $migrations -> scanModels();
