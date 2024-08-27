@@ -67,7 +67,7 @@ class MysqlAdapter extends DbAdapter
 		else if($type == "date_time")
 			$result = "datetime";
 		else if($type == "text" || $type == "multi_images")
-			$result = "text";
+			$result = "longtext";
 		else if(in_array($type, $varchar_types))
 			$result = "varchar(250)";
 		else if($type == "enum")
@@ -105,7 +105,7 @@ class MysqlAdapter extends DbAdapter
 		$fields = $result_sql = [];
 		
 		if($is_simple_model)
-			$sql .= "`key` varchar(100) NOT NULL, \n`value` text NOT NULL";
+			$sql .= "`key` varchar(100) NOT NULL, \n`value` longtext NOT NULL";
 		else
 		{
 			$sql .= "`id` int(11) NOT NULL,\n";
