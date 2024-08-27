@@ -16,14 +16,14 @@ class Installation
      */
     static public function instance(array $params = [])
     {
-        if(self :: $instance !== null)
-            return;
+        if(static :: $instance === null)
+            static :: $instance = [
+                'directory' => realpath($params['directory'] ?? __DIR__.'/../../../..'),
+                'package' => $params['package'] ?? '',
+                'boot' => false
+            ];
 
-        self :: $instance = [
-            'directory' => realpath($params['directory'] ?? __DIR__.'/../../../..'),
-            'package' => $params['package'] ?? '',
-            'boot' => false
-        ];
+        return static :: $instance;
     }
 
     /**
@@ -31,6 +31,8 @@ class Installation
      */
     static public function boot()
     {
+        echo __FUNCTION__.PHP_EOL;
+        
         if(static :: $instance['boot'] === true)
             return;
 
