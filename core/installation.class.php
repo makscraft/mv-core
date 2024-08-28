@@ -34,17 +34,17 @@ class Installation
         if(static :: $instance['boot'] === true)
             return;
             
-        echo ' -------- '.__FUNCTION__.PHP_EOL;
+        echo PHP_EOL.PHP_EOL.' ------- --------------- !!! Boot command !!! -------- '.PHP_EOL.PHP_EOL;
 
         $registry = Registry :: instance();
 
-        include self :: $instance['directory'].'/config/setup.php';
-        include self :: $instance['directory'].'/config/settings.php';
-        include self :: $instance['directory'].'/config/models.php';
-        include self :: $instance['directory'].'/config/plugins.php';
+        include static :: $instance['directory'].'/config/setup.php';
+        include static :: $instance['directory'].'/config/settings.php';
+        include static :: $instance['directory'].'/config/models.php';
+        include static :: $instance['directory'].'/config/plugins.php';
 
         $mvSetupSettings['BootFromCLI'] = true;
-        $mvSetupSettings['IncludePath'] = str_replace('\\', '/', self :: $instance['directory']).'/';
+        $mvSetupSettings['IncludePath'] = str_replace('\\', '/', static :: $instance['directory']).'/';
         $mvSetupSettings['CorePath'] = __DIR__.DIRECTORY_SEPARATOR;
         $mvSetupSettings['Models'] = $mvActiveModels;
         $mvSetupSettings['Plugins'] = $mvActivePlugins;
@@ -125,7 +125,7 @@ class Installation
      */
     static public function setEnvFileParameter(string $key, string $value)
     {
-        $env_file = self :: $instance['directory'].'/.env';
+        $env_file = static :: $instance['directory'].'/.env';
         $env = file_get_contents($env_file);
 
         $env = preg_replace('/'.$key.'=[\/\w]*/ui', $key.'='.trim($value), $env);
@@ -202,7 +202,7 @@ class Installation
      */
     static public function postUpdate(Event $event)
     {
-        self :: moveAdminPanelDirectory();
+        static :: moveAdminPanelDirectory();
     }
 
     /**
@@ -227,7 +227,7 @@ class Installation
      */
     static public function changeAutoloaderString(string $file)
     {
-        $file = realpath(self :: $instance['directory'].$file);
+        $file = realpath(static :: $instance['directory'].$file);
 
         if(!file_exists($file))
             return;
@@ -263,14 +263,14 @@ class Installation
             if(!$error && !preg_match('/\/$/', $folder))
                 $folder = $folder.'/';
 
-            $back = self :: $instance['directory'].preg_replace('/\w+/', '..', $folder);
+            $back = static :: $instance['directory'].preg_replace('/\w+/', '..', $folder);
             $back = realpath($back);
             
             if(!$error)
             {
                 if(!is_dir(realpath($back.$folder)))
                     $error = 'Error! Project directory does not exist: ';
-                else if(realpath($back.$folder) !== realpath(self :: $instance['directory']))
+                else if(realpath($back.$folder) !== realpath(static :: $instance['directory']))
                     $error = 'Error! Not suitable project subdirectory: ';
 
                 if($error)
@@ -294,7 +294,7 @@ class Installation
 
         if($directory !== '' && $directory !== '/')
         {
-            $htaccess_file = self :: $instance['directory'].'/.htaccess';
+            $htaccess_file = static :: $instance['directory'].'/.htaccess';
             $htaccess = file_get_contents($htaccess_file);
             $htaccess = preg_replace('/RewriteBase\s+\/[\/\w]*/', 'RewriteBase '.$directory, $htaccess);
             file_put_contents($htaccess_file, $htaccess);
@@ -343,7 +343,7 @@ class Installation
     static public function displayFinalInstallationMessage()
     {
         Installation :: instance(['directory' => __DIR__.'/..']);
-        $env = parse_ini_file(self :: $instance['directory'].DIRECTORY_SEPARATOR.'.env');
+        $env = parse_ini_file(static :: $instance['directory'].DIRECTORY_SEPARATOR.'.env');
 
         $message = "Installation complete, now you can open your MV application in browser.".PHP_EOL;
         $message .= " MV start page http://yourdomain.com".preg_replace('/\/$/', '', $env['APP_FOLDER']).PHP_EOL;
@@ -359,7 +359,7 @@ class Installation
      */
     static public function runPdo(): ?PDO
     {
-        $env_file = self :: $instance['directory'].'/.env';
+        $env_file = static :: $instance['directory'].'/.env';
         $env = parse_ini_file($env_file);
 
         if($env['DATABASE_ENGINE'] !== 'mysql' && $env['DATABASE_ENGINE'] !== 'sqlite')
@@ -380,7 +380,7 @@ class Installation
         else if($env['DATABASE_ENGINE'] == 'sqlite')
         {
             $path = '/userfiles/database/sqlite/database.sqlite';
-            $file = self :: $instance['directory'].$path;
+            $file = static :: $instance['directory'].$path;
             $file = realpath($file);
 
             if(!is_file($file))
@@ -425,7 +425,7 @@ class Installation
      */
     static public function configureDatabaseMysql()
     {
-        $env = parse_ini_file(self :: $instance['directory'].'/.env');
+        $env = parse_ini_file(static :: $instance['directory'].'/.env');
         $keys = ['DATABASE_HOST', 'DATABASE_USER', 'DATABASE_NAME'];
 
         foreach($keys as $key)
@@ -444,7 +444,7 @@ class Installation
             self :: displaySuccessMessage(' - MySQL initial dump has been already imported before.');
         else
         {        
-            $dump_file = self :: $instance['directory'].'/userfiles/database/mysql-dump.sql';
+            $dump_file = static :: $instance['directory'].'/userfiles/database/mysql-dump.sql';
 
             if(true === self :: loadMysqlDump($dump_file, $pdo))
                 self :: displaySuccessMessage(' - MySQL initial dump has been imported.');
@@ -454,7 +454,7 @@ class Installation
 
         self :: displayDoneMessage('MySQL database has been successfully configurated.');
 
-        if(self :: $instance['package'] === '')
+        if(static :: $instance['package'] === '')
             self :: displayFinalInstallationMessage();
     }
 
@@ -542,8 +542,8 @@ class Installation
         }
         while(true);
 
-        self :: $instance['login'] = $login;
-        self :: $instance['password'] = $password;
+        static :: $instance['login'] = $login;
+        static :: $instance['password'] = $password;
 
         $password = password_hash($password, PASSWORD_DEFAULT, ['cost' => 10]);
         $date = date('Y-m-d H:i:s');
@@ -578,7 +578,7 @@ class Installation
         self :: boot();
 
         $region = $region === 'us' ? 'en' : $region;
-        $package = self :: $instance['directory'].'/customs/regions/'.$region;
+        $package = static :: $instance['directory'].'/customs/regions/'.$region;
 
         $file = $package.'/package-'.$region.'.php';
         $data = is_file($file) ? include $file : null;
@@ -617,7 +617,7 @@ class Installation
     static public function commandConfigureDatabase(Event $event)
     {
         self :: instance();
-        $env = parse_ini_file(self :: $instance['directory'].'/.env');
+        $env = parse_ini_file(static :: $instance['directory'].'/.env');
 
         if($env['DATABASE_ENGINE'] === 'mysql')
         {
@@ -630,7 +630,7 @@ class Installation
                 self :: setEnvFileParameter('DATABASE_PASSWORD', '');
                 self :: setEnvFileParameter('DATABASE_NAME', $arguments[1] ?? 'development');
                 
-                $env = parse_ini_file(self :: $instance['directory'].'/.env');
+                $env = parse_ini_file(static :: $instance['directory'].'/.env');
             }
         }
         
@@ -742,10 +742,10 @@ class Installation
             return;
         }
 
-        if(self :: $instance['package'] !== '')
+        if(static :: $instance['package'] !== '')
             return $region;
 
-        $env = parse_ini_file(self :: $instance['directory'].'/.env');
+        $env = parse_ini_file(static :: $instance['directory'].'/.env');
         $env_region = $env['APP_REGION'] ?? '';
         $versions = Database :: instance() -> getCount('versions');
         $logs = Database :: instance() -> getCount('log');
@@ -770,19 +770,19 @@ class Installation
 
         $region_initial = $region;
         $region = $region === 'us' ? 'en' : $region;
-        $package = self :: $instance['directory'].'/customs/regions/'.$region;
+        $package = static :: $instance['directory'].'/customs/regions/'.$region;
 
         if(is_dir($package))
         {
             if(is_dir($package.'/models') && count(scandir($package.'/models')) > 2)
             {
-                self :: copyDirectory($package.'/models', self :: $instance['directory'].'/models');
+                self :: copyDirectory($package.'/models', static :: $instance['directory'].'/models');
                 self :: displaySuccessMessage(' - Models files have been copied.');
             }
 
             if(is_dir($package.'/views') && count(scandir($package.'/views')) > 2)
             {
-                self :: copyDirectory($package.'/views', self :: $instance['directory'].'/views');
+                self :: copyDirectory($package.'/views', static :: $instance['directory'].'/views');
                 self :: displaySuccessMessage(' - Views files have been copied.');
             }
 
