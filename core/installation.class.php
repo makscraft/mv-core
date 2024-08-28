@@ -31,17 +31,17 @@ class Installation
      */
     static public function boot()
     {
-        if(static :: $instance['boot'] === true)
-            return;
-            
         echo PHP_EOL.PHP_EOL.' ------- --------------- !!! Boot command !!! -------- '.PHP_EOL.PHP_EOL;
+
+        if(static :: $instance['boot'] === true)
+            return Registry :: instance() -> loadEnvironmentSettings();
 
         $registry = Registry :: instance();
 
-        include static :: $instance['directory'].'/config/setup.php';
-        include static :: $instance['directory'].'/config/settings.php';
-        include static :: $instance['directory'].'/config/models.php';
-        include static :: $instance['directory'].'/config/plugins.php';
+        require_once static :: $instance['directory'].'/config/setup.php';
+        require_once static :: $instance['directory'].'/config/settings.php';
+        require_once static :: $instance['directory'].'/config/models.php';
+        require_once static :: $instance['directory'].'/config/plugins.php';
 
         $mvSetupSettings['BootFromCLI'] = true;
         $mvSetupSettings['IncludePath'] = str_replace('\\', '/', static :: $instance['directory']).'/';
@@ -50,9 +50,11 @@ class Installation
         $mvSetupSettings['Plugins'] = $mvActivePlugins;
 
         Registry :: generateSettings($mvSetupSettings);
+
         $registry -> loadSettings($mvMainSettings);
         $registry -> loadSettings($mvSetupSettings);
-        $registry -> loadEnvironmentSettings() -> lowerCaseConfigNames();
+        $registry -> loadEnvironmentSettings();
+        $registry -> lowerCaseConfigNames();
         $registry -> createClassesAliases();
 
         static :: $instance['boot'] = true;
@@ -574,7 +576,6 @@ class Installation
      */
     static public function insertInitionDatabaseContent(string $region)
     {
-        echo __FUNCTION__.PHP_EOL;
         self :: boot();
 
         $region = $region === 'us' ? 'en' : $region;
@@ -593,7 +594,6 @@ class Installation
      */
     static public function findAndExecuteAllAvailableMigartions()
     {
-        echo __FUNCTION__.PHP_EOL;
         static :: boot();
 
         $migrations = new Migrations(true);
