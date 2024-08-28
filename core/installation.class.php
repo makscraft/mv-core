@@ -31,8 +31,6 @@ class Installation
      */
     static public function boot()
     {
-        echo PHP_EOL.PHP_EOL.' ------- --------------- !!! Boot command !!! -------- '.PHP_EOL.PHP_EOL;
-
         if(static :: $instance['boot'] === true)
             return Registry :: instance() -> loadEnvironmentSettings();
 
