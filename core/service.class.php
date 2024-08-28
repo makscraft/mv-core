@@ -225,7 +225,10 @@ class Service
 	 */
 	static public function unserializeArray(string $var)
 	{
-		$mass = unserialize(base64_decode($var));
+		try{
+			$mass = unserialize(base64_decode($var));
+		}
+		catch(\Exception $error) {}
 		
 		if(!is_array($mass))
 			return [];

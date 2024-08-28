@@ -9,16 +9,23 @@ class Record extends Content
 {
 	public function __construct(array $data, object $model)
 	{
+		//Keeps the link to parent model object
 		$this -> model = $model;
 			
 		parent :: __construct($data);
 	}
 
+	/**
+	 * Returns the class name of the record's parent model.
+	 */
 	public function getModelName()
 	{
 		return $this -> model -> getModelClass();
 	}
 	
+	/**
+	 * Returns field value by key (if exists).
+	 */
 	public function __get(string $key)
 	{
 		if(isset($this -> content[$key]))
@@ -37,12 +44,20 @@ class Record extends Content
 		}
 	}
 	
+	/**
+	 * Sets field value by key (if exists).
+	 */
 	public function __set(string $key, mixed $value)
 	{
 		if($key != 'id' && $this -> model -> getElement($key))		
 			$this -> content[$key] = is_string($value) ? trim($value) : $value;
 	}
 
+	/**
+	 * Add one or many ids for mny to many field value.
+	 * @param string $field name of field in model
+	 * @param mixed $value one id or array of ids (opposite model in m2m)
+	 */
 	public function addValueM2M(string $field, mixed $value)
 	{
 		if($object = $this -> model -> getElement($field))
@@ -58,16 +73,26 @@ class Record extends Content
 			}
 	}
 	
+	/**
+	 * Returns the array of all fields' values of the record.
+	 */
 	public function getValues()
 	{
 		return $this -> content;
 	}
 
+	/**
+	 * Returns the array of all fields' values of the record.
+	 */
 	public function all()
 	{
 		return $this -> getValues();
 	}
-			
+	
+	/**
+	 * Sets the list (array) of values for record's fields.
+	 * @param array $values like ['name' => 'Hello']
+	 */
 	public function setValues(array $values)
 	{
 		foreach($values as $field => $value)			
@@ -77,9 +102,11 @@ class Record extends Content
 		return $this;
 	}
 	
+	/**
+	 * Gets values of fields ready for create/update action for current DB record.
+	 */
 	public function prepareContentValues()
 	{
-		//Gets values of fields ready for create/update action with current DB record
 		$prepared_values = [];
 		$version = Registry :: getInitialVersion();
 		$fast = ['int', 'float', 'bool', 'parent', 'enum'];
@@ -193,6 +220,9 @@ class Record extends Content
 		return $prepared_values;
 	}
 	
+	/**
+	 * Returns title (caption, not key) of particular enum field. 
+	 */
 	public function getEnumTitle(string $field)
 	{
 		$object = $this -> model -> getElement($field);
@@ -218,6 +248,9 @@ class Record extends Content
 				return $this -> enum_values[$field][$this -> content[$field]];
 	}	
 	
+	/**
+	 * Creates new record in model's table in database, via INSERT query.
+	 */
 	public function create()
 	{
 		if(get_parent_class($this -> model) == "ModelSimple" || $this -> id)
@@ -244,6 +277,9 @@ class Record extends Content
 		}
 	}
 	
+	/**
+	 * Updates the record in model's table in database, via UPDATE query.
+	 */
 	public function update()
 	{
 		if($this -> id && get_parent_class($this -> model) != "ModelSimple")
@@ -265,6 +301,9 @@ class Record extends Content
 		return $this;
 	}
 
+	/**
+	 * Creates (or updates if created before) record in model's table in database, via INSERT / UPDATE query.
+	 */
 	public function save()
 	{
 		if($this -> id)
@@ -275,6 +314,10 @@ class Record extends Content
 		return $this;
 	}
 	
+	/**
+	 * Removes record from model's table in database, via DELETE query.
+	 * Does NOT put it in garbage table like in admin panel.
+	 */
 	public function delete()
 	{
 		if($this -> id && get_parent_class($this -> model) != "ModelSimple")
@@ -287,6 +330,10 @@ class Record extends Content
 		return $this;
 	}
 
+	/**
+	 * Returns the value of record field (many_to_many or multi_images) in array format.
+	 * Can apply sql conditions for m2m field, like ['active' => 1].
+	 */
 	public function asArrays(string $field, array $conditions = [])
 	{
 		if($element = $this -> model -> getElement($field))
