@@ -585,6 +585,8 @@ class Installation
         if(is_array($data))
             if(0 < self :: importInitialDatabaseData($data['database']))
                 self :: displaySuccessMessage(' - Database data has been imported.');
+
+        return $data;
     }
 
     /**
