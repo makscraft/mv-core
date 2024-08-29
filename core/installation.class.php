@@ -405,7 +405,7 @@ class Installation
      */
     static public function configureDatabase()
     {
-        $message = 'Please provide database driver [mysql / sqlite]';
+        $message = 'Please select database driver [mysql / sqlite]';
         $driver = self :: typePromptWithCoices($message, ['mysql', 'sqlite']);
 
         self :: setEnvFileParameter('DATABASE_ENGINE', $driver);
@@ -602,7 +602,7 @@ class Installation
         
         if($available)
         {
-            self :: displaySuccessMessage(' - Found available migrations ('.$available.'):');
+            self :: displaySuccessMessage(' - Found available migrations: '.$available);
 
             $migrations -> runMigrations('all');
             self :: displaySuccessMessage(' - Migrations have been executed.');
@@ -753,7 +753,7 @@ class Installation
         if($env_region !== '' || $versions > 0 || $logs > 0)
         {
             $message = "Attention! Changing of the region will cause overwriting files of 3 base models, views ";
-            $message .= "and content of table 'pages' in database.".PHP_EOL;
+            $message .= "and content of table 'pages' in database.";
             
             self :: displayErrorMessage($message);
 
