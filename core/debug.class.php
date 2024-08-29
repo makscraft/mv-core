@@ -54,6 +54,15 @@ class Debug
 	 */
 	public static function pre(mixed $var)
 	{
+		if(Registry :: get('BootFromCLI'))
+		{
+			echo PHP_EOL;
+			print_r($var);
+			echo PHP_EOL;
+
+			return;
+		}
+
 		echo "\n<pre style=\"white-space: pre-wrap; font-size: 14px !important; background: #222; color: #def474; padding: 20px;\">";
 		print_r($var);
 		echo "</pre>\n";

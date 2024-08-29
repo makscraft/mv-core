@@ -168,7 +168,7 @@ class Installation
             return;
 
         if(!is_dir($to))
-            @mkdir($to);
+            @mkdir($to, 0777, true);
 
         $objects = scandir($from);
 
@@ -217,6 +217,7 @@ class Installation
         self :: changeAutoloaderString('/index.php');
         self :: displaySuccessMessage(' - index.php file has been configurated.');
         self :: moveAdminPanelDirectory();
+        self :: checkAndSetDirectoriesPermissions();
 
         if(true === self :: configureDatabase())
             self :: displayFinalInstallationMessage();
@@ -335,6 +336,39 @@ class Installation
         self :: removeDirectory($to);
         self :: copyDirectory($from, $to);
         self :: displaySuccessMessage(' - Admin panel folder has been moved.');
+    }
+
+    /**
+     * Sets directories permissions depending on OS.
+     */
+    static public function checkAndSetDirectoriesPermissions()
+    {
+        $directories = ['log', 'userfiles', 'userfiles/tmp', 'userfiles/database/sqlite'];
+        $root = Registry :: get('IncludePath');
+        $all = [];
+        
+        foreach($directories as $directory)
+        {
+            if(!is_dir($root.$directory))
+                continue;
+
+            $all[] = $root.$directory;
+
+            if($directory === 'userfiles' || $directory === 'userfiles/tmp')
+                foreach(scandir($root.$directory) as $subdir)
+                    if($subdir !== '.' && $subdir !== '..' && is_dir($root.$directory.'/'.$subdir))
+                        $all[] = $root.$directory.'/'.$subdir;
+        }
+
+        $all = array_unique($all);
+
+        if(PHP_OS_FAMILY === 'Darwin')
+        {
+            foreach($all as $directory)            
+                chmod($directory, 0777);
+
+            self :: displaySuccessMessage(' - MacOS directories permissions have been set.');
+        }        
     }
 
     /**
@@ -693,8 +727,8 @@ class Installation
         self :: boot();
         
         $userfiles = Registry :: get('FilesPath');
-        self :: removeDirectory($userfiles.'cache');
-        mkdir($userfiles.'cache');
+
+        Cache :: emptyCacheDirectory();        
         self :: displaySuccessMessage(' - Env and media cache have been cleared.');
 
         $folders = ['tmp/', 'tmp/admin/', 'tmp/redactor/', 'tmp/filemanager/'];

@@ -57,11 +57,20 @@ class Registry
 		$settings_list['AdminPanelPath'] = $settings_list['MainPath'].$settings_list['AdminFolder'].'/';
 
 		//Setting based on http domain name
-		if(isset($settings_list["DomainName"], $settings_list["MainPath"], $settings_list["AdminPanelPath"]))
+		if(isset($settings_list['DomainName'], $settings_list['MainPath'], $settings_list['AdminPanelPath']))
 		{
-			$settings_list["DomainName"] = preg_replace("/\/$/", "", $settings_list["DomainName"]);
-			$settings_list["HttpPath"] = $settings_list["DomainName"].$settings_list["MainPath"];
-			$settings_list["HttpAdminPanelPath"] = $settings_list["DomainName"].$settings_list["AdminPanelPath"];
+			$settings_list['DomainName'] = preg_replace('/\/$/', '', $settings_list['DomainName']);
+			$settings_list['HttpPath'] = $settings_list['DomainName'].$settings_list['MainPath'];
+			$settings_list['HttpAdminPanelPath'] = $settings_list['DomainName'].$settings_list['AdminPanelPath'];
+		}
+
+		//Tries to define native server domain
+		if('' !== $settings_list['ServerDomain'] = $_SERVER['SERVER_NAME'] ?? '')
+		{
+			$settings_list['ServerDomain'] = 'http'.(Http :: isHttps() ? 's' : '').'://'.$settings_list['ServerDomain'];
+
+			if(!isset($settings_list['DomainName']) || !$settings_list['DomainName'])
+				$settings_list['DomainName'] = $settings_list['ServerDomain'];
 		}
 	}
 

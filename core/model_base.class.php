@@ -913,7 +913,7 @@ abstract class ModelBase extends ModelInitial
 		}
 		
 		if(!is_dir(dirname($moved_file)))
-			@mkdir(dirname($moved_file));
+			@mkdir(dirname($moved_file), 0777, true);
 				
 		@copy($file, $moved_file);
 		

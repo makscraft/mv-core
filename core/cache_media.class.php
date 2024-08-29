@@ -71,13 +71,13 @@ class CacheMedia
             self :: $folder = Registry :: get('IncludePath').'userfiles/cache/';
 
             if(!is_dir(self :: $folder))
-                mkdir(self :: $folder);
+                mkdir(self :: $folder, 0777, true);
 
             self :: $map_file = self :: $folder.'media-map-'.self :: $build.'.php';
             self :: $folder .= 'media/';
 
             if(!is_dir(self :: $folder))
-                mkdir(self :: $folder);
+                mkdir(self :: $folder, 0777, true);
 
             if(Registry :: onDevelopment() || Registry :: get('CheckConfigFilesUntil') - time() > 0)
                 self :: $flags['check_filetimes'] = true;

@@ -304,7 +304,7 @@ class Cache
 		$cache_folder = Registry:: get('IncludePath').'userfiles/cache/';
 		
 		if(!is_dir($cache_folder))
-			mkdir($cache_folder);
+			mkdir($cache_folder, 0777, true);
 
 		self :: cleanConfigCacheFilesByKey($file_key);
 
@@ -312,5 +312,18 @@ class Cache
 
 		$file = $cache_folder.$file_key.'-'.(Registry :: get('Build') ?? '0').'.php';
 		file_put_contents($file, $content);
+	}
+
+	static public function emptyCacheDirectory()
+	{
+		$cache_folder = Registry:: get('IncludePath').'userfiles/cache/';
+		$objects = scandir($cache_folder);
+
+		foreach($objects as $object)
+			if($object != '.' && $object != '..')
+				if(is_file($cache_folder.$object))
+					unlink($cache_folder.$object);
+				else
+					Installation :: removeDirectory($cache_folder.$object);
 	}
 }
