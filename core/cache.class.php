@@ -317,6 +317,10 @@ class Cache
 	static public function emptyCacheDirectory()
 	{
 		$cache_folder = Registry:: get('IncludePath').'userfiles/cache/';
+
+		if(!is_dir($cache_folder))
+			return;
+		
 		$objects = scandir($cache_folder);
 
 		foreach($objects as $object)
