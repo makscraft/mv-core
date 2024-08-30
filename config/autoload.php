@@ -35,6 +35,7 @@ require_once $mvCorePath.'datatypes/image.type.php';
 require_once $mvCorePath.'datatypes/int.type.php';
 require_once $mvCorePath.'datatypes/order.type.php';
 require_once $mvCorePath.'datatypes/text.type.php';
+require_once $mvCorePath.'http.class.php';
 require_once $mvCorePath.'registry.class.php';
 require_once $mvCorePath.'i18n.class.php';
 require_once $mvCorePath.'service.class.php';
