@@ -203,6 +203,8 @@ class Installation
     static public function postUpdate(Event $event)
     {
         static :: moveAdminPanelDirectory();
+        Cache :: emptyCacheDirectory();
+        self :: displaySuccessMessage(' - Cache directory has been cleared.');
     }
 
     /**
