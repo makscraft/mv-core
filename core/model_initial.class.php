@@ -477,7 +477,7 @@ abstract class ModelInitial
 		$method = (isset($arguments[5]) && $arguments[5] == "resize") ? "compress" : "crop";
 
 		$src = $imager -> $method($image, $folder, $width, $height);
-		$file = Service :: removeFileRoot($this -> registry -> getSetting("DocumentRoot").$src);
+		$file = Service :: removeFileRoot(Registry :: get('DocumentRoot').$src);
 		
 		if(isset($params["watermark"]) && !$imager -> wasCreatedErlier())
 		{

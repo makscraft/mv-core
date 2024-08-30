@@ -45,9 +45,10 @@ class Registry
 		if(isset($settings_list['MainPath']) && $settings_list['MainPath'] !== '/')
 			$settings_list['MainPath'] = '/'.preg_replace('/^\/?(.+[^\/])\/?$/', '$1', $settings_list['MainPath']).'/';
 
-		$settings_list['DocumentRoot'] = $_SERVER['DOCUMENT_ROOT'];
-	
-		//Absolute path to userfiles folder.
+		//Some servers have trailing slash in DOCUMENT_ROOT, some not...
+		$settings_list['DocumentRoot'] = preg_replace('/\/$/', '', $_SERVER['DOCUMENT_ROOT']);	
+
+		//Absolute path to userfiles folder
 		$settings_list['FilesPath'] = $settings_list['IncludePath'].$settings_list['FilesPath'].'/';
 	
 		//Absolute path to include files into admin panel, must start and end with '/'
@@ -160,7 +161,7 @@ class Registry
 		if(!is_file($env))
 			return $this;
 
-		$data = parse_ini_file($env);
+		$data = parse_ini_file($env, false, INI_SCANNER_TYPED);
 
 		if(!is_array($data))
 			return $this;
