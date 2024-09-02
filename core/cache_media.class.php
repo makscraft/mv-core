@@ -346,12 +346,15 @@ class CacheMedia
                 $data = preg_replace('/\Wurl\s*\(\s*(\'|\")?\s*/', ' url($1'.$path, $data);
             }
 
-            $content .= "\n/* File: ".basename($file)." */\n\n";
+            $content .= "\n/* File data: ".basename($file)." */\n\n";
             $content .= $data;
             $content .= "\n/* End of file */\n\n";
         }
 
         file_put_contents($file_path, $content);
+
+        if(PHP_OS_FAMILY === 'Darwin')
+            chmod($file_path, 0777);
 
         return true;
     }

@@ -308,10 +308,13 @@ class Cache
 
 		self :: cleanConfigCacheFilesByKey($file_key);
 
-		$content = "<?php\nreturn ".var_export($data, true).";?>\n";
+		$content = "<?php\nreturn ".var_export($data, true).";";
 
 		$file = $cache_folder.$file_key.'-'.(Registry :: get('Build') ?? '0').'.php';
 		file_put_contents($file, $content);
+
+		if(PHP_OS_FAMILY === 'Darwin')
+			chmod($file, 0777);
 	}
 
 	static public function emptyCacheDirectory()

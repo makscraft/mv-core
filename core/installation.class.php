@@ -369,7 +369,12 @@ class Installation
             foreach($all as $directory)            
                 chmod($directory, 0777);
 
-            self :: displaySuccessMessage(' - MacOS directories permissions have been set.');
+            $sqlite = $root.'userfiles/database/sqlite/database.sqlite';
+            
+            if(is_file($sqlite))
+                chmod($sqlite, 0777);
+
+            self :: displaySuccessMessage(' - MacOS directories and files permissions have been set.');
         }        
     }
 

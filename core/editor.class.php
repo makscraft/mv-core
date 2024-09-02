@@ -87,9 +87,9 @@ class Editor
 				if(is_file($folder.$file))
 				{
 					$json[] = array("name" => "",
-										 "title" => $file,
-										 "link" => $url.$file, 
-										 "size" => I18n :: convertFileSize(filesize($folder.$file)));	
+									"title" => $file,
+									"link" => $url.$file, 
+									"size" => I18n :: convertFileSize(filesize($folder.$file)));	
 				}
 			}
 				
