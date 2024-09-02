@@ -139,6 +139,7 @@ class Registry
 		class_alias('ModelBase', 'Model_Base');
 		class_alias('ModelSimple', 'Model_Simple');
 		class_alias('Paginator', 'Pager');
+		class_alias('AdminPanel', 'Admin_Panel');
 
 		return $this;
 	}
