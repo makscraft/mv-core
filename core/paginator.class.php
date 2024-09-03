@@ -128,7 +128,7 @@ class Paginator
 	 * Checks if the current paginator has pages quantity greater than 2.
 	 * @return bool
 	 */
-	public function hasPages()
+	public function hasPages(): bool
 	{
 		return ($this -> intervals > 1); 
 	}
@@ -152,7 +152,7 @@ class Paginator
 	 * Creates string for SQL query to set limits of selected items (to use it like LIMIT 5,8).
 	 * @return string like LIMIT 20,10
 	 */
-   	public function getParamsForSQL()
+   	public function getParamsForSQL(): string
    	{
        	return ' LIMIT '.$this -> start.','.$this -> limit; 
    	}
@@ -161,7 +161,7 @@ class Paginator
 	 * Returns parameters for query constructor, to use in Model :: select() method.
 	 * @return string string like '10,30' to use in 'limit->' parameter.
 	 */
-	public function getParamsForSelect()
+	public function getParamsForSelect(): string
    	{
    		return $this -> start.','.$this -> limit;
    	}
@@ -170,9 +170,32 @@ class Paginator
 	 * Returns pagination conditions for sql query constructor.
 	 * @return array conditions for select() and find() methods, like ['limit->' => '5,10']
 	 */
-	public function getConditions()
+	public function getConditions(): array
 	{
 		return ['limit->' => $this -> getParamsForSelect()];
+	}
+
+	/**
+	 * Returns pagination summary with the all calculated values as array.
+	 * @return array like ['total' => 120, 'limit' => 10, ...]
+	 */
+	public function getState(): array
+	{
+		if($this -> intervals <= 1)
+			$last = $this -> total - 1;
+		else if($this -> page < $this -> intervals)
+			$last = ($this -> page * $this -> limit) - 1;
+		else
+			$last = $this -> total - 1;
+
+		return [
+			'total' => $this -> total,
+			'limit' => $this -> limit,
+			'page' => $this -> page,
+			'intervals' => $this -> intervals,
+			'first' => $this -> start,
+			'last' => $last
+		];
 	}
    
 	/**
@@ -191,8 +214,8 @@ class Paginator
 	 * Returns string of url GET params.
 	 * @return string like page=23
 	 */
-	public function getUrlParams()
-	{	
+	public function getUrlParams(): string
+	{
 		return $this -> page > 1 ? 'page='.$this -> page : '';
 	}
 	
@@ -200,7 +223,7 @@ class Paginator
 	 * Adds to passed url the string of pagination GET params.
 	 * @return string path with current page param
 	 */
-	public function addUrlParams(string $path)
+	public function addUrlParams(string $path): string
 	{
 		if($this -> page <= 1)
 			return $path;
@@ -214,7 +237,7 @@ class Paginator
 	 * Returns get param string like (?|&)page=2
 	 * @return string
 	 */
-   public function addPage(string $get) 
+   public function addPage(string $get): string
    {  	  
 	  	if($this -> intervals > 1)
       	  	return $get ? '&page='.$this -> page : '?page='.$this -> page;
@@ -226,7 +249,7 @@ class Paginator
 	* Chaeck if we have any pages before or after the current one.
 	* @return bool
     */
-   public function checkPrevNext(string $type)
+   public function checkPrevNext(string $type): bool
    {
       	if($type == 'next')
          	return ($this -> page + 1 <= $this -> intervals);
@@ -240,7 +263,7 @@ class Paginator
 	* Generates pagination list of html links for admin panel.
     * @return string html code
     */
-   public function displayPagesAdmin()
+   public function displayPagesAdmin(): string
    {
       	if($this -> intervals < 2)
          	return '';
@@ -319,9 +342,9 @@ class Paginator
 	* Displays select options (limits of elements per page).
     * @return string html options for select tag
     */	
-   	public function displayPagerLimits(array $values)
+   	public function displayPagerLimits(array $values): string
    	{
-   	  	$html = "";
+   	  	$html = '';
    	  
    	  	foreach($values as $value)
    	  	{
@@ -340,7 +363,7 @@ class Paginator
 	 * Displays html links of pagination (current page is in the center of interval).
 	 * @return string html code
 	 */
-   	public function display(string $path, bool $smart = false)
+   	public function display(string $path, bool $smart = false): string
    	{
       	if($this -> intervals < 2) //If numer of pages less than 2
          	return '';
@@ -449,7 +472,7 @@ class Paginator
 	 * Displays html link for previous page (if exists).
 	 * @return string html link code
 	 */	
-   	public function displayPrevLink(string $caption, string $path)
+   	public function displayPrevLink(string $caption, string $path): string
    	{
    		if($this -> checkPrevNext("prev") && $caption)
    		{
@@ -466,7 +489,7 @@ class Paginator
 	 * Displays html link for next page (if exists).
 	 * @return string html link code
 	 */	
-   	public function displayNextLink(string $caption, string $path)
+   	public function displayNextLink(string $caption, string $path): string
    	{
    		if($this -> checkPrevNext("next") && $caption)
    		{

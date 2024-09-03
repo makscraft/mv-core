@@ -18,8 +18,6 @@ class AdminPanel
 
         if(!isset($_SESSION['mv']['flash_messages']))
             $_SESSION['mv']['flash_messages'] = [];
-
-        //Debug :: pre($_SESSION['mv']);
     }
 
     static public function getPaginationLimit(): int
@@ -29,26 +27,41 @@ class AdminPanel
         return in_array($limit, self :: PAGINATION_LIMITS) ? $limit : 10;
     }
 
-    static public function savePaginationLimit(mixed $limit)
+    static public function savePaginationLimit(mixed $limit): bool
     {
         $limit = intval($limit);
 
         if(!in_array($limit, self :: PAGINATION_LIMITS))
-            return;
+            return false;
 
-        
+        $_SESSION['mv']['settings']['pager-limit'] = $limit;
+
+        return true;
     }
 
     public function addFlashMessage(string $type, string $message)
     {
+        $_SESSION['mv']['flash_messages'][$type] ??= [];
+        $_SESSION['mv']['flash_messages'][$type][] = $message;
 
+        return $this;
     }
 
     public function displayAndClearFlashMessages(): string
     {
         $html = '';
 
+        foreach($_SESSION['mv']['flash_messages'] as $type => $messages)
+        {
+            $html .= "<div class=\"flash-message ".$type."\">\n";
 
+            foreach($messages as $message)
+                $html .= "<div>".$message."</div>\n";
+
+            $html .= "</div>\n";
+        }
+
+        $_SESSION['mv']['flash_messages'] = [];
 
         return $html;
     }

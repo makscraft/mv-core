@@ -177,7 +177,7 @@ class I18n
 	 * @param string $key
 	 * @return string
 	 */
-	static public function locale($key)
+	static public function locale(string $key): string
 	{
 		//Gets language string for lacalization
 		if(isset(self :: $translation[$key]) && self :: $translation[$key] != "")
@@ -440,13 +440,14 @@ class I18n
 	 */
 	static public function convertFileSize($size)
 	{
-		if($size >= 1048576)
-			return round($size / 1048576, 1)." ".I18n :: locale("size-mb");
-			
-		if($size >= 1024)
-			return round($size / 1024)." ".I18n :: locale("size-kb");
-		else
-			return round($size / 1024, 2)." ".I18n :: locale("size-kb");
+		$sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+		if($size == 0)
+			return 0;
+
+		$decimals = ($size > 1073741824) ? 2 : ($size > 1048576 ? 1 : 0);
+    
+		return round($size / pow(1024, ($i = floor(log($size, 1024)))), $decimals).' '.$sizes[$i];
 	}
 	
 	/**

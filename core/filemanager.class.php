@@ -55,6 +55,12 @@ class Filemanager
 	 */
 	private const FORBIDDEN_FILES = ['tmp', 'cache', 'database'];
 
+	/**
+	 * Shows if we are currently at the root allowed derectory.
+	 * @var bool
+	 */
+	private $in_root = true;
+
 	public function __construct()
 	{
 		$_SESSION['mv']['file_manager'] ??= [];
@@ -67,11 +73,25 @@ class Filemanager
 		if(!$match || $path === '/' || strpos($path, '..') !== false || !is_dir($path))
 			$path = $_SESSION['mv']['file_manager']['path'] = Registry :: get('FilesPath');
 
+		foreach(self :: FORBIDDEN_FILES as $forbidden)
+			if(realpath($path) == realpath(Registry :: get('FilesPath').$forbidden))
+			{
+				$path = $_SESSION['mv']['file_manager']['path'] = Registry :: get('FilesPath');
+				break;
+			}
+
+		$this -> in_root = realpath(Registry :: get('FilesPath')) === realpath($path);
+
 		$this -> path = preg_replace('/\/$/', '', $path);
+		$_SESSION['mv']['file_manager']['path'] = $this -> path;
 
 		$limit = AdminPanel :: getPaginationLimit();
 		$this -> total = $this -> countFilesInDirectory($this -> path);
-		$this -> pagination = new Paginator($this -> total, 10);
+
+		if($this -> in_root && $this -> total > 0)
+			$this -> total --;
+
+		$this -> pagination = new Paginator($this -> total, $limit);
 	}
 
 	public function setUser(User $user)
@@ -98,69 +118,88 @@ class Filemanager
 
 	public function displayCurrentPath()
 	{ 
-		$html = Service :: removeDocumentRoot($this -> path);
+		$html = Service :: removeFileRoot($this -> path);
 		$html = str_replace('/', ' / ', $html);
 
-		return $html;
+		return '/ '.$html;
 	}
 
-	public function openDirectory(string $path = '')
-	{
-		$folder = $path === '' ? $this -> path : $path;
-		$descriptor = @opendir($folder);
-		
-		if($descriptor === false)
-		{
-			Debug :: displayError('Unable to open the directory:'.$folder);
-			return false;
-		}
-		else 
-			return $descriptor;
-	}
+	/* Navigation */
 
-	/**
-	 * Counts the total number of files in directory for pagination.
-	 */
-	public function countFilesInDirectory(string $directory): int
+	public function navigate(string $path): bool
 	{
-		if(false === $descriptor = $this -> openDirectory($directory))
-			return 0;
-		
-		$count = 0;
-				
-		while(false !== ($file = readdir($descriptor)))
+		$path = trim($path);
+
+		if($path === 'back')
 		{
-			if($file === '.' || preg_match('/^\.[^\.]+/', $file))
-				continue;
+			if($this -> in_root)
+				return false;
 			
-			if($file === '..' && $this -> path == Registry :: get('FilesPath'))
-				continue;
+			$back = realpath($_SESSION['mv']['file_manager']['path'].'/..');
 
-			if(is_file($directory.'/'.$file) || is_dir($directory.'/'.$file)) //Counts only real files and folders
-				$count ++;
+			if($back !== false)
+			{
+				$_SESSION['mv']['file_manager']['path'] = str_replace('\\', '/', $back);
+
+				return true;
+			}
 		}
-		
-		return $count;
+		else if(preg_match('/^folder-/', $path))
+		{
+			$folder = preg_replace('/^folder-/', '', $path);
+
+			if($folder == '' || preg_match('/[\.`\/\\\]+/', $folder) || !is_dir($this -> path.'/'.$folder))
+				return false;
+
+			$_SESSION['mv']['file_manager']['path'] .= '/'.$folder;
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public function prepareFilesForDisplay(): array
 	{
-		if(false === $descriptor = $this -> openDirectory($this -> path))
-			return ['..'];
+		clearstatcache();
 
-		$result = ['..'];
+		if(false === $descriptor = $this -> openDirectory($this -> path))
+			return [];
+
+		$pagination = $this -> pagination -> getState();
+		$count = 0;
+		$result = [];
+		
+		if(!$this -> in_root)
+		{
+			if($pagination['page'] == 1)
+				$result = ['..'];
+
+			$count = 1;
+		}
 
 		while(false !== ($file = readdir($descriptor)))
-			if($file !== '.' && $file !== '..' && !preg_match('/^\.[^\.]+/', $file))
-				if(is_dir($this -> path.'/'.$file))
-					$result[] = $this -> path.'/'.$file;
+			if($file !== '.' && $file !== '..' && is_dir($this -> path.'/'.$file))
+				{
+					if($count >= $pagination['first'] && $count <= $pagination['last'])
+						$result[$count] = $this -> path.'/'.$file;
+
+					$count ++;
+				}
 
 		rewinddir($descriptor);
 
 		while(false !== ($file = readdir($descriptor)))
-			if($file !== '.' && $file !== '..' && !preg_match('/^\.[^\.]+/', $file))
-				if(is_file($this -> path.'/'.$file))
-					$result[] = $this -> path.'/'.$file;
+			if($file !== '.' && $file !== '..' && is_file($this -> path.'/'.$file))
+				{
+					if($count >= $pagination['first'] && $count <= $pagination['last'])
+						$result[$count] = $this -> path.'/'.$file;
+
+					if( ++ $count > $pagination['last'])
+						break;
+				}
+
+		closedir($descriptor);
 
 		return $result;
 	}
@@ -179,6 +218,7 @@ class Filemanager
 		$all_types = Registry :: get('AllowedFiles');
 		$tmp = Registry :: get('FilesPath').'tmp';
 		$imager = new Imager();
+		$img_max_weight = 1024 * 1024 * 3;
 
 		foreach($files as $file)
 		{
@@ -202,7 +242,7 @@ class Filemanager
 			{
 				$extension = Service :: getExtension($file);
 
-				if(!in_array($extension, $all_types))
+				if(!in_array($extension, $all_types) || preg_match('/^\.[^\.]+/', $file))
 					$disable = true;
 				else
 				{
@@ -213,11 +253,11 @@ class Filemanager
 							$thumb = Service :: removeDocumentRoot($file);
 							$params = "<img class=\"svg-image\" src=\"".$thumb."\" alt=\"".basename($file)."\" />\n";
 						}
-						else
+						else if(filesize($file) <= $img_max_weight)
 						{
 							$tmp_file = $tmp.'/'.md5($file).'.'.$extension;
 							copy($file, $tmp_file);
-							$thumb = $imager -> compress($tmp_file, 'filemanager', 100, 100);
+							$thumb = $imager -> compress($tmp_file, 'filemanager', 60, 60);
 							unlink($tmp_file);
 
 							if($thumb)
@@ -235,24 +275,33 @@ class Filemanager
 				}
 			}
 
-			$html .= "<tr".($disable ? ' class="disabled"' : '').">\n";
-			//$html .= "<td><input type=\"checkbox\" name=\"delete_".$count."\" value=\"\" /></td>\n";
+			$css = $file === '..' ? 'back' : '';
+			$css = is_dir($file) && $file !== '..' ? 'folder' : $css;
+			$css .= $disable ? ' disabled' : '';
+
+			$html .= "<tr".($css ? ' class="'.$css.'"' : '').">\n";
+			$html .= "<td class=\"name\">";
 
 			if($file === '..')
-				$html .= "<td><a href=\"?back=".md5(dirname($file))."\"> .. ".I18n :: locale('back')."</a></td>\n";
+				$html .= "<a href=\"?navigation=back\"> .. ".mb_strtolower(I18n :: locale('back'))."</a>";
 			else if($disable)
-				$html .= "<td class=\"name\">".basename($file)."</td>\n";
+				$html .= basename($file);
 			else if(is_dir($file))
-				$html .= "<td><a href=\"?folder=".basename($href)."\">".basename($file)."</a></td>\n";
+				$html .= "<a href=\"?navigation=folder-".urlencode(basename($href))."\">".basename($file)."</a>";
 			else
-				$html .= "<td><a target=\"_blank\" href=\"".$href."\">".basename($file)."</a></td>\n";
+				$html .= "<a target=\"_blank\" href=\"".$href."\">".basename($file)."</a>";
+
+			$html .= "</td>\n";				
 			
-			$html .= "<td>".($file === '..' ? '-' : I18n :: convertFileSize($size))."</td>\n";
+			$html .= "<td>".($file === '..' ? '-' : I18n :: convertFileSize($size))."</td>\n";			
+			$html .= "<td class=\"params\">".$params."</td>\n";
 			$html .= "<td>".I18n :: timestampToDate(filemtime($file))."</td>\n";
-			$html .= "<td>".$params."</td>\n";
+
+			if(is_dir($file) && count(scandir($file)) > 2)
+				$disable = true;
 
 			if($file !== '..' && !$disable)
-				$html .= "<td><a class=\"single-action action-delete\"></a></td>\n";
+				$html .= "<td class=\"operations\"><a class=\"single-action action-delete\"></a></td>\n";
 			else
 				$html .= "<td></td>\n";
 			
@@ -267,28 +316,67 @@ class Filemanager
 	/**
 	 * 
 	 */
-	public function uploadFile($file)
+	public function uploadFile($name)
 	{
+		$folder = Service :: removeFileRoot($this -> path);
+		$folder = preg_replace('/^\/?userfiles\/?/', '', $folder);
+		$object = new FileModelElement('File', 'file', $name, ['files_folder' => $folder]);
+		$object -> setValue($_FILES[$name] ?? []);
+		$result = ['success' => false, 'message' => ''];
 
+		if(is_null($object -> getValue()) || !is_file($object -> getValue()))
+		{
+			if($object -> getError())
+				$result['message'] = Model :: processErrorText(['File', $object -> getError()], $object);
+
+			return $result;
+		}
+
+		if(file_exists($this -> path.'/'.$object -> getProperty('file_name')))
+		{
+			$result['message'] = I18n :: locale('file-exists');
+			return $result;
+		}
+
+		if($object -> copyFile())
+			$result = [
+				'success' => true,
+				'message' => I18n :: locale('file-uploaded')
+			];
+
+		return $result;
 	}
 
 	/**
-	 * 
+	 * Creates a new folder (directory) in current directory.
 	 */
-	public function createFolder($name)
+	public function createFolder($name): array
 	{
 		$name = trim(strval($name));
+		$result = ['success' => false, 'message' => ''];
 		
-		if($name == "")
-			return;
+		if($name === '' || $name === '/')
+			return $result;
+
+		if(preg_match("/[^\w\-\s]/ui", $name))
+		{
+			$result['message'] = I18n :: locale('bad-folder-name');
+			return $result;
+		}
 		
-		if(file_exists($this -> path.$name))
-			return "error=folder-exists";
-		else if(preg_match("/[^\w-]/", $name))
-			return "error=bad-folder-name";
+		if(file_exists($this -> path.'/'.$name))
+		{
+			$result['message'] = I18n :: locale('folder-exists');
+			return $result;
+		}
+
+		if(mkdir($this -> path.'/'.$name))
+			$result = [
+				'success' => true,
+				'message' => I18n :: locale('folder-created')
+			];
 		
-		// Creates a new folder (directory) in current directory
-		return @mkdir($this -> path.$name) ? "done=folder-created" : "error=folder-not-created";
+		return $result;
 	}
 
 	/**
@@ -321,7 +409,7 @@ class Filemanager
 
 		while(false !== ($file = readdir($descriptor)))
 			if(is_file($tmp_folder.$file) && !preg_match('/^\.[^\.]+/', $file))
-				if(time() - filemtime(tmp_folder.$file) > 3600)
+				if(time() - filemtime($tmp_folder.$file) > 3600)
 					@unlink($tmp_folder.$file);
 		
 		$tmp_folder .= 'filemanager/';
@@ -333,11 +421,12 @@ class Filemanager
 					@unlink($tmp_folder.$file);
 	}
 
-	static public function cleanModelImages($path) 
+	/**
+	 * Deletes temporary images which are not reladted to any image from main folder.
+	 * There must be a dir with initial images and dirs like tmp, tmpsmall with thumbs.
+	 */
+	static public function cleanModelImages(string $path)
 	{
-		//Deletes temporary images which are not reladted to any image from main folder
-		//There must be dir with initial images and dirs like tmp, tmpsmall with thumbs
-
 		if(!is_dir($path))
 			return;
 		
@@ -495,7 +584,49 @@ class Filemanager
 
 	/* Heplers */
 
-	public function defineFolderSize(string $path)
+	public function openDirectory(string $path = '')
+	{
+		$folder = $path === '' ? $this -> path : $path;
+		$descriptor = @opendir($folder);
+		
+		if($descriptor === false)
+		{
+			Debug :: displayError('Unable to open the directory:'.$folder);
+			return false;
+		}
+		else 
+			return $descriptor;
+	}
+
+	/**
+	 * Counts the total number of files in directory for pagination.
+	 */
+	public function countFilesInDirectory(string $directory): int
+	{
+		if(false === $descriptor = $this -> openDirectory($directory))
+			return 0;
+		
+		$count = 0;
+				
+		while(false !== ($file = readdir($descriptor)))
+		{
+			if($file === '.')
+				continue;
+			
+			//Counts only real files and folders
+			if(is_file($directory.'/'.$file) || is_dir($directory.'/'.$file))
+				$count ++;
+		}
+
+		closedir($descriptor);
+		
+		return $count;
+	}	
+
+	/**
+	 * Calculates total size of directory with all it's content.
+	 */
+	public function defineFolderSize(string $path): int
 	{
 	    $size = 0;
 	    $dir = scandir($path);
