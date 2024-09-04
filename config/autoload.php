@@ -58,6 +58,7 @@ require_once $mvCorePath.'imager.class.php';
 require_once $mvCorePath.'content.class.php';
 require_once $mvCorePath.'record.class.php';
 require_once $mvCorePath.'paginator.class.php';
+require_once $mvCorePath.'admin_panel.class.php';
 
 $mvConfigFiles = [
 	$mvIncludePath.'config/setup.php',
