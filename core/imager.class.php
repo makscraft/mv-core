@@ -142,7 +142,7 @@ class Imager
          case('jpg'):
             return imagecreatefromjpeg($image);
          case('png'):
-            return imagecreatefrompng($image);
+            return @imagecreatefrompng($image);
          case('webp'):
             return imagecreatefromwebp($image);
       }
@@ -223,7 +223,7 @@ class Imager
                   break;
          case('png'):
          		   $pattern = $this -> removePngTransparency($pattern);
-                  $image = imagecreatefrompng($this -> image);
+                  $image = @imagecreatefrompng($this -> image);
                   imagecopyresampled($pattern, $image, 0, 0, 0, 0, $new_width, $new_height, $this -> width, $this -> height);
                   imagepng($pattern, $new_file);
                   break;
