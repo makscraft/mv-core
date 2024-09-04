@@ -7,11 +7,12 @@
 #filemanager-form tr.disabled td.name{color: #999;}
 #filemanager-form tr td.name{padding-left: 30px; background-repeat: no-repeat; 
 background-position: left 5px center;}
-#filemanager-form tr td.params{display: flex; align-items: center;}
+#filemanager-form tr td.params > div{display: flex; align-items: center; height: 60px;}
 #filemanager-form tr td.params a{display: inline-flex;}
-#filemanager-form tr td.params:has(img) span{margin-left: 10px;}
+#filemanager-form tr td.params div:has(img) div{margin-left: 10px;}
 #filemanager-form tr td.params img{max-width: 60px;}
 #filemanager-form tr td.operations{max-width: 100px;}
+#filemanager-form tr td.operations a.disabled{opacity: 0.3; cursor: default;}
 
 #filemanager-navigation{display: flex; justify-content: space-between; margin-bottom: 30px;}
 #filemanager-navigation section:first-child{margin-bottom: 25px;}
@@ -20,10 +21,3 @@ background-position: left 5px center;}
 #filemanager-navigation section form input[type='text']{height: 33px; box-sizing: border-box;
 padding: 5px 1%; border-radius: 3px; border: 1px solid #918b8b; width: 238px;}
 #filemanager-navigation section form input[type='file']{width: 230px;}
-
-.flash-message{margin: 0 5px 20px 0px; padding: 15px 10px; width: 60%; clear: both; border-radius: 4px; 
--moz-border-radius: 4px; -webkit-border-radius: 4px; background: #fdccfa;}
-.flash-message div{margin-bottom: 10px;}
-.flash-message div:last-child{margin-bottom: 0;}
-.flash-message.error{background: #fbd689;}
-.flash-message.success{background: #deee85;}

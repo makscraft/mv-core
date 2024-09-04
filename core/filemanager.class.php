@@ -14,7 +14,7 @@ class Filemanager
 	public $pagination;
 		
 	/**
-	 * User object to check the rights to manage files.
+	 * Current user object of admin panel to check the rights to manage files.
 	 * @var User
 	 */ 
 	public $user;
@@ -126,6 +126,11 @@ class Filemanager
 
 	/* Navigation */
 
+	/**
+	 * Canges current filesystem path stored in session.
+	 * @param string $path clicked folder or back action
+	 * @return bool true is success
+	 */
 	public function navigate(string $path): bool
 	{
 		$path = trim($path);
@@ -159,6 +164,10 @@ class Filemanager
 		return false;
 	}
 
+	/**
+	 * Selects files and folders to display according to rules and pagination.
+	 * @return array files and folders to display
+	 */
 	public function prepareFilesForDisplay(): array
 	{
 		clearstatcache();
@@ -219,6 +228,9 @@ class Filemanager
 		$tmp = Registry :: get('FilesPath').'tmp';
 		$imager = new Imager();
 		$img_max_weight = 1024 * 1024 * 3;
+		$secret = Registry :: get('SecretCode');
+		$highlight = AdminPanel :: getFlashParameter('highlight') ?? '';
+		$can_delete = $this -> user -> checkModelRights('filemanager', 'delete');
 
 		foreach($files as $file)
 		{
@@ -230,13 +242,19 @@ class Filemanager
 			$params = '-';
 			$disable = false;
 			$href = Service :: removeDocumentRoot($file);
+			$identity = ['type' => '', 'path' => $file, 'token' => md5(filemtime($file).$file.$secret)];
 
 			if(is_dir($file) && $file !== '..')
 			{
 				if(in_array(basename($file), self :: FORBIDDEN_FILES))
 					$disable = true;
-				else
-					$params = I18n :: locale('show').': '.$this -> countFilesInDirectory($file) - 1;
+
+				$total_in = $this -> countFilesInDirectory($file) - 1;
+				
+				if($total_in > 0)
+					$params = I18n :: locale('number-files', ['number' => $total_in, 'files' => '*number']);
+
+				$identity['type'] = 'directory';
 			}
 			else if(is_file($file))
 			{
@@ -266,18 +284,23 @@ class Filemanager
 
 						if(strpos($params, '<img ') !== false)
 						{
-							$params = "<a target=\"_blank\" href=\"".$href."\">".$params."</a>\n";
+							$params = "<div>\n<a target=\"_blank\" href=\"".$href."\">".$params."</a>\n";
 							
 							if($dimentions = @getimagesize($file))
-								$params .= "<span>".$dimentions[0].' x '.$dimentions[1]." px<span>\n";
+								$params .= "<div>".$dimentions[0].' x '.$dimentions[1]." px</div>\n";
+
+							$params .= "</div>\n";
 						}
 					}
+
+					$identity['type'] = 'file';
 				}
 			}
 
 			$css = $file === '..' ? 'back' : '';
 			$css = is_dir($file) && $file !== '..' ? 'folder' : $css;
 			$css .= $disable ? ' disabled' : '';
+			$css .= $highlight === $file ? ' moved-line' : '';
 
 			$html .= "<tr".($css ? ' class="'.$css.'"' : '').">\n";
 			$html .= "<td class=\"name\">";
@@ -293,20 +316,35 @@ class Filemanager
 
 			$html .= "</td>\n";				
 			
-			$html .= "<td>".($file === '..' ? '-' : I18n :: convertFileSize($size))."</td>\n";			
+			$html .= "<td>".(($file === '..' || !$size) ? '-' : I18n :: convertFileSize($size))."</td>\n";			
 			$html .= "<td class=\"params\">".$params."</td>\n";
 			$html .= "<td>".I18n :: timestampToDate(filemtime($file))."</td>\n";
 
-			if(is_dir($file) && count(scandir($file)) > 2)
+			if(is_dir($file) && count(scandir($file)) > 2 || !is_writable($file))
 				$disable = true;
 
-			if($file !== '..' && !$disable)
-				$html .= "<td class=\"operations\"><a class=\"single-action action-delete\"></a></td>\n";
+			if($file !== '..')
+			{
+				$identity = Service :: encodeBase64(json_encode($identity));
+				$type = is_file($file) ? 'is-file' : 'is-folder';
+				$css = '';
+
+				if($disable || !$can_delete || !is_writable($file))
+				{
+					$css = ' disabled';
+					$identity = '';
+				}
+
+				$html .= "<td class=\"operations\"><a class=\"single-action action-delete ".$type.$css."\"";
+				$html .= " data=\"".$identity."\"></a></td>\n";
+			}
 			else
 				$html .= "<td></td>\n";
 			
 			$html .= "</tr>\n";
 		}
+
+		AdminPanel :: clearFlashParameters();
 
 		return $html;
 	}
@@ -314,9 +352,10 @@ class Filemanager
 	/* Actions in admin panel */
 
 	/**
-	 * 
+	 * Uploads a file using FileModelElement functions.
+	 * @param string $name field name in $_FILES array
 	 */
-	public function uploadFile($name)
+	public function uploadFile(string $name)
 	{
 		$folder = Service :: removeFileRoot($this -> path);
 		$folder = preg_replace('/^\/?userfiles\/?/', '', $folder);
@@ -339,10 +378,14 @@ class Filemanager
 		}
 
 		if($object -> copyFile())
+		{
 			$result = [
 				'success' => true,
 				'message' => I18n :: locale('file-uploaded')
 			];
+
+			AdminPanel :: addFlashParameter('highlight', $this -> path.'/'.$object -> getProperty('file_name'));
+		}
 
 		return $result;
 	}
@@ -371,30 +414,72 @@ class Filemanager
 		}
 
 		if(mkdir($this -> path.'/'.$name))
+		{
 			$result = [
 				'success' => true,
 				'message' => I18n :: locale('folder-created')
 			];
-		
+
+			AdminPanel :: addFlashParameter('highlight', $this -> path.'/'.$name);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Common delete processor for files and folders.
+	 * @param string $target packed identifier
+	 */
+	public function deleteAction(string $target)
+	{
+		$result = ['success' => false, 'message' => ''];
+		$target = json_decode(Service :: decodeBase64($target), true);
+
+		if(!is_array($target) || !isset($target['path']))
+			return $result;
+
+		$in_path = $this -> path.'/'.basename($target['path']);
+		$token = md5(filemtime($target['path']).$target['path'].Registry :: get('SecretCode'));
+
+		if(!file_exists($target['path']) || $target['token'] !== $token || $in_path !== $target['path'])
+			return $result;
+
+		if(!is_writable($target['path']))
+			$result['message'] = I18n :: locale('no-rights');
+		else
+		{
+			if($target['type'] === 'file')
+				$result['success'] = $this -> deleteFile($target['path']);
+			else if($target['type'] === 'directory')
+				$result['success'] = $this -> deleteFolder($target['path']);
+
+			$key = !$result['success'] ? 'done-delete' : 'not-deleted';
+			$result['message'] = I18n :: locale($key);		
+		}
+
 		return $result;
 	}
 
 	/**
 	 * Deletes folder in current directory.
 	 */
-	public function deleteFolder($folder)
+	public function deleteFolder(string $path)
 	{
-		if(file_exists($this -> path.$folder))
-			return @rmdir($this -> path.$folder);
+		if(is_dir($path))
+			@rmdir($path);
+
+		return !is_dir($path);
 	}
 
 	/**
 	 * Deletes the one file in current directory.	
 	 */
-	public function deleteFile($file)
+	public function deleteFile(string $path)
 	{
-		if(file_exists($this -> path.$file))
-			return @unlink($this -> path.$file);
+		if(is_file($path))
+			@unlink($path);
+
+		return !is_file($path);
 	}
 
 	/* Cleanup support */

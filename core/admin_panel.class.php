@@ -5,20 +5,38 @@
 class AdminPanel
 {
     /**
+	 * Current user object of admin panel with credentials and settings.
+	 * @var User
+	 */ 
+	public $user;
+
+    /**
      * Available limits for pagination in admin panel, for all modules.
      */
     public const PAGINATION_LIMITS = [5, 10, 15, 20, 30, 50, 100, 200, 300, 500];
 
-    public function __construct()
+    public function __construct(User $user = null)
     {
         Registry :: set('AdminPanelEnvironment', true);
         
         if(!Service :: sessionIsStarted())
             session_start();
 
-        if(!isset($_SESSION['mv']['flash_messages']))
-            $_SESSION['mv']['flash_messages'] = [];
+        $_SESSION['mv']['flash_messages'] ??= [];
+        $_SESSION['mv']['flash_parameters'] ??= [];
+
+        if(is_object($user))
+            $this -> setUser($user);
     }
+
+    /**
+     * Sets current user objec in admin panel.
+     */
+    public function setUser(User $user)
+	{ 
+		$this -> user = $user;
+		return $this;
+	}
 
     static public function getPaginationLimit(): int
     {
@@ -27,7 +45,7 @@ class AdminPanel
         return in_array($limit, self :: PAGINATION_LIMITS) ? $limit : 10;
     }
 
-    static public function savePaginationLimit(mixed $limit): bool
+    public function savePaginationLimit(mixed $limit): bool
     {
         $limit = intval($limit);
 
@@ -35,6 +53,9 @@ class AdminPanel
             return false;
 
         $_SESSION['mv']['settings']['pager-limit'] = $limit;
+
+        if(is_object($this -> user))
+            $this -> user -> saveSettings($_SESSION['mv']['settings']);
 
         return true;
     }
@@ -64,5 +85,21 @@ class AdminPanel
         $_SESSION['mv']['flash_messages'] = [];
 
         return $html;
+    }
+
+    static public function addFlashParameter(string $key, mixed $value)
+    {
+        if(is_numeric($value) || is_string($value) || is_array($value))
+            $_SESSION['mv']['flash_parameters'][$key] = $value;
+    }
+
+    static public function getFlashParameter(string $key): mixed
+    {
+        return $_SESSION['mv']['flash_parameters'][$key] ?? null;
+    }
+
+    static public function clearFlashParameters()
+    {
+        $_SESSION['mv']['flash_parameters'] = [];
     }
 }

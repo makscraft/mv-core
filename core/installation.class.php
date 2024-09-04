@@ -740,6 +740,8 @@ class Installation
 
         $folders = ['tmp/', 'tmp/admin/', 'tmp/redactor/', 'tmp/filemanager/'];
 
+        (new Filemanager()) -> cleanTmpFiles();
+
         foreach($folders as $folder)
             Filemanager :: deleteOldFiles($userfiles.$folder);
 

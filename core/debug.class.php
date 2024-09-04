@@ -54,6 +54,8 @@ class Debug
 	 */
 	public static function pre(mixed $var)
 	{
+		$var = is_null($var) ? 'null' : $var;
+
 		if(Registry :: get('BootFromCLI'))
 		{
 			echo PHP_EOL;

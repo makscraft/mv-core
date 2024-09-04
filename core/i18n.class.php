@@ -207,10 +207,13 @@ class I18n
 					else
 						$string = str_replace('{'.$pattern.'}', $value, $string);
 			
+			if(is_array($string))
+				$string = '{'.$key.'_'.self :: $region.'}';
+			
 			return $string;
 		}
 		else
-			return "{".$key."_".self :: $region."}"; //If key not found we show the key + lang prefix
+			return '{'.$key.'_'.self :: $region.'}'; //If key not found we show the key + lang prefix
 	}
 	
 	/**

@@ -144,7 +144,6 @@ $regionalData = array(
       'name' => 'Name',
       'garbage' => 'Papierkorb',
       'module' => 'Modul',
-      'date' => 'Datum',
       'creating' => 'Herstellung',
       'editing' => 'Bearbeitung',
       'deleting' => 'Löschen',

@@ -146,7 +146,6 @@ $regionalData = array(
 		'name' => 'Название',
 		'garbage' => 'Корзина',
 		'module' => 'Модуль',
-		'date' => 'Дата',
 		'creating' => 'Создание',
 		'editing' => 'Редактирование',
 		'deleting' => 'Удаление',
