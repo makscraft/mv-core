@@ -142,7 +142,7 @@ class User
  										FROM `".self :: TABLE."`  
  										WHERE `id`='".$this -> id."'");
  		
- 		return json_decode(base64_decode($data), true);
+		return json_decode(base64_decode(strval($data)), true);
  	}
  	
  	public function updateSetting($key, $value)
