@@ -255,10 +255,8 @@ class Installation
             $folder = $folder === '' ? '/' : $folder;
             $error = '';
             
-            if(!preg_match('/^[\/\w\-_]+$/', $folder))
+            if(!preg_match('/^[\/\w\-]+$/', $folder))
                 $error = 'Error! You need to enter the project subdirectory name like /my/application/ or myapp (or simply /).';
-            else if(strpos($folder, '.') !== false)
-                $error = 'Error! Project subdirectory name may not contain \".\" character.';
 
             if(!$error && !preg_match('/^\//', $folder))
                 $folder = '/'.$folder;
@@ -266,7 +264,7 @@ class Installation
             if(!$error && !preg_match('/\/$/', $folder))
                 $folder = $folder.'/';
 
-            $back = static :: $instance['directory'].preg_replace('/\w+/', '..', $folder);
+            $back = static :: $instance['directory'].preg_replace('/[\w\-]+/', '..', $folder);
             $back = realpath($back);
             
             if(!$error)
