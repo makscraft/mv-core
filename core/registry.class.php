@@ -2,15 +2,16 @@
 /**
  * Keeps all configurations of application and current version of MV core.
  * Works on the singleton pattern.
+ * Any setting can be retreived by using Registry :: get('option_name') method.
  */
 class Registry
 {
 	/**
-	 * Current version of MV core and admin panel.
+	 * Current version of MV core and admin panel, mostly for internal needs.
 	 * Works together with 'Version' setting from config/settings.php 
 	 * @var float
 	 */
-	private static $version = 3.0;
+	private static $version = 3.1;
 	
 	/**
 	 * Instance of singleton pattern to keep only one copy of object.
@@ -19,7 +20,7 @@ class Registry
 	private static $instance;
 	
 	/**
-	 * Configuration settings from /config/ folder and .env file.
+	 * Configuration settings from /config/ directory and .env file.
 	 * @var array
 	 */
 	private static $settings = [];
