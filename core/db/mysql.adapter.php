@@ -8,11 +8,14 @@ class MysqlAdapter extends DbAdapter
 	{
 		$host = self :: $registry -> getSetting("DbHost");
 		$user = self :: $registry -> getSetting("DbUser");
-		$pass = self :: $registry -> getSetting("DbPassword");
-		$name = self :: $registry -> getSetting("DbName");
+		$password = self :: $registry -> getSetting("DbPassword");
+		$database = self :: $registry -> getSetting("DbName");
+
+		if(PHP_OS_FAMILY === 'Darwin' && $host === 'localhost')
+			$host = '127.0.0.1';
 		
-		$pdo = new PDO("mysql:host=".$host.";dbname=".$name, $user, $pass, 
-			            array(PDO :: MYSQL_ATTR_INIT_COMMAND => "SET NAMES \"UTF8\""));
+		$pdo = new PDO("mysql:host=".$host.";dbname=".$database, $user, $password, 
+						[PDO :: MYSQL_ATTR_INIT_COMMAND => "SET NAMES \"UTF8\""]);
 								            
 		$pdo -> setAttribute(PDO :: MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 

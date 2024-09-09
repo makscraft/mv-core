@@ -167,9 +167,8 @@ class Installation
         if($from == '/' || strpos($from, '..') !== false || strpos($to, '..') !== false)
             return;
 
-        if(!is_dir($to))
-            @mkdir($to, 0777, true);
-
+        Filemanager :: createDirectory($to);
+        
         $objects = scandir($from);
 
         foreach($objects as $object)
@@ -446,9 +445,10 @@ class Installation
     {
         $message = 'Please select database driver [mysql / sqlite]';
         $driver = self :: typePromptWithCoices($message, ['mysql', 'sqlite']);
+        $db_host = PHP_OS_FAMILY === 'Darwin' ? '127.0.0.1' : 'localhost';
 
         self :: setEnvFileParameter('DATABASE_ENGINE', $driver);
-        self :: setEnvFileParameter('DATABASE_HOST', $driver === 'mysql' ? 'localhost' : '');
+        self :: setEnvFileParameter('DATABASE_HOST', $driver === 'mysql' ? $db_host : '');
 
         if($driver === 'sqlite')
         {

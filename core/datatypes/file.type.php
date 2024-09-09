@@ -324,7 +324,7 @@ class FileModelElement extends CharModelElement
 		if(!file_exists($new_value)) //If this file was not copied before
 		{
 			if(!is_dir($path)) //Makes the target folder if needed
-				@mkdir($path);
+				Filemanager :: createDirectory($path);
 				
 			if(is_file($this -> value)) //Moves the file to the target folder
 				@rename($this -> value, $new_value);

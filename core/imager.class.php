@@ -87,7 +87,7 @@ class Imager
       $new_file = $path.$file; //Path of small copy of image
             
       if(!is_dir($path))
-          @mkdir($path, 0777, true);
+         Filemanager :: createDirectory($path);
       
       return $new_file;
    }

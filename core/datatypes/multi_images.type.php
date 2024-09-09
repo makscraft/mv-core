@@ -218,10 +218,8 @@ class MultiImagesModelElement extends CharModelElement
 		$counter = intval($registry -> getDatabaseSetting('files_counter'));
 		
 		$moved_images = [];
-		
-		if(!is_dir($path)) 
-			@mkdir($path);
-				
+		Filemanager :: createDirectory($path);
+
 		foreach($images as $image)
 		{
 			$comment = $image['comment'] ?? '';
@@ -230,7 +228,7 @@ class MultiImagesModelElement extends CharModelElement
 				
 			if($check === true) //If image is located in temporary folder
 			{
-				if(strpos(basename($image), "-") !== false)
+				if(strpos(basename($image), '-') !== false)
 				{
 					$new_value = Service :: removeExtension(basename($image));
 					$new_value = substr($new_value, 0, -31);

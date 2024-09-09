@@ -413,7 +413,7 @@ class Filemanager
 			return $result;
 		}
 
-		if(mkdir($this -> path.'/'.$name))
+		if(self :: createDirectory($this -> path.'/'.$name))
 		{
 			$result = [
 				'success' => true,
@@ -724,5 +724,21 @@ class Filemanager
 	                 $size += filesize($path.'/'.$file);
 	    
 	    return $size;
+	}
+
+
+	/**
+	 * Creates new directory and sets permissions according to OS.
+	 * @return bool true if created succesfully, false if not
+	 */
+	static public function createDirectory(string $path): bool
+	{
+		if(!file_exists($path))
+			mkdir($path. 0777, true);
+
+		if(PHP_OS_FAMILY === 'Darwin')
+			chmod($path, 0777);
+
+		return is_dir($path);
 	}
 }

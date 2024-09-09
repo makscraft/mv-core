@@ -304,7 +304,7 @@ class Cache
 		$cache_folder = Registry:: get('IncludePath').'userfiles/cache/';
 		
 		if(!is_dir($cache_folder))
-			mkdir($cache_folder, 0777, true);
+			Filemanager :: createDirectory($cache_folder);
 
 		self :: cleanConfigCacheFilesByKey($file_key);
 
