@@ -734,7 +734,7 @@ class Filemanager
 	static public function createDirectory(string $path): bool
 	{
 		if(!file_exists($path))
-			mkdir($path. 0777, true);
+			mkdir($path, 0777, true);
 
 		if(PHP_OS_FAMILY === 'Darwin')
 			chmod($path, 0777);
