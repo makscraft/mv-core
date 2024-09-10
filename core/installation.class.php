@@ -456,7 +456,7 @@ class Installation
             return true;
         }
         else if($driver === 'mysql')
-            self :: displaySuccessMessage(' - Now please fill database settings for MySQL in .env file and run "composer database" in your project directory.');
+            self :: displaySuccessMessage(' - Now please fill database settings for MySQL in .env file and run "composer mv:database" in your project directory.');
     }
 
     /**
@@ -651,7 +651,7 @@ class Installation
     //Commands
 
     /**
-     * Database configuration via CLI composer command.
+     * Command 'composer mv:database', database initial configuration via CLI.
      */
     static public function commandConfigureDatabase(Event $event)
     {
@@ -682,7 +682,7 @@ class Installation
     }
 
     /**
-     * Check and runs database migrations via CLI composer command.
+     * Command 'composer mv:migrations', checks and runs database migrations via CLI.
      */
     static public function commandMigrations(Event $event)
     {
@@ -694,7 +694,7 @@ class Installation
         if(!in_array('versions', $tables) || !in_array('users', $tables))
         {
             $message = "Unable to run migrations. Initial database dump was not imported.".PHP_EOL;
-            $message .= " Probably you need to execute \"composer database\" before.";
+            $message .= " Probably you need to execute \"composer mv:database\" before.";
 
             self :: displayErrorMessage($message);
             return;
@@ -724,7 +724,7 @@ class Installation
     }
 
     /**
-     * Cleans cache folder and deletes old files from userfiles/ directory. 
+     * Command 'composer mv:cleanup', cleans cache folder and deletes old files from userfiles/ directory. 
      */
     static public function commandCleanup(Event $event)
     {
@@ -754,7 +754,7 @@ class Installation
     }
 
     /**
-     * Sets the application regional localization (env, initial models, views, and database pages)
+     * Command 'composer mv:region' the application regional localization (env, initial models, views, and database pages)
      */
     static public function commandRegion(Event $event)
     {
@@ -767,7 +767,7 @@ class Installation
 
         if($region === '')
         {
-            $message = 'Region value has not been passed. Pass it like "composer region -- en"';
+            $message = 'Region value has not been passed. Pass it like "composer mv:region -- en"';
             $message .= PHP_EOL.' Supported regions are: '.implode(', ', $supported);
             self :: displayErrorMessage($message);
 
@@ -875,7 +875,7 @@ class Installation
     }
 
     /**
-     * General common command to extend functionality.
+     * General common command 'composer mv:service' to extend functionality.
      */
     static public function commandService(Event $event)
     {
