@@ -64,8 +64,11 @@ class Installation
      * Displays CLI prompt message and retutns the answer.
      * @return string answer from user
      */
-    static public function typePrompt(string $message)
+    static public function typePrompt(string $message, string $debug_key = '')
     {
+        if(null !== $value = self :: provideValueFromComposerTester($debug_key, $message))
+            return $value;
+
         echo PHP_EOL.$message.': ';
 
         $stdin = fopen('php://stdin', 'r');
@@ -79,7 +82,7 @@ class Installation
      * Displays promopt message and checks the result value, which must be equal to one of the choices.
      * @return mixed selected value or null if no choices
      */
-    static public function typePromptWithCoices(string $message, array $choices): mixed
+    static public function typePromptWithCoices(string $message, array $choices, string $debug_key = ''): mixed
     {
         if(count($choices) === 0)
         {
@@ -88,7 +91,7 @@ class Installation
         }
 
         do{
-            $answer = self :: typePrompt($message);
+            $answer = self :: typePrompt($message, $debug_key);
 
             if(in_array($answer, $choices))
                 return $answer;
@@ -168,7 +171,7 @@ class Installation
             return;
 
         Filemanager :: createDirectory($to);
-        
+
         $objects = scandir($from);
 
         foreach($objects as $object)
@@ -249,7 +252,7 @@ class Installation
         $directory = '';
 
         do{
-            $folder = self :: typePrompt('Please type the name of project subdirectory or press Enter to skip [default is /]');
+            $folder = self :: typePrompt('Please type the name of project subdirectory or press Enter to skip [default is /]', 'subdirectory');
             $folder = trim($folder);
             $folder = $folder === '' ? '/' : $folder;
             $error = '';
@@ -444,7 +447,7 @@ class Installation
     static public function configureDatabase()
     {
         $message = 'Please select database driver [mysql / sqlite]';
-        $driver = self :: typePromptWithCoices($message, ['mysql', 'sqlite']);
+        $driver = self :: typePromptWithCoices($message, ['mysql', 'sqlite'], 'select_database');
         $db_host = PHP_OS_FAMILY === 'Darwin' ? '127.0.0.1' : 'localhost';
 
         self :: setEnvFileParameter('DATABASE_ENGINE', $driver);
@@ -564,7 +567,7 @@ class Installation
         $login = $password = '';
 
         do{
-            $login = self :: typePrompt('Please setup your login for MV admin panel');
+            $login = self :: typePrompt('Please setup your login for MV admin panel', 'user_login');
 
             if(strlen($login) > 1)
                 break;
@@ -573,7 +576,7 @@ class Installation
         while(true);
 
         do{
-            $password = self :: typePrompt('Please setup your password for MV admin panel (min 6 characters)');
+            $password = self :: typePrompt('Please setup your password for MV admin panel (min 6 characters)', 'user_password');
 
             if(strlen($password) >= 6)
                 break;
@@ -714,7 +717,7 @@ class Installation
         self :: displaySuccessMessage(' - Found available migrations ('.$available.'):');
         echo implode("\n", $migrations -> getMigrationsShortList()).PHP_EOL;
         
-        $answer = self :: typePrompt('Do you want to run the migrations now? [yes]');
+        $answer = self :: typePrompt('Do you want to run the migrations now? [yes]', 'run_migrations');
 
         if($answer == '' || $answer == 'yes' || $answer == 'y')
         {
@@ -724,7 +727,7 @@ class Installation
     }
 
     /**
-     * Command 'composer mv:cleanup', cleans cache folder and deletes old files from userfiles/ directory. 
+     * Command 'composer mv:cleanup', cleans cache folder and deletes old files from userfiles/ directory.
      */
     static public function commandCleanup(Event $event)
     {
@@ -767,7 +770,7 @@ class Installation
 
         if($region === '')
         {
-            $message = 'Region value has not been passed. Pass it like "composer mv:region -- en"';
+            $message = 'Region value has not been provided. Pass it like "composer mv:region -- en"';
             $message .= PHP_EOL.' Supported regions are: '.implode(', ', $supported);
             self :: displayErrorMessage($message);
 
@@ -800,7 +803,7 @@ class Installation
 
             $message = "Do you want to proceed? [yes / no]";
 
-            $answer = self :: typePromptWithCoices($message, ['yes', 'y', 'no', 'n', '']);
+            $answer = self :: typePromptWithCoices($message, ['yes', 'y', 'no', 'n', ''], 'change_region');
             
             if($answer !== 'yes' && $answer !== 'y')
                 return;
@@ -882,5 +885,32 @@ class Installation
         $arguments = $event -> getArguments();
 
         //for the future ...
+    }
+
+    /* Debug, testing and development */
+
+    static public function provideValueFromComposerTester(string $key, string $message)
+    {
+        require_once realpath(__DIR__.'/../../../../../boot.class.php');
+        $package = getenv('MV_COMPOSER_TEST_ENVIRONMENT');
+
+        if(!class_exists(BootTestEnvironment :: class) || !$package || !$key)
+            return null;
+
+        $settings = BootTestEnvironment :: instance($package);
+        $value = $settings['prompts'][$key] ?? null;
+
+        if(is_null($value))
+        {
+            self :: displayErrorMessage('No test value from BootTestEnvironment for key: '.$key);
+            exit();
+        }
+        else
+        {
+            $message = "Simulation of prompt, providing the value: '".$value."' for key: '".$key."'.";
+            echo "\033[40m\r\n\r\n \033[1;33m".$message." \r\n \033[0m".PHP_EOL.PHP_EOL;
+
+            return $value;
+        }
     }
 }
