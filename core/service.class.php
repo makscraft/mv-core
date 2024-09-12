@@ -55,7 +55,7 @@ class Service
 	}
 	
 	/**
-	 * Adds domain name and application folder to file's path (if needed).
+	 * [LEGACY] Adds domain name and application folder to file's path (if needed).
 	 * @return string
 	 */
 	static public function setFullHttpPath(string $path = '')
@@ -63,6 +63,18 @@ class Service
 		$domain = Registry :: get("DomainName");
 		return preg_replace("/\/$/", "", $domain).self :: addRootPath($path);
 	}
+
+	/**
+	 * Returns absolute url, based on domain settings from .env file.
+	 * @return string absolute url with http(s).
+	 */
+	static public function getAbsoluteHttpPath(string $path = '')
+	{
+		$domain = preg_replace('/\/+$/', '', Registry :: get('DomainName'));
+		$domain .= preg_replace('/\/+$/', '', Registry :: get('MainPath'));
+
+		return ($path === '' || $path === '/') ? $domain : $domain.$path;
+	}	
 	
 	/**
 	 * Returns the UNIX rights for the file (like 0774).
