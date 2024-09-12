@@ -55,12 +55,21 @@ class Debug
 	public static function pre(mixed $var)
 	{
 		$var = is_null($var) ? 'null' : $var;
+		$var = is_bool($var) ? ($var ? 'true' : 'false') : $var;
 
-		if(Registry :: get('BootFromCLI'))
+		if(Registry :: get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
 		{
-			echo PHP_EOL;
-			print_r($var);
-			echo PHP_EOL;
+			echo "\033[40m".PHP_EOL.PHP_EOL." \033[1;33m Debug CLI output: ";
+
+			if(is_array($var) || is_object($var))
+			{
+				echo PHP_EOL.PHP_EOL;
+				print_r($var);
+			}
+			else
+				echo $var;
+			
+			echo PHP_EOL."\033[0m".PHP_EOL.PHP_EOL;
 
 			return;
 		}
@@ -78,9 +87,7 @@ class Debug
 		if(ob_get_length())
 			ob_end_clean();
 
-		if($var !== null)
-			self :: pre($var);
-
+		self :: pre($var);
 		exit();
 	}
 
