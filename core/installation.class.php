@@ -131,7 +131,7 @@ class Installation
         $env_file = static :: $instance['directory'].'/.env';
         $env = file_get_contents($env_file);
 
-        $env = preg_replace('/'.$key.'=[\/\w]*/ui', $key.'='.trim($value), $env);
+        $env = preg_replace('/'.$key.'=[\/\w\-]*/ui', $key.'='.trim($value), $env);
         file_put_contents($env_file, $env);
     }
 
