@@ -299,7 +299,7 @@ class Installation
         {
             $htaccess_file = static :: $instance['directory'].'/.htaccess';
             $htaccess = file_get_contents($htaccess_file);
-            $htaccess = preg_replace('/RewriteBase\s+\/[\/\w]*/', 'RewriteBase '.$directory, $htaccess);
+            $htaccess = preg_replace('/RewriteBase\s+\/[\/\w\-]*/', 'RewriteBase '.$directory, $htaccess);
             file_put_contents($htaccess_file, $htaccess);
 
             self :: displaySuccessMessage(' - .htaccess file has been configurated.');
