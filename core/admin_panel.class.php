@@ -31,6 +31,8 @@ class AdminPanel
 
     /**
      * Sets current user objec in admin panel.
+     * @param User $user object of current admin panel user
+     * @return self
      */
     public function setUser(User $user)
 	{ 
@@ -38,6 +40,10 @@ class AdminPanel
 		return $this;
 	}
 
+    /**
+     * Returns the current limit for pagination.
+     * @return int limit value
+     */
     static public function getPaginationLimit(): int
     {
         $limit = intval($_SESSION['mv']['settings']['pager-limit'] ?? 10);
@@ -45,6 +51,10 @@ class AdminPanel
         return in_array($limit, self :: PAGINATION_LIMITS) ? $limit : 10;
     }
 
+    /**
+     * Saves the provided pagination limit into user session and user settings in database.
+     * @return bool success flag
+     */
     public function savePaginationLimit(mixed $limit): bool
     {
         $limit = intval($limit);

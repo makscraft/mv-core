@@ -1,6 +1,7 @@
 <?php
 /**
- * Cache manager for media files (css and javascript).
+ * Cache manager for media files (css and javascript ones).
+ * Combines content of included files into one cache file.
  * Keeps data in files in ~/userfiles/cache/media folder.
  */
 class CacheMedia
@@ -56,11 +57,14 @@ class CacheMedia
         'save_map' => false,
         'check_filetimes' => false
     ];
-		
+	
+    /**
+     * Disable the native constructor.
+     */
 	private function __construct() {}
 	
 	/**
-	 * Creates or returns the Registry object as singleton pattern.
+	 * Creates or returns the current class instanse as a singleton pattern.
      * @return self
 	 */
 	static public function instance(Router $router = null)
@@ -79,6 +83,7 @@ class CacheMedia
             if(!is_dir(self :: $folder))
                 Filemanager :: createDirectory(self :: $folder);
 
+            //We check files modification time if on development mode and certan period of time after new build
             if(Registry :: onDevelopment() || Registry :: get('CheckConfigFilesUntil') - time() > 0)
                 self :: $flags['check_filetimes'] = true;
 
