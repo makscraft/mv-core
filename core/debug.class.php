@@ -216,7 +216,7 @@ class Debug
 		if(ob_get_length()) //In case of cache enabled
 			ob_end_clean();
 
-		if(Registry :: get('BootFromCLI'))
+		if(Registry :: get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
 		{
 			Installation :: displayErrorMessage($error);
 			exit();
