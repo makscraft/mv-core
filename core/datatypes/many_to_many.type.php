@@ -58,15 +58,10 @@ class ManyToManyModelElement extends ModelElement
 	public function setValue($values)
 	{
 		$this -> selected_ids = [];
+		$values = is_array($values) ? $values : explode(',', strval($values));
 		
-		if(!$values)
-			return;
-		
-		$values = explode(',', $values);
-		
-		if(count($values))
-			foreach($values as $value)
-				$this -> selected_ids[] = intval($value);
+		foreach($values as $value)
+			$this -> selected_ids[] = intval(trim($value));
 			
 		$this -> selected_ids = array_unique($this -> selected_ids);
 			
