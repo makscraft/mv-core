@@ -7,8 +7,8 @@ Updating via composer
 cd your_project
 composer update
 ```
+- After the composer update is finished, the admin panel directory will be updated with new files.
 
-- If your project is located at the domain root, get into the domain root directory and run the composer command with the **.** (dot) value instead of **project_name**.
 
 Manual update
 ---
@@ -16,4 +16,3 @@ Manual update
 - Create a backup of your project.
 - Download archive from the [last release of this repo](https://github.com/makscraft/mv-core/releases).
 - Copy the following folders over your project: adminpanel, config, core.
-
