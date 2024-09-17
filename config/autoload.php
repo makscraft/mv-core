@@ -41,6 +41,7 @@ require_once $mvCorePath.'http.class.php';
 require_once $mvCorePath.'registry.class.php';
 require_once $mvCorePath.'i18n.class.php';
 require_once $mvCorePath.'service.class.php';
+require_once $mvCorePath.'filemanager.class.php';
 require_once $mvCorePath.'cache.class.php';
 require_once $mvCorePath.'debug.class.php';
 require_once $mvCorePath.'database.class.php';
