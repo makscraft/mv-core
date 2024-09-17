@@ -16,3 +16,4 @@ Manual update
 - Create a backup of your project.
 - Download archive from the [last release of this repo](https://github.com/makscraft/mv-core/releases).
 - Copy the following folders over your project: **adminpanel**, **config**, **core**.
+- Empty the **/userfiles/cache** directory.
