@@ -891,7 +891,11 @@ class Installation
 
     static public function provideValueFromComposerTester(string $key, string $message)
     {
-        require_once realpath(__DIR__.'/../../../../../boot.class.php');
+        $boot_testing = realpath(__DIR__.'/../../../../../boot.class.php');
+
+        if(is_file($boot_testing))
+            require_once $boot_testing;
+
         $package = getenv('MV_COMPOSER_TEST_ENVIRONMENT');
 
         if(!class_exists(BootTestEnvironment :: class) || !$package || !$key)
