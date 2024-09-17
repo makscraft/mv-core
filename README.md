@@ -12,5 +12,8 @@ composer update
 
 Manual update
 ---
-- Download archive from the last release of this repo.
-- Copy
+- Make sure your project was installed manually and does not have the **vendor** directory.
+- Create a backup of your project.
+- Download archive from the [last release of this repo](https://github.com/makscraft/mv-core/releases).
+- Copy the following folders over your project: adminpanel, config, core.
+
