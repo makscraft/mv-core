@@ -362,6 +362,7 @@ background: #fff url("../images/icon-search.svg") center right 7px no-repeat;}
 .autocomplete-multi{padding-right: 28px !important;}
 .ui-datepicker{border: none !important;}
 .ck.ck-editor{z-index: 100;}
+.ck-content pre{margin-bottom: 20px;}
 
 /* Pagination */
 .pager{text-align: right; position: relative; float: right; width: 100%; padding: 15px 0 0 0;}
