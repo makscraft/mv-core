@@ -224,7 +224,7 @@ class Builder
 	 */
 	public function displayDebugPanel()
 	{
-		if(Registry :: get('DebugPanel'))
+		if(Registry :: get('DebugPanel') && !Http :: isAjaxRequest())
 		{
 			if(Registry :: onDevelopment())
 				include_once Registry :: get('IncludeAdminPath').'controls/debug-panel.php';
