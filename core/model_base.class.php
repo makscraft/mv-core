@@ -98,24 +98,25 @@ abstract class ModelBase extends ModelInitial
 	
 	/**
 	 * Additional display parameters of model in admin panel.
+	 * Can be set individually in any model.
 	 * @var array
 	 */
 	protected $display_params = [
-		"visible_fields" => "*",
-		"hidden_fields" => [],
-		"editable_fields" => "*",
-		"not_editable_fields" => [],
-		"create_actions" => true,
-		"update_actions" => true,
-		"delete_actions" => true,
-		"mass_actions" => true,		
-		"fields_groups" => [],
-		"default_table_columns" => [],		
-		"default_filters" => [],
-		"show_empty_default_filters" => false,
-		"redirects_to_models" => [],
-		"foreign_keys_admin_links" => false,
-		"versions_limit" => "config"
+		'visible_fields' => '*',
+		'hidden_fields' => [],
+		'editable_fields' => '*',
+		'not_editable_fields' => [],
+		'create_actions' => true,
+		'update_actions' => true,
+		'delete_actions' => true,
+		'mass_actions' => true,
+		'fields_groups' => [],
+		'default_table_columns' => [],
+		'default_filters' => [],
+		'show_empty_default_filters' => false,
+		'redirects_to_models' => [],
+		'foreign_keys_admin_links' => false,
+		'versions_limit' => 'config'
 	];
 	
 	/**
@@ -128,7 +129,7 @@ abstract class ModelBase extends ModelInitial
 	 * Folder with extra parts of code to include into admin panel interface.
 	 * @var string
 	 */
-	public $includes_folder = "customs/models/";
+	public $includes_folder = 'customs/models/';
 	
 	/**
 	 * File system path to the document root of the project.
