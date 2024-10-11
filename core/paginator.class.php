@@ -369,7 +369,6 @@ class Paginator
          	return '';
       
       	$html = '';
-		$path = Registry :: get('SitePath').$path;
       	$interval = []; //Pages numbers to display
       
       	$current_left = ceil($this -> page - 1); //Number of pages from left side

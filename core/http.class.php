@@ -67,39 +67,50 @@ class Http
      * Sends http header and json data, created from passed array.
      * @param array $json data for json output
      * @param mixed $flags optional, php json flag(s) constant(s)
-     * @return string
      */
     static public function responseJson(array $json = [], $flags = 0): void
     {
         $json = json_encode($json, $flags);
 
-        header('Content-type: application/json');
+        header('Content-Type: application/json');
         echo $json;
+        exit();
     }
 
     /**
      * Sends http header and passed xml data.
      * @param string $xml xml string for output
-     * @return string
      */
     static public function responseXml(string $xml): void
     {
         if(strpos($xml, '<?xml version=') !== 0)
             $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"\n".$xml;
 
-        header('Content-type: application/xml');
+        header('Content-Type: application/xml');
         echo $xml;
+        exit();
     }
 
     /**
      * Sends http header and passed palin text data.
      * @param string $text text string for output
-     * @return string
      */
     static public function responseText(string $text): void
     {
-        header('Content-type: text/plain');
+        header('Content-Type: text/plain');
         echo $text;
+        exit();
+    }
+
+    /**
+     * Sends http header and passed HTML data.
+     * @param string $html text string for output
+     */
+    static public function responseHtml(string $html): void
+    {
+        header('Content-Type: text/html');
+        echo $html;
+        exit();
     }
 
     /**
