@@ -1,12 +1,12 @@
 @font-face {
-    font-family: 'Panton-SemiBold';
-    src: url('../fonts/Panton-SemiBold.ttf') format('truetype');
+    font-family: 'PantonSemiBold';
+    src: url('../fonts/PantonSemiBold.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }			
 
 *{margin: 0; padding: 0; box-sizing: border-box;}
-body.debug-page{font: 14px/140% 'Panton-SemiBold'; background: #eee;}
+body.debug-page{font: 14px/140% 'PantonSemiBold'; background: #eee;}
 #debug-area .inner{width: 92%; margin: 0 auto;}
 #debug-area header{height: 70px; background: #333; margin-bottom: 30px; color: #fff;}
 #debug-area header div.inner{display: flex; align-items: center; height: 100%;}
@@ -24,7 +24,7 @@ max-width: 1300px; padding: 22px; background: #ddd; border-radius: 5px;}
 
 .mv-debug-panel{min-height: 50px; background: #333; color: #fff !important; position: fixed; width: 97%; bottom: 15px;
 display: flex; align-items: center; z-index: 100000000; left: 1.5%; padding: 10px 1%; border-radius: 5px; 
-font: 14px/140% 'Panton-SemiBold'; overflow: visible; box-sizing: border-box; transition: all 0.7s ease;}
+font: 14px/140% 'PantonSemiBold'; overflow: visible; box-sizing: border-box; transition: all 0.7s ease;}
 .mv-debug-panel > *{margin-right: 3%; color: #fff !important; width: auto;}
 .mv-debug-panel > img{width: 40px; cursor: pointer;}
 .mv-debug-panel > div.sql-section{white-space: nowrap;}

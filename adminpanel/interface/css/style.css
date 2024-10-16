@@ -1,7 +1,14 @@
 @font-face {
-  font-family: 'Panton-SemiBold';
-  src: url('../fonts/Panton-SemiBold.ttf') format('truetype');
+  font-family: 'PantonSemiBold';
+  src: url('../fonts/PantonSemiBold.ttf') format('truetype');
   font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'PantonBold';
+  src: url('../fonts/PantonBold.ttf') format('truetype');
+  font-weight: bold;
   font-style: normal;
 }
 
@@ -27,7 +34,7 @@ td.not-editable-field textarea{background-color: #e3e0e0 !important;}
 
 /* Main structure */
 html{height: 100%;}
-body{height: 100%; font: 14px "Panton-SemiBold"; background: #e2dcdc; color: #333; position: relative; 
+body{height: 100%; font: 14px 'PantonSemiBold'; background: #e2dcdc; color: #333; position: relative; 
 min-height: 100%; background-size: cover !important;}
 #header{background: #333; height: 70px;}
 #container{min-height: 100%; padding-bottom: 30px; position: relative; min-width: 980px; box-sizing: border-box;}
@@ -362,7 +369,6 @@ background: #fff url("../images/icon-search.svg") center right 7px no-repeat;}
 .autocomplete-multi{padding-right: 28px !important;}
 .ui-datepicker{border: none !important;}
 .ck.ck-editor{z-index: 100;}
-.ck-content pre{margin-bottom: 20px;}
 
 /* Pagination */
 .pager{text-align: right; position: relative; float: right; width: 100%; padding: 15px 0 0 0;}
@@ -594,14 +600,18 @@ padding-left: 23px}
 /* CKEditor content */
 .ck.ck-content{padding: 20px 1.4% !important;}
 .ck.ck-content p{margin: 0 0 15px 0 !important;}
-.ck.ck-content h1{font-size: 30px; line-height: 40px; margin: 0 0 15px 0 !important;}
-.ck.ck-content h2{font-size: 25px; line-height: 20px; margin: 0 0 15px 0 !important;}
-.ck.ck-content h3{font-size: 20px; line-height: 20px; margin: 0 0 15px 0 !important;}
-.ck.ck-content h4, .ck.ck-content h5, .ck.ck-content h6{margin: 0 0 15px 0 !important;}
+.ck.ck-content h1{font-size: 30px; line-height: 40px; margin: 0 0 15px 0 !important; font-family: 'PantonBold';}
+.ck.ck-content h2{font-size: 25px; line-height: 20px; margin: 0 0 15px 0 !important; font-family: 'PantonBold';}
+.ck.ck-content h3{font-size: 20px; line-height: 20px; margin: 0 0 15px 0 !important; font-family: 'PantonBold';}
+.ck.ck-content h4, .ck.ck-content h5, .ck.ck-content h6{margin: 0 0 15px 0 !important; font-family: 'PantonBold';}
 .ck.ck-content ul, .ck.ck-content ol{margin: 0 0 20px 25px !important;}
 .ck.ck-content li{margin: 0 0 10px 0 !important; list-style-position: outside !important;}
 .ck.ck-content ul li{list-style: disc;}
 .ck.ck-content ol li{list-style: decimal;}
+.ck.ck-content strong{font-weight: bold; font-family: 'PantonBold';}
+.ck.ck-content i{font-style: italic;}
+.ck.ck-content u{text-decoration: underline;}
+.ck.ck-content pre{margin-bottom: 20px;}
 
 @media all and (max-width: 1400px)
 {

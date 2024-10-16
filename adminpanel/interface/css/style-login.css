@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'Panton-SemiBold';
-  src: url('../fonts/Panton-SemiBold.ttf') format('truetype');
+  font-family: 'PantonSemiBold';
+  src: url('../fonts/PantonSemiBold.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -19,7 +19,7 @@ li{list-style: none;}
 .hidden{display: none !important;}
 
 html{height: 100%;}
-body{margin: 0; color: #eee; font: 14px "Panton-SemiBold"; position: relative; height: 100%;
+body{margin: 0; color: #eee; font: 14px "PantonSemiBold"; position: relative; height: 100%;
 background: #131313 url("../images/login-back.jpg?30") bottom center no-repeat; background-size: cover;}
 
 #container{min-width: 700px; margin: 0 auto; position: relative;}
