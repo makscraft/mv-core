@@ -453,7 +453,7 @@ class Filemanager
 			else if($target['type'] === 'directory')
 				$result['success'] = $this -> deleteFolder($target['path']);
 
-			$key = !$result['success'] ? 'done-delete' : 'not-deleted';
+			$key = $result['success'] ? 'done-delete' : 'not-deleted';
 			$result['message'] = I18n :: locale($key);		
 		}
 
