@@ -883,6 +883,18 @@ class Form
 
 		return $this;
 	}
+
+	/**
+	 * Returns caption (title) of the form field.
+	 * @return string
+	 */
+	public function getCaption(string $field): string
+	{
+		if(isset($this -> fields[$field]))
+			$this -> fields[$field] -> getCaption();
+
+		return '';
+	}
 	
 	/**
 	 * Sets required property to true for the single form field.
