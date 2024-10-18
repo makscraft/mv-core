@@ -1507,11 +1507,25 @@ class Form
 
 	/* Multiple files input processing */
 
-	public function getMultipleFilesValue($field)
+	/**
+	 * Returns multiple files form value.
+	 * @param string $field name of field
+	 * @param bool $http_path make absolute http url or not
+	 * @return array files pathes, absolute or from ~userfiles/...
+	 */
+	public function getMultipleFilesValue(string $field, bool $http_path = false): array
 	{
+		$files = [];
+
 		if(isset($this -> fields[$field]) && $this -> fields[$field] -> getType() == "file")
 			if($this -> fields[$field] -> getProperty("multiple"))
-				return $this -> fields[$field] -> getMultipleFilesPaths();
+				$files = $this -> fields[$field] -> getMultipleFilesPaths();
+
+		if($http_path)
+			foreach($files as $index => $file)
+				$files[$index] = Service::getAbsoluteHttpPath($file);
+
+		return $files;
 	}
 
 	static public function getMultipleFilesData(string $field)
