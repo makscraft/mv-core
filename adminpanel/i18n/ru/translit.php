@@ -2,7 +2,7 @@
 /**
  * Russian-english transliteration file for MV framework
  */
-$translitRules = array(
+$translitRules = [
 
     'А' => 'a', 'Б' => 'b', 'В' => 'v', 'Г' => 'g', 
     'Д' => 'd', 'Е' => 'e', 'Ё' => 'yo', 'Ж' => 'j', 
@@ -22,4 +22,4 @@ $translitRules = array(
 	'ш' => 'sh', 'щ' => 'sch', 'ъ' => 'y', 'ы' => 'yi', 'ь' => '', 
 	'э' => 'e', 'ю' => 'yu', 'я' => 'ya', ' ' => '-', '.' => '', 
 	'/' => '-'
-);
+];
