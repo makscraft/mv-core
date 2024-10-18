@@ -891,7 +891,7 @@ class Form
 	public function getCaption(string $field): string
 	{
 		if(isset($this -> fields[$field]))
-			$this -> fields[$field] -> getCaption();
+			return $this -> fields[$field] -> getCaption();
 
 		return '';
 	}
