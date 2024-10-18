@@ -1,6 +1,6 @@
 <?php 
 /**
- * German PHP regional translations and standarts for MV framework
+ * German (de) localization for MV framework.
  */
 $regionalData = array(
 
@@ -9,7 +9,6 @@ $regionalData = array(
    'date_format' => 'dd.mm.yyyy',
 
    'plural_rules' => array(
-
       'one' => '/^1$/'
    ),
    
