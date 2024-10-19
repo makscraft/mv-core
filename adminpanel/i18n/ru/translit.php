@@ -1,6 +1,6 @@
 <?php
 /**
- * Russian-english transliteration file for MV framework
+ * Russian-english transliteration file for MV framework.
  */
 $translitRules = [
 
