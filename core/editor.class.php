@@ -49,7 +49,17 @@ class Editor
 						image: { insert: {type: 'side'} },
 						mediaEmbed: { previewsInData: true },
 						language: '".$region."',
-						htmlSupport: {allow: [{classes: true, styles: true}]},
+						htmlSupport: { allow: [{classes: true, styles: true, attributes: true}] },
+						link: {
+							decorators: {
+								openInNewTab: {
+									mode: 'manual',
+									label: 'Open in a new tab',
+									defaultValue: false,
+									attributes: { target: '_blank', rel: 'noopener noreferrer' }
+								}
+							}
+						},
 						simpleUpload: {
 							uploadUrl: '".$upload_path."',
 							withCredentials: true
