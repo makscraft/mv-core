@@ -16,14 +16,14 @@ class Installation
      */
     static public function instance(array $params = [])
     {
-        if(static :: $instance === null)
-            static :: $instance = [
+        if(static::$instance === null)
+            static::$instance = [
                 'directory' => realpath($params['directory'] ?? __DIR__.'/../../../..'),
                 'package' => $params['package'] ?? '',
                 'boot' => false
             ];
 
-        return static :: $instance;
+        return static::$instance;
     }
 
     /**
@@ -31,23 +31,23 @@ class Installation
      */
     static public function boot()
     {
-        if(static :: $instance['boot'] === true)
-            return Registry :: instance() -> loadEnvironmentSettings();
+        if(static::$instance['boot'] === true)
+            return Registry::instance() -> loadEnvironmentSettings();
 
-        $registry = Registry :: instance();
+        $registry = Registry::instance();
 
-        require_once static :: $instance['directory'].'/config/setup.php';
-        require_once static :: $instance['directory'].'/config/settings.php';
-        require_once static :: $instance['directory'].'/config/models.php';
-        require_once static :: $instance['directory'].'/config/plugins.php';
+        require_once static::$instance['directory'].'/config/setup.php';
+        require_once static::$instance['directory'].'/config/settings.php';
+        require_once static::$instance['directory'].'/config/models.php';
+        require_once static::$instance['directory'].'/config/plugins.php';
 
         $mvSetupSettings['BootFromCLI'] = true;
-        $mvSetupSettings['IncludePath'] = str_replace('\\', '/', static :: $instance['directory']).'/';
+        $mvSetupSettings['IncludePath'] = str_replace('\\', '/', static::$instance['directory']).'/';
         $mvSetupSettings['CorePath'] = __DIR__.DIRECTORY_SEPARATOR;
         $mvSetupSettings['Models'] = $mvActiveModels;
         $mvSetupSettings['Plugins'] = $mvActivePlugins;
 
-        Registry :: generateSettings($mvSetupSettings);
+        Registry::generateSettings($mvSetupSettings);
 
         $registry -> loadSettings($mvMainSettings);
         $registry -> loadSettings($mvSetupSettings);
@@ -55,7 +55,7 @@ class Installation
         $registry -> lowerCaseConfigNames();
         $registry -> createClassesAliases();
 
-        static :: $instance['boot'] = true;
+        static::$instance['boot'] = true;
     }
 
     //Heplers
@@ -66,7 +66,7 @@ class Installation
      */
     static public function typePrompt(string $message, string $debug_key = '')
     {
-        if(null !== $value = self :: provideValueFromComposerTester($debug_key, $message))
+        if(null !== $value = self::provideValueFromComposerTester($debug_key, $message))
             return $value;
 
         echo PHP_EOL.$message.': ';
@@ -86,12 +86,12 @@ class Installation
     {
         if(count($choices) === 0)
         {
-            self :: displayErrorMessage('You must provide choices array for message "'.$message.'"');
+            self::displayErrorMessage('You must provide choices array for message "'.$message.'"');
             return null;
         }
 
         do{
-            $answer = self :: typePrompt($message, $debug_key);
+            $answer = self::typePrompt($message, $debug_key);
 
             if(in_array($answer, $choices))
                 return $answer;
@@ -128,7 +128,7 @@ class Installation
      */
     static public function setEnvFileParameter(string $key, string $value)
     {
-        $env_file = static :: $instance['directory'].'/.env';
+        $env_file = static::$instance['directory'].'/.env';
         $env = file_get_contents($env_file);
 
         $env = preg_replace('/'.$key.'=[\/\w\-\.:]*/ui', $key.'='.trim($value), $env);
@@ -152,7 +152,7 @@ class Installation
                 if($object != '.' && $object != '..')
                 { 
                     if(is_dir($directory.DIRECTORY_SEPARATOR.$object) && !is_link($directory.DIRECTORY_SEPARATOR.$object))
-                        self :: removeDirectory($directory.DIRECTORY_SEPARATOR.$object);
+                        self::removeDirectory($directory.DIRECTORY_SEPARATOR.$object);
                     else
                         unlink($directory. DIRECTORY_SEPARATOR.$object); 
                 } 
@@ -163,6 +163,26 @@ class Installation
     }
 
     /**
+     * Removes all directory contents recursively.
+     */
+    static public function emptyDirectory(string $directory): bool
+    {
+        if($directory == '/' || strpos($directory, '..') !== false || !is_dir($directory))
+            return false;
+
+        $root = realpath($directory).DIRECTORY_SEPARATOR;
+
+        foreach(scandir($root) as $file)
+            if($file !== '.' && $file !== '..')
+                if(is_file($root.$file))
+                    unlink($root.$file);
+                else
+                    Installation::removeDirectory($root.$file);
+
+        return count(scandir($root)) === 2;
+    }    
+
+    /**
      * Copies the directory recursively.
      */
     static public function copyDirectory(string $from, string $to)
@@ -170,7 +190,7 @@ class Installation
         if($from == '/' || strpos($from, '..') !== false || strpos($to, '..') !== false)
             return;
 
-        Filemanager :: createDirectory($to);
+        Filemanager::createDirectory($to);
 
         $objects = scandir($from);
 
@@ -182,7 +202,7 @@ class Installation
                 $one_to = $to.DIRECTORY_SEPARATOR.$object;
 
                 if(is_dir($one_from))
-                    self :: copyDirectory($one_from, $one_to);
+                    self::copyDirectory($one_from, $one_to);
                 else
                     copy($one_from, $one_to);
             }
@@ -204,9 +224,9 @@ class Installation
      */
     static public function postUpdate(Event $event)
     {
-        static :: moveAdminPanelDirectory();
-        Cache :: emptyCacheDirectory();
-        self :: displaySuccessMessage(' - Cache directory has been cleared.');
+        static::moveAdminPanelDirectory();
+        Cache::emptyCacheDirectory();
+        self::displaySuccessMessage(' - Cache directory has been cleared.');
     }
 
     /**
@@ -214,17 +234,17 @@ class Installation
      */
     static public function finish()
     {
-        self :: instance();
-        self :: configureDirectory();
-        self :: generateSecurityToken();
+        self::instance();
+        self::configureDirectory();
+        self::generateSecurityToken();
 
-        self :: changeAutoloaderString('/index.php');
-        self :: displaySuccessMessage(' - index.php file has been configurated.');
-        self :: moveAdminPanelDirectory();
-        self :: checkAndSetDirectoriesPermissions();
+        self::changeAutoloaderString('/index.php');
+        self::displaySuccessMessage(' - index.php file has been configurated.');
+        self::moveAdminPanelDirectory();
+        self::checkAndSetDirectoriesPermissions();
 
-        if(true === self :: configureDatabase())
-            self :: displayFinalInstallationMessage();
+        if(true === self::configureDatabase())
+            self::displayFinalInstallationMessage();
     }
 
     /**
@@ -232,7 +252,7 @@ class Installation
      */
     static public function changeAutoloaderString(string $file)
     {
-        $file = realpath(static :: $instance['directory'].$file);
+        $file = realpath(static::$instance['directory'].$file);
 
         if(!file_exists($file))
             return;
@@ -252,7 +272,7 @@ class Installation
         $directory = '';
 
         do{
-            $folder = self :: typePrompt('Please type the name of project subdirectory or press Enter to skip [default is /]', 'subdirectory');
+            $folder = self::typePrompt('Please type the name of project subdirectory or press Enter to skip [default is /]', 'subdirectory');
             $folder = trim($folder);
             $folder = $folder === '' ? '/' : $folder;
             $error = '';
@@ -266,14 +286,14 @@ class Installation
             if(!$error && !preg_match('/\/$/', $folder))
                 $folder = $folder.'/';
 
-            $back = static :: $instance['directory'].preg_replace('/[\w\-]+/', '..', $folder);
+            $back = static::$instance['directory'].preg_replace('/[\w\-]+/', '..', $folder);
             $back = realpath($back);
             
             if(!$error)
             {
                 if(!is_dir(realpath($back.$folder)))
                     $error = 'Error! Project directory does not exist: ';
-                else if(realpath($back.$folder) !== realpath(static :: $instance['directory']))
+                else if(realpath($back.$folder) !== realpath(static::$instance['directory']))
                     $error = 'Error! Not suitable project subdirectory: ';
 
                 if($error)
@@ -286,7 +306,7 @@ class Installation
             }
 
             if($error)
-                self :: displayErrorMessage($error);
+                self::displayErrorMessage($error);
             else
             {
                 $directory = $folder;
@@ -297,16 +317,16 @@ class Installation
 
         if($directory !== '' && $directory !== '/')
         {
-            $htaccess_file = static :: $instance['directory'].'/.htaccess';
+            $htaccess_file = static::$instance['directory'].'/.htaccess';
             $htaccess = file_get_contents($htaccess_file);
             $htaccess = preg_replace('/RewriteBase\s+\/[\/\w\-]*/', 'RewriteBase '.$directory, $htaccess);
             file_put_contents($htaccess_file, $htaccess);
 
-            self :: displaySuccessMessage(' - .htaccess file has been configurated.');
+            self::displaySuccessMessage(' - .htaccess file has been configurated.');
         }
 
-        self :: setEnvFileParameter('APP_FOLDER', $directory);
-        self :: displaySuccessMessage(' - .env file has been configurated.');
+        self::setEnvFileParameter('APP_FOLDER', $directory);
+        self::displaySuccessMessage(' - .env file has been configurated.');
     }
 
     /**
@@ -314,9 +334,9 @@ class Installation
      */
     static public function generateSecurityToken()
     {
-        $value = Service :: strongRandomString(40);
-        self :: setEnvFileParameter('APP_TOKEN', $value);
-        self :: displaySuccessMessage(' - Security token has been generated.');   
+        $value = Service::strongRandomString(40);
+        self::setEnvFileParameter('APP_TOKEN', $value);
+        self::displaySuccessMessage(' - Security token has been generated.');   
     }
 
     /**
@@ -326,18 +346,18 @@ class Installation
      */
     static public function moveAdminPanelDirectory()
     {
-        self :: instance();
-        self :: boot();
+        self::instance();
+        self::boot();
         
         $from = realpath(__DIR__.'/../adminpanel');
-        $to = Registry :: get('IncludePath').Registry :: get('AdminFolder');
+        $to = Registry::get('IncludePath').Registry::get('AdminFolder');
 
         if(!is_dir($from))
             return;
 
-        self :: removeDirectory($to);
-        self :: copyDirectory($from, $to);
-        self :: displaySuccessMessage(' - Admin panel folder has been moved.');
+        self::removeDirectory($to);
+        self::copyDirectory($from, $to);
+        self::displaySuccessMessage(' - Admin panel folder has been moved.');
     }
 
     /**
@@ -346,7 +366,7 @@ class Installation
     static public function checkAndSetDirectoriesPermissions()
     {
         $directories = ['log', 'userfiles', 'userfiles/tmp', 'userfiles/database/sqlite'];
-        $root = Registry :: get('IncludePath');
+        $root = Registry::get('IncludePath');
         $all = [];
         
         foreach($directories as $directory)
@@ -374,7 +394,7 @@ class Installation
             if(is_file($sqlite))
                 chmod($sqlite, 0777);
 
-            self :: displaySuccessMessage(' - MacOS directories and files permissions have been set.');
+            self::displaySuccessMessage(' - MacOS directories and files permissions have been set.');
         }        
     }
 
@@ -383,14 +403,14 @@ class Installation
      */
     static public function displayFinalInstallationMessage()
     {
-        Installation :: instance(['directory' => __DIR__.'/..']);
-        $env = parse_ini_file(static :: $instance['directory'].DIRECTORY_SEPARATOR.'.env');
+        Installation::instance(['directory' => __DIR__.'/..']);
+        $env = parse_ini_file(static::$instance['directory'].DIRECTORY_SEPARATOR.'.env');
 
         $message = "Installation complete, now you can open your MV application in browser.".PHP_EOL;
         $message .= " MV start page http://yourdomain.com".preg_replace('/\/$/', '', $env['APP_FOLDER']).PHP_EOL;
         $message .= " Admin panel location http://yourdomain.com".$env['APP_FOLDER']."adminpanel";
 
-        self :: displayDoneMessage($message);
+        self::displayDoneMessage($message);
     }    
 
     //Database confuguration
@@ -400,12 +420,12 @@ class Installation
      */
     static public function runPdo(): ?PDO
     {
-        $env_file = static :: $instance['directory'].'/.env';
+        $env_file = static::$instance['directory'].'/.env';
         $env = parse_ini_file($env_file);
 
         if($env['DATABASE_ENGINE'] !== 'mysql' && $env['DATABASE_ENGINE'] !== 'sqlite')
         {
-            self :: displayErrorMessage('Undefined database engine in parameter DATABASE_ENGINE in .env file.');
+            self::displayErrorMessage('Undefined database engine in parameter DATABASE_ENGINE in .env file.');
         }
 
         if($env['DATABASE_ENGINE'] == 'mysql')
@@ -413,25 +433,25 @@ class Installation
             $pdo = new PDO("mysql:host=".$env['DATABASE_HOST'].";dbname=".$env['DATABASE_NAME'], 
                                                                           $env['DATABASE_USER'], 
                                                                           $env['DATABASE_PASSWORD'], [
-                                    PDO :: MYSQL_ATTR_INIT_COMMAND => "SET NAMES \"UTF8\""
+                                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES \"UTF8\""
                             ]);
 
-            $pdo -> setAttribute(PDO :: MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+            $pdo -> setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
         }
         else if($env['DATABASE_ENGINE'] == 'sqlite')
         {
             $path = '/userfiles/database/sqlite/database.sqlite';
-            $file = static :: $instance['directory'].$path;
+            $file = static::$instance['directory'].$path;
             $file = realpath($file);
 
             if(!is_file($file))
             {
-                self :: displayErrorMessage('SQLite database file no found: ~'.$path);
+                self::displayErrorMessage('SQLite database file no found: ~'.$path);
                 return null;
             }
             else if(!is_writable(dirname($file)))
             {
-                self :: displayErrorMessage('Please make directory with sqlite file writable: '.dirname($file));
+                self::displayErrorMessage('Please make directory with sqlite file writable: '.dirname($file));
                 return null;
             }
 
@@ -447,19 +467,19 @@ class Installation
     static public function configureDatabase()
     {
         $message = 'Please select database driver [mysql / sqlite]';
-        $driver = self :: typePromptWithCoices($message, ['mysql', 'sqlite'], 'select_database');
+        $driver = self::typePromptWithCoices($message, ['mysql', 'sqlite'], 'select_database');
         $db_host = PHP_OS_FAMILY === 'Darwin' ? '127.0.0.1' : 'localhost';
 
-        self :: setEnvFileParameter('DATABASE_ENGINE', $driver);
-        self :: setEnvFileParameter('DATABASE_HOST', $driver === 'mysql' ? $db_host : '');
+        self::setEnvFileParameter('DATABASE_ENGINE', $driver);
+        self::setEnvFileParameter('DATABASE_HOST', $driver === 'mysql' ? $db_host : '');
 
         if($driver === 'sqlite')
         {
-            self :: configureDatabaseSQLite();
+            self::configureDatabaseSQLite();
             return true;
         }
         else if($driver === 'mysql')
-            self :: displaySuccessMessage(' - Now please fill database settings for MySQL in .env file and run "composer mv:database" in your project directory.');
+            self::displaySuccessMessage(' - Now please fill database settings for MySQL in .env file and run "composer mv:database" in your project directory.');
     }
 
     /**
@@ -467,37 +487,37 @@ class Installation
      */
     static public function configureDatabaseMysql()
     {
-        $env = parse_ini_file(static :: $instance['directory'].'/.env');
+        $env = parse_ini_file(static::$instance['directory'].'/.env');
         $keys = ['DATABASE_HOST', 'DATABASE_USER', 'DATABASE_NAME'];
 
         foreach($keys as $key)
             if(!isset($env[$key]) || trim($env[$key]) === '')
             {
-                self :: displayErrorMessage('Please fill "'.$key.'" parameter in .env file.');
+                self::displayErrorMessage('Please fill "'.$key.'" parameter in .env file.');
                 return;
             }
 
-        $pdo = self :: runPdo();
+        $pdo = self::runPdo();
         $query = $pdo -> prepare('SHOW TABLES');
         $query -> execute();
-        $tables = $query -> fetchAll(PDO :: FETCH_COLUMN);
+        $tables = $query -> fetchAll(PDO::FETCH_COLUMN);
     
         if(is_array($tables) && in_array('versions', $tables))
-            self :: displaySuccessMessage(' - MySQL initial dump has been already imported before.');
+            self::displaySuccessMessage(' - MySQL initial dump has been already imported before.');
         else
         {        
-            $dump_file = static :: $instance['directory'].'/userfiles/database/mysql-dump.sql';
+            $dump_file = static::$instance['directory'].'/userfiles/database/mysql-dump.sql';
 
-            if(true === self :: loadMysqlDump($dump_file, $pdo))
-                self :: displaySuccessMessage(' - MySQL initial dump has been imported.');
+            if(true === self::loadMysqlDump($dump_file, $pdo))
+                self::displaySuccessMessage(' - MySQL initial dump has been imported.');
         }
 
-        self :: setRootUserLogin($pdo);
+        self::setRootUserLogin($pdo);
 
-        self :: displayDoneMessage('MySQL database has been successfully configurated.');
+        self::displayDoneMessage('MySQL database has been successfully configurated.');
 
-        if(static :: $instance['package'] === '')
-            self :: displayFinalInstallationMessage();
+        if(static::$instance['package'] === '')
+            self::displayFinalInstallationMessage();
     }
 
     /**
@@ -505,8 +525,8 @@ class Installation
      */
     static public function configureDatabaseSQLite()
     {
-        self :: setRootUserLogin(self :: runPdo());
-        self :: displayDoneMessage('SQLite database has been successfully configurated.');
+        self::setRootUserLogin(self::runPdo());
+        self::displayDoneMessage('SQLite database has been successfully configurated.');
     }
 
     /**
@@ -560,14 +580,14 @@ class Installation
 
         if($total > 1)
         {
-            self :: displaySuccessMessage(' - Database has been already configurated.');
+            self::displaySuccessMessage(' - Database has been already configurated.');
             return;
         }
 
         $login = $password = '';
 
         do{
-            $login = self :: typePrompt('Please setup your login for MV admin panel', 'user_login');
+            $login = self::typePrompt('Please setup your login for MV admin panel', 'user_login');
 
             if(strlen($login) > 1)
                 break;
@@ -576,7 +596,7 @@ class Installation
         while(true);
 
         do{
-            $password = self :: typePrompt('Please setup your password for MV admin panel (min 6 characters)', 'user_password');
+            $password = self::typePrompt('Please setup your password for MV admin panel (min 6 characters)', 'user_password');
 
             if(strlen($password) >= 6)
                 break;
@@ -584,8 +604,8 @@ class Installation
         }
         while(true);
 
-        static :: $instance['login'] = $login;
-        static :: $instance['password'] = $password;
+        static::$instance['login'] = $login;
+        static::$instance['password'] = $password;
 
         $password = password_hash($password, PASSWORD_DEFAULT, ['cost' => 10]);
         $date = date('Y-m-d H:i:s');
@@ -608,7 +628,7 @@ class Installation
         }
 
         if($query -> execute())
-            self :: displaySuccessMessage(' - Root user of admin panel has been successfully created.');
+            self::displaySuccessMessage(' - Root user of admin panel has been successfully created.');
     }
 
     /**
@@ -616,17 +636,17 @@ class Installation
      */
     static public function insertInitionDatabaseContent(string $region)
     {
-        self :: boot();
+        self::boot();
 
         $region = $region === 'us' ? 'en' : $region;
-        $package = static :: $instance['directory'].'/customs/regions/'.$region;
+        $package = static::$instance['directory'].'/customs/regions/'.$region;
 
         $file = $package.'/package-'.$region.'.php';
         $data = is_file($file) ? include $file : null;
         
         if(is_array($data))
-            if(0 < self :: importInitialDatabaseData($data['database']))
-                self :: displaySuccessMessage(' - Database data has been imported.');
+            if(0 < self::importInitialDatabaseData($data['database']))
+                self::displaySuccessMessage(' - Database data has been imported.');
 
         return $data;
     }
@@ -636,7 +656,7 @@ class Installation
      */
     static public function findAndExecuteAllAvailableMigartions()
     {
-        static :: boot();
+        static::boot();
 
         $migrations = new Migrations(true);
         $migrations -> scanModels();
@@ -644,10 +664,10 @@ class Installation
         
         if($available)
         {
-            self :: displaySuccessMessage(' - Found available migrations: '.$available);
+            self::displaySuccessMessage(' - Found available migrations: '.$available);
 
             $migrations -> runMigrations('all');
-            self :: displaySuccessMessage(' - Migrations have been executed.');
+            self::displaySuccessMessage(' - Migrations have been executed.');
         }
     }
 
@@ -658,8 +678,8 @@ class Installation
      */
     static public function commandConfigureDatabase(Event $event)
     {
-        self :: instance();
-        $env = parse_ini_file(static :: $instance['directory'].'/.env');
+        self::instance();
+        $env = parse_ini_file(static::$instance['directory'].'/.env');
 
         if($env['DATABASE_ENGINE'] === 'mysql')
         {
@@ -667,21 +687,21 @@ class Installation
 
             if(isset($arguments[0]) && $arguments[0] == 'dev')
             {
-                self :: setEnvFileParameter('DATABASE_HOST', 'localhost');
-                self :: setEnvFileParameter('DATABASE_USER', 'root');
-                self :: setEnvFileParameter('DATABASE_PASSWORD', '');
-                self :: setEnvFileParameter('DATABASE_NAME', $arguments[1] ?? 'development');
+                self::setEnvFileParameter('DATABASE_HOST', 'localhost');
+                self::setEnvFileParameter('DATABASE_USER', 'root');
+                self::setEnvFileParameter('DATABASE_PASSWORD', '');
+                self::setEnvFileParameter('DATABASE_NAME', $arguments[1] ?? 'development');
                 
-                $env = parse_ini_file(static :: $instance['directory'].'/.env');
+                $env = parse_ini_file(static::$instance['directory'].'/.env');
             }
         }
         
         if($env['DATABASE_ENGINE'] === 'mysql')
-            self :: configureDatabaseMysql();
+            self::configureDatabaseMysql();
         else if($env['DATABASE_ENGINE'] === 'sqlite')
-            self :: configureDatabaseSQLite();
+            self::configureDatabaseSQLite();
         else
-            self :: displayErrorMessage('Undefined database "DATABASE_ENGINE='.$env['DATABASE_ENGINE'].'" in .env file');
+            self::displayErrorMessage('Undefined database "DATABASE_ENGINE='.$env['DATABASE_ENGINE'].'" in .env file');
     }
 
     /**
@@ -689,17 +709,17 @@ class Installation
      */
     static public function commandMigrations(Event $event)
     {
-        self :: instance();
-        self :: boot();
+        self::instance();
+        self::boot();
 
-        $tables = Database :: instance() -> getTables();
+        $tables = Database::instance() -> getTables();
 
         if(!in_array('versions', $tables) || !in_array('users', $tables))
         {
             $message = "Unable to run migrations. Initial database dump was not imported.".PHP_EOL;
             $message .= " Probably you need to execute \"composer mv:database\" before.";
 
-            self :: displayErrorMessage($message);
+            self::displayErrorMessage($message);
             return;
         }
 
@@ -709,20 +729,20 @@ class Installation
 
         if($available == 0)
         {
-            self :: displaySuccessMessage(' - No new migrations available.');
+            self::displaySuccessMessage(' - No new migrations available.');
             return;
         }
 
         echo PHP_EOL;
-        self :: displaySuccessMessage(' - Found available migrations ('.$available.'):');
+        self::displaySuccessMessage(' - Found available migrations ('.$available.'):');
         echo implode("\n", $migrations -> getMigrationsShortList()).PHP_EOL;
         
-        $answer = self :: typePrompt('Do you want to run the migrations now? [yes]', 'run_migrations');
+        $answer = self::typePrompt('Do you want to run the migrations now? [yes]', 'run_migrations');
 
         if($answer == '' || $answer == 'yes' || $answer == 'y')
         {
             $migrations -> runMigrations('all');
-            self :: displayDoneMessage('Migrations have been executed. Your database now is up to date.');
+            self::displayDoneMessage('Migrations have been executed. Your database now is up to date.');
         }
     }
 
@@ -731,29 +751,29 @@ class Installation
      */
     static public function commandCleanup(Event $event)
     {
-        self :: instance();
-        self :: boot();
+        self::instance();
+        self::boot();
         
-        $userfiles = Registry :: get('FilesPath');
+        $userfiles = Registry::get('FilesPath');
 
-        Cache :: emptyCacheDirectory();        
-        self :: displaySuccessMessage(' - Env and media cache have been cleared.');
+        Cache::emptyCacheDirectory();        
+        self::displaySuccessMessage(' - Env and media cache have been cleared.');
 
         $folders = ['tmp/', 'tmp/admin/', 'tmp/redactor/', 'tmp/filemanager/'];
 
         (new Filemanager()) -> cleanTmpFiles();
 
         foreach($folders as $folder)
-            Filemanager :: deleteOldFiles($userfiles.$folder);
+            Filemanager::deleteOldFiles($userfiles.$folder);
 
-        self :: displaySuccessMessage(' - Temporary files have been removed.');
+        self::displaySuccessMessage(' - Temporary files have been removed.');
 
-        Filemanager :: setCleanupLimit(100000);
-        Filemanager :: makeModelsFilesCleanUp();
-        self :: displaySuccessMessage(' - Models files have been optimized.');
+        Filemanager::setCleanupLimit(100000);
+        Filemanager::makeModelsFilesCleanUp();
+        self::displaySuccessMessage(' - Models files have been optimized.');
 
-        Cache :: cleanAll();
-        self :: displaySuccessMessage(' - Database cache has been cleared.');
+        Cache::cleanAll();
+        self::displaySuccessMessage(' - Database cache has been cleared.');
     }
 
     /**
@@ -761,81 +781,81 @@ class Installation
      */
     static public function commandRegion(Event $event)
     {
-        self :: instance();
-        self :: boot();
+        self::instance();
+        self::boot();
 
         $arguments = $event -> getArguments();
         $region = strtolower(trim($arguments[0] ?? ''));
-        $supported = Registry :: get('SupportedRegions');
+        $supported = Registry::get('SupportedRegions');
 
         if($region === '')
         {
             $message = 'Region value has not been provided. Pass it like "composer mv:region -- en"';
             $message .= PHP_EOL.' Supported regions are: '.implode(', ', $supported);
-            self :: displayErrorMessage($message);
+            self::displayErrorMessage($message);
 
             return;
         }
 
-        if(!in_array($region, Registry :: get('SupportedRegions')))
+        if(!in_array($region, Registry::get('SupportedRegions')))
         {
             $message = 'Undefined region passed "'.$region.'"';
             $message .= PHP_EOL.' Supported regions are: '.implode(', ', $supported);
-            self :: displayErrorMessage($message);
+            self::displayErrorMessage($message);
 
             return;
         }
 
-        if(static :: $instance['package'] !== '')
+        if(static::$instance['package'] !== '')
             return $region;
 
-        $env = parse_ini_file(static :: $instance['directory'].'/.env');
+        $env = parse_ini_file(static::$instance['directory'].'/.env');
         $env_region = $env['APP_REGION'] ?? '';
-        $versions = Database :: instance() -> getCount('versions');
-        $logs = Database :: instance() -> getCount('log');
+        $versions = Database::instance() -> getCount('versions');
+        $logs = Database::instance() -> getCount('log');
 
         if($env_region !== '' || $versions > 0 || $logs > 0)
         {
             $message = "Attention! Changing of the region will cause overwriting files of 3 base models, views ";
             $message .= "and content of table 'pages' in database.";
             
-            self :: displayErrorMessage($message);
+            self::displayErrorMessage($message);
 
             $message = "Do you want to proceed? [yes / no]";
 
-            $answer = self :: typePromptWithCoices($message, ['yes', 'y', 'no', 'n', ''], 'change_region');
+            $answer = self::typePromptWithCoices($message, ['yes', 'y', 'no', 'n', ''], 'change_region');
             
             if($answer !== 'yes' && $answer !== 'y')
                 return;
         }
 
-        self :: setEnvFileParameter('APP_REGION', $region);
-        self :: displaySuccessMessage(' - .env file has been configurated.');
+        self::setEnvFileParameter('APP_REGION', $region);
+        self::displaySuccessMessage(' - .env file has been configurated.');
 
         $region_initial = $region;
         $region = $region === 'us' ? 'en' : $region;
-        $package = static :: $instance['directory'].'/customs/regions/'.$region;
+        $package = static::$instance['directory'].'/customs/regions/'.$region;
 
         if(is_dir($package))
         {
             if(is_dir($package.'/models') && count(scandir($package.'/models')) > 2)
             {
-                self :: copyDirectory($package.'/models', static :: $instance['directory'].'/models');
-                self :: displaySuccessMessage(' - Models files have been copied.');
+                self::copyDirectory($package.'/models', static::$instance['directory'].'/models');
+                self::displaySuccessMessage(' - Models files have been copied.');
             }
 
             if(is_dir($package.'/views') && count(scandir($package.'/views')) > 2)
             {
-                self :: copyDirectory($package.'/views', static :: $instance['directory'].'/views');
-                self :: displaySuccessMessage(' - Views files have been copied.');
+                self::copyDirectory($package.'/views', static::$instance['directory'].'/views');
+                self::displaySuccessMessage(' - Views files have been copied.');
             }
 
             $file = $package.'/package-'.$region.'.php';
             $data = is_file($file) ? include $file : null;
             
             if(is_array($data))
-                if(0 < self :: importInitialDatabaseData($data['database']))
-                    self :: displaySuccessMessage(' - Database data has been imported.');
+                if(0 < self::importInitialDatabaseData($data['database']))
+                    self::displaySuccessMessage(' - Database data has been imported.');
         }
 
         $message = 'Region settings from the "'.$region_initial.'" package have been installed.';
@@ -843,7 +863,7 @@ class Installation
         if(isset($data['hello']) && $data['hello'] !== '')
             $message .= PHP_EOL.' '.$data['hello'];
     
-        self :: displayDoneMessage($message);
+        self::displayDoneMessage($message);
     }
 
     /**
@@ -860,7 +880,7 @@ class Installation
 
         foreach($data as $model_name => $items)
         {
-            if(Registry :: checkModel($model_name) !== true)
+            if(Registry::checkModel($model_name) !== true)
                 continue;
 
             $model = new $model_name;
@@ -898,15 +918,15 @@ class Installation
 
         $package = getenv('MV_COMPOSER_TEST_ENVIRONMENT');
 
-        if(!class_exists(BootTestEnvironment :: class) || !$package || !$key)
+        if(!class_exists(BootTestEnvironment::class) || !$package || !$key)
             return null;
 
-        $settings = BootTestEnvironment :: instance($package);
+        $settings = BootTestEnvironment::instance($package);
         $value = $settings['prompts'][$key] ?? null;
 
         if(is_null($value))
         {
-            self :: displayErrorMessage('No test value from BootTestEnvironment for key: '.$key);
+            self::displayErrorMessage('No test value from BootTestEnvironment for key: '.$key);
             exit();
         }
         else
