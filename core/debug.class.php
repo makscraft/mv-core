@@ -56,6 +56,7 @@ class Debug
 	{
 		$var = is_null($var) ? 'null' : $var;
 		$var = is_bool($var) ? ($var ? 'true' : 'false') : $var;
+		$var = $var === '' ? "''" : $var;
 
 		if(Registry :: get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
 		{
