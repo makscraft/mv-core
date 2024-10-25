@@ -34,9 +34,9 @@ class Http
         $method = $method === '' ? $method : strtolower($method);
         $check = true;
 
-        if($method === 'get' && !self :: isGetRequest())
+        if($method === 'get' && !self::isGetRequest())
             $check = false;
-        else if($method === 'post' && !self :: isPostRequest())
+        else if($method === 'post' && !self::isPostRequest())
             $check = false;
 
         if($check)
@@ -83,11 +83,11 @@ class Http
      */
     static public function responseXml(string $xml): void
     {
-        if(strpos($xml, '<?xml version=') !== 0)
-            $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"\n".$xml;
+        if(strpos($xml, '<?xml version=') === false)
+            $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".$xml;
 
         header('Content-Type: application/xml');
-        echo $xml;
+        echo trim($xml);
         exit();
     }
 
@@ -98,7 +98,7 @@ class Http
     static public function responseText(string $text): void
     {
         header('Content-Type: text/plain');
-        echo $text;
+        echo trim($text);
         exit();
     }
 
@@ -109,7 +109,7 @@ class Http
     static public function responseHtml(string $html): void
     {
         header('Content-Type: text/html');
-        echo $html;
+        echo trim($html);
         exit();
     }
 
@@ -119,7 +119,7 @@ class Http
 	 */
     static public function isHttps()
     {
-        return Router :: isHttps();
+        return Router::isHttps();
     }
 
     /**
@@ -128,7 +128,7 @@ class Http
 	 */
     static public function isLocalHost()
     {
-        return Router :: isLocalHost();
+        return Router::isLocalHost();
     }
 
     /**
@@ -140,10 +140,10 @@ class Http
     static public function setCookie(string $key, string $value, array $params = []): void
     {
         $expires = $params['expires'] ?? 0;
-        $path = $params['path'] ?? Registry :: get('MainPath');
+        $path = $params['path'] ?? Registry::get('MainPath');
         $domain = $params['domain'] ?? '';
-        $http_only = Registry :: get('HttpOnlyCookie') ?? true;
+        $http_only = Registry::get('HttpOnlyCookie') ?? true;
 
-        setcookie($key, $value, $expires, $path, $domain, self :: isHttps(), $http_only);
+        setcookie($key, $value, $expires, $path, $domain, self::isHttps(), $http_only);
     }
 }
