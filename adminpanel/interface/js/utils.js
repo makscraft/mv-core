@@ -13,8 +13,44 @@ $(document).ready(function()
 	//And then we run the script every few minutes
 	setInterval(keepSessionAlive, 1000 * 60 * 3);
 
-	$("input.form-date-time-field").attr("autocomplete", "off").datetimepicker({timeFormat: 'hh:mm', dateFormat: mVobject.dateFormat});
-	$("input.form-date-field").attr("autocomplete", "off").datepicker({dateFormat: mVobject.dateFormat});	
+	//Air datepicker calendar run
+	function runAirDatepicker(item)
+	{
+		$(item).attr('autocomplete', 'off');
+		let dateAndTime = item.classList.contains('form-date-time-field');
+		let inModal = $(item).parent().hasClass('multi-value-select');
+
+		let airDatepickerCalendar = new AirDatepicker(item, {
+			selectedDates: [$(item).val()],
+			autoClose: !dateAndTime,
+			timepicker: dateAndTime,
+			position: 'bottom right',
+			inline: false,
+			onSelect: function(date)
+			{
+				//Bulk action value processing
+				if(inModal)
+					dialogs.setSelectedMultiActionDateTime(date.formattedDate);
+			}
+		});
+
+		if(typeof airDatepickerLocale !== 'undefined')
+		{
+			if(mVobject.dateFormat)
+				airDatepickerLocale.dateFormat = mVobject.dateFormat.replace('mm', 'MM');
+
+			airDatepickerCalendar.update({locale: airDatepickerLocale});
+		}
+	}
+
+	//Pass function into other module
+	dialogs.runAirDatepicker = runAirDatepicker;
+	
+	$('input.form-date-field, input.form-date-time-field').each(function()
+	{
+		runAirDatepicker(this);
+	});
+	
 	$("td.not-editable-field").find(":checkbox, :text, :password, :file, textarea, select").attr("disabled", "disabled");
 	$("td.not-editable-field").find("div.upload-buttons").empty();
 	$("td.not-editable-field:has(div.upload-buttons)").find("div.controls").remove();	
@@ -447,12 +483,15 @@ $(document).ready(function()
 					$(select).find("option[value='" + name + "']").appendTo("#remove-filter");
 					$("#remove-filter option").removeAttr("selected");
 					$("#remove-filter option[value='']").attr("selected", "selected");
-					$("input.form-date-time-field").datetimepicker({timeFormat: 'hh:mm', dateFormat: mVobject.dateFormat});
-					$("input.form-date-field").datepicker({dateFormat: mVobject.dateFormat});
-					
-					$("#admin-filters input.autocomplete-input").each(function(index, element)
+
+					$('#model-filters input.form-date-field, #model-filters input.form-date-time-field').each(function()
+					{
+						runAirDatepicker(this);
+					});
+
+					$('#admin-filters input.autocomplete-input').each(function()
 		  		  	{
-						runAutocomplete(element);
+						runAutocomplete(this);
 		  		  	});
 				}
 			});

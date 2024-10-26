@@ -97,6 +97,7 @@ var dialogs = {
 			
 			let ajax_params = "action=" + multi_action + "&value=" + multi_value;
 			let checked_elements = [];
+			let _this = this;
 			
 			$("table.model-table tr:gt(0) :checkbox:checked").each(function()
 			{
@@ -151,27 +152,15 @@ var dialogs = {
 						else if(type == 'date' || type == 'date_time')
 						{
 							message_key += '_enum';
-							var date_css_class = (type == 'date') ? "form-date-field" : "form-date-time-field";
+							let date_css_class = (type == 'date') ? "form-date-field" : "form-date-time-field";
 							
 							var html = "<div class=\"multi-value-select date-time-set\">";
 							html += "<input type=\"text\" value=\"\" class=\"" + date_css_class + "\" /></div>";
-							
-							$("div.multi-value-select input").live("change", function()
-							{
-								var date_value = $.trim($(this).val());
-								
-								if(date_value)
-								{
-									var form_action = $("#model-table-form").attr("action");
-									form_action = form_action.replace(/multi_value=[^&]+/, "multi_value=" + date_value);
-									$("#model-table-form").attr("action", form_action);
-								}
-							});
 						}
 						else if(type == 'int' || type == 'float')
 						{
 							message_key += '_enum';
-							multi_value = "";
+							multi_value = '';
 							
 							var html = "<div class=\"multi-value-select numeric-value\">";
 							html += "<input type=\"text\" value=\"\" /></div>";
@@ -194,8 +183,6 @@ var dialogs = {
 								message_key += '_m2m_' + multi_value;
 							else
 								message_key += '_enum';
-							
-							var ids = (type == 'parent') ? checked_elements.join(',') : "";
 							
 							if($(data).find('response').find('long_list').text())
 							{
@@ -283,10 +270,23 @@ var dialogs = {
 
 					//Extra js plugins
 					runAutocomplete("input.autocomplete-multi");
-					$("input.form-date-time-field").datetimepicker({timeFormat: 'hh:mm', dateFormat: mVobject.dateFormat});
-					$("input.form-date-field").datepicker({dateFormat: mVobject.dateFormat});
+
+					$('div.message-confirm input.form-date-field, div.message-confirm input.form-date-time-field').each(function()
+					{
+						_this.runAirDatepicker(this);
+					});
 				}
 			});
+		},
+
+		setSelectedMultiActionDateTime: function(value)
+		{
+			if(value)
+			{
+				var form_action = $('#model-table-form').attr('action');
+				form_action = form_action.replace(/multi_value=[^&]+/, 'multi_value=' + value);
+				$('#model-table-form').attr('action', form_action);
+			}
 		},
 		
 		commentImage: function(id)

@@ -12,8 +12,8 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 ?>
 <div id="columns-wrapper">
    <div id="model-table">
-         <h3 class="column-header"><?php echo I18n :: locale("import-csv"); ?><span class="header-info"><?php echo $system -> model -> getName(); ?></span></h3>
-         <p class="csv-notice"><?php echo I18n :: locale('choose-fields-import-csv'); ?></p>
+         <h3 class="column-header"><?php echo I18n::locale("import-csv"); ?><span class="header-info"><?php echo $system -> model -> getName(); ?></span></h3>
+         <p class="csv-notice"><?php echo I18n::locale('choose-fields-import-csv'); ?></p>
             <form id="csv-settings" method="post" enctype="multipart/form-data" action="<?php echo $upload_path; ?>">
 				<?php echo $csv_manager -> displayFieldsLists($system -> model); ?>            
                <div class="clear">
@@ -21,31 +21,31 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
                </div>
 	            <table>               
                    <tr>
-                      <td class="setting-name"><?php echo I18n :: locale('file-csv'); ?></td>
+                      <td class="setting-name"><?php echo I18n::locale('file-csv'); ?></td>
                       <td class="setting-input"><input type="file" name="csv_file" id="csv_file" /></td>
                    </tr>
                    <tr>
-                     <td class="setting-name"><?php echo I18n :: locale('update-order'); ?></td>
+                     <td class="setting-name"><?php echo I18n::locale('update-order'); ?></td>
                      <td class="setting-input">
                         <select name="csv_update_order">
-                           <option value="update-and-create"><?php echo I18n :: locale('update-and-create'); ?></option>
-                           <option value="update-only"><?php echo I18n :: locale('update-only'); ?></option>
-                           <option value="create-only"><?php echo I18n :: locale('create-only'); ?></option>
+                           <option value="update-and-create"><?php echo I18n::locale('update-and-create'); ?></option>
+                           <option value="update-only"><?php echo I18n::locale('update-only'); ?></option>
+                           <option value="create-only"><?php echo I18n::locale('create-only'); ?></option>
                         </select>
                      </td>
                    </tr>                   
 	               <tr>
-	                  <td class="setting-name"><?php echo I18n :: locale('column-separator'); ?></td>
+	                  <td class="setting-name"><?php echo I18n::locale('column-separator'); ?></td>
 	                  <td class="setting-input">
 	                     <select name="csv_separator">
-                           <option value="semicolon"><?php echo I18n :: locale('semicolon'); ?></option>
-                           <option value="comma"><?php echo I18n :: locale('comma'); ?></option>
-                           <option value="tabulation"><?php echo I18n :: locale('tabulation'); ?></option>
+                           <option value="semicolon"><?php echo I18n::locale('semicolon'); ?></option>
+                           <option value="comma"><?php echo I18n::locale('comma'); ?></option>
+                           <option value="tabulation"><?php echo I18n::locale('tabulation'); ?></option>
 	                     </select>
 	                  </td>
 	               </tr>
 	               <tr>
-	                  <td class="setting-name"><?php echo I18n :: locale('file-encoding'); ?></td>
+	                  <td class="setting-name"><?php echo I18n::locale('file-encoding'); ?></td>
 	                  <td class="setting-input">
 	                     <select name="csv_encoding">
                            <option value="windows-1251">Windows1251</option>
@@ -54,13 +54,13 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	                  </td>
 	               </tr>
 	               <tr>
-	                  <td class="setting-name"><?php echo I18n :: locale('first-line-headers'); ?></td>
+	                  <td class="setting-name"><?php echo I18n::locale('first-line-headers'); ?></td>
 	                  <td class="setting-input"><input type="checkbox" name="csv_headers" checked="checked" /></td>
 	               </tr>
 	            </table>
             </form>
-            <input class="button-light" type="button" onclick="importFromCSV()" value="<?php echo I18n :: locale('upload-file'); ?>" />
-            <input class="button-dark" onclick="location.href='<?php echo $back_path; ?>'" type="button" value="<?php echo I18n :: locale('back'); ?>" />
+            <input class="button-light" type="button" onclick="importFromCSV()" value="<?php echo I18n::locale('upload-file'); ?>" />
+            <input class="button-dark" onclick="location.href='<?php echo $back_path; ?>'" type="button" value="<?php echo I18n::locale('back'); ?>" />
             <span id="csv-upload-loader"></span>
        </div>
 </div>

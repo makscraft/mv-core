@@ -5,4 +5,4 @@ else
 	$action = "$.modalWindow.open(mVobject.locale('no_rights'), {css_class: 'alert'});";
 ?>
 
-<input class="button-create" type="button" onclick="<?php echo $action; ?>" value="<?php echo I18n :: locale('create'); ?>" />
+<input class="button-create" type="button" onclick="<?php echo $action; ?>" value="<?php echo I18n::locale('create'); ?>" />

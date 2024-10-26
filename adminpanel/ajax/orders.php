@@ -1,7 +1,7 @@
 <?php
 include "../../config/autoload.php";
 
-Http :: isAjaxRequest('post', true);
+Http::isAjaxRequest('post', true);
 $system = new System('ajax');
 
 if(isset($_POST['orders_update_data'], $_POST['model'], $_POST['model_field'], $_POST["admin-panel-csrf-token"]) && 

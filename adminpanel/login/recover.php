@@ -3,14 +3,14 @@ include_once "../../config/autoload.php";
 sleep(1);
 
 $login = new Login();
-$i18n = I18n :: instance();
-$region = I18n :: defineRegion();
+$i18n = I18n::instance();
+$region = I18n::defineRegion();
 $i18n -> setRegion($region);
 
 if(isset($_GET["code"], $_GET["token"]) && $_GET["code"] && $_GET["token"])
 	if(!$login -> checkNewPasswordParams($_GET["code"], $_GET["token"]))
 	{
-		$_SESSION['login']['message'] = I18n :: locale("password-not-confirmed");
+		$_SESSION['login']['message'] = I18n::locale("password-not-confirmed");
 		$_SESSION['login']['message-css'] = "errors";
 		
 		$login -> reload("login/");
@@ -39,21 +39,21 @@ if(!empty($_POST))
 		$errors[] = $form -> displayOneError($error);
 	
 	if(!count($errors) && $form -> password != $form -> password_repeat)
-		$errors[] = I18n :: locale("passwords-must-match");
+		$errors[] = I18n::locale("passwords-must-match");
 	
-	if(!isset($_SESSION["login"]["ajax-token"]) || $_SESSION["login"]["ajax-token"] != Login :: getAjaxInitialToken())
-		$errors[] = I18n :: locale("error-wrong-token");
+	if(!isset($_SESSION["login"]["ajax-token"]) || $_SESSION["login"]["ajax-token"] != Login::getAjaxInitialToken())
+		$errors[] = I18n::locale("error-wrong-token");
 
-	if(!isset($_POST["js-token"]) || $_POST["js-token"] != Login :: getJavaScriptToken())
-		$errors[] = I18n :: locale("error-wrong-token");
+	if(!isset($_POST["js-token"]) || $_POST["js-token"] != Login::getJavaScriptToken())
+		$errors[] = I18n::locale("error-wrong-token");
 
-	if(!isset($_POST["admin-login-csrf-token"]) || $_POST["admin-login-csrf-token"] != Login :: getTokenCSRF())
-		$errors[] = I18n :: locale("error-wrong-token");
+	if(!isset($_POST["admin-login-csrf-token"]) || $_POST["admin-login-csrf-token"] != Login::getTokenCSRF())
+		$errors[] = I18n::locale("error-wrong-token");
 	
 	if(!count($errors))
 	{
 		$login -> saveNewPassword($_SESSION['login']['change-password'], $form -> password);
-		$_SESSION['login']['message'] = I18n :: locale("password-confirmed");
+		$_SESSION['login']['message'] = I18n::locale("password-confirmed");
 		$_SESSION['login']['message-css'] = "success";
 		 
 		$login -> reload("login/");
@@ -66,23 +66,23 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
 	   <div id="login-area">
            <div id="login-top"></div>
            <div id="login-middle">
-	           <div id="header"><?php echo I18n :: locale('password-restore'); ?></div>
+	           <div id="header"><?php echo I18n::locale('password-restore'); ?></div>
                <form method="post" class="login-form">
                   <?php echo $login -> displayLoginErrors($errors); ?>
                   <div class="line">
-                     <div class="name"><?php echo I18n :: locale('new-password'); ?></div>
+                     <div class="name"><?php echo I18n::locale('new-password'); ?></div>
                      <input class="password" type="password" name="password" value="<?php echo $form -> password; ?>" autocomplete="off" />
                   </div>
                   <div class="line">
-                     <div class="name"><?php echo I18n :: locale('password-repeat'); ?></div>
+                     <div class="name"><?php echo I18n::locale('password-repeat'); ?></div>
                      <input class="password" type="password" name="password_repeat" value="<?php echo $form -> password_repeat; ?>" autocomplete="off" />
                   </div>
                   <div class="submit">
-                     <input class="submit" type="submit" value="<?php echo I18n :: locale('restore'); ?>" />
+                     <input class="submit" type="submit" value="<?php echo I18n::locale('restore'); ?>" />
                      <input type="hidden" name="admin-login-csrf-token" value="<?php echo $login -> getTokenCSRF(); ?>" />
                   </div>
                   <div class="cancel">
-                     <a href="<?php echo $registry -> getSetting('AdminPanelPath'); ?>login/"><?php echo I18n :: locale('cancel'); ?></a>
+                     <a href="<?php echo $registry -> getSetting('AdminPanelPath'); ?>login/"><?php echo I18n::locale('cancel'); ?></a>
                   </div>               
                </form>
            </div>

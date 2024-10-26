@@ -1,10 +1,10 @@
 <?php
 include "../../config/autoload.php";
 
-if(!Http :: isGetRequest())
+if(!Http::isGetRequest())
 	exit();
 
-$registry = Registry :: instance();
+$registry = Registry::instance();
 $system = new System('ajax');
 
 if(!$system -> user -> checkUserLogin())

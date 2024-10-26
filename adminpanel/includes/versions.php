@@ -17,14 +17,14 @@
 	?>
 </table>
 <div id="versions-limit"<?php echo $versions_limit ? "" : ' class="versions-disabled"'; ?>>
-	<?php echo $versions_limit ? I18n :: locale("versions-limit").": ".$versions_limit : I18n :: locale("versions-disabled"); ?>
+	<?php echo $versions_limit ? I18n::locale("versions-limit").": ".$versions_limit : I18n::locale("versions-disabled"); ?>
 </div>
 <div id="versions-pager">
 	<div class="limit">
       <?php
       	  if($versions_limit)
       	  {
-      	  	  echo "<span>".I18n :: locale('pager-limit')."</span>\n";
+      	  	  echo "<span>".I18n::locale('pager-limit')."</span>\n";
       	  	  echo "<select>\n".$system -> versions -> pager -> displayPagerLimits(array(5,10,15,20,25,30,50,100))."</select>\n";
       	  }
       ?>

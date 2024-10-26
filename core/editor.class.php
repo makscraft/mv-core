@@ -14,17 +14,18 @@ class Editor
 	{
 		$html = '';
 
-		$region = Registry :: get('Region');
+		$region = Registry::get('Region');
 		$region = ($region == 'en' || $region == 'am' || $region == 'us') ? 'uk' : $region;
-		$upload_path = Registry :: get('AdminPanelPath').'controls/upload.php?ck-image';
+		$region_path = Registry::get('AdminPanelPath').'i18n/'.$region.'/';
+		$upload_path = Registry::get('AdminPanelPath').'controls/upload.php?ck-image';
   
-		if(!self :: $instance)
+		if(!self::$instance)
 		{
-			$path = Registry :: get("AdminPanelPath")."interface/ckeditor/";
+			$path = Registry::get("AdminPanelPath")."interface/ckeditor/";
 			$html .= "<script type=\"text/javascript\" src=\"".$path."ckeditor.js\"></script>\n";
-			$html .= "<script type=\"text/javascript\" src=\"".$path."translations/".$region.".js\"></script>\n";
+			$html .= "<script type=\"text/javascript\" src=\"".$region_path."ckeditor.".$region.".js\"></script>\n";
 
-			self :: $instance = true;
+			self::$instance = true;
 		}
 
 		$html .= "<style type=\"text/css\"> textarea#".$id." + div .ck-editor__editable_inline{min-height: ".$height."px; max-height: 800px} </style>\n";
@@ -78,7 +79,7 @@ class Editor
 	
 	static public function createFilesJSON()
 	{
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 		$path = $registry -> getSetting("FilesPath")."tmp/files.json";
 		$folder = $registry -> getSetting("FilesPath")."files/";
 		$url = $registry -> getSetting("MainPath")."userfiles/files/";
@@ -99,7 +100,7 @@ class Editor
 					$json[] = array("name" => "",
 									"title" => $file,
 									"link" => $url.$file, 
-									"size" => I18n :: convertFileSize(filesize($folder.$file)));	
+									"size" => I18n::convertFileSize(filesize($folder.$file)));	
 				}
 			}
 				
@@ -108,7 +109,7 @@ class Editor
    
 	static public function createImagesJSON()
 	{
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 		$path = $registry -> getSetting("FilesPath")."tmp/images.json";
 		$folder = $registry -> getSetting("FilesPath")."images/";
 		$url = $registry -> getSetting("MainPath")."userfiles/images/";
@@ -127,7 +128,7 @@ class Editor
 				
 				if(is_file($folder.$file))
 				{
-					$extension = Service :: getExtension($file);
+					$extension = Service::getExtension($file);
 					
 					if(!in_array($extension, $registry -> getSetting("AllowedImages")))
 						continue;
@@ -143,7 +144,7 @@ class Editor
 						@unlink($tmp_name);
 					}
 					
-					$json[] = array("thumb" => Service :: removeDocumentRoot($thumb_name),
+					$json[] = array("thumb" => Service::removeDocumentRoot($thumb_name),
 										 "image" => $url.$file,
 										 "title" => $file);
 				}

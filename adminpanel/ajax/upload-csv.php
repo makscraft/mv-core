@@ -1,7 +1,7 @@
 <?php
 include "../../config/autoload.php";
 
-Http :: isAjaxRequest('post', true);
+Http::isAjaxRequest('post', true);
 $system = new System('ajax');
 
 $time_limit = $system -> registry -> getSetting("CsvUploadTimeLimit");
@@ -35,7 +35,7 @@ if(isset($_FILES["csv_file"], $_POST["model"], $_POST["csv_fields"], $_POST["csv
 					$result["error"] = "error-not-all-params";
 				
 				if(!$result["error"])
-					if(Service :: getExtension($_FILES['csv_file']['name']) != "csv")
+					if(Service::getExtension($_FILES['csv_file']['name']) != "csv")
 						$result["error"] = "error-wrong-csv-file";
 					else
 					{
@@ -67,23 +67,23 @@ if(isset($_FILES["csv_file"], $_POST["model"], $_POST["csv_fields"], $_POST["csv
 			}
 			
 if($result["error"])
-	$result["message"] = I18n :: locale($result["error"]);
+	$result["message"] = I18n::locale($result["error"]);
 else if(isset($upload_result))
 {
 	if(count($upload_result["created_ids"]) || count($upload_result["updated_ids"])) //Update was done
 	{
-		$result["message"] = I18n :: locale('update-was-successful');
+		$result["message"] = I18n::locale('update-was-successful');
 		
 		if(count($upload_result["created_ids"]))
-			$result["message"] .= "<br />".I18n :: locale('created-records').": ".count($upload_result["created_ids"]);
+			$result["message"] .= "<br />".I18n::locale('created-records').": ".count($upload_result["created_ids"]);
 		
 		if(count($upload_result["updated_ids"]))
-			$result["message"] .= "<br />".I18n :: locale('updated-records').": ".count($upload_result["updated_ids"]);
+			$result["message"] .= "<br />".I18n::locale('updated-records').": ".count($upload_result["updated_ids"]);
 	}
 	else //If nothing was created or updated
 	{
 		$result["error"] = 1;
-		$result["message"] = I18n :: locale('update-was-failed');
+		$result["message"] = I18n::locale('update-was-failed');
 	}
 	
 	$many_declined_strings = false;
@@ -101,7 +101,7 @@ else if(isset($upload_result))
 
 	if(count($upload_result["declined_strings"]))
 	{
-		$result["message"] .= "<br />".I18n :: locale('declined-strings').": ";
+		$result["message"] .= "<br />".I18n::locale('declined-strings').": ";
 		$result["message"] .= implode(", ", array_keys($upload_result["declined_strings"]));
 		
 		if($many_declined_strings)
@@ -109,4 +109,4 @@ else if(isset($upload_result))
 	}
 }
 
-Http :: responseJson($result);
+Http::responseJson($result);

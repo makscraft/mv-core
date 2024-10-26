@@ -7,7 +7,7 @@ if(isset($_GET["text"]) && trim($_GET["text"]) != "")
 else
 	$search_text = "";
 
-$search_text = Service :: cleanHtmlSpecialChars($search_text);	
+$search_text = Service::cleanHtmlSpecialChars($search_text);	
 	
 if($search_text && mb_strlen($search_text) > 1)
 	$result = $system -> searchInAllModels($search_text);
@@ -39,15 +39,15 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 ?>
 <div id="columns-wrapper">
     <div id="index-search" class="search-page">
-         <h3 class="column-header"><?php echo I18n :: locale('search'); ?>
-            <span class="header-info"><?php echo I18n :: locale('results-found'); ?>: <?php echo $result["number"]; ?></span>
+         <h3 class="column-header"><?php echo I18n::locale('search'); ?>
+            <span class="header-info"><?php echo I18n::locale('results-found'); ?>: <?php echo $result["number"]; ?></span>
          </h3>
          <div id="search-results">
             <?php echo $html; ?>
          </div>
          <div id="search-pager">
             <div class="pager-limit">
-	            <span><?php echo I18n :: locale('pager-limit'); ?></span>
+	            <span><?php echo I18n::locale('pager-limit'); ?></span>
 	            <select>
 	            	<?php echo $pager -> displayPagerLimits($allowed_limits); ?>
 	            </select>

@@ -1,7 +1,7 @@
 <?php
 include "../../config/autoload.php";
 
-Http :: isAjaxRequest('get', true);
+Http::isAjaxRequest('get', true);
 $system = new System('ajax');
 
 if(isset($_GET['query']))
@@ -17,5 +17,5 @@ if(isset($_GET['query']))
 		'data' => array_keys($result)
 	];
 	
-	Http :: responseJson($result);
+	Http::responseJson($result);
 }

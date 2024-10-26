@@ -3,7 +3,7 @@ include "../../config/autoload.php";
 
 $system = new System('ajax');
 
-if(isset($_GET["locale"]) && I18n :: getRegion() == $_GET["locale"])
+if(isset($_GET["locale"]) && I18n::getRegion() == $_GET["locale"])
 {
 	$keys = array("delete-one", "delete-many", "delete-one-finally", "delete-many-finally", "restore-one", 
 				  "restore-many", "update-many-bool", "update-many-enum", "update-many-m2m-add", "update-many-m2m-remove", 
@@ -17,11 +17,11 @@ if(isset($_GET["locale"]) && I18n :: getRegion() == $_GET["locale"])
 	
 	header("Content-Type: application/javascript; charset=utf-8");
 
-	echo "mVobject.region = \"".I18n :: getRegion()."\";\n\n";
+	echo "mVobject.region = \"".I18n::getRegion()."\";\n\n";
 	echo "mVobject.localePackage = {\n";
 	
 	foreach($keys as $key)
-		$data[] = str_replace("-", "_", $key).': '.'"'.I18n :: locale($key).'"';
+		$data[] = str_replace("-", "_", $key).': '.'"'.I18n::locale($key).'"';
 	
 	echo implode(",\n", $data);
 	
@@ -33,7 +33,7 @@ $system -> ajaxRequestContinueOrExit();
 
 if(isset($_POST['action'], $_POST['string']) && $_POST['action'] == "translit")
 {
-	echo I18n :: translitUrl(trim($_POST['string']));
+	echo I18n::translitUrl(trim($_POST['string']));
 	exit();
 }
 
@@ -72,6 +72,6 @@ if(isset($_GET['model'], $_GET['field'], $_GET['query']) && $system -> registry 
 		if(isset($result["query"]))
 			$result["query"] = htmlspecialchars_decode($result["query"], ENT_QUOTES);
 		
-		Http :: responseJson($result);
+		Http::responseJson($result);
 	}
 }

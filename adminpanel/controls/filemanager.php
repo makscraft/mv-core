@@ -37,15 +37,15 @@ if(isset($_GET['action'], $_POST['csrf_token']) && in_array($_GET['action'], $al
 if($action_complete)
 	$system -> reload('controls/filemanager.php'.($url_params ? '?'.$url_params : ''));
 
-CacheMedia :: addJavaScriptFile(Registry :: get('AdminFolder').'/interface/js/file-manager.js');
-CacheMedia :: addCssFile(Registry :: get('AdminFolder').'/interface/css/style-filemanager.css');
+CacheMedia::addJavaScriptFile(Registry::get('AdminFolder').'/interface/js/file-manager.js');
+CacheMedia::addCssFile(Registry::get('AdminFolder').'/interface/css/style-filemanager.css');
 $to_display = $filemanager -> prepareFilesForDisplay();
 
 include $registry -> getSetting('IncludeAdminPath').'includes/header.php';
 ?>
 <div id="columns-wrapper">
     <div id="filemanager-area">
-		<h3 class="column-header"><?php echo I18n :: locale('file-manager'); ?></h3>
+		<h3 class="column-header"><?php echo I18n::locale('file-manager'); ?></h3>
 		<?php echo $admin_panel -> displayAndClearFlashMessages(); ?>
 		<div id="filemanager-path">
 			<?php echo $filemanager -> displayCurrentPath();  ?>
@@ -53,11 +53,11 @@ include $registry -> getSetting('IncludeAdminPath').'includes/header.php';
 		<form id="filemanager-form" method="post">
 			<table class="model-table filemanager">
 				<tr>
-					<th class="middle"><?php echo I18n :: locale('name'); ?></th>
-					<th class="middle"><?php echo I18n :: locale('size'); ?></th>
-					<th class="middle"><?php echo I18n :: locale('file-params'); ?></th>
-					<th class="middle"><?php echo I18n :: locale('last-change'); ?></th>
-					<th class="actions"><?php echo I18n :: locale('operations'); ?></th>
+					<th class="middle"><?php echo I18n::locale('name'); ?></th>
+					<th class="middle"><?php echo I18n::locale('size'); ?></th>
+					<th class="middle"><?php echo I18n::locale('file-params'); ?></th>
+					<th class="middle"><?php echo I18n::locale('last-change'); ?></th>
+					<th class="actions"><?php echo I18n::locale('operations'); ?></th>
 				</tr>
 				<?php echo $filemanager -> display($to_display); ?>
 			</table>
@@ -73,19 +73,19 @@ include $registry -> getSetting('IncludeAdminPath').'includes/header.php';
 		<div id="filemanager-navigation">
 			<div class="buttons">
 				<section>
-					<h3><?php echo I18n :: locale('upload-file'); ?></h3>
+					<h3><?php echo I18n::locale('upload-file'); ?></h3>
 					<form action="?action=uploadFile&<?php echo $url_params; ?>" method="post" enctype="multipart/form-data">
 						<input type="file" name="target" />
 						<input type="hidden" name="csrf_token" value="<?php echo $system -> getToken(); ?>" />
-						<input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n :: locale('upload'); ?>" />
+						<input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n::locale('upload'); ?>" />
 					</form>						
 				</section>
 				<section>
-					<h3><?php echo I18n :: locale('create-folder'); ?></h3>
+					<h3><?php echo I18n::locale('create-folder'); ?></h3>
 					<form action="?action=createFolder&<?php echo $url_params; ?>" method="post">
 						<input type="text" class="borderd" name="target" />
 						<input type="hidden" name="csrf_token" value="<?php echo $system -> getToken(); ?>" />
-						<input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n :: locale('create'); ?>" />
+						<input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n::locale('create'); ?>" />
 					</form>
 				</section>
 				<section>
@@ -97,9 +97,9 @@ include $registry -> getSetting('IncludeAdminPath').'includes/header.php';
 			</div>
 			<div>
 				<div class="pager-limit">
-					<span><?php echo I18n :: locale('pager-limit'); ?></span>
+					<span><?php echo I18n::locale('pager-limit'); ?></span>
 					<select>
-						<?php echo $filemanager -> pagination -> displayPagerLimits(AdminPanel :: PAGINATION_LIMITS); ?>
+						<?php echo $filemanager -> pagination -> displayPagerLimits(AdminPanel::PAGINATION_LIMITS); ?>
 					</select>
 					<input type="hidden" value="filemanager" />
 				</div>

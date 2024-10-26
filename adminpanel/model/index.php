@@ -165,21 +165,21 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
                          	 	
             	 if($system -> model -> filter -> ifAnyFilterApplied())
             	 {
-            	 	echo "<span class=\"header-info\">".I18n :: locale("filtration-applied")."</span>";
+            	 	echo "<span class=\"header-info\">".I18n::locale("filtration-applied")."</span>";
             	 	$number_of_records = $system -> model -> pager -> getTotal();
             	 	echo "<span class=\"header-info\">";
             	 	
             	 	if($number_of_records)
             	 	{
-            	 		$number_of_records = I18n :: formatIntNumber($number_of_records);
+            	 		$number_of_records = I18n::formatIntNumber($number_of_records);
             	 		
             	 		$i18n_arguments = array('number' => $number_of_records, 'records' => '*number',
             	 								'number_found' => $number_of_records, 'found' => '*number_found');
             	 		
-						echo I18n :: locale('found-records', $i18n_arguments);
+						echo I18n::locale('found-records', $i18n_arguments);
             	 	}
             	 	else
-            	 		echo I18n :: locale('no-records-found');
+            	 		echo I18n::locale('no-records-found');
             	 	
             	 	echo "</span>\n";
             	 }
@@ -190,8 +190,8 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
             	 	
             	 	if($total_records)
             	 	{
-            	 		$string = "<span class=\"header-info\">".I18n :: locale('number-records', $i18n_arguments)."</span>";
-            	 		echo str_replace($total_records, I18n :: formatIntNumber($total_records), $string);
+            	 		$string = "<span class=\"header-info\">".I18n::locale('number-records', $i18n_arguments)."</span>";
+            	 		echo str_replace($total_records, I18n::formatIntNumber($total_records), $string);
             	 	}
             	 }
 
@@ -201,7 +201,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
          </h3>
          <?php
          	if(isset($_SESSION["message"]["done"]) && in_array($_SESSION["message"]["done"], array('create','update','delete','restore')))
-          		echo "<div class=\"form-no-errors\"><p>".I18n :: locale('done-'.$_SESSION["message"]["done"])."</p></div>\n";
+          		echo "<div class=\"form-no-errors\"><p>".I18n::locale('done-'.$_SESSION["message"]["done"])."</p></div>\n";
 			else if(isset($_SESSION["message"]['not-deleted']))
          	{
          		if($_SESSION["message"]['not-deleted'] == 'root')
@@ -221,14 +221,14 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
          			$arguments['module'] = $object -> getName();
          		}
          		
-         		echo "<div class=\"form-errors\"><p>".I18n :: locale($message, $arguments)."</p></div>\n";         		
+         		echo "<div class=\"form-errors\"><p>".I18n::locale($message, $arguments)."</p></div>\n";         		
          	}
          	else if(isset($_SESSION["message"]["custom-errors"]) && $_SESSION["message"]["custom-errors"])
 			      echo $_SESSION["message"]["custom-errors"];
          	else if(isset($_SESSION["message"]["token-error"]))
          	{
-			      echo "<div class=\"form-errors\"><p>".I18n :: locale("error-failed")." ";
-			      echo I18n :: locale("error-wrong-token")."</p></div>\n";
+			      echo "<div class=\"form-errors\"><p>".I18n::locale("error-failed")." ";
+			      echo I18n::locale("error-wrong-token")."</p></div>\n";
          	}
 			      
 			unset($_SESSION["message"]);
@@ -252,11 +252,11 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	         	{
 	         		$quick_limit = "quick-limit-".$system -> model -> getPagerLimitForQuickEdit();
 	         		$quick_edit_buttons = "<input id=\"".$quick_limit."\" class=\"button-light mass-quick-edit\" type=\"button\" ";
-	         		$quick_edit_buttons .= "value=\"".I18n :: locale('quick-edit')."\" />\n";
+	         		$quick_edit_buttons .= "value=\"".I18n::locale('quick-edit')."\" />\n";
 	         		$quick_edit_buttons .= "<input class=\"button-light save-quick-edit\" type=\"button\" ";
-	         		$quick_edit_buttons .= "value=\"".I18n :: locale('save')."\" />\n";
+	         		$quick_edit_buttons .= "value=\"".I18n::locale('save')."\" />\n";
 	         		$quick_edit_buttons .= "<input class=\"button-dark cancel-quick-edit\" type=\"button\" ";
-	         		$quick_edit_buttons .= "value=\"".I18n :: locale('cancel')."\" />\n";	         		
+	         		$quick_edit_buttons .= "value=\"".I18n::locale('cancel')."\" />\n";	         		
 	         		
 	         		echo str_replace("</div>", $quick_edit_buttons."</div>", $multi_actions_menu);
 	         	}
@@ -264,7 +264,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	         	{
 	         		$rights_css = $system -> user -> checkModelRights("garbage", "delete") ? "" : " has-no-rights";
 	         		$button_empty = "<input class=\"button-light".$rights_css."\" id=\"empty-recycle-bin\" type=\"button\" ";
-	         		$button_empty .= "value=\"".I18n :: locale('empty-recylce-bin')."\" />\n";
+	         		$button_empty .= "value=\"".I18n::locale('empty-recylce-bin')."\" />\n";
 	         		
 	         		echo str_replace("</div>", $button_empty."</div>", $multi_actions_menu);
 	         	}
@@ -272,12 +272,12 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	         		echo $multi_actions_menu;
 	         ?>
             <div id="fields-list">
-               <input class="button-light<?php if($show_filters_column) echo " no-display"; ?>" type="button" id="show-filters" value="<?php echo I18n :: locale('filters'); ?>" />
-               <input class="button-list" type="button" id="fields-list-button" value="<?php echo I18n :: locale('display-fields'); ?>" />
+               <input class="button-light<?php if($show_filters_column) echo " no-display"; ?>" type="button" id="show-filters" value="<?php echo I18n::locale('filters'); ?>" />
+               <input class="button-list" type="button" id="fields-list-button" value="<?php echo I18n::locale('display-fields'); ?>" />
                <div class="list">
                      <div class="m2m-wrapper">
                         <div class="column">
-					       <div class="header"><?php echo I18n :: locale("not-selected"); ?></div>
+					       <div class="header"><?php echo I18n::locale("not-selected"); ?></div>
 		                   <select class="m2m-not-selected" multiple="multiple">
 		                           <?php 
 		                              $selects_html = $system -> menu -> displayTableFields($system -> model);
@@ -286,24 +286,24 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 		                   </select>                      
                         </div>					    
 					    <div class="m2m-buttons">
-						    <span class="m2m-right" title="<?php echo I18n :: locale('move-selected'); ?>"></span>
-						    <span class="m2m-left" title="<?php echo I18n :: locale('move-not-selected'); ?>"></span>						
+						    <span class="m2m-right" title="<?php echo I18n::locale('move-selected'); ?>"></span>
+						    <span class="m2m-left" title="<?php echo I18n::locale('move-not-selected'); ?>"></span>						
                         </div>
                         <div class="column">
-                           <div class="header"><?php echo I18n :: locale("selected"); ?></div>
+                           <div class="header"><?php echo I18n::locale("selected"); ?></div>
 					       <select class="m2m-selected" multiple="multiple">
                               <?php echo $selects_html['selected']; ?>
 					       </select>
                         </div>
                         <div class="m2m-buttons">
-                           <span class="m2m-up" title="<?php echo I18n :: locale('move-up'); ?>"></span>
-                           <span class="m2m-down" title="<?php echo I18n :: locale('move-down'); ?>"></span>						
+                           <span class="m2m-up" title="<?php echo I18n::locale('move-up'); ?>"></span>
+                           <span class="m2m-down" title="<?php echo I18n::locale('move-down'); ?>"></span>						
                         </div>
 					    <input type="hidden" value="" name="display-table-fields" />
 					 </div>
                      <div class="controls">
-                        <input class="apply button-light" type="button" value="<?php echo I18n :: locale('apply') ?>" />
-                        <input class="cancel button-dark" value="<?php echo I18n :: locale('cancel') ?>" type="button" />
+                        <input class="apply button-light" type="button" value="<?php echo I18n::locale('apply') ?>" />
+                        <input class="cancel button-dark" value="<?php echo I18n::locale('cancel') ?>" type="button" />
                      </div>
                </div>
                <?php
@@ -318,7 +318,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
          </form>
          <?php echo str_replace('class="multi-actions-menu"', 'class="multi-actions-menu" id="bottom-actions-menu"', $multi_actions_menu); ?>
        <div class="pager-limit">
-         <span><?php echo I18n :: locale('pager-limit'); ?></span>
+         <span><?php echo I18n::locale('pager-limit'); ?></span>
          <select>
             <?php echo $system -> model -> pager -> displayPagerLimits($allowed_limits); ?>
          </select>
@@ -334,8 +334,8 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
        </div>
     </div>	
 	<div id="model-filters"<?php if(!$show_filters_column) echo ' class="no-display"'; ?>>
-	       <h3><?php echo I18n :: locale('filters'); ?>
-               <span><input id="hide-filters" type="button" value="<?php echo I18n :: locale('hide') ?>" /></span>
+	       <h3><?php echo I18n::locale('filters'); ?>
+               <span><input id="hide-filters" type="button" value="<?php echo I18n::locale('hide') ?>" /></span>
            </h3>
 		   <div id="admin-filters">
 		      <?php 
@@ -348,8 +348,8 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 		      ?>
 		      <div class="controls">
 		         <input type="hidden" name="initial-form-params" value="<?php echo $system -> model -> getAllUrlParams(array('sorter','model','parent')); ?>" />
-                 <input class="button-light" type="button" id="filters-submit" value="<?php echo I18n :: locale('apply-filters'); ?>" />
-		         <input class="button-dark" type="button" id="filters-reset" value="<?php echo I18n :: locale('reset'); ?>" />
+                 <input class="button-light" type="button" id="filters-submit" value="<?php echo I18n::locale('apply-filters'); ?>" />
+		         <input class="button-dark" type="button" id="filters-reset" value="<?php echo I18n::locale('reset'); ?>" />
 		      </div>
 		   </div>         
 	</div>

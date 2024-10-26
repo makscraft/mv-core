@@ -1,10 +1,10 @@
 <?php
-$cache_drop = CacheMedia :: getDropMark();
-$admin_panel_path = Registry :: get('AdminPanelPath');
-$version_package = Registry :: getCorePackageVersion();
-$version = Registry :: getVersion();
-$engine = ', '.Registry :: get('DbEngine');
-$version_initial = Registry :: getInitialVersion();
+$cache_drop = CacheMedia::getDropMark();
+$admin_panel_path = Registry::get('AdminPanelPath');
+$version_package = Registry::getCorePackageVersion();
+$version = Registry::getVersion();
+$engine = ', '.Registry::get('DbEngine');
+$version_initial = Registry::getInitialVersion();
 $version_initial = ($version_initial != $version) ? $version_initial : null;
 
 $backtrace = debug_backtrace();

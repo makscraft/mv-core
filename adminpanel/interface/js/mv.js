@@ -1,34 +1,34 @@
 /**
- * JS object with settings and custom functions for MV framework
+ * JS object with settings and custom functions for MV framework admin panel.
  */
 var mVobject = {
 
 	//Root path of the project
-	mainPath: "",	
+	mainPath: '',	
 	
 	//Root path of administrator panel for urls
-	adminPanelPath: "",
+	adminPanelPath: '',
 		
 	//Parameters to add to urls
-	urlParams: "",
+	urlParams: '',
 	
 	//Name of sorting field
-	sortField: "",
+	sortField: '',
 	
 	//Filter of parent type field when ordering the child model rows
-	relatedParentFilter: "",
+	relatedParentFilter: '',
 	
 	//Order fields which depend on other fileds of model
 	dependedOrderFields: [],
 	
 	//When ordering the record in table its the first order number
-	startOrder: "",
+	startOrder: '',
 	
 	//Name of parent filter
 	allParentsFilter: false,
 	
 	//Name of region for i18n
-	region: "",
+	region: '',
 	
 	//Array of local words and settings 
 	localePackage: {},

@@ -1,7 +1,7 @@
 <?php
 include "../../config/autoload.php";
 
-Http :: isAjaxRequest('post', true);
+Http::isAjaxRequest('post', true);
 
 if(!empty($_POST))
 	session_start();
@@ -20,48 +20,48 @@ if(isset($_POST["login"], $_POST["password"]))
 	$password_filled = isset($_POST['password']) ? trim(htmlspecialchars($_POST['password'], ENT_QUOTES)) : "";
 
 	if(!$login_filled)
-		$errors[] = I18n :: locale("complete-login");
+		$errors[] = I18n::locale("complete-login");
 	
 	if(!$password_filled)
-		$errors[] = I18n :: locale("complete-password");
+		$errors[] = I18n::locale("complete-password");
 
-	if($login_attempts >= Login :: ATTEMPTS_NUMBER)
+	if($login_attempts >= Login::ATTEMPTS_NUMBER)
 	{
 		if(!isset($_POST['captcha']) || !trim($_POST['captcha']))
-			$errors[] = I18n :: locale("complete-captcha");
+			$errors[] = I18n::locale("complete-captcha");
 		else if(!isset($_SESSION['login']['captcha']) || md5(trim($_POST['captcha'])) != $_SESSION['login']['captcha'])
-			$errors[] = I18n :: locale("wrong-captcha");
+			$errors[] = I18n::locale("wrong-captcha");
 
 		sleep(1);
 	}
 
-	if($login_attempts + 1 >= Login :: ATTEMPTS_NUMBER)
+	if($login_attempts + 1 >= Login::ATTEMPTS_NUMBER)
 	{
 		$result["captcha"] = time();
-		$_SESSION['login']['captcha'] = Service :: randomString(7);
+		$_SESSION['login']['captcha'] = Service::randomString(7);
 	}
 
 	if($login_filled && $password_filled && !count($errors))
 	{
-		if($login_attempts < Login :: ATTEMPTS_NUMBER)
+		if($login_attempts < Login::ATTEMPTS_NUMBER)
 			$login -> addNewLoginAttempt($login_filled);
 
-		if(!isset($_SESSION["login"]["ajax-token"]) || $_SESSION["login"]["ajax-token"] != Login :: getAjaxInitialToken())
+		if(!isset($_SESSION["login"]["ajax-token"]) || $_SESSION["login"]["ajax-token"] != Login::getAjaxInitialToken())
 		{
 			unset($_SESSION["login"]["ajax-token"]);
-			$errors[] = I18n :: locale("error-wrong-token");
+			$errors[] = I18n::locale("error-wrong-token");
 			$result["action"] = "reload";
 		}
 
-		if(!isset($_POST["js-token"]) || $_POST["js-token"] != Login :: getJavaScriptToken())
+		if(!isset($_POST["js-token"]) || $_POST["js-token"] != Login::getJavaScriptToken())
 		{
-			$errors[] = I18n :: locale("error-wrong-token");
+			$errors[] = I18n::locale("error-wrong-token");
 			$result["action"] = "reload";
 		}
 
-		if(!isset($_POST["admin-login-csrf-token"]) || $_POST["admin-login-csrf-token"] != Login :: getTokenCSRF())
+		if(!isset($_POST["admin-login-csrf-token"]) || $_POST["admin-login-csrf-token"] != Login::getTokenCSRF())
 		{
-			$errors[] = I18n :: locale("error-wrong-token");
+			$errors[] = I18n::locale("error-wrong-token");
 			$result["action"] = "reload";
 		}
 
@@ -75,17 +75,17 @@ if(isset($_POST["login"], $_POST["password"]))
 				unset($_SESSION['login'], $_SESSION['login_captcha']);
 			
 				$user = new User($id);
-				$user -> updateSetting('region', I18n :: defineRegion());
+				$user -> updateSetting('region', I18n::defineRegion());
 				
 				$result["action"] = "start";
 			}
 			else
-				$errors[] = I18n :: locale("login-failed");
+				$errors[] = I18n::locale("login-failed");
 		}
 	}
 
 	if(count($errors))
 		$result["errors"] = $login -> displayLoginErrors($errors);
 
-	Http :: responseJson($result);
+	Http::responseJson($result);
 }

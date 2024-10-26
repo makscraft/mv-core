@@ -32,7 +32,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'create' && !empty($_POST))
 	
 	if(!isset($_POST["admin-panel-csrf-token"]) || $_POST["admin-panel-csrf-token"] != $system -> getToken())
 	{
-		$system -> model -> addError(I18n :: locale("error-wrong-token"));
+		$system -> model -> addError(I18n::locale("error-wrong-token"));
 		$form_errors = true;
 	}
 	
@@ -69,11 +69,11 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	       <h3 class="column-header with-navigation">
                 <?php 
                 	echo $system -> model -> getName();
-                	echo "<span class=\"header-info\">".I18n :: locale("create-record")."</span>\n";
+                	echo "<span class=\"header-info\">".I18n::locale("create-record")."</span>\n";
                 ?>
 				<span id="header-navigation">
-                	<input class="button-light" type="button" id="top-save-button" value="<?php echo I18n :: locale('save'); ?>" />
-                	<input class="button-dark button-back" type="button" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath').'model/?'.$back_url_params; ?>'" value="<?php echo I18n :: locale('cancel'); ?>" />
+                	<input class="button-light" type="button" id="top-save-button" value="<?php echo I18n::locale('save'); ?>" />
+                	<input class="button-dark button-back" type="button" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath').'model/?'.$back_url_params; ?>'" value="<?php echo I18n::locale('cancel'); ?>" />
 				</span>
            </h3>
            <?php      
@@ -81,7 +81,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
     	          echo $system -> model -> displayFormErrors();
     	       else if(isset($_SESSION["message"]["created"]))
     	       {
-			      echo "<div class=\"form-no-errors\"><p>".I18n :: locale('done-create')."</p></div>\n";
+			      echo "<div class=\"form-no-errors\"><p>".I18n::locale('done-create')."</p></div>\n";
 			      unset($_SESSION["message"]);
     	       }
 			      
@@ -110,10 +110,10 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 			  	 ?>
 		         <tr class="model-form-navigation">
 			         <td colspan="2" class="bottom-navigation">
-			            <input class="button-light" type="button" id="submit-button" value="<?php echo I18n :: locale('save'); ?>" />
-	                    <input class="button-light" type="button" id="continue-button" value="<?php echo I18n :: locale('create-and-continue'); ?>" />
-	                    <input class="button-light" type="button" id="create-edit-button" value="<?php echo I18n :: locale('create-and-edit'); ?>" />
-                        <input class="button-dark" id="model-cancel" type="button" rel="<?php echo $registry -> getSetting('AdminPanelPath')."model/?".$back_url_params; ?>" value="<?php echo I18n :: locale('cancel'); ?>" />
+			            <input class="button-light" type="button" id="submit-button" value="<?php echo I18n::locale('save'); ?>" />
+	                    <input class="button-light" type="button" id="continue-button" value="<?php echo I18n::locale('create-and-continue'); ?>" />
+	                    <input class="button-light" type="button" id="create-edit-button" value="<?php echo I18n::locale('create-and-edit'); ?>" />
+                        <input class="button-dark" id="model-cancel" type="button" rel="<?php echo $registry -> getSetting('AdminPanelPath')."model/?".$back_url_params; ?>" value="<?php echo I18n::locale('cancel'); ?>" />
                         <input type="hidden" name="admin-panel-csrf-token" value="<?php echo $system -> getToken(); ?>" />
 			         </td>
 		         </tr>
@@ -130,8 +130,8 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	</div>
 	<div id="model-versions">
 	   <div class="column-inner">
-	      <h3><?php echo I18n :: locale('versions-history'); ?></h3>
-	      <p><?php echo $system -> model -> getVersionsLimit() ? I18n :: locale('versions-history-new') : I18n :: locale("versions-disabled"); ?></p>
+	      <h3><?php echo I18n::locale('versions-history'); ?></h3>
+	      <p><?php echo $system -> model -> getVersionsLimit() ? I18n::locale('versions-history-new') : I18n::locale("versions-disabled"); ?></p>
 	   </div>
 	</div>
     <div class="clear"></div>

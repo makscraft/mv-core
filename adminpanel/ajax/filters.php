@@ -1,7 +1,7 @@
 <?php
 include "../../config/autoload.php";
 
-Http :: isAjaxRequest('post', true);
+Http::isAjaxRequest('post', true);
 $system = new System('ajax');
 		
 if(isset($_POST['model'], $_POST['add-filter']) && $system -> registry -> checkModel($_POST['model']))

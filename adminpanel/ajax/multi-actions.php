@@ -1,7 +1,7 @@
 <?php 
 include "../../config/autoload.php";
 
-Http :: isAjaxRequest('post', true);
+Http::isAjaxRequest('post', true);
 $system = new System('ajax');
 
 //Process of garbage cleaup
@@ -16,7 +16,7 @@ if(isset($_POST['empty-recycle-bin']))
 				exit();
 			
 			$arguments = array('number' => $garbage_number, 'records' => '*number');
-			echo I18n :: locale('number-records', $arguments);
+			echo I18n::locale('number-records', $arguments);
 		}
 		else if($_POST['empty-recycle-bin'] == "process" && isset($_POST['iterations-left'])) //Process of final delete of records
 		{
@@ -27,7 +27,7 @@ if(isset($_POST['empty-recycle-bin']))
 			
 			if(intval($_POST['iterations-left']) == 1)
 			{
-				Filemanager :: makeModelsFilesCleanUp();
+				Filemanager::makeModelsFilesCleanUp();
 				$_SESSION["message"]["done"] = "delete";
 			}
 		}
@@ -36,8 +36,7 @@ if(isset($_POST['empty-recycle-bin']))
 }
 
 //Response when call bulk operation in main table of model in admin panel
-$xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-$xml .= "<response>\n";
+$xml = "<response>\n";
 
 if(isset($_POST['model']) && ($system -> registry -> checkModel($_POST['model']) || $_POST['model'] == 'garbage'))
 {
@@ -54,7 +53,7 @@ if(isset($_POST['model']) && ($system -> registry -> checkModel($_POST['model'])
 		else if($object -> getType() == 'bool')
 		{
 			$key = $_POST['value'] ? 'yes' : 'no';
-			$xml .= "<value>".I18n :: locale($key)."</value>\n";
+			$xml .= "<value>".I18n::locale($key)."</value>\n";
 		}
 		else if($object -> getType() == 'enum')
 		{
@@ -94,12 +93,12 @@ if(isset($_POST['model']) && ($system -> registry -> checkModel($_POST['model'])
 	if($_POST['action'] == 'delete' || $_POST['action'] == 'restore')
 	{
 		$arguments = array('number' => count($ids), 'records' => '*number');
-		$xml .= "<number_records>".I18n :: locale('number-records', $arguments)."</number_records>\n";
+		$xml .= "<number_records>".I18n::locale('number-records', $arguments)."</number_records>\n";
 	}
 	else
 	{
 		$arguments = array('number' => count($ids), 'for-record' => '*number');
-		$xml .= "<number_records>".I18n :: locale('number-for-records', $arguments)."</number_records>\n";
+		$xml .= "<number_records>".I18n::locale('number-for-records', $arguments)."</number_records>\n";
 	}
 }
 else
@@ -107,4 +106,4 @@ else
 
 $xml .= "</response>\n";
 
-Http :: responseXml($xml);
+Http::responseXml($xml);

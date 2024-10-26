@@ -1,7 +1,7 @@
 <?php
 include "../../config/autoload.php";
 
-Http :: isAjaxRequest('get', true);
+Http::isAjaxRequest('get', true);
 $system = new System('ajax');
 
 if(isset($_GET['model'], $_GET['field'], $_GET['query']) && $registry -> checkModel($_GET['model']))

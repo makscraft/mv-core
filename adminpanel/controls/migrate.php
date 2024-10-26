@@ -8,7 +8,7 @@ $errors = false;
 
 if($system -> user -> getId() != 1)
 {
-	$system -> error = I18n :: locale("error-no-rights");
+	$system -> error = I18n::locale("error-no-rights");
 	include $system -> registry -> getSetting("IncludeAdminPath")."controls/internal-error.php";
 }
 
@@ -18,10 +18,10 @@ $number = $migrations -> getMigrationsQuantity();
 
 if(isset($_POST["migrations"], $_POST["migrations-csrf-token"]))
 {
-	I18n :: setRegion("en");
+	I18n::setRegion("en");
 	
 	if($_POST["migrations-csrf-token"] != $migrations -> createAllMigrationsToken())
-		$errors = I18n :: locale("error-wrong-token");
+		$errors = I18n::locale("error-wrong-token");
 	
 	if($_POST["migrations"] != "all")
 		$key = $migrations -> checkMigrationKeyToken($_POST["migrations"]);
@@ -29,13 +29,13 @@ if(isset($_POST["migrations"], $_POST["migrations-csrf-token"]))
 		$key = "all";
 	
 	if(!$key)
-		$errors = I18n :: locale("error-wrong-token");
+		$errors = I18n::locale("error-wrong-token");
 	
 	if(!$errors)
 	{
 		$migrations -> runMigrations($key);
 		
-		$_SESSION["message"]["done"] = I18n :: locale("done-operation");
+		$_SESSION["message"]["done"] = I18n::locale("done-operation");
 		$system -> reload("controls/migrate.php");
 	}
 }

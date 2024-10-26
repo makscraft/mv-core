@@ -3,33 +3,33 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-<title><?php echo I18n :: locale('mv'); ?></title>
+<title><?php echo I18n::locale('mv'); ?></title>
 <?php 
 $admin_panel_path = $registry -> getSetting('AdminPanelPath');
-$admin_media_path = Registry :: get('AdminFolder').'/interface/';
-$cache_drop = CacheMedia :: instance() :: getDropMark();
+$admin_media_path = Registry::get('AdminFolder').'/interface/';
+$cache_drop = CacheMedia::instance()::getDropMark();
 
-CacheMedia :: addCssFile([
+CacheMedia::addCssFile([
 	$admin_media_path.'css/style.css',
-	$admin_media_path.'css/ui.css'
+	$admin_media_path.'air-datepicker/air-datepicker.css',
 ]);
 
-if(Router :: isLocalHost())
-	echo CacheMedia :: getInitialFiles('css');
+if(Router::isLocalHost())
+	echo CacheMedia::getInitialFiles('css');
 else
-	echo CacheMedia :: getCssCache();
+	echo CacheMedia::getCssCache();
 ?>
 <script type="text/javascript" src="<?php echo $admin_panel_path; ?>interface/js/mv.js<?php echo $cache_drop; ?>"></script>
 <script type="text/javascript">
-mVobject.mainPath = "<?php echo $registry -> getSetting('MainPath'); ?>";
-mVobject.adminPanelPath = "<?php echo $admin_panel_path; ?>"; 
-mVobject.urlParams = "<?php if(isset($system -> model)) echo $system -> model -> getAllUrlParams(array('pager','filter','model','parent','id')); ?>";
+mVobject.mainPath = '<?php echo $registry -> getSetting('MainPath'); ?>';
+mVobject.adminPanelPath = '<?php echo $admin_panel_path; ?>';
+mVobject.urlParams = '<?php if(isset($system -> model)) echo $system -> model -> getAllUrlParams(array('pager','filter','model','parent','id')); ?>';
 <?php
 if(isset($system -> model))
-   echo "mVobject.currentModel = \"".$system -> model -> getModelClass()."\";\n";
+   echo "mVobject.currentModel = '".$system -> model -> getModelClass()."';\n";
 
 if(isset($system -> model -> sorter))
-   echo "mVobject.sortField = \"".$system -> model -> sorter -> getField()."\";\n";
+   echo "mVobject.sortField = '".$system -> model -> sorter -> getField()."';\n";
 
 if(isset($system -> model))
 {
@@ -39,51 +39,46 @@ if(isset($system -> model))
 
 if(isset($parent) && is_array($parent) && isset($system -> model -> filter))
 	if(!$system -> model -> filter -> allowChangeOrderLinkedWithEnum($parent['name']))
-		echo "mVobject.relatedParentFilter = \"".$parent['caption']."\";\n";
+		echo "mVobject.relatedParentFilter = '".$parent['caption']."';\n";
 
 if(isset($linked_order_fields) && count($linked_order_fields))
 	foreach($linked_order_fields as $name => $data)
 		if(!$system -> model -> filter -> allowChangeOrderLinkedWithEnum($data[0]))
-			echo "mVobject.dependedOrderFields.".$name." = \"".$data[1]."\";\n";
+			echo "mVobject.dependedOrderFields.".$name." = '".$data[1]."';\n";
 		
 $has_applied_filters = (int) (isset($system -> model -> filter) && $system -> model -> filter -> ifAnyFilterApplied());
 echo "mVobject.hasAppliedFilters = ".$has_applied_filters.";\n";      
       
 if(isset($system -> model -> filter))
    if($caption = $system -> model -> filter -> ifFilteredByAllParents())
-      echo "mVobject.allParentsFilter = \"".$caption."\";\n";
+      echo "mVobject.allParentsFilter = '".$caption."';\n";
    else if(isset($system -> model -> pager))
       echo "mVobject.startOrder = ".($system -> model -> pager -> getStart() + 1).";\n";
 	  
 $region = $registry -> getSetting('Region');
 ?>
-mVobject.dateFormat = "<?php echo str_replace("yyyy", "yy", I18n :: getDateFormat()); ?>";
+mVobject.region = '<?php echo $region; ?>';
+mVobject.dateFormat = '<?php echo I18n::getDateFormat(); ?>';
 </script>
 <?php
 
-CacheMedia :: addJavaScriptFile([
+CacheMedia::addJavaScriptFile([
 	$admin_media_path.'js/jquery.js',
 	$admin_media_path.'js/jquery-ui.js',
 	$admin_media_path.'js/form.js',
 	$admin_media_path.'js/jquery.overlay.js',
 	$admin_media_path.'js/dialogs.js',
-	$admin_media_path.'js/date-time.js',
 	$admin_media_path.'js/jquery.autocomplete.js',
+	$admin_media_path.'air-datepicker/air-datepicker.js',
+	Registry::get('AdminFolder').'/i18n/'.$region.'/datepicker.'.$region.'.js',
 	$admin_media_path.'js/modal.js',
-	$admin_media_path.'js/utils.js',
-	Registry :: get('AdminFolder').'/i18n/'.$region.'/jquery.ui.datepicker-'.$region.'.js'
+	$admin_media_path.'js/utils.js'
 ]);
 
-if($region != "en")
-	CacheMedia :: addJavaScriptFile([
-		Registry :: get('AdminFolder').'/i18n/'.$region.'/jquery-ui-timepicker-'.$region.'.js'
-	]);
-
-
-if(Router :: isLocalHost())
-	echo CacheMedia :: getInitialFiles('js');
+if(Router::isLocalHost())
+	echo CacheMedia::getInitialFiles('js');
 else
-	echo CacheMedia :: getJavaScriptCache();
+	echo CacheMedia::getJavaScriptCache();
 ?>
 <script type="text/javascript" src="<?php echo $admin_panel_path; ?>ajax/autocomplete.php?locale=<?php echo $region; ?>"></script>
 
@@ -119,7 +114,7 @@ else
 	      <div id="models-buttons">
 	         <ul>
 	            <li>
-	                <span><?php echo I18n :: locale("modules"); ?></span>
+	                <span><?php echo I18n::locale("modules"); ?></span>
 					<div id="models-list">
 						<?php echo $system -> menu -> displayModelsMenu(); ?>
 					</div>
@@ -135,18 +130,18 @@ else
                       	  if(isset($search_text) && preg_match("/\/search\.php$/", $_SERVER["SCRIPT_FILENAME"]))
                       	  	$header_search_value = $search_text;
                       ?>
-				      <input class="string" type="text" name="text" placeholder="<?php echo I18n :: locale('search-in-all-modules'); ?>" value="<?php echo $header_search_value; ?>" />
-				      <input type="submit" class="search-button" value="<?php echo I18n :: locale('find'); ?>" />
+				      <input class="string" type="text" name="text" placeholder="<?php echo I18n::locale('search-in-all-modules'); ?>" value="<?php echo $header_search_value; ?>" />
+				      <input type="submit" class="search-button" value="<?php echo I18n::locale('find'); ?>" />
 				   </div>
 				</form>
 		    </div>      
 	      <div id="user-settings">
 	       <ul>
 	         <li id="user-name"><span class="skin-color"><?php echo $system -> user -> getField('name'); ?></span></li>
-	         <li><a href="<?php echo $admin_panel_path; ?>controls/user-settings.php"><?php echo I18n :: locale("my-settings"); ?></a></li>
-	         <?php $logout_link = $admin_panel_path."login?logout=".Login :: getLogoutToken(); ?>
-	         <li><a href="<?php echo $registry -> getSetting('MainPath') ?>" target="_blank"><?php echo I18n :: locale("to-site"); ?></a></li>
-	         <li><a href="<?php echo $logout_link; ?>"><?php echo I18n :: locale("exit"); ?></a></li>
+	         <li><a href="<?php echo $admin_panel_path; ?>controls/user-settings.php"><?php echo I18n::locale("my-settings"); ?></a></li>
+	         <?php $logout_link = $admin_panel_path."login?logout=".Login::getLogoutToken(); ?>
+	         <li><a href="<?php echo $registry -> getSetting('MainPath') ?>" target="_blank"><?php echo I18n::locale("to-site"); ?></a></li>
+	         <li><a href="<?php echo $logout_link; ?>"><?php echo I18n::locale("exit"); ?></a></li>
 	       </ul>
 	      </div>
       </div>

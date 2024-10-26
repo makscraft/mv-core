@@ -24,7 +24,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'update' && !empty($_POST))
 	
 	if(!isset($_POST["admin-panel-csrf-token"]) || $_POST["admin-panel-csrf-token"] != $system -> getToken())
 	{
-		$system -> model -> addError(I18n :: locale("error-wrong-token"));
+		$system -> model -> addError(I18n::locale("error-wrong-token"));
 		$form_errors = true;
 	}
 	
@@ -66,21 +66,21 @@ include $registry -> getSetting("IncludeAdminPath")."includes/header.php";
          <h3 class="column-header with-navigation">
             <?php
             	echo $system -> model -> getName();
-            	echo "<span class=\"header-info\">".I18n :: locale("simple-module")."</span>";
+            	echo "<span class=\"header-info\">".I18n::locale("simple-module")."</span>";
             	
               	if($version = $system -> versions -> getVersion())
-              		echo "<span class=\"header-info\">".I18n :: locale("version-loaded").$version."</span>\n";
+              		echo "<span class=\"header-info\">".I18n::locale("version-loaded").$version."</span>\n";
             ?>
 			<span id="header-navigation">
-				<input class="button-light" type="button" id="top-save-button" value="<?php echo I18n :: locale('update'); ?>" />
-				<input class="button-dark button-back" type="button" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath'); ?>'" value="<?php echo I18n :: locale('cancel'); ?>" />
+				<input class="button-light" type="button" id="top-save-button" value="<?php echo I18n::locale('update'); ?>" />
+				<input class="button-dark button-back" type="button" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath'); ?>'" value="<?php echo I18n::locale('cancel'); ?>" />
 			</span>			            
          </h3>       
 		 <?php      
 		      if(isset($form_errors) && $form_errors)
 		          echo $system -> model -> displayFormErrors();
 		      else if(isset($_SESSION["message"]["updated"]))
-		          echo "<div class=\"form-no-errors\"><p>".I18n :: locale('done-update')."</p></div>\n";
+		          echo "<div class=\"form-no-errors\"><p>".I18n::locale('done-update')."</p></div>\n";
 		          
 		      unset($_SESSION["message"]);
 		          
@@ -114,8 +114,8 @@ include $registry -> getSetting("IncludeAdminPath")."includes/header.php";
                    	else
                    		$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(mVobject.locale('no_rights'), {css_class: 'alert'});\"";
                 ?>                 
-	           <input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n :: locale('update'); ?>" />
-	           <input class="button-dark" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath'); ?>'" type="button" value="<?php echo I18n :: locale('cancel'); ?>" />
+	           <input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n::locale('update'); ?>" />
+	           <input class="button-dark" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath'); ?>'" type="button" value="<?php echo I18n::locale('cancel'); ?>" />
                <input type="hidden" name="admin-panel-csrf-token" value="<?php echo $system -> getToken(); ?>" />
 	         </td>
 	      </tr>
@@ -129,7 +129,7 @@ include $registry -> getSetting("IncludeAdminPath")."includes/header.php";
    </div>
    <div id="model-versions">
       <div class="column-inner">
-         <h3><?php echo I18n :: locale('versions-history'); ?></h3>
+         <h3><?php echo I18n::locale('versions-history'); ?></h3>
 	     <?php include $registry -> getSetting("IncludeAdminPath")."includes/versions.php"; ?>
       </div>
    </div>

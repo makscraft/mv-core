@@ -57,7 +57,7 @@ if(isset($_GET['id']) && $_GET['id'])
 		
 		if(!isset($_POST["admin-panel-csrf-token"]) || $_POST["admin-panel-csrf-token"] != $system -> getToken())
 		{
-			$system -> model -> addError(I18n :: locale("error-wrong-token"));
+			$system -> model -> addError(I18n::locale("error-wrong-token"));
 			$form_errors = true;
 		}
 		
@@ -92,16 +92,16 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	         <h3 class="column-header with-navigation">
                 <?php
                 	echo $system -> model -> getName();
-                	echo "<span class=\"header-info\">".I18n :: locale("update-record")."</span>";
+                	echo "<span class=\"header-info\">".I18n::locale("update-record")."</span>";
                 	
                 	if($version = $system -> versions -> getVersion())
-                		echo "<span class=\"header-info\">".I18n :: locale("version-loaded").$version."</span>\n";
+                		echo "<span class=\"header-info\">".I18n::locale("version-loaded").$version."</span>\n";
                 ?>
 				<span id="header-navigation">
 					<?php if($system -> model -> getEditableFields() !== false): ?>
-						<input class="button-light" type="button" id="top-save-button" value="<?php echo I18n :: locale('save'); ?>" />
+						<input class="button-light" type="button" id="top-save-button" value="<?php echo I18n::locale('save'); ?>" />
 					<?php endif; ?>
-					<input class="button-dark button-back" type="button" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath').'model/?'.$back_url_params; ?>'" value="<?php echo I18n :: locale('cancel'); ?>" />             
+					<input class="button-dark button-back" type="button" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath').'model/?'.$back_url_params; ?>'" value="<?php echo I18n::locale('cancel'); ?>" />             
 				</span>				
              </h3>
 	   		 <?php      
@@ -110,7 +110,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 			      else if(isset($_SESSION["message"]['updated']) || isset($_SESSION["message"]['created']))
 			      {
 			      	  $key = isset($_SESSION["message"]['updated']) ? 'done-update' : 'created-now-edit';
-			          echo "<div class=\"form-no-errors\"><p>".I18n :: locale($key)."</p></div>\n";
+			          echo "<div class=\"form-no-errors\"><p>".I18n::locale($key)."</p></div>\n";
 			      }
 			      
 			      unset($_SESSION["message"]);
@@ -153,9 +153,9 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
                         	}
                         ?>
                         <?php if($system -> model -> getEditableFields() !== false): ?>
-			            <input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n :: locale('save'); ?>" />
-	                    <input class="button-light" type="button" <?php echo $continue_button; ?> value="<?php echo I18n :: locale('update-and-continue'); ?>" />                        
-                        <input class="button-dark" id="model-cancel" type="button" rel="<?php echo $registry -> getSetting('AdminPanelPath')."model/?".$back_url_params; ?>" value="<?php echo I18n :: locale('cancel'); ?>" />
+			            <input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n::locale('save'); ?>" />
+	                    <input class="button-light" type="button" <?php echo $continue_button; ?> value="<?php echo I18n::locale('update-and-continue'); ?>" />                        
+                        <input class="button-dark" id="model-cancel" type="button" rel="<?php echo $registry -> getSetting('AdminPanelPath')."model/?".$back_url_params; ?>" value="<?php echo I18n::locale('cancel'); ?>" />
                         <?php endif; ?>
                         <input type="hidden" name="admin-panel-csrf-token" value="<?php echo $system -> getToken(); ?>" />
 			         </td>
@@ -173,7 +173,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	</div>
 	<div id="model-versions">
 	   <div class="column-inner">
-	      <h3><?php echo I18n :: locale('versions-history'); ?></h3>
+	      <h3><?php echo I18n::locale('versions-history'); ?></h3>
           <?php include $registry -> getSetting('IncludeAdminPath')."includes/versions.php"; ?>
 	   </div>
 	</div>

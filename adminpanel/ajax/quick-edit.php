@@ -1,7 +1,7 @@
 <?php
 include "../../config/autoload.php";
 
-Http :: isAjaxRequest('post', true);
+Http::isAjaxRequest('post', true);
 $system = new System('ajax');
 	
 if(isset($_POST['model'], $_POST['admin-panel-csrf-token']) && $system -> registry -> checkModel($_POST['model']) && 
@@ -15,7 +15,7 @@ if(isset($_POST['model'], $_POST['admin-panel-csrf-token']) && $system -> regist
 	$token = md5($token.$system -> user -> getField("password"));
 	
 	if($_POST["admin-panel-csrf-token"] != $system -> getToken())
-		$result["general_errors"] = "<p>".I18n :: locale("error-wrong-token")."</p>";
+		$result["general_errors"] = "<p>".I18n::locale("error-wrong-token")."</p>";
 	
 	foreach($_POST as $key => $value) //Collecting fields and values for operation
 		if(preg_match("/^quick-edit-.*-\d+$/", $key))
@@ -78,7 +78,7 @@ if(isset($_POST['model'], $_POST['admin-panel-csrf-token']) && $system -> regist
 			{
 				if(is_array($error) && isset($error[2]))
 				{
-					$error_text = Model :: processErrorText($error, $system -> model -> getElement($error[2]));
+					$error_text = Model::processErrorText($error, $system -> model -> getElement($error[2]));
 					$result["wrong_fields"][] = "#quick-edit-".$error[2]."-".$id;
 				}
 				else
@@ -111,5 +111,5 @@ if(isset($_POST['model'], $_POST['admin-panel-csrf-token']) && $system -> regist
 	
 	$result["wrong_fields"] = implode(",", $result["wrong_fields"]);
 
-	Http :: responseJson($result);
+	Http::responseJson($result);
 }

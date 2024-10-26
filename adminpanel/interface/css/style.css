@@ -170,7 +170,7 @@ border-bottom: 1px solid #918b8b; cursor: pointer; background: #eeeded; text-dec
 #model-table-wrapper.hidden-filters #model-table{margin: 0 !important;}
 
 #model-filters{min-height: 100px; width: 220px; background: #f1e8e8; border-radius: 4px; -moz-border-radius: 4px;
--webkit-border-radius: 4px; padding: 13px 20px 20px 20px; position: relative;}
+-webkit-border-radius: 4px; padding: 13px 20px 20px 20px; position: relative; overflow: hidden;}
 #model-filters h3{font-weight: normal; font-size: 20px; margin: 0 0 15px 0;}
 #hide-filters{margin-left: 15px; border: none; background: none; color: #1464ba; font-size: 14px; cursor: pointer;}
 #show-filters{float: right; background: #918b8b url("../images/arrow-right-white.svg") right 17px center no-repeat;
@@ -355,7 +355,7 @@ height: 30px; width: 100%;}
 #admin-filters input.text, #admin-filters input.autocomplete-input{width: 100%; padding-right: 10%; border-radius: 4px; 
 -moz-border-radius: 4px; -webkit-border-radius: 4px;}
 #admin-filters .manage-filters{padding: 0 0 7px 0; display: flex; flex-wrap: wrap; justify-content: space-between;}
-#admin-filters .manage-filters p{margin: 0; padding: 4px 0;}
+#admin-filters .manage-filters p{margin: 0; padding: 4px 0; width: 100%;}
 #admin-filters .manage-filters select{width: 48.5%; box-sizing: border-box;}
 #admin-filters input.autocomplete-input{padding-right: 28px !important}
 #admin-filters div.long-list-select{padding: 0 0 7px 0;}
@@ -367,8 +367,18 @@ height: 30px; width: 100%;}
 .autocomplete-input, .m2m-not-selected-search, .m2m-selected-search, .autocomplete-multi{
 background: #fff url("../images/icon-search.svg") center right 7px no-repeat;}
 .autocomplete-multi{padding-right: 28px !important;}
-.ui-datepicker{border: none !important;}
+
+/* External plugins */
 .ck.ck-editor{z-index: 100;}
+
+.air-datepicker{z-index: 3000 !important;}
+.air-datepicker, .air-datepicker-time--current-hours, .air-datepicker-time--current-minutes{
+font-family: 'PantonSemiBold' !important;}
+.air-datepicker-body--day-name, .air-datepicker-cell.-current-{color: #1464ba !important;}
+.air-datepicker-cell.-selected-{background: #1464ba !important; color: #fff !important;}
+.air-datepicker-time--row input[type="range"]:focus::-webkit-slider-thumb,
+.air-datepicker-time--row input[type="range"]:focus::-moz-range-thumb{background: #858f9c !important;
+border-color: #858f9c !important;}
 
 /* Pagination */
 .pager{text-align: right; position: relative; float: right; width: 100%; padding: 15px 0 0 0;}
@@ -463,7 +473,7 @@ border-radius: 4px; box-sizing: border-box; height: 30px;}
 .multi-value-select input{padding: 4px 5px;}
 .multi-value-select.long-list select{margin-bottom: 7px;}
 .multi-value-select select option{padding: 0 5px 1px 5px;}
-div.date-time-set input{width: 150px;}
+div.date-time-set input{width: 250px;}
 #exposeMask{z-index: 1800 !important; opacity: 0.6 !important;}
 
 /* Buttons */
