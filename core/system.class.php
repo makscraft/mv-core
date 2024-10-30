@@ -333,7 +333,7 @@ class System
 				$name = $model -> tryToDefineName($row);
 				
 				$html .= preg_replace("/(".$request_re.")/ui", "<span>$1</span>", $name);				
-				$html .= "</a> Модуль: <a href=\"".$url."?model=".$row["model"]."\">";
+				$html .= "</a> ".I18n :: locale("module").": <a href=\"".$url."?model=".$row["model"]."\">";
 				$html .= $model -> getName()."</a></p>\n";
 			}
 				
