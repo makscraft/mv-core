@@ -518,7 +518,7 @@ a.action-delete{background: url("../images/icon-delete.svg") no-repeat;}
 a.action-restore{background: url("../images/icon-restore.svg") no-repeat; background-size: 15px 15px;}
 
 /* Admin rights table */
-#rights-table{border-bottom: 1px solid #918b8b; margin: 0 0 10px 0; width: auto;}
+#rights-table{border-bottom: 1px solid #918b8b; margin: 0 0 10px 0; width: 100%; max-width: 700px;}
 #rights-table tr{display: table-row !important;}
 #rights-table th{font-weight: normal; text-align: left; border-bottom: 1px solid #918b8b; padding: 0 5px 6px 5px;
 width: 15%; color: #1464ba; cursor: pointer;}
