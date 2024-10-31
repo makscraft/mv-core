@@ -44,7 +44,19 @@ class ModelSimple extends Model
 	public function __set($key, $value)
 	{
 		return $this -> setValue($key, $value);	
-	}	
+	}
+
+	/**
+	 * Returns the value of multi_images field in array format.
+	 */
+	public function asArrays(string $field): array
+	{
+		if($element = $this -> getElement($field))
+			if($element -> getType() === 'multi_images')
+				return MultiImagesModelElement :: unpackValue($this -> __get($field));
+
+		return [];
+	}
 	
 	/**
 	 * Loads values from database into model object.
