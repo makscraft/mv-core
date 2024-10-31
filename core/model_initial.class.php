@@ -237,23 +237,20 @@ abstract class ModelInitial
 			else if(is_array($value) || strpos($key, "->in") !== false || strpos($key, "->not-in") !== false)
 			{
 				$field = str_replace(["->in", "->not-in"], "", $key);
-				$condition_in = (is_array($value) || strpos($key, "->in") !== false); 
-				
+
+				if(strpos($key, '->') === false)
+					$condition_in = true;
+				else
+					$condition_in = strpos($key, '->in') !== false;
+
 				if($registry -> getInitialVersion() >= 2.0)
 				{
 					$values = is_array($value) ? $value : explode(',', $value);
 						
 					foreach($values as $k => $v)
-					{
-						$v = trim($v);
+						$values[$k] = "'".str_replace("'", '', trim($v))."'";
 						
-						if($v != "")
-							$values[$k] = "'".str_replace("'", "", $v)."'";
-						else
-							unset($values[$k]);
-					}
-						
-					$value = implode(",", $values);
+					$value = implode(',', $values);
 				}
 				else //Old version of code
 				{
