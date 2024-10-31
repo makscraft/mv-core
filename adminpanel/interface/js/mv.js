@@ -29,6 +29,9 @@ var mVobject = {
 	
 	//Name of region for i18n
 	region: '',
+
+	//Date format from i18n
+	dateFormat: '',
 	
 	//Array of local words and settings 
 	localePackage: {},
@@ -57,5 +60,27 @@ var mVobject = {
 		}
 		else
 			return "{" + key + "_" + this.region + "}"; //To see if we don't have needed message translated
+	},
+
+	convertDateIntoInternational: function(date)
+	{
+		if(this.dateFormat == '' || date == '')
+			return date;
+
+		let separator = this.dateFormat.replace(/\w/g, '')[0];
+		let re = new RegExp('\\' + separator);
+		let currentFormat = this.dateFormat.split(re);
+		let parts = date.split(/\s+/)[0].split(re);
+
+		if(currentFormat.length !== 3 || parts.length !== 3)
+			return date;
+
+		let result = [
+			parts[currentFormat.indexOf('yyyy')],
+			parts[currentFormat.indexOf('mm')],
+			parts[currentFormat.indexOf('dd')],
+		];
+
+		return result.join('-') + ' ' + date.split(/\s+/)[1];
 	}
 };

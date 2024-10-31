@@ -19,9 +19,13 @@ $(document).ready(function()
 		$(item).attr('autocomplete', 'off');
 		let dateAndTime = item.classList.contains('form-date-time-field');
 		let inModal = $(item).parent().hasClass('multi-value-select');
+		let selected = '';
+
+		if($(item).val())
+			selected = mVobject.convertDateIntoInternational($.trim($(item).val()));
 
 		let airDatepickerCalendar = new AirDatepicker(item, {
-			selectedDates: [$(item).val()],
+			selectedDates: [selected],
 			autoClose: !dateAndTime,
 			timepicker: dateAndTime,
 			position: 'bottom right',
