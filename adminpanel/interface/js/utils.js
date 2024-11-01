@@ -16,7 +16,11 @@ $(document).ready(function()
 	//Air datepicker calendar run
 	function runAirDatepicker(item)
 	{
+		if($(item).prop('disabled') || $(item).prop('readonly') || $(item).parent().hasClass('not-editable-field'))
+			return;
+
 		$(item).attr('autocomplete', 'off');
+
 		let dateAndTime = item.classList.contains('form-date-time-field');
 		let inModal = $(item).parent().hasClass('multi-value-select');
 		let selected = false;
