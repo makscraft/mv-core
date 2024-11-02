@@ -13,17 +13,17 @@ if(version_compare(phpversion(), '8.0', '<'))
 
 ini_set('display_errors', 1);
 
-if(is_file(__DIR__.'/../../../../vendor/autoload.php'))
-{
-	$mvIncludePath = realpath(__DIR__.'/../../../..').DIRECTORY_SEPARATOR;
-	$mvIncludePath = str_replace('\\', '/', $mvIncludePath);
-
-	$mvCorePath = realpath(__DIR__.'/../core').DIRECTORY_SEPARATOR;
-}
-else
+if(is_file(__DIR__.'/setup.php'))
 {
 	$mvIncludePath = str_replace('\\', '/', realpath(__DIR__.'/..')).'/';
 	$mvCorePath = $mvIncludePath.'core/';
+}
+else
+{
+	$mvIncludePath = realpath(__DIR__.'/../../../..').'/';
+	$mvIncludePath = str_replace('\\', '/', $mvIncludePath);
+
+	$mvCorePath = realpath(__DIR__.'/../core').DIRECTORY_SEPARATOR;
 }
 
 require_once $mvIncludePath.'config/setup.php';
@@ -83,7 +83,7 @@ if(isset($mvSetupSettings['Build']))
 		//Checks config files modification time if not in production environment
 		if($check || $cache['Mode'] !== 'production')
 		{
-			$hash = Service :: getFilesModificationTimesHash($mvConfigFiles);
+			$hash = Service::getFilesModificationTimesHash($mvConfigFiles);
 			$env = $mvIncludePath.'.env';
 
 			if($hash == $cache['ConfigFilesHash'])
@@ -109,12 +109,12 @@ if(!isset($mvSetupSettings['LoadedFromCache']))
 }
 
 //Runs main settings storage object
-$registry = Registry :: instance();
+$registry = Registry::instance();
 
 //Loads all settings into Registry to get them from any place
 if(!isset($mvSetupSettings['LoadedFromCache']))
 {
-	Registry :: generateSettings($mvSetupSettings);
+	Registry::generateSettings($mvSetupSettings);
 	
 	$registry -> loadSettings($mvSetupSettings);
 	$registry -> loadSettings($mvMainSettings);
@@ -122,7 +122,7 @@ if(!isset($mvSetupSettings['LoadedFromCache']))
 	$registry -> loadEnvironmentSettings() -> checkSettingsValues() -> lowerCaseConfigNames();
 	
 	//Saves cache confid file (if we have .env file in root folder)
-	Cache :: createMainConfigFile($mvConfigFiles);
+	Cache::createMainConfigFile($mvConfigFiles);
 }
 else
 	$registry -> loadSettings($mvSetupSettings);
@@ -131,10 +131,10 @@ $registry -> createClassesAliases();
 
 $mvAutoloadData = [
 	'models' => $mvSetupSettings['Models'],
-	'models_lower' => Registry :: get('ModelsLower'),
+	'models_lower' => Registry::get('ModelsLower'),
 	'plugins' => $mvSetupSettings['Plugins'],
-	'plugins_lower' => Registry :: get('PluginsLower'),
-	'datatypes_lower' => Registry :: get('DataTypesLower')
+	'plugins_lower' => Registry::get('PluginsLower'),
+	'datatypes_lower' => Registry::get('DataTypesLower')
 ];
 
 $GLOBALS['mvAutoloadData'] = $mvAutoloadData;
@@ -169,16 +169,16 @@ spl_autoload_register(function($class_name)
 });
 
 //Sets up current localization region of the application
-I18n :: instance() -> setRegion($mvSetupSettings['Region']);
+I18n::instance() -> setRegion($mvSetupSettings['Region']);
 
 //Start time for debug panel
-Registry :: set('WorkTimeStart', gettimeofday());
+Registry::set('WorkTimeStart', gettimeofday());
 
 //Error handlers functions
 function errorHandlerMV($type, $message, $file, $line)
 {
-	$message = 'Error: '.$message.' in line '.$line.' of file ~'.Service :: removeDocumentRoot($file);
-	Debug :: displayError($message, $file, $line, Registry :: onDevelopment());
+	$message = 'Error: '.$message.' in line '.$line.' of file ~'.Service::removeDocumentRoot($file);
+	Debug::displayError($message, $file, $line, Registry::onDevelopment());
 }
 
 function exceptionHandlerMV(Throwable $exception)
@@ -186,17 +186,17 @@ function exceptionHandlerMV(Throwable $exception)
 	$line = $exception -> getLine();
 	$file = $exception -> getFile();
 
-	$message = 'Exception: '.$exception -> getMessage().' in line '.$line.' of file ~'.Service :: removeDocumentRoot($file);
-	Debug :: displayError($message, $file, $line);
+	$message = 'Exception: '.$exception -> getMessage().' in line '.$line.' of file ~'.Service::removeDocumentRoot($file);
+	Debug::displayError($message, $file, $line);
   }
 
 function fatalErrorHandlerMV()
 {
-	if(!Registry :: get('ErrorAlreadyLogged'))
+	if(!Registry::get('ErrorAlreadyLogged'))
 		if(null !== $error = error_get_last())
 		{
-			$message = 'Fatal error: '.$error['message'].', in line '.$error['line'].' of file ~'.Service :: removeDocumentRoot($error['file']);
-			Debug :: displayError($message, $error['file'], $error['line']);
+			$message = 'Fatal error: '.$error['message'].', in line '.$error['line'].' of file ~'.Service::removeDocumentRoot($error['file']);
+			Debug::displayError($message, $error['file'], $error['line']);
 		}
 }
 
