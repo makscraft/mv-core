@@ -54,7 +54,11 @@ $wrapped = isset($_COOKIE['_mv_debug_panel']) && $_COOKIE['_mv_debug_panel'] == 
             current = current == '' ? 'wrapped' : '';
             document.cookie = '_mv_debug_panel=' + current + expires + '; path=<?php echo $cookie_path; ?>';
 
-            panel = document.getElementsByClassName('mv-debug-panel')[0].classList.toggle('wrapped');
+            let panel = document.getElementsByClassName('mv-debug-panel')[0];
+            panel.classList.toggle('wrapped');
+
+            if(panel.classList.contains('wrapped'))
+                document.getElementById('mv-debug-panel-queries-list').classList.remove('active');
         }
     }
 </script>
