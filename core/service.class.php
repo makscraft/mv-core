@@ -10,7 +10,7 @@ class Service
 	 */
 	static public function addFileRoot(string $path = '')
 	{
-		return Registry :: get('IncludePath').$path;
+		return Registry::get('IncludePath').$path;
 	}
 
 	/**
@@ -20,7 +20,7 @@ class Service
 	 */
 	static public function removeFileRoot(string $path = '')
 	{
-		$root = str_replace(['\\', '/'], '\/', Registry :: get('IncludePath'));
+		$root = str_replace(['\\', '/'], '\/', Registry::get('IncludePath'));
 		return preg_replace("/^".$root."/", '', $path);
 	}
 	
@@ -31,7 +31,7 @@ class Service
 	 */
 	static public function removeDocumentRoot(string $path = '')
 	{
-		$root = str_replace(['\\', '/'], '\/', Registry :: get('DocumentRoot'));
+		$root = str_replace(['\\', '/'], '\/', Registry::get('DocumentRoot'));
 		return preg_replace("/^".$root."/", '', $path);
 	}
 	
@@ -41,7 +41,7 @@ class Service
 	 */
 	static public function addRootPath(string $path = '')
 	{
-		return Registry :: get('MainPath').self :: removeFileRoot($path);
+		return Registry::get('MainPath').self::removeFileRoot($path);
 	}
 
 	/**
@@ -50,7 +50,7 @@ class Service
 	 */
 	static public function removeRootPath(string $path = '')
 	{
-		$root = str_replace('/', '\/', Registry :: get('MainPath'));
+		$root = str_replace('/', '\/', Registry::get('MainPath'));
 		return preg_replace("/^".$root."/", '', $path);
 	}
 	
@@ -60,8 +60,8 @@ class Service
 	 */
 	static public function setFullHttpPath(string $path = '')
 	{
-		$domain = Registry :: get("DomainName");
-		return preg_replace("/\/$/", "", $domain).self :: addRootPath($path);
+		$domain = Registry::get("DomainName");
+		return preg_replace("/\/$/", "", $domain).self::addRootPath($path);
 	}
 
 	/**
@@ -70,8 +70,8 @@ class Service
 	 */
 	static public function getAbsoluteHttpPath(string $path = '')
 	{
-		$domain = preg_replace('/\/+$/', '', Registry :: get('DomainName'));
-		$domain .= preg_replace('/\/+$/', '', Registry :: get('MainPath'));
+		$domain = preg_replace('/\/+$/', '', Registry::get('DomainName'));
+		$domain .= preg_replace('/\/+$/', '', Registry::get('MainPath'));
 
 		return ($path === '' || $path === '/') ? $domain : $domain.$path;
 	}	
@@ -109,7 +109,7 @@ class Service
 	 */
 	static public function translateFileName(string $file_name)
 	{
-		$file_name = I18n :: translitUrl(self :: removeExtension(trim($file_name)));
+		$file_name = I18n::translitUrl(self::removeExtension(trim($file_name)));
 		
 		if(!$file_name)
 			return '';
@@ -131,13 +131,13 @@ class Service
 	static public function prepareFilePath(string $file_path)
 	{
 		$file_dir = dirname($file_path)."/";
-		$extension = self :: getExtension(basename($file_path));
+		$extension = self::getExtension(basename($file_path));
 		$extension = ($extension == "jpeg") ? ".jpg" : ".".$extension;
-		$file_name = self :: translateFileName(basename($file_path));
+		$file_name = self::translateFileName(basename($file_path));
 		
 		if(!$file_name || file_exists($file_dir.$file_name.$extension))
 		{
-			$registry = Registry :: instance();
+			$registry = Registry::instance();
 			$counter = intval($registry -> getDatabaseSetting('files_counter')) + 1;
 			$registry -> setDatabaseSetting('files_counter', $counter);
 
@@ -391,7 +391,7 @@ class Service
 	 */
 	static public function makeHash(string $string, int $cost = 10)
 	{
-		if(Registry :: instance() -> getInitialVersion() < 2.2)
+		if(Registry::instance() -> getInitialVersion() < 2.2)
 			return md5($string);
 		
 		$options = array("cost" => $cost);
@@ -404,7 +404,7 @@ class Service
 	 */
 	static public function checkHash(string $string, string $hash)
 	{
-		if(Registry :: instance() -> getInitialVersion() < 2.2)
+		if(Registry::instance() -> getInitialVersion() < 2.2)
 			return (md5($string) == $hash);
 		
 		return password_verify($string, $hash);
@@ -429,7 +429,7 @@ class Service
 		if($algo !== '' && in_array($algo, $allowed) && in_array($algo, $system_algos))
 			return hash($algo, $string);
 
-		$code = Registry :: get("SecretCode");
+		$code = Registry::get("SecretCode");
 		$code = (int) preg_replace("/\D/", "", $code);
 
 		if($algo == "random" && $code)
@@ -483,7 +483,7 @@ class Service
     static public function createFilesModificationTimesHash(array $files)
     {
         $hash = [];
-        $files = self :: addFilesWithModificationTimes($files);
+        $files = self::addFilesWithModificationTimes($files);
 
         foreach($files as $file => $time)
             $hash[] = md5($file.$time);
@@ -499,7 +499,7 @@ class Service
 	 */
 	static public function mixNumberWithLetters(int $number, int $lenght)
 	{
-		$random = self :: strongRandomString($lenght);
+		$random = self::strongRandomString($lenght);
 		$signs = str_split(preg_replace('/\d/', '*', $random));
 		$number = str_split(strval($number));
 

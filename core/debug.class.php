@@ -58,7 +58,7 @@ class Debug
 		$var = is_bool($var) ? ($var ? 'true' : 'false') : $var;
 		$var = $var === '' ? "''" : $var;
 
-		if(Registry :: get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
+		if(Registry::get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
 		{
 			echo "\033[40m".PHP_EOL.PHP_EOL." \033[1;33m Debug CLI output: ";
 
@@ -88,7 +88,7 @@ class Debug
 		if(ob_get_length())
 			ob_end_clean();
 
-		self :: pre($var);
+		self::pre($var);
 		exit();
 	}
 
@@ -103,7 +103,7 @@ class Debug
 		
 		$agent = strtolower($_SERVER['HTTP_USER_AGENT']);
 		
-		if(self :: isMobile())
+		if(self::isMobile())
 		{
 			if(strpos($agent, 'crios/') !== false)
 				return 'chrome';
@@ -189,7 +189,7 @@ class Debug
 	 */
 	static public function getWorkTime()
 	{
-		$start = Registry :: get('WorkTimeStart');
+		$start = Registry::get('WorkTimeStart');
 		$stop = gettimeofday();
 		$time_sec = $stop['sec'] - $start['sec'];
 		$time_msec = ($stop['usec'] - $start['usec']) / 1000000;
@@ -217,20 +217,20 @@ class Debug
 		if(ob_get_length()) //In case of cache enabled
 			ob_end_clean();
 
-		if(Registry :: get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
+		if(Registry::get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
 		{
-			Installation :: displayErrorMessage($error);
+			Installation::displayErrorMessage($error);
 			exit();
 		}
 
-		if(Registry :: get('Mode') !== 'production')
+		if(Registry::get('Mode') !== 'production')
 		{
 			$debug_error = $error;
 
 			if($file !== '' && $line !== 0)
-				$debug_code = self :: getErrorCodeFragment($file, $line);
+				$debug_code = self::getErrorCodeFragment($file, $line);
 
-			$screen = Registry :: get('IncludeAdminPath').'controls/debug-error.php';
+			$screen = Registry::get('IncludeAdminPath').'controls/debug-error.php';
 
 			if(file_exists($screen))
 				include($screen);
@@ -239,7 +239,7 @@ class Debug
 		}
 		else
 		{
-			Log :: add($error);
+			Log::add($error);
 			
 			if(!headers_sent())
 			{
@@ -249,11 +249,11 @@ class Debug
 						$GLOBALS['mv'] -> display404();
 				}
 				else if($exit)
-					include Registry :: get('IncludeAdminPath').'controls/production-error.php';
+					include Registry::get('IncludeAdminPath').'controls/production-error.php';
 			}
 		}
 		
-		Registry :: set('ErrorAlreadyLogged', true);
+		Registry::set('ErrorAlreadyLogged', true);
 		
 		if($exit)
 			exit();

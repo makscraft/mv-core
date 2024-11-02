@@ -47,10 +47,10 @@ class Database
 	{
 		$param = $params[0] ?? null;
 		
-		if(method_exists(self :: $adapter, $method))
-			return self :: $adapter -> $method($param);
+		if(method_exists(self::$adapter, $method))
+			return self::$adapter -> $method($param);
 		else
-			Debug :: displayError("You must define method '".$method."' in ".get_class(self :: $adapter)." class.");
+			Debug::displayError("You must define method '".$method."' in ".get_class(self::$adapter)." class.");
 	}
 	
 	/**
@@ -58,24 +58,24 @@ class Database
 	 */
 	static public function instance()
 	{
-		if(!isset(self :: $instance))
+		if(!isset(self::$instance))
 		{
-			self :: $instance = new self();			
-			self :: $registry = Registry :: instance();
+			self::$instance = new self();			
+			self::$registry = Registry::instance();
 			
-			$db_engine = self :: $registry -> getSetting("DbEngine");
+			$db_engine = self::$registry -> getSetting("DbEngine");
 			
-			if(!in_array($db_engine, PDO :: getAvailableDrivers()))
+			if(!in_array($db_engine, PDO::getAvailableDrivers()))
 			{
 				$message = "The PDO driver for database '".$db_engine."' is not available. ";
 				$message .= "Please install the needed PDO driver or check the database config settings.";
 
-				Debug :: displayError($message);
+				Debug::displayError($message);
 			}
 			 
-			self :: $engine = $db_engine;
-			$base_db_adapter = self :: $registry -> getSetting("CorePath")."db/base.adapter.php";
-			$db_adapter_file = self :: $registry -> getSetting("CorePath")."db/".$db_engine.".adapter.php";
+			self::$engine = $db_engine;
+			$base_db_adapter = self::$registry -> getSetting("CorePath")."db/base.adapter.php";
+			$db_adapter_file = self::$registry -> getSetting("CorePath")."db/".$db_engine.".adapter.php";
 			
 			if(file_exists($db_adapter_file))
 			{
@@ -83,50 +83,50 @@ class Database
 				require_once $db_adapter_file;
 				
 				$db_adapter_class = ucfirst($db_engine."Adapter");
-				self :: $adapter = new $db_adapter_class();
+				self::$adapter = new $db_adapter_class();
 			}
 			else
-				Debug :: displayError("Database adapter class required ~/core/db/".$db_engine.".adapter.php"); 
+				Debug::displayError("Database adapter class required ~/core/db/".$db_engine.".adapter.php"); 
 			
 			try
 			{
-				self :: $pdo = self :: $adapter -> runPDO();
+				self::$pdo = self::$adapter -> runPDO();
 			}
 			catch(PDOException $error)
 			{
-				if(Registry :: onDevelopment())
-					Debug :: displayError($error -> getMessage());
+				if(Registry::onDevelopment())
+					Debug::displayError($error -> getMessage());
 				else
 				{
-					self :: $registry -> setSetting("ErrorAlreadyLogged", true);
-					Log :: add($error -> getMessage()." \r\n".$error -> getTraceAsString());
+					self::$registry -> setSetting("ErrorAlreadyLogged", true);
+					Log::add($error -> getMessage()." \r\n".$error -> getTraceAsString());
 				}
 				
 				exit();
 			}
 						            
-			self :: $pdo -> setAttribute(PDO :: ATTR_ERRMODE, PDO :: ERRMODE_EXCEPTION);
+			self::$pdo -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			
-			if(self :: $engine == "mysql")
+			if(self::$engine == "mysql")
 			{
-				$sql_mode = self :: $registry -> getSetting("DbMode");
+				$sql_mode = self::$registry -> getSetting("DbMode");
 				
-				if(!$sql_mode && self :: $registry -> getInitialVersion() < 2.4)
+				if(!$sql_mode && self::$registry -> getInitialVersion() < 2.4)
 					$sql_mode = "NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION";
 				
 				if($sql_mode)
-					self :: $pdo -> query("SET `sql_mode`='".$sql_mode."'");
+					self::$pdo -> query("SET `sql_mode`='".$sql_mode."'");
 			}
 			
 			//Sets local time zone if defined
-			if(self :: $engine == "mysql" && $time_zone = self :: $registry -> getSetting("TimeZone"))
+			if(self::$engine == "mysql" && $time_zone = self::$registry -> getSetting("TimeZone"))
 			{
 				date_default_timezone_set($time_zone);
-				self :: $pdo -> query("SET `time_zone`='".date('P')."'");
+				self::$pdo -> query("SET `time_zone`='".date('P')."'");
 			}
 		}
 			
-		return self :: $instance;
+		return self::$instance;
 	}
 	
 	/**
@@ -134,8 +134,8 @@ class Database
 	 */
 	static public function close()
 	{
-		self :: $pdo = self :: $engine = self :: $instance = self :: $adapter = self :: $registry = null;
-		self :: $total = [];
+		self::$pdo = self::$engine = self::$instance = self::$adapter = self::$registry = null;
+		self::$total = [];
 	}
 	
 	/**
@@ -143,7 +143,7 @@ class Database
 	 */
 	static public function secure($value)
 	{		
-		return self :: $pdo -> quote($value);
+		return self::$pdo -> quote($value);
 	}
 	
 	/**
@@ -151,7 +151,7 @@ class Database
 	 */
 	public function beginTransaction()
 	{
-		self :: $pdo -> beginTransaction();
+		self::$pdo -> beginTransaction();
 	}
 
 	/**
@@ -159,15 +159,15 @@ class Database
 	 */
 	public function commitTransaction()
 	{
-		if(method_exists(self :: $pdo, 'inTransaction'))
+		if(method_exists(self::$pdo, 'inTransaction'))
 		{
-			if(self :: $pdo -> inTransaction())
-				self :: $pdo -> commit();
+			if(self::$pdo -> inTransaction())
+				self::$pdo -> commit();
 		
 			return;
 		}
 
-		self :: $pdo -> commit();
+		self::$pdo -> commit();
 	}
 
 	/**
@@ -175,24 +175,24 @@ class Database
 	 */
 	public function query(string $query)
 	{
-		if(Registry :: get('DebugPanel') === true)
-			self :: $total[] = $query;
+		if(Registry::get('DebugPanel') === true)
+			self::$total[] = Service::cutText($query, 800, ' ...');
 		
 		try
 		{
-			if($result = self :: $pdo -> query($query))
+			if($result = self::$pdo -> query($query))
 				return $result;
 		}
 		catch(PDOException $error)
 		{
-			if(Registry :: onDevelopment())
-				Debug :: displayError($error -> getMessage());
+			if(Registry::onDevelopment())
+				Debug::displayError($error -> getMessage());
 			else
 			{
-				Registry :: set('ErrorAlreadyLogged', true);
+				Registry::set('ErrorAlreadyLogged', true);
 				$trace = $error -> getTrace();
 
-				Log :: add($error -> getMessage()."\r\n".$trace[0]["args"][0]." \r\n".$error -> getTraceAsString());
+				Log::add($error -> getMessage()."\r\n".$trace[0]["args"][0]." \r\n".$error -> getTraceAsString());
 			}
 			
 			exit();		
@@ -205,9 +205,9 @@ class Database
 	static public function fetch(mixed $result, string $format = '')
 	{
 		if($format === 'NUM')
-			return $result -> fetch(PDO :: FETCH_NUM);
+			return $result -> fetch(PDO::FETCH_NUM);
 		else
-			return $result -> fetch(PDO :: FETCH_ASSOC);
+			return $result -> fetch(PDO::FETCH_ASSOC);
 	}
 	
 	/**
@@ -215,7 +215,7 @@ class Database
 	 */
 	static public function lastId()
 	{
-		return (int) self :: $pdo -> lastInsertId();
+		return (int) self::$pdo -> lastInsertId();
 	}
 	
 	/**
@@ -231,7 +231,7 @@ class Database
 	 */
 	public function getRow(string $query)
 	{
-		return $this -> query($query) -> fetch(PDO :: FETCH_ASSOC);
+		return $this -> query($query) -> fetch(PDO::FETCH_ASSOC);
 	}
 	
 	/**
@@ -285,14 +285,14 @@ class Database
 	 */
 	public function countRows(string $query): int
 	{
-		if(Registry :: get('AdminPanelEnvironment'))
+		if(Registry::get('AdminPanelEnvironment'))
 			$query = preg_replace('/\.\*/ui', '.`id`', $query);
 
-		$statement = self :: $pdo -> prepare($query);
+		$statement = self::$pdo -> prepare($query);
 		$statement -> execute();
 
-		if(Registry :: get('DbEngine') == 'sqlite')
-			return count($statement -> fetchAll(PDO :: FETCH_ASSOC));
+		if(Registry::get('DbEngine') == 'sqlite')
+			return count($statement -> fetchAll(PDO::FETCH_ASSOC));
 				
 		return (int) $statement -> rowCount();
 	}
@@ -311,7 +311,7 @@ class Database
 	public function getTables()
 	{
 		$tables = [];
-		$result = $this -> query(self :: $adapter -> getTables());
+		$result = $this -> query(self::$adapter -> getTables());
 		
 		while($row = $this -> fetch($result, "NUM"))
 			$tables[] = $row[0];
