@@ -1,6 +1,6 @@
 <?php
 /**
- * Localization manager class.
+ * Localization manager form MV admin panel and front.
  * Works with translations, dates and numbers.
  * Takes source files from /adminpanel/i18n/ and /customs/i18n/ folders.
  */
