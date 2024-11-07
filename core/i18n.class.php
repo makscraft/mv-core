@@ -16,7 +16,13 @@ class I18n
 	 * Current region key (en, am, de, ru).
 	 * @var string
 	 */
-	private static  $region;
+	private static $region;
+
+	/**
+	 * Current region name like 'English', 'Português'
+	 * @var string
+	 */
+	private static $name;
 	
 	/**
 	 * Current format of date.
@@ -79,10 +85,10 @@ class I18n
 	 */
 	static public function instance()
 	{
-		if(!isset(self :: $instance))
-			self :: $instance = new self();
+		if(!isset(self::$instance))
+			self::$instance = new self();
 			
-		return self :: $instance;
+		return self::$instance;
 	}
 	
 	/**
@@ -91,7 +97,7 @@ class I18n
 	 */
 	static public function setRegion($region)
 	{
-		$registry = Registry :: instance();	
+		$registry = Registry::instance();	
 		$registry  -> setSetting("AmericanFix", false);
 		
 		//American locale is the same as UK with only different date format, and it works with 'en' folder.
@@ -103,7 +109,7 @@ class I18n
 		else
 			$registry -> setSetting("Region", $region);
 		
-		self :: $region = $region;			
+		self::$region = $region;
 		$region_folder = $registry -> getSetting("IncludeAdminPath")."i18n/".$region."/";
 		
 		//Main locale settings and translations
@@ -113,17 +119,21 @@ class I18n
 			
 			if(isset($regionalData, $regionalData['date_format'], $regionalData['translation'], $regionalData['plural_rules']))
 			{
-				self :: $date_format = $registry  -> getSetting("AmericanFix") ? "mm/dd/yyyy" : $regionalData['date_format'];
-				self :: $plural_rules = $regionalData['plural_rules'];
-				self :: $translation = $regionalData['translation'];
-				self :: $month = $regionalData['month'];
-				self :: $month_case = $regionalData['month_case'];
-				self :: $week_days = $regionalData['week_days'];
-				self :: $decimal_mark = $regionalData['decimal_mark'];
+				self::$date_format = $registry  -> getSetting("AmericanFix") ? "mm/dd/yyyy" : $regionalData['date_format'];
+				self::$plural_rules = $regionalData['plural_rules'];
+				self::$translation = $regionalData['translation'];
+				self::$month = $regionalData['month'];
+				self::$month_case = $regionalData['month_case'];
+				self::$week_days = $regionalData['week_days'];
+				self::$decimal_mark = $regionalData['decimal_mark'];
+				self::$name = $regionalData['caption'];
+				
+				if(self::$region == 'en' && Registry::get('AmericanFix'))
+					self::$name = 'English (US)';
 				
 				$registry -> setSetting("DecimalMark", $regionalData['decimal_mark']);
 				
-				self :: defineDateSeparator($regionalData['date_format']);
+				self::defineDateSeparator($regionalData['date_format']);
 			}
 			
 			//Special file for non-english laguages to convert names into Latin
@@ -132,7 +142,7 @@ class I18n
 				include $region_folder."translit.php";
 				
 				if(isset($translitRules))
-					self :: $translit_rules = $translitRules;
+					self::$translit_rules = $translitRules;
 			}
 			
 			//Additional custom translations if exist 
@@ -142,8 +152,8 @@ class I18n
 			{
 				include $extra;
 				
-				if(isset($translations) && count($translations))
-					self :: $translation = array_merge(self :: $translation, $translations);
+				if(isset($translations) && is_array($translations))
+					self::$translation = array_merge(self::$translation, $translations);
 			}
 		}
 	}
@@ -154,7 +164,16 @@ class I18n
 	 */
 	static public function getRegion()
 	{
-		return self :: $region;
+		return self::$region;
+	}
+
+	/**
+	 * Return current region name.
+	 * @return string like 'English', 'Português'
+	 */
+	static public function getName()
+	{
+		return self::$name;
 	}
 	
 	/**
@@ -165,11 +184,11 @@ class I18n
 	static public function defineDateSeparator($date_format)
 	{
 	    if(strpos($date_format, '.') !== false)
-	        self :: $date_separator = '.';
+	        self::$date_separator = '.';
         else if(strpos($date_format, '/') !== false)
-            self :: $date_separator = '/';
+            self::$date_separator = '/';
         else if(strpos($date_format, '-') !== false)
-            self :: $date_separator = '-';
+            self::$date_separator = '-';
 	}
 	
 	/**
@@ -180,9 +199,9 @@ class I18n
 	static public function locale(string $key): string
 	{
 		//Gets language string for lacalization
-		if(isset(self :: $translation[$key]) && self :: $translation[$key] != "")
+		if(isset(self::$translation[$key]) && self::$translation[$key] != "")
 		{
-			$string = self :: $translation[$key];
+			$string = self::$translation[$key];
 			$string = preg_replace("/'([^']+)'/", "&laquo;$1&raquo;", $string);
 			
 			$arguments = func_get_args();
@@ -195,25 +214,25 @@ class I18n
 						$defined_type = 'other';
 						
 						//Implemens plural translation rules for numbers.
-						foreach(self :: $plural_rules as $type => $re)
-							if(is_numeric($number) && preg_match($re, $number) && isset(self :: $translation[$pattern][$type]))
+						foreach(self::$plural_rules as $type => $re)
+							if(is_numeric($number) && preg_match($re, $number) && isset(self::$translation[$pattern][$type]))
 							{
 								$defined_type = $type;
 								break;
 							}
 						
-						$string = str_replace('['.$pattern.']', self :: $translation[$pattern][$defined_type], $string);						
+						$string = str_replace('['.$pattern.']', self::$translation[$pattern][$defined_type], $string);						
 					}
 					else
 						$string = str_replace('{'.$pattern.'}', $value, $string);
 			
 			if(is_array($string))
-				$string = '{'.$key.'_'.self :: $region.'}';
+				$string = '{'.$key.'_'.self::$region.'}';
 			
 			return $string;
 		}
 		else
-			return '{'.$key.'_'.self :: $region.'}'; //If key not found we show the key + lang prefix
+			return '{'.$key.'_'.self::$region.'}'; //If key not found we show the key + lang prefix
 	}
 	
 	/**
@@ -222,7 +241,7 @@ class I18n
 	 */
 	static public function formatIntNumber(mixed $value)
 	{
-		return number_format($value, 0, self :: $decimal_mark, " ");
+		return number_format($value, 0, self::$decimal_mark, " ");
 	}
 	
 	/**
@@ -231,7 +250,7 @@ class I18n
 	 */
 	static public function formatFloatNumber(mixed $value, int $decimals = 2)
 	{		
-		return number_format($value, $decimals, self :: $decimal_mark, " ");
+		return number_format($value, $decimals, self::$decimal_mark, " ");
 	}
 	
 	/**
@@ -243,8 +262,8 @@ class I18n
 		$day_of_week = date("w", strtotime($date));
 		$day_of_week = $day_of_week ? $day_of_week - 1 : 6;
 		
-		if(isset(self :: $week_days[$day_of_week]))
-			return self :: $week_days[$day_of_week];
+		if(isset(self::$week_days[$day_of_week]))
+			return self::$week_days[$day_of_week];
 
 		return '';
 	}
@@ -255,7 +274,7 @@ class I18n
 	 */
 	static public function checkDateFormat(string $date)
 	{
-		$re = "/^".str_replace(["d","m","y",".","/"], ["\d","\d","\d","\.","\/"], self :: $date_format);
+		$re = "/^".str_replace(["d","m","y",".","/"], ["\d","\d","\d","\.","\/"], self::$date_format);
 		
 		$arguments = func_get_args();
 		$re .= (isset($arguments[1]) && $arguments[1] == "with-time") ? "(\s\d\d:\d\d(:\d\d)?)$/" : "$/";
@@ -275,16 +294,16 @@ class I18n
 		if(preg_match('/\s\d\d:\d\d(:\d\d)?$/', $date))
 		{
 			$parts = explode(' ', $date);
-			$date_parts = explode(self :: $date_separator, $parts[0]);
+			$date_parts = explode(self::$date_separator, $parts[0]);
 			$time = $parts[1];
 		}
 		else
-			$date_parts = explode(self :: $date_separator, $date);
+			$date_parts = explode(self::$date_separator, $date);
 			
 		if(count($date_parts) != 3)
 			return '';
 			
-		$positions = array_flip(explode(self :: $date_separator, self :: $date_format));
+		$positions = array_flip(explode(self::$date_separator, self::$date_format));
 		
 		$result = $date_parts[$positions['yyyy']];
 		$result .= '-'.$date_parts[$positions['mm']];
@@ -308,14 +327,14 @@ class I18n
 		$parts[0] = explode('-', $parts[0]);
 		$date_parts = array('yyyy' => $parts[0][0], 'mm' => $parts[0][1], 'dd' => $parts[0][2]);
 		
-		$positions = explode(self :: $date_separator, self :: $date_format);
+		$positions = explode(self::$date_separator, self::$date_format);
 		
 		$result = [];
 		
 		foreach($positions as $key)
 			$result[] = $date_parts[$key];
 		
-		$result = implode(self :: $date_separator, $result);
+		$result = implode(self::$date_separator, $result);
 		
 		if(isset($parts[1]))
 		{
@@ -343,9 +362,9 @@ class I18n
 	static public function formatDate(string $date, string $format = '')
 	{		
 		if($format === '' || $format === 'no-seconds' || $format === 'only-date')
-			return  self :: dateFromSQL($date, $format);
+			return  self::dateFromSQL($date, $format);
 		else
-			return date($format, self :: dateToTimestamp($date));
+			return date($format, self::dateToTimestamp($date));
 	}
 
 	/**
@@ -355,8 +374,8 @@ class I18n
 	{
 	    if(preg_match("/^(d|m|y){2,4}(\.|\/)(d|m|y){2,4}(\.|\/)(d|m|y){2,4}$/", $format))
 	    {
-	       self :: $date_format = $format;
-	       self :: defineDateSeparator($format);
+	       self::$date_format = $format;
+	       self::defineDateSeparator($format);
 	    }
 	}
 	
@@ -366,7 +385,7 @@ class I18n
 	 */
 	static public function getDecimalMark()
 	{
-		return self :: $decimal_mark;
+		return self::$decimal_mark;
 	}
 	
 	/**
@@ -375,7 +394,7 @@ class I18n
 	 */
 	static public function getDateFormat()
 	{
-		return self :: $date_format;
+		return self::$date_format;
 	}
 	
 	/**
@@ -384,7 +403,7 @@ class I18n
 	 */
 	static public function getDateTimeFormat()
 	{
-		return self :: $date_format." hh:mi";
+		return self::$date_format." hh:mi";
 	}
 	
 	/**
@@ -396,7 +415,7 @@ class I18n
 		$arguments = func_get_args();
 		$date = date("Y-m-d");
 		
-		return (isset($arguments[0]) && $arguments[0] == "SQL") ? $date : self :: dateFromSQL($date);
+		return (isset($arguments[0]) && $arguments[0] == "SQL") ? $date : self::dateFromSQL($date);
 	}
 	
 	/**
@@ -408,7 +427,7 @@ class I18n
 		$arguments = func_get_args();
 		$date = date("Y-m-d H:i:s");
 		
-		return (isset($arguments[0]) && $arguments[0] == "SQL") ? $date : self :: dateFromSQL($date);
+		return (isset($arguments[0]) && $arguments[0] == "SQL") ? $date : self::dateFromSQL($date);
 	}
 	
 	/**
@@ -417,7 +436,7 @@ class I18n
 	 */
 	static public function timestampToDate($timestamp)
 	{
-		return self :: dateFromSQL(date("Y-m-d H:i:s", $timestamp));	
+		return self::dateFromSQL(date("Y-m-d H:i:s", $timestamp));	
 	}
 	
 	/**
@@ -459,7 +478,7 @@ class I18n
 	 */
 	static public function getMonth($number)
 	{
-		return self :: $month[$number - 1] ?? '';
+		return self::$month[$number - 1] ?? '';
 	}
 	
 	/**
@@ -468,7 +487,7 @@ class I18n
 	 */
 	static public function getMonthCase($number)
 	{
-		return self :: $month_case[$number - 1] ?? '';
+		return self::$month_case[$number - 1] ?? '';
 	}
 	
 	/**
@@ -479,8 +498,8 @@ class I18n
 	{
 		$url = mb_strtolower($string, "utf-8");
 		
-		if(self :: $translit_rules && count(self :: $translit_rules))
-			$url = strtr($url, self :: $translit_rules);
+		if(self::$translit_rules && count(self::$translit_rules))
+			$url = strtr($url, self::$translit_rules);
 		else
 			$url = str_replace(" ", "-", $url);
 		
@@ -499,7 +518,7 @@ class I18n
 	 */
 	static public function getRegionsOptions()
 	{
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 		$values = [];
 		$regions = $registry -> getSetting('SupportedRegions');
 		
@@ -538,7 +557,7 @@ class I18n
 	{
 		$html = "";
 		
-		foreach(self :: getRegionsOptions() as $key => $caption)
+		foreach(self::getRegionsOptions() as $key => $caption)
 		{
 			$selected = ($active == $key) ? ' selected="selected"' : "";
 			$html .= "<option value=\"".$key."\"".$selected.">".$caption."</option>\n";
@@ -553,7 +572,7 @@ class I18n
 	 */
 	static public function checkRegion(string $region)
 	{
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 		$regions = $registry -> getSetting('SupportedRegions');
 		$regions = (is_array($regions) && count($regions)) ? $regions : array($registry -> getSetting('Region'));
 		
@@ -566,8 +585,8 @@ class I18n
 	 */
 	static public function createRegionCookieKey()
 	{
-		$code = substr(Registry :: get('SecretCode'), 5, 5).Debug :: browser();
-		$code .= Registry :: get('DomainName').Registry :: get('AdminFolder');
+		$code = substr(Registry::get('SecretCode'), 5, 5).Debug::browser();
+		$code .= Registry::get('DomainName').Registry::get('AdminFolder');
 
 		return 'region_'.substr(md5($code), 0, 8);
 	}
@@ -578,15 +597,15 @@ class I18n
 	 */
 	static public function defineRegion()
 	{
-		$key = self :: createRegionCookieKey();
+		$key = self::createRegionCookieKey();
 
-		if(isset($_COOKIE[$key]) && self :: checkRegion((string) $_COOKIE[$key]))
+		if(isset($_COOKIE[$key]) && self::checkRegion((string) $_COOKIE[$key]))
 			return (string) $_COOKIE[$key];
 		else
 		{
-			$region = Registry :: get('Region');
+			$region = Registry::get('Region');
 
-			return ($region == 'en' && Registry :: get('AmericanFix')) ? 'us' : $region;
+			return ($region == 'en' && Registry::get('AmericanFix')) ? 'us' : $region;
 		}
 	}
 	
@@ -595,12 +614,12 @@ class I18n
 	 */
 	static public function saveRegion(string $region)
 	{		
-		if(!self :: checkRegion($region))
+		if(!self::checkRegion($region))
 			return;
 
-		$key = self :: createRegionCookieKey();
+		$key = self::createRegionCookieKey();
 		$time = time() + 3600 * 24 * 365;
 
-		Http :: setCookie($key, $region, ['expires' => $time, 'path' => Registry :: get('AdminPanelPath')]);
+		Http::setCookie($key, $region, ['expires' => $time, 'path' => Registry::get('AdminPanelPath')]);
 	}
 }
