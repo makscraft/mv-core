@@ -231,6 +231,9 @@ class Debug
 				$debug_code = self::getErrorCodeFragment($file, $line);
 
 			$screen = Registry::get('IncludeAdminPath').'controls/debug-error.php';
+			
+			if(!headers_sent())
+				header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
 
 			if(file_exists($screen))
 				include($screen);
