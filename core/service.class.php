@@ -377,7 +377,7 @@ class Service
 	 * Checks if PHP session is already started.
 	 * @return bool
 	 */
-	static public function sessionIsStarted()
+	static public function sessionIsStarted(): bool
 	{
 		if(version_compare(phpversion(), '5.4.0', '>='))			
 			return session_status() === PHP_SESSION_ACTIVE;
