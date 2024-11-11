@@ -1,6 +1,8 @@
 <?php
 /**
- * 
+ * Session manager for MV applications.
+ * Keeps sessions data in separate containers.
+ * Default session has label 'front' and can be used anywhere like Session::get('key').
  */
 class Session
 {
