@@ -53,7 +53,7 @@ class Session
      */
     static private function generateKey(string $container): string
     {
-        return $container.'_'.md5($container.Registry::get('SecretCode').$container);
+        return $container.'_'.md5($container.Registry::get('SecretCode').session_id());
     }
 
     /**
