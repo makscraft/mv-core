@@ -2350,6 +2350,11 @@ class Model extends ModelBase
 					
 		return $record;
 	}
+
+	public function getAuthorizationSessings()
+	{
+		return $this -> auth_settings ?? null;
+	}
 		
 	public function __call($method, $arguments)
 	{		
