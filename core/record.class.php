@@ -16,11 +16,19 @@ class Record extends Content
 	}
 
 	/**
-	 * Returns the class name of the record's parent model.
+	 * Returns the class name lowercased of the record's parent model.
 	 */
 	public function getModelName()
 	{
 		return $this -> model -> getModelClass();
+	}
+
+	/**
+	 * Returns the class name of the record's parent model.
+	 */
+	public function getModelClass()
+	{
+		return get_class($this -> model);
 	}
 	
 	/**

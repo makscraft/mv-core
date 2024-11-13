@@ -116,7 +116,7 @@ class Session
     /**
      * Returns all session data for current container.
      */
-    static public function dump(): array
+    static public function all(): array
     {
         return self::$container !== null && is_array(self::$container['data']) ? self::$container['data'] : [];
     }
@@ -145,6 +145,21 @@ class Session
             return self::$container['data'][$key];
         else
             return $default;
+    }
+
+    /**
+     * Checks if the current session data has passed keys.
+     */
+    static public function has(...$keys): bool
+    {
+        if(!isset(self::$container['data']) || !count($keys))
+            return false;
+
+        foreach($keys as $key)
+            if(!array_key_exists($key, self::$container['data']))
+                return false;
+
+        return true;
     }
 
     /**
