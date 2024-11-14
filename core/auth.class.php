@@ -18,6 +18,7 @@ class Auth
         'last_login_field' => '',
         'remember_me' => false,
         'remember_me_lifetime' => 30,
+        'recover_password_lifetime' => 3600,
         'watch_ip' => false,
         'watch_browser' => false,
         'allowed_urls' => []
@@ -230,16 +231,82 @@ class Auth
 
     }
 
-    /* Password recovery */
-
-    static public function generatePasswordRecoveryLink(Record $record)
+    static public function generateRememberMeCookieToken(Record $record): string
     {
+        $login_field = self::$containers[self::$current]['login_field'];
+        $password_field = self::$containers[self::$current]['password_field'];
+        $token_field = self::$containers[self::$current]['token_field'];
 
+        $base = self::getCryptoBase();
+        $data = $base['secret'].$record -> id.$record -> $login_field.$record -> $password_field.($record -> $token_field ?? '');
+        $first = Service::mixNumberWithLetters($record -> id, mt_rand(20, 30));
+        $first = str_replace($base['first_separator'], '', $first);
+        $second = preg_replace('/^\$2y\$14\$/', '', Service::makeHash($data, 14));
+        $third = preg_replace('/^\$2y\$10\$/', '', Service::makeHash(mt_rand(1, 100000), 10));
+        $third = str_replace($base['second_separator'], '', $third);
+
+        return $first.$base['first_separator'].$second.$base['second_separator'].$third;
     }
 
-    static public function checkPasswordRecoveryLink(Router $router)
+    static public function checkRememberMeCookieToken(string $token): ?Record
     {
+        $token = trim($token);
 
+        if($token === '')
+            return null;
+
+        $base = self::getCryptoBase();
+        $first_separator = strpos($token, $base['first_separator']);
+        $second_separator = strrpos($token, $base['second_separator']);
+
+        $first = substr($token, 0, $first_separator);
+        $second = substr($token, $first_separator + 1, $second_separator - $first_separator - 1);
+
+        $id = (int) preg_replace('/\D/', '', $first);
+        
+        if(null === $record = self::$model -> find($id))
+            return null;
+
+        if('' !== $active_field = self::$containers[self::$current]['active_field'])
+            if(!$record -> $active_field)
+                return null;
+
+        $login_field = self::$containers[self::$current]['login_field'];
+        $password_field = self::$containers[self::$current]['password_field'];
+        $token_field = self::$containers[self::$current]['token_field'];
+
+        $data = $base['secret'].$record -> id.$record -> $login_field.$record -> $password_field.($record -> $token_field ?? '');
+
+        return Service::checkHash($data, '$2y$14$'.$second) ? $record : null;
+    }
+
+    /* Password recovery */
+
+    static public function generatePasswordRecoveryToken(Record $record): string
+    {
+        $token_field = self::$containers[self::$current]['token_field'];
+        $lifetime = self::$containers[self::$current]['recover_password_lifetime'];
+        $base = self::getCryptoBase();
+
+        $first = Service::mixNumberWithLetters($record -> id, mt_rand(25, 35), true);
+
+        $third = Service::mixNumberWithLetters((time() + $lifetime - $base['filetime_offset']), mt_rand(20, 25), true);
+        
+        Debug::exit($first);
+        return '';
+    }
+
+    static public function checkPasswordRecoveryToken(string $token): ?Record
+    {
+        // Debug::pre();
+        // Debug::pre($base);
+        // Debug::pre($token);
+        // Debug::pre($first);
+        // Debug::pre($second);
+        // Debug::pre($id);
+        // exit();
+        
+        return null;
     }
 
     static public function recoverPassword(Record $record, string $password)
@@ -256,4 +323,20 @@ class Auth
 		
 		return md5($token);
 	}
+
+    static public function getCryptoBase(): array
+    {
+        $secret = Registry::get('SecretCode');
+        $first_separator = substr($secret, 0, 1);
+        $second_separator = substr(str_replace($first_separator, '', $secret), 0, 1);
+        
+        return [
+            'secret' => $secret,
+            'first_separator' => $first_separator,
+            'second_separator' => $second_separator,
+            'filetime_offset' => 1731600000
+        ];
+    }
+
+
 }

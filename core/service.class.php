@@ -497,9 +497,13 @@ class Service
 	 * @param int $length final approximate string length
 	 * @return string
 	 */
-	static public function mixNumberWithLetters(int $number, int $lenght)
+	static public function mixNumberWithLetters(int $number, int $lenght, bool $flat = false): string
 	{
-		$random = self::strongRandomString($lenght);
+		if($flat)
+			$random = substr(Self::createHash(strval(time()), 'sha512'), 0, $lenght);
+		else
+			$random = self::strongRandomString($lenght);
+		
 		$signs = str_split(preg_replace('/\d/', '*', $random));
 		$number = str_split(strval($number));
 
