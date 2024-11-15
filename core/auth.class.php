@@ -4,13 +4,13 @@
  */
 class Auth
 {
-    private static $current = null;
+    protected static $current = null;
 
-    private static $model = null;
+    protected static $model = null;
 
-    private static $containers = [];
+    protected static $containers = [];
 
-    private const DEFAULT_SETTINGS = [
+    protected const DEFAULT_SETTINGS = [
         'login_field' => '',
         'password_field' => '',
         'token_field' => '',
@@ -233,16 +233,12 @@ class Auth
 
     static public function generateRememberMeCookieToken(Record $record): string
     {
-        $login_field = self::$containers[self::$current]['login_field'];
-        $password_field = self::$containers[self::$current]['password_field'];
-        $token_field = self::$containers[self::$current]['token_field'];
-
-        $base = self::getCryptoBase();
-        $data = $base['secret'].$record -> id.$record -> $login_field.$record -> $password_field.($record -> $token_field ?? '');
-        $first = Service::mixNumberWithLetters($record -> id, mt_rand(20, 30));
+        $base = self::getCryptoBase($record);
+        $data = $base['secret'].$base['record_data'].Debug::browser();
+        $first = Service::mixNumberWithLetters($record -> id, $base['digits'] + mt_rand(30, 50));
         $first = str_replace($base['first_separator'], '', $first);
         $second = preg_replace('/^\$2y\$14\$/', '', Service::makeHash($data, 14));
-        $third = preg_replace('/^\$2y\$10\$/', '', Service::makeHash(mt_rand(1, 100000), 10));
+        $third = preg_replace('/^\$2y\$10\$/', '', Service::makeHash(mt_rand(1, 10000000), 10));
         $third = str_replace($base['second_separator'], '', $third);
 
         return $first.$base['first_separator'].$second.$base['second_separator'].$third;
@@ -258,25 +254,17 @@ class Auth
         $base = self::getCryptoBase();
         $first_separator = strpos($token, $base['first_separator']);
         $second_separator = strrpos($token, $base['second_separator']);
-
         $first = substr($token, 0, $first_separator);
         $second = substr($token, $first_separator + 1, $second_separator - $first_separator - 1);
 
         $id = (int) preg_replace('/\D/', '', $first);
         
-        if(null === $record = self::$model -> find($id))
+        if(null === $record = self::checkActiveUserWithIdFromToken($id))
             return null;
 
-        if('' !== $active_field = self::$containers[self::$current]['active_field'])
-            if(!$record -> $active_field)
-                return null;
-
-        $login_field = self::$containers[self::$current]['login_field'];
-        $password_field = self::$containers[self::$current]['password_field'];
-        $token_field = self::$containers[self::$current]['token_field'];
-
-        $data = $base['secret'].$record -> id.$record -> $login_field.$record -> $password_field.($record -> $token_field ?? '');
-
+        $base = self::getCryptoBase($record);
+        $data = $base['secret'].$base['record_data'].Debug::browser();
+        
         return Service::checkHash($data, '$2y$14$'.$second) ? $record : null;
     }
 
@@ -284,29 +272,45 @@ class Auth
 
     static public function generatePasswordRecoveryToken(Record $record): string
     {
-        $token_field = self::$containers[self::$current]['token_field'];
-        $lifetime = self::$containers[self::$current]['recover_password_lifetime'];
-        $base = self::getCryptoBase();
-
-        $first = Service::mixNumberWithLetters($record -> id, mt_rand(25, 35), true);
-
-        $third = Service::mixNumberWithLetters((time() + $lifetime - $base['filetime_offset']), mt_rand(20, 25), true);
+        $lifetime = time() + self::$containers[self::$current]['recover_password_lifetime'];
+        $base = self::getCryptoBase($record);
         
-        Debug::exit($first);
-        return '';
+        $first = Service::mixNumberWithLetters($record -> id, $base['digits'] + mt_rand(10, 20), true);
+        $first = str_replace($base['first_separator_flat'], '', $first);
+        $second = Service::createHash($base['record_data'].$lifetime.$base['secret'], 'gost');
+        $third = Service::mixNumberWithLetters(($lifetime - $base['filetime_offset']), mt_rand(10, 20), true);
+        $third = str_replace($base['second_separator_flat'], '', $third);
+        
+        return $first.$base['first_separator_flat'].$second.$base['second_separator_flat'].$third;
     }
 
     static public function checkPasswordRecoveryToken(string $token): ?Record
     {
-        // Debug::pre();
-        // Debug::pre($base);
-        // Debug::pre($token);
-        // Debug::pre($first);
-        // Debug::pre($second);
-        // Debug::pre($id);
-        // exit();
+        $token = trim($token);
+
+        if($token === '')
+            return null;
+
+        $base = self::getCryptoBase();
+        $first_separator = strpos($token, $base['first_separator_flat']);
+        $second_separator = strrpos($token, $base['second_separator_flat']);
+        $first = substr($token, 0, $first_separator);
+        $second = substr($token, $first_separator + 1, $second_separator - $first_separator - 1);
+        $third = substr($token, $second_separator + 1);
+
+        $id = (int) preg_replace('/\D/', '', $first);
+        $time = (int) preg_replace('/\D/', '', $third) + $base['filetime_offset'];
+
+        if(time() > $time)
+            return null;
         
-        return null;
+        if(null === $record = self::checkActiveUserWithIdFromToken($id))
+            return null;
+
+        $base = self::getCryptoBase($record);
+        $check = Service::createHash($base['record_data'].$time.$base['secret'], 'gost');
+
+        return $check === $second ? $record : null;
     }
 
     static public function recoverPassword(Record $record, string $password)
@@ -324,19 +328,38 @@ class Auth
 		return md5($token);
 	}
 
-    static public function getCryptoBase(): array
+    static public function getCryptoBase(?Record $record = null): array
     {
-        $secret = Registry::get('SecretCode');
+        $separators = ['a','b','c','d','e','f'];
+        $secret = preg_replace('/\d/', '', Registry::get('SecretCode'));
         $first_separator = substr($secret, 0, 1);
         $second_separator = substr(str_replace($first_separator, '', $secret), 0, 1);
-        
+
+        $login_field = self::$containers[self::$current]['login_field'];
+        $password_field = self::$containers[self::$current]['password_field'];
+        $token_field = self::$containers[self::$current]['token_field'];
+
         return [
-            'secret' => $secret,
+            'secret' => Registry::get('SecretCode'),
+            'digits' => $record ? strlen(strval($record -> id)) : 0,
             'first_separator' => $first_separator,
             'second_separator' => $second_separator,
-            'filetime_offset' => 1731600000
+            'first_separator_flat' => $separators[ord($first_separator) % 6],
+            'second_separator_flat' => $separators[ord($second_separator) % 6],            
+            'filetime_offset' => 1731600000,
+            'record_data' => $record ? md5($record -> id.$record -> $login_field.$record -> $password_field.$record -> $token_field) : ''
         ];
     }
 
+    static protected function checkActiveUserWithIdFromToken(int $id): ?Record
+    {
+        if(null === $record = self::$model -> find($id))
+            return null;
 
+        if('' !== $active_field = self::$containers[self::$current]['active_field'])
+            if(!$record -> $active_field)
+                return null;
+
+        return $record;
+    }
 }

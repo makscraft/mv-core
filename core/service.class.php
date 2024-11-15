@@ -402,7 +402,7 @@ class Service
 	 * Compares hash value with given string.
 	 * @return string
 	 */
-	static public function checkHash(string $string, string $hash)
+	static public function checkHash(string $string, string $hash): bool
 	{
 		if(Registry::instance() -> getInitialVersion() < 2.2)
 			return (md5($string) == $hash);
@@ -416,7 +416,7 @@ class Service
 	 * @param string $algo optional param of algorithm name (can be 'random')
 	 * @return string
 	 */
-	static public function createHash(string $string, string $algo = '')
+	static public function createHash(string $string, string $algo = ''): string
 	{
 		$allowed = ["sha224", "sha256", "sha384", "sha512/224", "sha512/256", "sha512", "sha3-224", "sha3-256", "sha3-384",
 					"sha3-512", "ripemd160", "ripemd256", "ripemd320", "whirlpool", "tiger160,3", "tiger192,3",
@@ -500,7 +500,7 @@ class Service
 	static public function mixNumberWithLetters(int $number, int $lenght, bool $flat = false): string
 	{
 		if($flat)
-			$random = substr(Self::createHash(strval(time()), 'sha512'), 0, $lenght);
+			$random = substr(self::createHash(strval(time()), 'sha512'), 0, $lenght);
 		else
 			$random = self::strongRandomString($lenght);
 		
