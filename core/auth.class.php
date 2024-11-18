@@ -234,11 +234,13 @@ class Auth
     static public function generateRememberMeCookieToken(Record $record): string
     {
         $base = self::getCryptoBase($record);
-        $data = $base['secret'].$base['record_data'].Debug::browser();
-        $first = Service::mixNumberWithLetters($record -> id, $base['digits'] + mt_rand(30, 50));
+        $data_second = $base['secret'].$base['record_data'];
+        $data_third = $base['secret'].$base['browser'];
+        
+        $first = Service::mixNumberWithLetters($record -> id + $base['id_offset'], $base['digits'] + mt_rand(30, 50));
         $first = str_replace($base['first_separator'], '', $first);
-        $second = preg_replace('/^\$2y\$14\$/', '', Service::makeHash($data, 14));
-        $third = preg_replace('/^\$2y\$10\$/', '', Service::makeHash(mt_rand(1, 10000000), 10));
+        $second = preg_replace('/^\$2y\$14\$/', '', Service::makeHash($data_second, 14));
+        $third = preg_replace('/^\$2y\$10\$/', '', Service::makeHash($data_third, 10));
         $third = str_replace($base['second_separator'], '', $third);
 
         return $first.$base['first_separator'].$second.$base['second_separator'].$third;
@@ -255,17 +257,20 @@ class Auth
         $first_separator = strpos($token, $base['first_separator']);
         $second_separator = strrpos($token, $base['second_separator']);
         $first = substr($token, 0, $first_separator);
-        $second = substr($token, $first_separator + 1, $second_separator - $first_separator - 1);
+        $second = '$2y$14$'.substr($token, $first_separator + 1, $second_separator - $first_separator - 1);
+        $third = '$2y$10$'.substr($token, $second_separator + 1);
+        
 
-        $id = (int) preg_replace('/\D/', '', $first);
+        $id = (int) preg_replace('/\D/', '', $first) - $base['id_offset'];
         
         if(null === $record = self::checkActiveUserWithIdFromToken($id))
             return null;
 
         $base = self::getCryptoBase($record);
-        $data = $base['secret'].$base['record_data'].Debug::browser();
-        
-        return Service::checkHash($data, '$2y$14$'.$second) ? $record : null;
+        $data_second = $base['secret'].$base['record_data'];
+        $data_third = $base['secret'].$base['browser'];
+
+        return (Service::checkHash($data_second, $second) && Service::checkHash($data_third, $third)) ? $record : null;
     }
 
     /* Password recovery */
@@ -275,7 +280,7 @@ class Auth
         $lifetime = time() + self::$containers[self::$current]['recover_password_lifetime'];
         $base = self::getCryptoBase($record);
         
-        $first = Service::mixNumberWithLetters($record -> id, $base['digits'] + mt_rand(10, 20), true);
+        $first = Service::mixNumberWithLetters($record -> id + $base['id_offset'], $base['digits'] + mt_rand(10, 20), true);
         $first = str_replace($base['first_separator_flat'], '', $first);
         $second = Service::createHash($base['record_data'].$lifetime.$base['secret'], 'gost');
         $third = Service::mixNumberWithLetters(($lifetime - $base['filetime_offset']), mt_rand(10, 20), true);
@@ -298,7 +303,7 @@ class Auth
         $second = substr($token, $first_separator + 1, $second_separator - $first_separator - 1);
         $third = substr($token, $second_separator + 1);
 
-        $id = (int) preg_replace('/\D/', '', $first);
+        $id = (int) preg_replace('/\D/', '', $first) - $base['id_offset'];
         $time = (int) preg_replace('/\D/', '', $third) + $base['filetime_offset'];
 
         if(time() > $time)
@@ -340,13 +345,15 @@ class Auth
         $token_field = self::$containers[self::$current]['token_field'];
 
         return [
+            'browser' => Debug::browser(),
             'secret' => Registry::get('SecretCode'),
             'digits' => $record ? strlen(strval($record -> id)) : 0,
+            'id_offset' => preg_replace('/\D/', '', Registry::get('SecretCode')),
             'first_separator' => $first_separator,
             'second_separator' => $second_separator,
             'first_separator_flat' => $separators[ord($first_separator) % 6],
             'second_separator_flat' => $separators[ord($second_separator) % 6],            
-            'filetime_offset' => 1731600000,
+            'filetime_offset' => filemtime(__FILE__),
             'record_data' => $record ? md5($record -> id.$record -> $login_field.$record -> $password_field.$record -> $token_field) : ''
         ];
     }

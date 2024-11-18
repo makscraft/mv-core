@@ -12,7 +12,7 @@ class Record extends Content
 		//Keeps the link to parent model object
 		$this -> model = $model;
 			
-		parent :: __construct($data);
+		parent::__construct($data);
 	}
 
 	/**
@@ -116,8 +116,8 @@ class Record extends Content
 	public function prepareContentValues()
 	{
 		$prepared_values = [];
-		$version = Registry :: getInitialVersion();
-		$fast = ['int', 'float', 'bool', 'parent', 'enum'];
+		$version = Registry::getInitialVersion();
+		$fast = ['int', 'float', 'bool', 'parent', 'enum', 'password'];
 		
 		foreach($this -> content as $field => $value)
 		{
@@ -139,19 +139,19 @@ class Record extends Content
 			$type = $object -> getType();
 			$value = is_string($value) ? trim($value) : $value;
 			
-			if($type == 'text' && $object -> getProperty('virtual'))
+			if($type === 'text' && $object -> getProperty('virtual'))
 				continue;
 			
 			if(in_array($type, $fast))
 				$prepared_values[$field] = $object -> setValue($value) -> prepareValue();
-			else if($type == "date" || $type == "date_time")
+			else if($type === 'date' || $type === 'date_time')
 			{
 				if(!preg_match("/^\d{4}-\d{2}-\d{2}(\s\d{2}:\d{2}(:\d{2})?)?$/", $value))
-					$prepared_values[$field] = I18n :: dateForSQL($value);
+					$prepared_values[$field] = I18n::dateForSQL($value);
 				else
 					$prepared_values[$field] = $value;
 			}
-			else if($type == "order")
+			else if($type === 'order')
 			{
 				if($value)
 				{
@@ -167,9 +167,9 @@ class Record extends Content
 							
 				$prepared_values[$field] = $this -> content[$field] = $this -> model -> setLastOrder($object);
 			}
-			else if($type == "text")
+			else if($type === 'text')
 			{
-				if($object -> getProperty("display_method"))
+				if($object -> getProperty('display_method'))
 				{
 					if($version >= 2.4)
 						$prepared_values[$field] = str_replace("'", "&#039;", $value);
@@ -193,13 +193,13 @@ class Record extends Content
 			else if($type == 'image' || $type == 'file')
 			{
 				if(preg_match("/^userfiles\/models\//", $value))
-					$value = Service :: addFileRoot($value);
+					$value = Service::addFileRoot($value);
 				
 				$object -> setRealValue($value, basename($value));
 				
 				if($new_path = $object -> copyFile(get_class($this -> model)))
 				{
-					$prepared_values[$field] = Service :: removeFileRoot($new_path);
+					$prepared_values[$field] = Service::removeFileRoot($new_path);
 					
 					if($version >= 2.2)
 						$this -> content[$field] = $prepared_values[$field];
@@ -261,7 +261,7 @@ class Record extends Content
 	 */
 	public function create()
 	{
-		if(get_parent_class($this -> model) == "ModelSimple" || $this -> id)
+		if(get_parent_class($this -> model) === 'ModelSimple' || $this -> id)
 			return;
 			
 		$params = [];
@@ -290,11 +290,11 @@ class Record extends Content
 	 */
 	public function update()
 	{
-		if($this -> id && get_parent_class($this -> model) != "ModelSimple")
+		if($this -> id && get_parent_class($this -> model) !== 'ModelSimple')
 		{	
 			$params = [];
 			$prepared_values = $this -> prepareContentValues();
-						
+			
 			foreach($prepared_values as $field => $value)
 				if($this -> model -> getElement($field))
 					$params[$field] = $value;
@@ -359,7 +359,7 @@ class Record extends Content
 				return $this -> model -> select($conditions);
 			}
 			else if($element -> getType() === 'multi_images')
-				return MultiImagesModelElement :: unpackValue($this -> __get($field));
+				return MultiImagesModelElement::unpackValue($this -> __get($field));
 
 		return [];
 	}
@@ -374,9 +374,9 @@ class Record extends Content
 		{
 			$trace = debug_backtrace();
 			$message = "Call to undefiend method '".$method."' of Record object of model '".get_class($this -> model)."'";
-			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service :: removeDocumentRoot($trace[0]['file']);
+			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
 
-			Debug :: displayError($message, $trace[0]['file'], $trace[0]['line']);			
+			Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);			
 		}
 	}
 }

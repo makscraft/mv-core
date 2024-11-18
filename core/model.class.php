@@ -32,9 +32,9 @@ class Model extends ModelBase
 
 	public function __construct(array $row_data = [])
 	{
-		$this -> registry = Registry :: instance();
-		$this -> db = Database :: instance();
-		$this -> i18n = I18n :: instance();
+		$this -> registry = Registry::instance();
+		$this -> db = Database::instance();
+		$this -> i18n = I18n::instance();
 		$this -> table = $this -> registry -> defineModelTableName(get_class($this));
 		
 		if(count($this -> model_elements))
@@ -46,7 +46,7 @@ class Model extends ModelBase
 		{
 			$message = "To run the model '".get_class($this)."' you need to specify the model fields array in property ";
 			$message .= "'model_elements' in model class.";
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 				
 		foreach($this -> elements as $name => $object)
@@ -61,24 +61,24 @@ class Model extends ModelBase
 				{
 					$message = "You need to correctly specify 'related_model' ";
 					$message .= "parameter for element '".$name."' in model '".get_class($this)."'.";
-					Debug :: displayError($message);
+					Debug::displayError($message);
 				}
 
-				if(Registry :: getInitialVersion() < 3.0 && $object -> getProperty('linking_table') === '')
+				if(Registry::getInitialVersion() < 3.0 && $object -> getProperty('linking_table') === '')
 				{
 					$message = "You need to specify 'linking_table' ";
 					$message .= "parameter for element '".$name."' in model '".get_class($this)."'.";
-					Debug :: displayError($message);
+					Debug::displayError($message);
 				}
-				else if(Registry :: getInitialVersion() >= 3.0 && $object -> getProperty('linking_table') !== '')
+				else if(Registry::getInitialVersion() >= 3.0 && $object -> getProperty('linking_table') !== '')
 				{
 					$message = "Since MV version 3.0 you don't need to specify 'linking_table' property ";
 					$message .= " for element '".$name."' in model '".get_class($this)."'.";
 
-					Debug :: displayError($message);
+					Debug::displayError($message);
 				}
 
-				if(Registry :: getInitialVersion() >= 3.0)
+				if(Registry::getInitialVersion() >= 3.0)
 					$object -> defineLinkingTable(get_class($this));
 			}
 			else if($type == 'many_to_one')
@@ -89,7 +89,7 @@ class Model extends ModelBase
 				{
 					$message = "You need to correctly specify 'related_model' parameter for element '".$name."' ";
 					$message .= "in model '".get_class($this)."'.";
-					Debug :: displayError($message);
+					Debug::displayError($message);
 				} 
 			}
 			else if($type == 'enum')
@@ -102,7 +102,7 @@ class Model extends ModelBase
 					{
 						$message = "It's forbidden to set up value with key '0' for element '".$name."' ";
 						$message .= "in model '".get_class($this)."'.";
-						Debug :: displayError($message);
+						Debug::displayError($message);
 					}
 				}
 				
@@ -118,7 +118,7 @@ class Model extends ModelBase
 						$message .= "in model '".get_class($this)."' ";
 						$message .= "the enum field '".$name."' with property 'is_parent' and foreign key '";
 						$message .= $object -> getProperty('foreign_key')."'.";
-						Debug :: displayError($message);
+						Debug::displayError($message);
 					}
 				}
 			}
@@ -141,13 +141,13 @@ class Model extends ModelBase
 						$this -> parent_id = -1;
 				}
 				else
-					Debug :: displayError("Model '".get_class($this)."' can have only 1 field of 'parent' data type.");
+					Debug::displayError("Model '".get_class($this)."' can have only 1 field of 'parent' data type.");
 				
 				if($object -> getProperty('foreign_key'))
 				{
 					$message = "Element '".$name."' of model '".get_class($this)."' can not have 'foreign_key' property ";
 					$message .= "because the type of element is 'parent'.";
-					Debug :: displayError($message);
+					Debug::displayError($message);
 				}
 			}
 			else if($type == 'group')
@@ -176,7 +176,7 @@ class Model extends ModelBase
 		}
 		
 		if(isset($this -> name) && preg_match("/^\{.*\}$/", $this -> name))
-			$this -> name = I18n :: locale(preg_replace("/^\{(.*)\}$/", "$1", $this -> name));
+			$this -> name = I18n::locale(preg_replace("/^\{(.*)\}$/", "$1", $this -> name));
 			
 		$this -> includes_folder = $this -> registry -> getSetting("IncludePath").$this -> includes_folder;
 		$this -> root_path = $this -> registry -> getSetting("MainPath");
@@ -202,7 +202,7 @@ class Model extends ModelBase
 			if(in_array($name, $this -> registry -> getSetting('ForbiddenModelsNames')))
 			{
 				$message = "The name of model '".$name."' is forbidden, please try different one.";
-				Debug :: displayError($message);
+				Debug::displayError($message);
 			}
 	}
 	
@@ -221,7 +221,7 @@ class Model extends ModelBase
 
 		//Translates the name if needed
 		if(preg_match("/^\{.*\}$/", $field_data[0]))
-			$field_data[0] = I18n :: locale(preg_replace("/^\{(.*)\}$/", "$1", $field_data[0]));
+			$field_data[0] = I18n::locale(preg_replace("/^\{(.*)\}$/", "$1", $field_data[0]));
 
 		$map = [
 			'date_time' => 'DateTimeModelElement',
@@ -246,40 +246,40 @@ class Model extends ModelBase
 	
 	public function instanceElement($field_data)
 	{
-		self :: checkElement($field_data, get_class($this));
-		$element = self :: elementsFactory($field_data, get_class($this));
+		self::checkElement($field_data, get_class($this));
+		$element = self::elementsFactory($field_data, get_class($this));
 
 		$this -> elements[$element -> getName()] = $element;
 	}
 	
 	static public function checkElement(array $element_data, string $context = 'form')
 	{
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 		$context = $context === 'form' ? $context : "model '".$context."'";
 		
 		if(count($element_data) < 3)
 		{	
 			$message = "The field description of ".$context." must have at least 3 parameters:";
 			$message .= " caption (title), datatype and field name for sql table.";
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 		else if(!in_array($element_data[1], $registry -> getSetting('ModelsDataTypes')))
 		{
 			$message = "Undefined element data type '".$element_data[1]."' in ".$context.". ";
 			$message .= "Allowed types are: ".implode(', ', $registry -> getSetting('ModelsDataTypes')).".";
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 		else if(in_array($element_data[2], $registry -> getSetting('ForbiddenFieldsNames')))
 		{
 			$message = "You can't use the field name '".$element_data[2]."' in ".$context;
 			$message .= " or in any other model or form either.";
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 		else if($registry -> getInitialVersion() >= 1.1 && strpos($element_data[2], "-") !== false)
 		{
 			$message = "You can't use symbol '-' in field name '".$element_data[2]."' of ".$context;
 			$message .= ", use '_' instead.";
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}		
 	}
 	
@@ -425,8 +425,8 @@ class Model extends ModelBase
 		$row = (get_parent_class($this) != "ModelSimple") ? $this -> getById() : $this -> loadData();
 
 		//Tmp files cleanup
-		Filemanager :: deleteOldFiles($this -> registry -> getSetting("FilesPath")."tmp/");
-		Filemanager :: deleteOldFiles($this -> registry -> getSetting("FilesPath")."tmp/filemanager/");
+		Filemanager::deleteOldFiles($this -> registry -> getSetting("FilesPath")."tmp/");
+		Filemanager::deleteOldFiles($this -> registry -> getSetting("FilesPath")."tmp/filemanager/");
 		
 		foreach($this -> elements as $name => $object)
 		{
@@ -437,13 +437,13 @@ class Model extends ModelBase
 				if($type == "date" || $type == "date_time")
 				{
 					$this -> elements[$name] -> setDisplaySelects(false);					
-					$object -> setValue(I18n :: dateFromSQL($row[$name], "no-seconds"));
+					$object -> setValue(I18n::dateFromSQL($row[$name], "no-seconds"));
 				}
 				else if($type == 'multi_images')
 					$object -> setValuesWithRoot($row[$name]);
 				else if($type == 'image' || $type == 'file')
 				{
-					$file = Service :: addFileRoot($row[$name]);
+					$file = Service::addFileRoot($row[$name]);
 					
 					if(is_file($file))
 						$object -> setRealValue($file, basename($file));
@@ -505,7 +505,7 @@ class Model extends ModelBase
 			return false; 
 		
 		//Checks if we have foreign key fields in other models
-		foreach(array_keys(Registry :: get('ModelsLower')) as $model)
+		foreach(array_keys(Registry::get('ModelsLower')) as $model)
 			if($model != $this -> getModelClass())
 			{
 				$model_object = new $model(); //Creates the objects of models to check foreign keys
@@ -526,8 +526,8 @@ class Model extends ModelBase
 	
 	public function defineAvailableParents($checked_ids)
 	{
-		$options_xml = "<value id=\"\">".I18n :: locale("select-value")."</value>\n";
-		$options_xml .= "<value id=\"-1\">".I18n :: locale('root-catalog')."</value>\n";
+		$options_xml = "<value id=\"\">".I18n::locale("select-value")."</value>\n";
+		$options_xml .= "<value id=\"-1\">".I18n::locale('root-catalog')."</value>\n";
 		
 		foreach($checked_ids as $key => $id)
 			$checked_ids[$key] = intval($id);
@@ -576,7 +576,7 @@ class Model extends ModelBase
 		
 		if(isset($arguments[1]) && $arguments[1] == "autocomplete")
 		{
-			$values_to_sort[-1] = I18n :: locale('root-catalog');
+			$values_to_sort[-1] = I18n::locale('root-catalog');
 			return $values_to_sort;
 		}
 		
@@ -589,7 +589,7 @@ class Model extends ModelBase
 	public function getParentsForMultiAutocomplete($request, $ids)
 	{
 		//Autocomplete for parent type if long list option is on
-		$request_re = Service :: prepareRegularExpression(trim($request));
+		$request_re = Service::prepareRegularExpression(trim($request));
 		$result_rows = $this -> defineAvailableParents($ids, "autocomplete");
 				
 		foreach($result_rows as $key => $value)
@@ -701,13 +701,13 @@ class Model extends ModelBase
 			}
 			else
 			{
-				$param = ($type == 'date' || $type == 'date_time') ? 'sql' : '';
+				$param = ($type === 'date' || $type === 'date_time') ? 'sql' : '';
 				$value = $object -> getValue($param);
 				
-				if($type == 'image' || $type == 'file')
-					$value = Service :: removeFileRoot((string) $value);
+				if($type === 'image' || $type === 'file')
+					$value = Service::removeFileRoot((string) $value);
 					
-				$value = Service :: cleanHtmlSpecialChars((string) $value);				
+				$value = Service::cleanHtmlSpecialChars((string) $value);				
 				$version_dump[$name] = $fields_and_values[$name] = $value;
 			}			
 		}
@@ -720,7 +720,7 @@ class Model extends ModelBase
 				foreach($result_values as $name => $value)
 					if(array_key_exists($name, $fields_and_values))
 					{
-						$value = Service :: cleanHtmlSpecialChars(htmlspecialchars($value, ENT_QUOTES));
+						$value = Service::cleanHtmlSpecialChars(htmlspecialchars($value, ENT_QUOTES));
 						$version_dump[$name] = $fields_and_values[$name] = $value;
 					}					
 		}
@@ -746,14 +746,14 @@ class Model extends ModelBase
 		$name = $this -> tryToDefineName($version_dump);
 		
 		if($this -> user)
-			Log :: write($this -> getModelClass(), $this -> id, $name, $this -> user -> getId(), "create");
+			Log::write($this -> getModelClass(), $this -> id, $name, $this -> user -> getId(), "create");
 		
 		$this -> updateManyToManyTables();
 		
 		if(method_exists($this, "afterCreate"))
 			$this -> afterCreate($this -> id, $version_dump);
 			
-		Cache :: cleanByModel($this -> getModelClass());
+		Cache::cleanByModel($this -> getModelClass());
 		
 		return $this -> id;
 	}
@@ -783,7 +783,7 @@ class Model extends ModelBase
 			if(isset($row[$name]))
 			{
 				if($type == 'image' || $type == 'file')
-					$object -> setRealValue(Service :: addFileRoot($row[$name]), basename($row[$name]));
+					$object -> setRealValue(Service::addFileRoot($row[$name]), basename($row[$name]));
 				else if($type == 'multi_images')
 					$object -> setValuesWithRoot($row[$name]);
 				else if($type == 'date' || $type == 'date_time')
@@ -791,7 +791,7 @@ class Model extends ModelBase
 					if($type == 'date')
 						$object -> setDisplaySelects(false); 
 					
-					$object -> setValue(I18n :: dateFromSQL($row[$name], "no-seconds"));
+					$object -> setValue(I18n::dateFromSQL($row[$name], "no-seconds"));
 				}
 				else if($type == 'password')
 				{
@@ -844,7 +844,7 @@ class Model extends ModelBase
 			else if($type == 'multi_images')
 				$object -> copyImages(get_class($this), $old_content[$name]);					
 			else if($type == 'password')
-				if(is_null($object -> getValue()) || trim($object -> getValue() == ''))
+				if(is_null($object -> getValue()) || trim($object -> getValue() === ''))
 					$object -> setValue($old_content[$name]);
 				else
 					$this -> prepareElementValue($object);
@@ -854,10 +854,10 @@ class Model extends ModelBase
 			$value = $object -> getValue($param);
 			
 			if($type == 'image' || $type == 'file')
-				$value = Service :: removeFileRoot($value ?? '');
+				$value = Service::removeFileRoot($value ?? '');
 			
 			if(is_string($value))
-				$value = Service :: cleanHtmlSpecialChars($value);
+				$value = Service::cleanHtmlSpecialChars($value);
 
 			if($name != 'id' && $type != 'many_to_many' && $type != 'many_to_one')
 				if($this -> checkIfFieldEditable($name)) //Only editable fields can be updated
@@ -882,7 +882,7 @@ class Model extends ModelBase
 				foreach($result_values as $name => $value)
 					if(array_key_exists($name, $fields_and_values))
 					{
-						$value = Service :: cleanHtmlSpecialChars(htmlspecialchars($value, ENT_QUOTES));
+						$value = Service::cleanHtmlSpecialChars(htmlspecialchars($value, ENT_QUOTES));
 						$version_dump[$name] = $fields_and_values[$name] = $value;
 					}				
 		}
@@ -911,7 +911,7 @@ class Model extends ModelBase
 			$name = $this -> tryToDefineName($version_dump);
 			
 			if($this -> user)
-				Log :: write($this -> getModelClass(), $this -> id, $name, $this -> user -> getId(), "update");
+				Log::write($this -> getModelClass(), $this -> id, $name, $this -> user -> getId(), "update");
 		}
 			
 		$this -> updateManyToManyTables("update");
@@ -919,7 +919,7 @@ class Model extends ModelBase
 		if(method_exists($this, "afterUpdate"))
 			$this -> afterUpdate($this -> id, $version_dump);
 			
-		Cache :: cleanByModel($this -> getModelClass());
+		Cache::cleanByModel($this -> getModelClass());
 				
 		return $this;
 	}
@@ -963,14 +963,14 @@ class Model extends ModelBase
 		$name = $this -> tryToDefineName($content);
 		
 		if($this -> user)
-			Log :: write($this -> getModelClass(), $this -> id, $name, $this -> user -> getId(), "delete");
+			Log::write($this -> getModelClass(), $this -> id, $name, $this -> user -> getId(), "delete");
 			
 		if(method_exists($this, "afterDelete"))
 			$this -> afterDelete($this -> id, $content);
 			
 		$this -> drop();
 		
-		Cache :: cleanByModel($this -> getModelClass());
+		Cache::cleanByModel($this -> getModelClass());
 		
 		return $this;
 	}
@@ -982,8 +982,8 @@ class Model extends ModelBase
 		
 		foreach($this -> elements as $field => $object)
 		{
-			$object -> setValue("");
-			$object -> setError("");
+			$object -> setValue('');
+			$object -> setError('');
 		}
 		
 		return $this;
@@ -991,7 +991,7 @@ class Model extends ModelBase
 					
 	public function displayModelFormInAdminPanel()
 	{
-		$html = $tabs_html = "";
+		$html = $tabs_html = '';
 		$current_tab = 1;
 		$arguments = func_get_args();
 		$action_create = false;
@@ -1016,7 +1016,7 @@ class Model extends ModelBase
 			foreach($this -> display_params["fields_groups"] as $name => $fields_list)
 				if(count($fields_list))
 				{
-					$active = ($index == $current_tab) ? " class=\"active\"" : "";
+					$active = ($index == $current_tab) ? " class=\"active\"" : '';
 					$hidden_tr = ($current_tab == $index) ? "" : " no-display";
 					$tabs_html .= "<li".$active." id=\"tab-group-".$index."\">".$name."</li>";
 					
@@ -1060,7 +1060,7 @@ class Model extends ModelBase
 			if($object -> getProperty('required'))
 				$caption .= "<span class=\"required\">*</span>";
 				
-			$css_class = "";
+			$css_class = '';
 			
 			if(in_array($type, array("char", "email", "password", "url", "redirect", "phone")))
 				$css_class = " text";
@@ -1078,10 +1078,10 @@ class Model extends ModelBase
 				if($type == "bool" && $object -> getProperty("on_create"))
 					$object -> setValue(true);
 				else if($type == "date" && $object -> getProperty("now_on_create"))
-					$object -> setValue(I18n :: getCurrentDate());
+					$object -> setValue(I18n::getCurrentDate());
 				else if($type == "date_time" && $object -> getProperty("now_on_create"))
 				{
-					$current_date_time = I18n :: getCurrentDateTime();
+					$current_date_time = I18n::getCurrentDateTime();
 					$current_date_time = preg_replace("/(\d{2}):(\d{2}):\d{2}/", "$1:$2", $current_date_time);
 					$object -> setValue($current_date_time);
 				}
@@ -1124,7 +1124,7 @@ class Model extends ModelBase
 	static public function processErrorText($error, $object)
 	{
 		//Preparing for operations
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 		$type = false;
 		
 		if(!is_array($error))
@@ -1179,9 +1179,9 @@ class Model extends ModelBase
 		//Adding the parameters for error messages
 		switch($error[1])
 		{
-			case 'error-date-format': $arguments['date_format'] = I18n :: getDateFormat();
+			case 'error-date-format': $arguments['date_format'] = I18n::getDateFormat();
 				break;
-			case 'error-date-time-format': $arguments['date_time_format'] = I18n :: getDateTimeFormat();
+			case 'error-date-time-format': $arguments['date_time_format'] = I18n::getDateTimeFormat();
 				break;
 			case 'error-short-password': $arguments['min_length'] = $object -> getProperty('min_length');
 										 $arguments['symbol'] = '*min_length'; //TODO remove password error?
@@ -1198,9 +1198,9 @@ class Model extends ModelBase
 				break;
 			case 'wrong-file-type': if($files_formats) $arguments['formats'] = $files_formats;
 				break;
-			case 'too-heavy-file': $arguments['weight'] = I18n :: convertFileSize($max_file_size);
+			case 'too-heavy-file': $arguments['weight'] = I18n::convertFileSize($max_file_size);
 				break;
-			case 'too-heavy-image': $arguments['weight'] = I18n :: convertFileSize($max_image_size);
+			case 'too-heavy-image': $arguments['weight'] = I18n::convertFileSize($max_image_size);
 				break;
 			case 'too-large-image': $arguments['size'] = $max_image_width." x ".$max_image_height;
 				break;
@@ -1208,7 +1208,7 @@ class Model extends ModelBase
 		}
 		
 		//The translation operation
-		$text = $needs_translation ? I18n :: locale($error[1], $arguments) : $error[1];
+		$text = $needs_translation ? I18n::locale($error[1], $arguments) : $error[1];
 		
 		return preg_replace("/'([^']+)'/", "&laquo;$1&raquo;", $text);
 	}
@@ -1223,7 +1223,7 @@ class Model extends ModelBase
 		foreach($this -> errors as $error)
 		{
 			$object = is_array($error) && isset($error[2], $this -> elements[$error[2]]) ? $this -> elements[$error[2]] : false;
-			$html .= "<p>".Model :: processErrorText($error, $object)."</p>\n";
+			$html .= "<p>".Model::processErrorText($error, $object)."</p>\n";
 		}
 		
 		return $html."</div>\n";
@@ -1271,7 +1271,7 @@ class Model extends ModelBase
 			}
 			else if($data['type'] == 'many_to_one')
 			{
-				$condition = Filter :: NUMERIC_CONDITIONS;
+				$condition = Filter::NUMERIC_CONDITIONS;
 				
 				// ...
 			}
@@ -1465,7 +1465,7 @@ class Model extends ModelBase
 
 		foreach($this -> display_params['table_fields'] as $name)
 		{
-			$css_class = "";
+			$css_class = '';
 				
 			if($name == "checkbox")
 			{
@@ -1474,7 +1474,7 @@ class Model extends ModelBase
 			}
 			else if($name == "actions")
 			{
-				$caption = I18n :: locale('operations');
+				$caption = I18n::locale('operations');
 				$css_class = " class=\"actions\"";
 			}
 			else if($name == "id")
@@ -1502,7 +1502,7 @@ class Model extends ModelBase
 					$caption = $this -> sorter -> createAdminLink($caption, $name);
 			}
 			else if(isset($this -> elements[$name]) && $type == "parent")
-				$caption = I18n :: locale('child-records');				
+				$caption = I18n::locale('child-records');				
 			
 			$html .= "<th".$css_class.">".$caption."</th>\n";
 		}
@@ -1613,14 +1613,14 @@ class Model extends ModelBase
 						   }
 					}
 					else if($type == 'int')
-						$row[$name] = I18n :: formatIntNumber(intval($row[$name]));
+						$row[$name] = I18n::formatIntNumber(intval($row[$name]));
 					else if($type == 'float')
 					{
 						$float_number = explode(".", $row[$name]);
-						$row[$name] = I18n :: formatIntNumber($float_number[0]);
+						$row[$name] = I18n::formatIntNumber($float_number[0]);
 						
 						if(isset($float_number[1]) && $float_number[1])
-							$row[$name] .= I18n :: getDecimalMark().$float_number[1];
+							$row[$name] .= I18n::getDecimalMark().$float_number[1];
 					}
 					else if($type == 'many_to_many')
 						$row[$name] = $this -> elements[$name] -> displayAdminTableLink($row['id']);
@@ -1641,16 +1641,16 @@ class Model extends ModelBase
 							$row[$name] = $this -> elements[$name] -> displayHtmlForTable($row[$name], $name."_".$row['id']);							
 					}
 					else if($type == 'image')
-						$row[$name] = $this -> displayAdminImage(Service :: addFileRoot($row[$name]));
+						$row[$name] = $this -> displayAdminImage(Service::addFileRoot($row[$name]));
 					else if($type == 'multi_images')
 					{
-						$images_list = MultiImagesModelElement :: unpackValue($row[$name]);
-						$row[$name] = $this -> displayAdminImage(Service :: addFileRoot($images_list[0]['image'] ?? ''));
+						$images_list = MultiImagesModelElement::unpackValue($row[$name]);
+						$row[$name] = $this -> displayAdminImage(Service::addFileRoot($images_list[0]['image'] ?? ''));
 					}
 					else if($type == 'file')
 						$row[$name] = basename($row[$name]);
 					else if($type == 'date' || $type == 'date_time')
-						$row[$name] = I18n :: dateFromSQL((string) $row[$name], "no-seconds");
+						$row[$name] = I18n::dateFromSQL((string) $row[$name], "no-seconds");
 					else if($type == 'parent')
 							$row[$name] = $this -> elements[$name] -> countChildElements(get_class($this), $name, $row['id']);
 					else if($type == 'bool')
@@ -1661,7 +1661,7 @@ class Model extends ModelBase
 						{
 							$bool_title = $row[$name] ? "switch-off" : "switch-on";
 							$row[$name] = "<span id=\"".$name."-".$row['id']."-".$this -> table."\" class=\"bool-field ";
-							$row[$name] .= $css_class."\" title=\"".I18n :: locale($bool_title)."\"><span class=\"slider\"></span></span>";
+							$row[$name] .= $css_class."\" title=\"".I18n::locale($bool_title)."\"><span class=\"slider\"></span></span>";
 						}
 						else
 							$row[$name] = "<span class=\"bool-field off ".$css_class."\"><span class=\"slider\"></span></span>";
@@ -1669,7 +1669,7 @@ class Model extends ModelBase
 					else if($type == "text" && $this -> elements[$name] -> getProperty("show_in_admin"))
 					{
 						if($row[$name])
-							$row[$name] = Service :: cutText($row[$name], $this -> elements[$name] -> getProperty("show_in_admin"), " ...");
+							$row[$name] = Service::cutText($row[$name], $this -> elements[$name] -> getProperty("show_in_admin"), " ...");
 						else
 							$row[$name] = '';
 					}
@@ -1782,7 +1782,7 @@ class Model extends ModelBase
 				if($error == 'wrong-images-type')
 					$arguments['formats'] = implode(', ', $this -> elements[$name] -> getOverriddenProperty("allowed_extensions"));
 				else if($error == 'too-heavy-image')
-					$arguments['weight'] = I18n :: convertFileSize($this -> elements[$name] -> getOverriddenProperty("max_size"));
+					$arguments['weight'] = I18n::convertFileSize($this -> elements[$name] -> getOverriddenProperty("max_size"));
 				else if($error == 'too-large-image')
 				{
 					$arguments['size'] = $this -> elements[$name] -> getOverriddenProperty("max_width")." x ";
@@ -1818,7 +1818,7 @@ class Model extends ModelBase
 		
 		if($action_type == 'delete' || $action_type == 'restore')
 		{
-			$html = "<a title=\"".I18n :: locale($action_type)."\" id=\"";
+			$html = "<a title=\"".I18n::locale($action_type)."\" id=\"";
 			
 			if($has_right)
 			{
@@ -1831,7 +1831,7 @@ class Model extends ModelBase
 		}
 		else if($action_type == 'update')
 		{
-			$html = "<a title=\"".I18n :: locale("edit")."\" href=\"";
+			$html = "<a title=\"".I18n::locale("edit")."\" href=\"";
 			$html .= $this -> registry -> getSetting('AdminPanelPath')."model/";
 			$html .= "update.php?".$this -> getAllUrlParams(array('parent','model','pager','filter'));
 			$html .= "&id=".$id."\" class=\"single-action action-".$action_type."\"></a>\n";
@@ -1843,19 +1843,19 @@ class Model extends ModelBase
 	public function generateSingleActionToken($id)
 	{
 	    $token = $this -> registry -> getSetting("AdminPanelCSRFToken").$this -> getName();
-	    $token = Service :: createHash($_SERVER["HTTP_USER_AGENT"].$token.$id.$_SERVER["REMOTE_ADDR"]);
+	    $token = Service::createHash($_SERVER["HTTP_USER_AGENT"].$token.$id.$_SERVER["REMOTE_ADDR"]);
 	    
 	    return $token;
 	}
 	
 	public function displayParentsPath($start_id)
 	{
-		$html = "<span>".I18n :: locale('root-catalog')."</span>";
+		$html = "<span>".I18n::locale('root-catalog')."</span>";
 		
 		if($start_id != -1)
 		{
 			$html = "<a href=\"?model=".$this -> getModelClass()."&".$this -> parent_field."=-1\">";
-			$html .= I18n :: locale('root-catalog')."</a> ";
+			$html .= I18n::locale('root-catalog')."</a> ";
 			
 			$data = $this -> elements[$this -> parent_field] -> displayPath($start_id);
 			
@@ -1883,7 +1883,7 @@ class Model extends ModelBase
 									  SET `".$field."`=".$this -> db -> secure($order)." 
 									  WHERE `id`='".$id."'");
 				
-		Cache :: cleanByModel($this -> getModelClass());
+		Cache::cleanByModel($this -> getModelClass());
 		
 		$this -> db -> commitTransaction();		
 	}
@@ -2003,7 +2003,7 @@ class Model extends ModelBase
 							$object -> setProperty('empty_value', true);
 							
 						$empty_value = $object -> getProperty('empty_value');
-						$empty_text = is_bool($empty_value) ? I18n :: locale("not-defined") : $empty_value;
+						$empty_text = is_bool($empty_value) ? I18n::locale("not-defined") : $empty_value;
 						$filters_data[$field]['empty_value'] = $empty_text;
 					}
 					else if($type == "many_to_many")
@@ -2014,7 +2014,7 @@ class Model extends ModelBase
 					
 					if(isset($_GET[$field])) //Takes values of filters from GET
 					{
-						$value = Filter :: checkFieldValue($type, trim($_GET[$field]), $filters_data[$field]);
+						$value = Filter::checkFieldValue($type, trim($_GET[$field]), $filters_data[$field]);
 						
 						if($value != '')
 							$filters_data[$field]['value'] = $value;
@@ -2024,7 +2024,7 @@ class Model extends ModelBase
 							if(preg_match("/^".$field."-(eq|neq|gt|lt|gte|lte)$/", $key))
 							{
 								$condition = preg_replace("/^".$field."-(eq|neq|gt|lt|gte|lte)$/", "$1", $key);
-								$value = Filter :: checkFieldValue($type, trim($val), $filters_data[$field]);
+								$value = Filter::checkFieldValue($type, trim($val), $filters_data[$field]);
 								
 								if($value != '')
 									$filters_data[$field]['conditions'][$condition] = $value;
@@ -2048,18 +2048,13 @@ class Model extends ModelBase
 				if($object -> getType() != 'many_to_many')
 				{	
 					$fields[] = "`".$field."`";
-					$value = Service :: cleanHtmlSpecialChars($value);
+					$value = Service::cleanHtmlSpecialChars($value);
 					
-					$version = $this -> registry -> getInitialVersion();
-					
-					if($object -> getType() == "password" && $value != "" && ($version >= 1.1 && $version < 2.2))
-						$values[] = "'".md5($value)."'";
-					else
-						$values[] = $this -> db -> secure($value);
+					$values[] = $this -> db -> secure($value);
 				}
 				
-		if(method_exists(Database :: $pdo, "inTransaction"))
-			$in_transaction = Database :: $pdo -> inTransaction();
+		if(method_exists(Database::$pdo, "inTransaction"))
+			$in_transaction = Database::$pdo -> inTransaction();
 		else
 			$in_transaction = true;
 		
@@ -2094,8 +2089,7 @@ class Model extends ModelBase
 			return;
 			
 		$checked_fields = $m2m_fields = [];
-		$content = $this -> db -> getRow("SELECT * FROM `".$this -> table."` WHERE `id`='".$id."'");
-
+		
 		foreach($fields as $field => $value)
 			if($object = $this -> getElement($field))
 				if($object -> getType() === 'many_to_many')
@@ -2107,29 +2101,19 @@ class Model extends ModelBase
 				}				
 				else
 				{
-					if($object -> getType() === 'password')
-					{
-						if($value == '' || ($value != '' && isset($content[$field]) && $content[$field] == $value))
-							continue;
-						else
-						{
-							$version = $this -> registry -> getInitialVersion();
-							$value = ($version >= 1.1 && $version < 2.2) ? "'".md5($value)."'" : "'".$value."'";
-						}
-					}	
-					else if($object -> getType() != 'text')
+					if($object -> getType() !== 'text')
 						$value = $this -> db -> secure($value);
 					else
 						$value = "'".$value."'";
 	
-					$checked_fields[] = "`".$field."`=".Service :: cleanHtmlSpecialChars($value);					
+					$checked_fields[] = "`".$field."`=".Service::cleanHtmlSpecialChars($value);					
 				}
 				
 		if(!count($checked_fields))
 			return;
 		
-		if(method_exists(Database :: $pdo, 'inTransaction'))
-			$in_transaction = Database :: $pdo -> inTransaction();
+		if(method_exists(Database::$pdo, 'inTransaction'))
+			$in_transaction = Database::$pdo -> inTransaction();
 		else
 			$in_transaction = true;
 		
@@ -2147,8 +2131,8 @@ class Model extends ModelBase
 		
 	public function deleteRecord($id)
 	{
-		if(method_exists(Database :: $pdo, "inTransaction"))
-			$in_transaction = Database :: $pdo -> inTransaction();
+		if(method_exists(Database::$pdo, "inTransaction"))
+			$in_transaction = Database::$pdo -> inTransaction();
 		else
 			$in_transaction = true;
 		
@@ -2221,7 +2205,7 @@ class Model extends ModelBase
 		
 		if($empty_value = $object -> getProperty("empty_value"))
 		{
-			$empty_text = is_bool($empty_value) ? I18n :: locale("not-defined") : $empty_value;
+			$empty_text = is_bool($empty_value) ? I18n::locale("not-defined") : $empty_value;
 			$html .= "<option value=\"\">".$empty_text."</option>\n";
 		}
 		
@@ -2375,9 +2359,9 @@ class Model extends ModelBase
 		{
 			$trace = debug_backtrace();
 			$message = "Call to undefiend method '".$method."' of model '".get_class($this)."'";
-			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service :: removeDocumentRoot($trace[0]['file']);
+			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
 
-			Debug :: displayError($message, $trace[0]['file'], $trace[0]['line']);
+			Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);
 		}
 	}
 }

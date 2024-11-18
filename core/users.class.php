@@ -40,10 +40,10 @@ class Users extends Model
 			
 	public function __construct()
 	{
-		parent :: __construct();
+		parent::__construct();
 		
 		$this -> includes_folder = $this -> registry -> getSetting("IncludeAdminPath")."includes/";
-		$this -> models_list = array_merge(array_keys(Registry :: get('ModelsLower')), ["users", "log", "garbage"]);
+		$this -> models_list = array_merge(array_keys(Registry::get('ModelsLower')), ["users", "log", "garbage"]);
 	}
 				
 	public function validate()
@@ -52,9 +52,9 @@ class Users extends Model
 		$password_repeat = $this -> elements['password_repeat'] -> getValue();
 		
 		if(($password || $password_repeat) && $password_repeat != $password)
-			$this -> errors[] = "{passwords-must-match}";
+			$this -> errors[] = '{passwords-must-match}';
 		
-		return parent :: validate();
+		return parent::validate();
 	}
 	
 	public function create()
@@ -62,10 +62,10 @@ class Users extends Model
 		unset($this -> elements['password_repeat']);
 		$rights = $this -> getRightsFromPost();
 		
-		$this -> elements['date_registered'] -> setValue(I18n :: getCurrentDateTime());
+		$this -> elements['date_registered'] -> setValue(I18n::getCurrentDateTime());
 		
 		$this -> sendUserInfo("created") -> hashUserPassword();
-		$this -> id = parent :: create(array("rights" => $this -> packRights($rights)));
+		$this -> id = parent::create(['rights' => $this -> packRights($rights)]);
 		$this -> updateRights($rights);		
 		
 		return $this -> id;
@@ -92,7 +92,7 @@ class Users extends Model
 		if($this -> users_rights === false)
 			$this -> getUsersRights();
 
-		return parent :: read($arguments[0]);
+		return parent::read($arguments[0]);
 	}
 	
 	public function update()
@@ -112,17 +112,17 @@ class Users extends Model
 			$this -> elements['active'] -> setValue(1);
 		
 		if($_SESSION['mv']['user']['id'] == $this -> id) //Puts new data into session to avoid the break of login
-			User :: updateLoginData($this -> getValue('login'), $this -> getValue('password'));
+			User::updateLoginData($this -> getValue('login'), $this -> getValue('password'));
 		
-		return parent :: update(array("rights" => $this -> packRights($rights)));
+		return parent::update(array("rights" => $this -> packRights($rights)));
 	}
 	
 	public function hashUserPassword()
 	{
-		if($this -> getValue("password") && $this -> registry -> getInitialVersion() >= 2.2)
+		if($this -> getValue('password') && $this -> registry -> getInitialVersion() >= 2.2)
 		{
-			$hash = Service :: makeHash(trim($this -> getValue("password")));
-			$this -> setValue("password", $hash);
+			$hash = Service::makeHash(trim($this -> getValue('password')));
+			$this -> setValue('password', $hash);
 		}
 		
 		return $this;
@@ -145,7 +145,7 @@ class Users extends Model
 			$models_names[$model] = $model_object -> getName();
 		}
 		
-		$models_names["file_manager"] = I18n :: locale("file-manager");
+		$models_names["file_manager"] = I18n::locale("file-manager");
 		
 		natsort($models_names); //A-z sorting of names list
 
@@ -274,7 +274,7 @@ class Users extends Model
 	
 	static public function arrangeRights($data)
 	{
-		$models = array_merge(array_keys(Registry :: get('ModelsLower')), ["users", "log", "garbage"]);
+		$models = array_merge(array_keys(Registry::get('ModelsLower')), ["users", "log", "garbage"]);
 		$rights = [];
 		
 		foreach($data as $row)
@@ -289,22 +289,22 @@ class Users extends Model
 	{
 		$email = $this -> elements["email"] -> getValue();
 		$email = $this -> elements["name"] -> getValue()." <".$email.">";
-		$password = $this -> elements["password"] -> getValue();
-		$password = $password ? $password : mb_strtolower(I18n :: locale("no-changes"), "utf-8");
+		$password = $this -> elements['password'] -> getValue();
+		$password = $password ? $password : mb_strtolower(I18n::locale("no-changes"), "utf-8");
 		
 		if($email && isset($_POST["send_admin_info_email"]) && $_POST["send_admin_info_email"])
 		{
 			$url = $this -> registry -> getSetting("HttpAdminPanelPath");
 			
 			$message = "<p>".$this -> elements["name"] -> getValue().",<br />\n";
-			$message .= I18n :: locale("user-account-".$type)."</p>\n";
+			$message .= I18n::locale("user-account-".$type)."</p>\n";
 			$message .= "<ul>\n<li>".$this -> elements["email"] -> getCaption().": ";
 			$message .= $this -> elements["email"] -> getValue()."</li>\n";
 			$message .= "<li>".$this -> elements["login"] -> getCaption().": ".$this -> elements["login"] -> getValue()."</li>\n";
-			$message .= "<li>".$this -> elements["password"] -> getCaption().": ".$password."</li>\n";
+			$message .= "<li>".$this -> elements['password'] -> getCaption().": ".$password."</li>\n";
 			$message .= "<li>URL: <a href=\"".$url."\">".$url."</a></li>\n</ul>\n";
 			
-			Email :: send($email, I18n :: locale('user-data'), $message);
+			Email::send($email, I18n::locale('user-data'), $message);
 		}
 		
 		return $this;

@@ -2,7 +2,7 @@
 /**
  * Keeps all configurations of application and current version of MV core.
  * Works on the singleton pattern.
- * Any setting can be retreived by using Registry :: get('option_name') method.
+ * Any setting can be retreived by using Registry::get('option_name') method.
  */
 class Registry
 {
@@ -32,10 +32,10 @@ class Registry
 	 */
 	static public function instance()
 	{
-		if(!isset(self :: $instance))
-			self :: $instance = new self();
+		if(!isset(self::$instance))
+			self::$instance = new self();
 		
-		return self :: $instance;
+		return self::$instance;
 	}
 
 	static public function generateSettings(array &$settings_list)
@@ -69,7 +69,7 @@ class Registry
 		//Tries to define native server domain
 		if('' !== $settings_list['ServerDomain'] = $_SERVER['SERVER_NAME'] ?? '')
 		{
-			$settings_list['ServerDomain'] = 'http'.(Http :: isHttps() ? 's' : '').'://'.$settings_list['ServerDomain'];
+			$settings_list['ServerDomain'] = 'http'.(Http::isHttps() ? 's' : '').'://'.$settings_list['ServerDomain'];
 
 			if(!isset($settings_list['DomainName']) || !$settings_list['DomainName'])
 				$settings_list['DomainName'] = $settings_list['ServerDomain'];
@@ -81,22 +81,22 @@ class Registry
 	 */
 	public function checkSettingsValues()
 	{
-		if(self :: $settings['Mode'] !== 'development' && self :: $settings['Mode'] !== 'production')
+		if(self::$settings['Mode'] !== 'development' && self::$settings['Mode'] !== 'production')
 		{
 			$message = "Settings 'APP_ENV' and 'Mode' may have 'development' or 'production' values only.";
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 
-		$supported = self :: $settings['SupportedRegions'];
+		$supported = self::$settings['SupportedRegions'];
 
-		if(!in_array(self :: $settings['Region'], $supported))
+		if(!in_array(self::$settings['Region'], $supported))
 		{
 			$message = "Settings 'APP_REGION' and 'Region' must have values from the list ";
 			$message .= "of supported regions from config/settings.php file.";
 			$message .= "<br>The actual setting name is 'SupportedRegions'.<br>";
 			$message .= "Available values are: ".implode(', ', $supported);
 
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 
 		return $this;
@@ -109,19 +109,19 @@ class Registry
 	{
 		$names = [];
 
-		foreach(self :: $settings['Models'] as $name)
+		foreach(self::$settings['Models'] as $name)
 			$names[strtolower($name)] = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $name));
 
-		self :: $settings['ModelsLower'] = $names;
+		self::$settings['ModelsLower'] = $names;
 
 		$names = [];
 
-		foreach(self :: $settings['Plugins'] as $name)
+		foreach(self::$settings['Plugins'] as $name)
 			$names[strtolower($name)] = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $name));
 
-		self :: $settings['PluginsLower'] = $names;
+		self::$settings['PluginsLower'] = $names;
 
-		self :: $settings['DataTypesLower'] = [
+		self::$settings['DataTypesLower'] = [
 			'datetime' => 'date_time',
 			'multiimages' => 'multi_images',
 			'manytomany' => 'many_to_many',
@@ -150,7 +150,7 @@ class Registry
 	 */
 	public function loadSettings(array $settings_list)
 	{
-		self :: $settings = array_merge(self :: $settings, $settings_list);
+		self::$settings = array_merge(self::$settings, $settings_list);
 	}
 
 	/**
@@ -158,7 +158,7 @@ class Registry
 	 */
 	public function loadEnvironmentSettings()
 	{
-		$env = self :: $settings['IncludePath'].'.env';
+		$env = self::$settings['IncludePath'].'.env';
 
 		if(!is_file($env))
 			return $this;
@@ -183,13 +183,13 @@ class Registry
 
 		foreach($settings as $old => $new)
 			if(array_key_exists($new, $data) && trim($data[$new]) !== '')
-				self :: $settings[$old] = trim($data[$new]);
+				self::$settings[$old] = trim($data[$new]);
 		
-		self :: $settings = array_merge(self :: $settings, $data);
+		self::$settings = array_merge(self::$settings, $data);
 
-		self :: $settings['AdminPanelPath'] = self :: $settings['MainPath'].self :: $settings['AdminFolder'].'/';
-		self :: $settings['HttpPath'] = self :: $settings['DomainName'].self :: $settings['MainPath'];
-		self :: $settings['HttpAdminPanelPath'] = self :: $settings['DomainName'].self :: $settings['AdminPanelPath'];		
+		self::$settings['AdminPanelPath'] = self::$settings['MainPath'].self::$settings['AdminFolder'].'/';
+		self::$settings['HttpPath'] = self::$settings['DomainName'].self::$settings['MainPath'];
+		self::$settings['HttpAdminPanelPath'] = self::$settings['DomainName'].self::$settings['AdminPanelPath'];		
 
 		return $this;
 	}
@@ -200,7 +200,7 @@ class Registry
 	 */
 	static public function getAllSettings()
 	{
-		return self :: $settings;
+		return self::$settings;
 	}
 	
 	/**
@@ -209,16 +209,16 @@ class Registry
 	 */
 	static public function getSetting(string $key)
 	{
-		if($key == "SecretCode" && (!isset(self :: $settings[$key]) || strlen(self :: $settings[$key]) < 32))
+		if($key == "SecretCode" && (!isset(self::$settings[$key]) || strlen(self::$settings[$key]) < 32))
 		{
 			$message = "You must specify 'APP_TOKEN' setting in .env file, or 'SecretCode' ";
 			$message .= " setting in ~/config/setup.php file, at least 32 symbols.<br>";
-			$message .= "You can use this random code: ".Service :: strongRandomString(35);
+			$message .= "You can use this random code: ".Service::strongRandomString(mt_rand(32, 40));
 
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}				
-		else if(isset(self :: $settings[$key]))
-			return self :: $settings[$key];
+		else if(isset(self::$settings[$key]))
+			return self::$settings[$key];
 	}
 
 	/**
@@ -227,7 +227,7 @@ class Registry
 	 */
 	static public function get(string $key)
 	{
-		return self :: getSetting($key);
+		return self::getSetting($key);
 	}
 	
 	/**
@@ -236,7 +236,7 @@ class Registry
 	 */
 	public function setSetting(string $key, mixed $value)
 	{
-		self :: $settings[$key] = $value;
+		self::$settings[$key] = $value;
 
 		return $this;
 	}
@@ -246,7 +246,7 @@ class Registry
 	 */
 	static public function set(string $key, mixed $value)
 	{
-		self :: $settings[$key] = $value;
+		self::$settings[$key] = $value;
 	}
 	
 	/**
@@ -255,7 +255,7 @@ class Registry
 	 */
 	static public function getDatabaseSetting(string $key)
 	{
-		$db = Database :: instance();
+		$db = Database::instance();
 
 		return $db -> getCell("SELECT `value` FROM `settings` 
 							   WHERE `key`=".$db -> secure($key));
@@ -267,7 +267,7 @@ class Registry
 	 */	
 	static public function setDatabaseSetting(string $key, mixed $value)
 	{
-		$db = Database :: instance();
+		$db = Database::instance();
 		
 		if(!$db -> getCount("settings", "`key`=".$db -> secure($key)))
 			return $db -> query("INSERT INTO `settings`(`key`,`value`) 
@@ -286,8 +286,8 @@ class Registry
 	{
 		$class_name = strtolower($class_name);
 
-		if(array_key_exists($class_name, self :: $settings['ModelsLower']))
-			return self :: $settings['ModelsLower'][$class_name];
+		if(array_key_exists($class_name, self::$settings['ModelsLower']))
+			return self::$settings['ModelsLower'][$class_name];
 
 		if(in_array($class_name, ['garbage', 'log', 'users']))
 			return $class_name;
@@ -303,8 +303,8 @@ class Registry
 	{
 		$class_name = strtolower($class_name);
 
-		if(array_key_exists($class_name, self :: $settings['PluginsLower']))
-			return self :: $settings['PluginsLower'][$class_name];
+		if(array_key_exists($class_name, self::$settings['PluginsLower']))
+			return self::$settings['PluginsLower'][$class_name];
 
 		return '';
 	}
@@ -318,10 +318,10 @@ class Registry
 	{
 		$lower = strtolower($name);
 
-		if(array_key_exists($lower, self :: $settings['ModelsLower']))
+		if(array_key_exists($lower, self::$settings['ModelsLower']))
 			return true;
 
-		if(in_array($lower, self :: $settings['ModelsLower']))
+		if(in_array($lower, self::$settings['ModelsLower']))
 			return true;
 
 		if(in_array($lower, ['garbage', 'log', 'users']))
@@ -336,8 +336,8 @@ class Registry
 	 */
 	static public function getModelClassByTable(string $table)
 	{
-		if(in_array($table, self :: $settings['ModelsLower']))
-			return array_search($table, self :: $settings['ModelsLower']);
+		if(in_array($table, self::$settings['ModelsLower']))
+			return array_search($table, self::$settings['ModelsLower']);
 
 
 		return '';
@@ -349,7 +349,7 @@ class Registry
 	 */
 	static public function getVersion()
 	{
-		return self :: $version;
+		return self::$version;
 	}
 	
 	/**
@@ -358,7 +358,7 @@ class Registry
 	 */	
 	static public function getInitialVersion()
 	{
-		return floatval(self :: $settings['Version']);
+		return floatval(self::$settings['Version']);
 	}
 
 	/**
@@ -376,7 +376,7 @@ class Registry
 					return $version;
 
 		//If MV was installed manually without composer
-		return number_format(self :: $version, 1);
+		return number_format(self::$version, 1);
 	}
 
 	/**
@@ -385,7 +385,7 @@ class Registry
 	 */
 	static public function onDevelopment()
 	{
-		return self :: $settings['Mode'] === 'development';
+		return self::$settings['Mode'] === 'development';
 	}
 
 	/**
@@ -394,6 +394,6 @@ class Registry
 	 */
 	static public function onProduction()
 	{
-		return self :: $settings['Mode'] === 'production';
+		return self::$settings['Mode'] === 'production';
 	}
 }
