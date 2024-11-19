@@ -29,20 +29,11 @@ class Auth
     static public function useModel(string $model_class)
     {
         $model = self::analyzeModel($model_class);
-        $settings = self::generateContainerSettings($model);
+        self::generateContainerSettings($model);
 
         self::$current = get_class($model);
         self::$model = $model;
-
-        //Session::start($settings['session_key']);
     }
-
-    // static protected function generateContainerKey(object $model)
-    // {
-    //     $class_name = $model -> getModelClass();
-
-    //     return 'auth_'.$class_name.'_'.md5($class_name.Registry::get('SecretCode'));
-    // }
 
     static protected function analyzeModel(string $model_class)
     {
@@ -144,9 +135,13 @@ class Auth
         else if(!is_string($login) || $password === '')
             return null;
 
-        $record = self::$model -> find([$login_field => $login]);
+        if(null === $record = self::$model -> find([$login_field => $login]))
+            return null;
 
-        if(is_object($record) && ($force_login || Service::checkHash($password, $record -> $password_field)))
+        $element = self::$model -> getElement($password_field);
+        $compare_hash = $element -> comparePasswordHash($password, $record -> $password_field);
+
+        if($force_login || $compare_hash)
         {
             if('' !== $active_field = self::$containers[self::$current]['active_field'])
                 if(!$record -> $active_field)
@@ -176,7 +171,7 @@ class Auth
             Session::destroy(self::$containers[self::$current]['session_key']);
     }
 
-    static public function check()
+    static public function check(): ?Record
     {
         if(is_null(self::$current))
             return null;
@@ -188,7 +183,7 @@ class Auth
         
         Session::start($session_key);
 
-        if(!Session::has('id', 'password', 'token'))
+        if(!Session::has('id', 'password', 'token') || !self::checkIpAndBrowser())
             return null;
         
         $record = self::$model -> find(Session::get('id'));
@@ -214,21 +209,53 @@ class Auth
         return null;
     }
 
+    static protected function checkIpAndBrowser(): bool
+    {
+        if(self::$containers[self::$current]['watch_ip'])
+            if(Session::getParameter('ip_hash') !== md5($_SERVER['REMOTE_ADDR']))
+                return false;
+        
+        if(self::$containers[self::$current]['watch_browser'])
+            if(Session::getParameter('browser_hash') !== md5($_SERVER['HTTP_USER_AGENT']))
+               return false;
+
+        return true;
+    }
+
     /* Remember me */
 
-    static public function remember()
+    static protected function generateCookieStorageKey(): string
     {
-        $key = Service::strongRandomString(50);
+        $key = self::$current.Registry::get('SecretCode').Debug::browser();
+        $key .= self::$containers[self::$current]['login_field'];
+
+        return 'remember_'.substr(md5($key), 5, 10);
     }
 
-    static public function cancelRemember()
+    static public function remember(Record $record)
     {
+        if(!self::$current || !self::$containers[self::$current]['remember_me'])
+            return;
 
+        $value = self::generateRememberMeCookieToken($record);
+        $time = time() + ((self::$containers[self::$current]['remember_me_lifetime'] ?? 30) * 3600 * 24);
+
+        Http::setCookie(self::generateCookieStorageKey(), $value, ['expires' => $time]);
     }
 
-    static public function loginWithRememberCookie()
+    static public function forget()
     {
+        if(self::$current)
+            Http::setCookie(self::generateCookieStorageKey(), '');
+    }
 
+    static public function loginWithRememberMeCookie()
+    {
+        $key = self::generateCookieStorageKey();
+        $cookie = Http::getCookie($key, '');
+        $record = self::checkRememberMeCookieToken($cookie);
+        Debug::pre($cookie);
+        Debug::pre($record);
     }
 
     static public function generateRememberMeCookieToken(Record $record): string
@@ -260,16 +287,15 @@ class Auth
         $second = '$2y$14$'.substr($token, $first_separator + 1, $second_separator - $first_separator - 1);
         $third = '$2y$10$'.substr($token, $second_separator + 1);
         
-
         $id = (int) preg_replace('/\D/', '', $first) - $base['id_offset'];
         
         if(null === $record = self::checkActiveUserWithIdFromToken($id))
-            return null;
+            return null;            
 
         $base = self::getCryptoBase($record);
         $data_second = $base['secret'].$base['record_data'];
         $data_third = $base['secret'].$base['browser'];
-
+        
         return (Service::checkHash($data_second, $second) && Service::checkHash($data_third, $third)) ? $record : null;
     }
 
@@ -320,7 +346,17 @@ class Auth
 
     static public function recoverPassword(Record $record, string $password)
     {
+        if(!$password === '')
+            return;
         
+        $check = self::$model -> find($record -> id);
+
+        if($check === null || $check -> getModelClass() !== self::$current)
+            return;
+        
+        $password_field = self::$containers[self::$current]['password_field'];
+        $record -> $password_field = $password;
+        $record -> save();
     }
 
     /* Helpers */

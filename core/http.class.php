@@ -146,4 +146,14 @@ class Http
 
         setcookie($key, $value, $expires, $path, $domain, self::isHttps(), $http_only);
     }
+
+    /**
+     * Gets one cookie by key from COOKIE global array.
+     * @param string $key name of cookie
+     * @param string $default value of cookie if key not existed
+     */
+    static public function getCookie(string $key, mixed $default = null): mixed
+    {
+        return isset($_COOKIE, $_COOKIE[$key]) ? trim($_COOKIE[$key]) : $default;
+    }
 }

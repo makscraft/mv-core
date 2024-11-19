@@ -70,4 +70,11 @@ class PasswordModelElement extends CharModelElement
 
 		return $value ? Service::makeHash(trim($value).$salt, 12) : '';
 	}
+
+	public function comparePasswordHash(string $password, string $hash): bool
+	{
+		$salt = $this -> getPasswordSalt();
+		
+		return Service::checkHash($password.$salt, $hash);
+	}
 }
