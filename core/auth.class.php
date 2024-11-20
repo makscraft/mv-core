@@ -10,6 +10,8 @@ class Auth
 
     protected static $containers = [];
 
+    protected static $users = [];
+
     protected const DEFAULT_SETTINGS = [
         'login_field' => '',
         'password_field' => '',
@@ -102,6 +104,33 @@ class Auth
         return $defaults;
     }
 
+    static public function getState()
+    {
+        return [
+            'model' => self::$current,
+            'settings' => self::$containers[self::$current] ?? [],
+            'users' => self::$users
+        ];
+    }
+
+    static protected function addAuthorizedUser(Record $user)
+    {
+        if(is_null(self::$current) || $user -> getModelClass() !== self::$current)
+            return;
+
+        $login_field = self::$containers[self::$current]['login_field'];
+
+        self::$users[self::$current] = [
+            'id' => $user -> id,
+            'login' => $user -> $login_field
+        ];
+    }
+
+    static protected function removeAuthorizedUser(string $model)
+    {
+        
+    }
+
     /* Login and logout */
 
     static public function login(mixed $login, string $password = '')
@@ -159,6 +188,8 @@ class Auth
                 if(!$record -> $token_field)
                     $record -> setValue($token_field, Service::strongRandomString(50)) -> update();
 
+            self::addAuthorizedUser($record);
+
             return $record;
         }
         
@@ -199,7 +230,9 @@ class Auth
                         Session::destroy($session_key);
                         return null;
                     }
-
+                
+                self::addAuthorizedUser($record);
+                
                 return $record;
             }
 
@@ -268,7 +301,10 @@ class Auth
         $first = str_replace($base['first_separator'], '', $first);
         $second = preg_replace('/^\$2y\$14\$/', '', Service::makeHash($data_second, 14));
         $third = preg_replace('/^\$2y\$10\$/', '', Service::makeHash($data_third, 10));
-        $third = str_replace($base['second_separator'], '', $third);
+
+        Debug::exit($third);
+        //Debug::exit($base);
+        //$third = str_replace($base['second_separator'], '', $third);
 
         return $first.$base['first_separator'].$second.$base['second_separator'].$third;
     }
@@ -291,7 +327,7 @@ class Auth
         
         if(null === $record = self::checkActiveUserWithIdFromToken($id))
             return null;            
-
+        
         $base = self::getCryptoBase($record);
         $data_second = $base['secret'].$base['record_data'];
         $data_third = $base['secret'].$base['browser'];
