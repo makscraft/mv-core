@@ -832,7 +832,7 @@ $(document).ready(function()
   	$("#container").click(function()
 	{
   		$("div.multi-actions-menu ul, #operations-menu, #fields-list div.list").hide();
-  		$("#models-list").hide("slide", {direction: "up"}, 300);
+  		$("#models-list").removeClass('open');
 	});
   	
   	//Refers to model
@@ -915,7 +915,7 @@ $(document).ready(function()
 	//Shows / hides list of models
 	$("#models-buttons span").click(function()
 	{
-		$("#models-list").toggle("slide", {direction: "up"}, 300);
+		$("#models-list").toggleClass('open');
 		return false;
 	});
 	 	  	
