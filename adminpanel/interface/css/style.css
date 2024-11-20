@@ -61,7 +61,7 @@ background: url("../images/arrow-models.png") right no-repeat; transition: all 0
 #user-settings li a{color: #f26061;}
 #user-name{max-width: 190px; overflow: hidden; margin-left: 0 !important;}
 
-#models-list{position: absolute; top: 40px; left: 0; padding: 18px 5% 13px 5%; display: block; z-index: 10000; width: 90%; 
+#models-list{position: absolute; top: 85px; left: 0; padding: 18px 5% 13px 5%; display: block; z-index: 10000; width: 90%; 
 background: #eeeded; box-shadow: 0 0 9px #999; -webkit-box-shadow: 0 0 7px #777; -moz-box-shadow: 0 0 9px #999;
 transition: all 0.5s ease; opacity: 0;}
 #models-list.open{display: block; top: 70px; opacity: 1;}
