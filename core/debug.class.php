@@ -225,6 +225,12 @@ class Debug
 
 		if(Registry::get('Mode') !== 'production')
 		{
+			if(Http::isAjaxRequest())
+			{
+				header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
+				Http::responseJson(['error' => $error, 'http_code' => 500, 'file' => $file, 'line' => $line]);
+			}
+			
 			$debug_error = $error;
 
 			if($file !== '' && $line !== 0)
