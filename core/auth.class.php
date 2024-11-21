@@ -106,6 +106,8 @@ class Auth
 
     static public function getState()
     {
+        //Debug::pre(self::$containers);
+
         return [
             'model' => self::$current,
             'settings' => self::$containers[self::$current] ?? [],
@@ -113,7 +115,7 @@ class Auth
         ];
     }
 
-    static protected function addAuthorizedUser(Record $user)
+    static protected function addAuthorizedUser(Record $user, string $source = '')
     {
         if(is_null(self::$current) || $user -> getModelClass() !== self::$current)
             return;
@@ -122,7 +124,8 @@ class Auth
 
         self::$users[self::$current] = [
             'id' => $user -> id,
-            'login' => $user -> $login_field
+            'login' => $user -> $login_field,
+            'source' => $source
         ];
     }
 
@@ -133,7 +136,7 @@ class Auth
 
     /* Login and logout */
 
-    static public function login(mixed $login, string $password = '')
+    static public function login(mixed $login, string $password = '', string $source = 'login')
     {
         if(is_null(self::$current) || !$login)
             return null;
@@ -188,7 +191,7 @@ class Auth
                 if(!$record -> $token_field)
                     $record -> setValue($token_field, Service::strongRandomString(50)) -> update();
 
-            self::addAuthorizedUser($record);
+            self::addAuthorizedUser($record, $source);
 
             return $record;
         }
@@ -231,7 +234,7 @@ class Auth
                         return null;
                     }
                 
-                self::addAuthorizedUser($record);
+                self::addAuthorizedUser($record, 'session');
                 
                 return $record;
             }
@@ -282,29 +285,30 @@ class Auth
             Http::setCookie(self::generateCookieStorageKey(), '');
     }
 
-    static public function loginWithRememberMeCookie()
+    static public function loginWithRememberMeCookie(): ?Record
     {
+        if(is_null(self::$current))
+            return null;
+        
         $key = self::generateCookieStorageKey();
         $cookie = Http::getCookie($key, '');
-        $record = self::checkRememberMeCookieToken($cookie);
-        Debug::pre($cookie);
-        Debug::pre($record);
+
+        if(null !== $record = self::checkRememberMeCookieToken($cookie))
+            return self::login($record, '', 'remember_me');
+        
+        return null;
     }
 
     static public function generateRememberMeCookieToken(Record $record): string
     {
         $base = self::getCryptoBase($record);
         $data_second = $base['secret'].$base['record_data'];
-        $data_third = $base['secret'].$base['browser'];
         
         $first = Service::mixNumberWithLetters($record -> id + $base['id_offset'], $base['digits'] + mt_rand(30, 50));
         $first = str_replace($base['first_separator'], '', $first);
         $second = preg_replace('/^\$2y\$14\$/', '', Service::makeHash($data_second, 14));
-        $third = preg_replace('/^\$2y\$10\$/', '', Service::makeHash($data_third, 10));
-
-        Debug::exit($third);
-        //Debug::exit($base);
-        //$third = str_replace($base['second_separator'], '', $third);
+        $third = Service::mixNumberWithLetters($base['browser_digits'], $base['digits'] + mt_rand(120, 150));
+        $third = str_replace($base['second_separator'], '', $third);
 
         return $first.$base['first_separator'].$second.$base['second_separator'].$third;
     }
@@ -321,18 +325,18 @@ class Auth
         $second_separator = strrpos($token, $base['second_separator']);
         $first = substr($token, 0, $first_separator);
         $second = '$2y$14$'.substr($token, $first_separator + 1, $second_separator - $first_separator - 1);
-        $third = '$2y$10$'.substr($token, $second_separator + 1);
-        
+        $third = substr($token, $second_separator + 1);
+
         $id = (int) preg_replace('/\D/', '', $first) - $base['id_offset'];
         
         if(null === $record = self::checkActiveUserWithIdFromToken($id))
             return null;            
         
-        $base = self::getCryptoBase($record);
+        $base = self::getCryptoBase($record);        
         $data_second = $base['secret'].$base['record_data'];
-        $data_third = $base['secret'].$base['browser'];
+        $browser = preg_replace('/\D/', '', $third);
         
-        return (Service::checkHash($data_second, $second) && Service::checkHash($data_third, $third)) ? $record : null;
+        return ($browser == $base['browser_digits'] && Service::checkHash($data_second, $second)) ? $record : null;
     }
 
     /* Password recovery */
@@ -418,13 +422,14 @@ class Auth
 
         return [
             'browser' => Debug::browser(),
+            'browser_digits' => preg_replace('/\D/', '', md5(Debug::browser().Registry::get('SecretCode'))),
             'secret' => Registry::get('SecretCode'),
             'digits' => $record ? strlen(strval($record -> id)) : 0,
             'id_offset' => preg_replace('/\D/', '', Registry::get('SecretCode')),
             'first_separator' => $first_separator,
             'second_separator' => $second_separator,
             'first_separator_flat' => $separators[ord($first_separator) % 6],
-            'second_separator_flat' => $separators[ord($second_separator) % 6],            
+            'second_separator_flat' => $separators[ord($second_separator) % 6],
             'filetime_offset' => filemtime(__FILE__),
             'record_data' => $record ? md5($record -> id.$record -> $login_field.$record -> $password_field.$record -> $token_field) : ''
         ];
