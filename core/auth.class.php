@@ -1,17 +1,41 @@
 <?php
 /**
+ * Authorization processor for MV framework with session and remeber me methods.
+ * Supports multiple models accounts at one time with individual sets of options.
+ * Keeps session and cookie data in separate containers.
  * 
+ * Always start with Auth::useModel(YourModel::class) method call.
  */
 class Auth
 {
+    /**
+     * Current model class name.
+     * @var string
+     */
     protected static $current = null;
 
+    /**
+     * Current model object.
+     * @var object
+     */
     protected static $model = null;
 
+    /**
+     * List of separate auth containers for each model.
+     * @var array
+     */
     protected static $containers = [];
 
+    /**
+     * List of currently logged in users (last one from each model).
+     * @var array
+     */
     protected static $users = [];
 
+    /**
+     * List of default authorization settings for each model (can be overriden).
+     * @const array
+     */
     protected const DEFAULT_SETTINGS = [
         'login_field' => '',
         'password_field' => '',
@@ -37,7 +61,7 @@ class Auth
         self::$model = $model;
     }
 
-    static protected function analyzeModel(string $model_class)
+    static protected function analyzeModel(string $model_class): object
     {
         if(!class_exists($model_class) || get_parent_class($model_class) !== 'Model')
             Debug::displayError('Undefined or not suitable class name passed for Authorization: '.$model_class);
@@ -73,7 +97,7 @@ class Auth
         return $model;
     }
 
-    static protected function generateContainerSettings(object $model)
+    static protected function generateContainerSettings(object $model): array
     {
         $settings = $model -> getAuthorizationSessings();
         $defaults = self::DEFAULT_SETTINGS;
@@ -104,10 +128,8 @@ class Auth
         return $defaults;
     }
 
-    static public function getState()
+    static public function getState(): array
     {
-        //Debug::pre(self::$containers);
-
         return [
             'model' => self::$current,
             'settings' => self::$containers[self::$current] ?? [],
@@ -131,12 +153,13 @@ class Auth
 
     static protected function removeAuthorizedUser(string $model)
     {
-        
+        if(!is_null(self::$current) && isset(self::$users[self::$current]))
+            unset(self::$users[self::$current]);
     }
 
     /* Login and logout */
 
-    static public function login(mixed $login, string $password = '', string $source = 'login')
+    static public function login(mixed $login, string $password = '', string $source = 'login'): ?Record
     {
         if(is_null(self::$current) || !$login)
             return null;
@@ -201,8 +224,15 @@ class Auth
 
     static public function logout()
     {
-        if(self::$current !== null)
-            Session::destroy(self::$containers[self::$current]['session_key']);
+        if(is_null(self::$current))
+            return null;
+
+        Session::destroy(self::$containers[self::$current]['session_key']);
+
+        self::forget();
+        self::removeAuthorizedUser(self::$current);
+
+        return null;
     }
 
     static public function check(): ?Record
@@ -217,8 +247,11 @@ class Auth
         
         Session::start($session_key);
 
-        if(!Session::has('id', 'password', 'token') || !self::checkIpAndBrowser())
+        if(!Session::has('id', 'password', 'token'))
             return null;
+
+        if(!self::checkIpAndBrowser())
+            return self::logout();
         
         $record = self::$model -> find(Session::get('id'));
         $password_field = self::$containers[self::$current]['password_field'];
@@ -239,7 +272,7 @@ class Auth
                 return $record;
             }
 
-            Session::destroy(self::$containers[self::$current]['session_key']);
+            return self::logout();
         }
 
         return null;
@@ -270,7 +303,7 @@ class Auth
 
     static public function remember(Record $record)
     {
-        if(!self::$current || !self::$containers[self::$current]['remember_me'])
+        if(is_null(self::$current) || !self::$containers[self::$current]['remember_me'])
             return;
 
         $value = self::generateRememberMeCookieToken($record);
@@ -281,13 +314,18 @@ class Auth
 
     static public function forget()
     {
-        if(self::$current)
-            Http::setCookie(self::generateCookieStorageKey(), '');
+        $key = self::generateCookieStorageKey();
+
+        if(!is_null(self::$current) && Http::getCookie($key))
+            Http::setCookie($key, '');
     }
 
     static public function loginWithRememberMeCookie(): ?Record
     {
-        if(is_null(self::$current))
+        if(is_null(self::$current) || isset(self::$users[self::$current]))
+            return null;
+
+        if(!self::$containers[self::$current]['remember_me'])
             return null;
         
         $key = self::generateCookieStorageKey();
@@ -384,19 +422,21 @@ class Auth
         return $check === $second ? $record : null;
     }
 
-    static public function recoverPassword(Record $record, string $password)
+    static public function recoverPassword(Record $record, string $password): bool
     {
         if(!$password === '')
-            return;
+            return false;
         
         $check = self::$model -> find($record -> id);
 
         if($check === null || $check -> getModelClass() !== self::$current)
-            return;
+            return false;
         
         $password_field = self::$containers[self::$current]['password_field'];
         $record -> $password_field = $password;
         $record -> save();
+
+        return true;
     }
 
     /* Helpers */
