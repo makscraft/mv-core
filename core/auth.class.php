@@ -52,6 +52,10 @@ class Auth
 
     /* Initial settings */
 
+    /**
+     * Initial required method to start working with Auth.
+     * Provide model class with filled $auth_settings property like Auth::useModel(YourModel::class)
+     */
     static public function useModel(string $model_class)
     {
         $model = self::analyzeModel($model_class);
@@ -61,6 +65,10 @@ class Auth
         self::$model = $model;
     }
 
+    /**
+     * Internal method to analyze $auth_settings property of current model.
+     * @return object analyzed model or fires an error
+     */
     static protected function analyzeModel(string $model_class): object
     {
         if(!class_exists($model_class) || get_parent_class($model_class) !== 'Model')
@@ -97,6 +105,10 @@ class Auth
         return $model;
     }
 
+    /**
+     * Combines settings from $auth_settings property with default Auth settings from DEFAULT_SETTINGS.
+     * @return array properties
+     */
     static protected function generateContainerSettings(object $model): array
     {
         $settings = $model -> getAuthorizationSessings();
@@ -128,6 +140,10 @@ class Auth
         return $defaults;
     }
 
+    /**
+     * Current state of Auth class with current model settings and all authorized users.
+     * @return array data of Auth
+     */
     static public function getState(): array
     {
         return [
@@ -137,6 +153,9 @@ class Auth
         ];
     }
 
+    /**
+     * Adds one authorized user into state data.
+     */
     static protected function addAuthorizedUser(Record $user, string $source = '')
     {
         if(is_null(self::$current) || $user -> getModelClass() !== self::$current)
@@ -151,6 +170,9 @@ class Auth
         ];
     }
 
+    /**
+     * Removes one authorized user from state data? usually after logout.
+     */
     static protected function removeAuthorizedUser(string $model)
     {
         if(!is_null(self::$current) && isset(self::$users[self::$current]))
@@ -159,6 +181,14 @@ class Auth
 
     /* Login and logout */
 
+    /**
+     * Logins user of current model, according to settings, runs individual Session container.
+     * @param mixed $login accepts string | Form | Record parameter
+     * @param string $password required string if $login is string
+     * @param string $source internal marker for getState()
+     * 
+     * @return ?Record object of user or null if failed
+     */
     static public function login(mixed $login, string $password = '', string $source = 'login'): ?Record
     {
         if(is_null(self::$current) || !$login)
@@ -222,19 +252,24 @@ class Auth
         return null;
     }
 
+    /**
+     * Drops current user's authorization including rememeber me cookie.
+     */
     static public function logout()
     {
         if(is_null(self::$current))
-            return null;
+            return;
 
         Session::destroy(self::$containers[self::$current]['session_key']);
 
         self::forget();
         self::removeAuthorizedUser(self::$current);
-
-        return null;
     }
 
+    /**
+     * Check if current model has authorized user.
+     * @return ?Record object of user or null if failed
+     */
     static public function check(): ?Record
     {
         if(is_null(self::$current))
@@ -278,6 +313,9 @@ class Auth
         return null;
     }
 
+    /**
+     * Check ip and browser condition if exist in auth settings of current model.
+     */
     static protected function checkIpAndBrowser(): bool
     {
         if(self::$containers[self::$current]['watch_ip'])
@@ -293,6 +331,9 @@ class Auth
 
     /* Remember me */
 
+    /**
+     * Generates cookie key name for remember me.
+     */
     static protected function generateCookieStorageKey(): string
     {
         $key = self::$current.Registry::get('SecretCode').Debug::browser();
@@ -301,6 +342,9 @@ class Auth
         return 'remember_'.substr(md5($key), 5, 10);
     }
 
+    /**
+     * Sets remember me cookie for record of current model.
+     */
     static public function remember(Record $record)
     {
         if(is_null(self::$current) || !self::$containers[self::$current]['remember_me'])
@@ -312,6 +356,9 @@ class Auth
         Http::setCookie(self::generateCookieStorageKey(), $value, ['expires' => $time]);
     }
 
+    /**
+     * Removes remember me cookie for current model and drops autologin.
+     */
     static public function forget()
     {
         $key = self::generateCookieStorageKey();
@@ -320,6 +367,10 @@ class Auth
             Http::setCookie($key, '');
     }
 
+    /**
+     * Logins user of current model with remember me cookie if such one exists.
+     * @return ?Record object of user or null if failed
+     */
     static public function loginWithRememberMeCookie(): ?Record
     {
         if(is_null(self::$current) || isset(self::$users[self::$current]))
@@ -337,6 +388,9 @@ class Auth
         return null;
     }
 
+    /**
+     * Creates remember me cookie value.
+     */
     static public function generateRememberMeCookieToken(Record $record): string
     {
         $base = self::getCryptoBase($record);
@@ -351,6 +405,10 @@ class Auth
         return $first.$base['first_separator'].$second.$base['second_separator'].$third;
     }
 
+    /**
+     * Checks remember me cookie value and looks for needed user.
+     * @return ?Record object of user or null if failed
+     */
     static public function checkRememberMeCookieToken(string $token): ?Record
     {
         $token = trim($token);
@@ -379,6 +437,9 @@ class Auth
 
     /* Password recovery */
 
+    /**
+     * Creates token value for password recovery URL.
+     */
     static public function generatePasswordRecoveryToken(Record $record): string
     {
         $lifetime = time() + self::$containers[self::$current]['recover_password_lifetime'];
@@ -393,6 +454,10 @@ class Auth
         return $first.$base['first_separator_flat'].$second.$base['second_separator_flat'].$third;
     }
 
+    /**
+     * Checks password recovery token value and looks for needed user.
+     * @return ?Record object of user or null if failed
+     */
     static public function checkPasswordRecoveryToken(string $token): ?Record
     {
         $token = trim($token);
@@ -422,6 +487,9 @@ class Auth
         return $check === $second ? $record : null;
     }
 
+    /**
+     * Performs saving a new password of user.
+     */
     static public function recoverPassword(Record $record, string $password): bool
     {
         if(!$password === '')
@@ -441,6 +509,9 @@ class Auth
 
     /* Helpers */
 
+    /**
+     * Creates token for user's session after login success.
+     */
     static public function generateRecordSessionToken(Record $record): string
 	{
 		$token = $record -> id.Registry::get('SecretCode');
@@ -449,6 +520,9 @@ class Auth
 		return md5($token);
 	}
 
+    /**
+     * Combines special set of data for creating remember me and recovery tokens.
+     */
     static public function getCryptoBase(?Record $record = null): array
     {
         $separators = ['a','b','c','d','e','f'];
@@ -475,6 +549,9 @@ class Auth
         ];
     }
 
+    /**
+     * Checks if the user of current model exists and active (if required by settings).
+     */
     static protected function checkActiveUserWithIdFromToken(int $id): ?Record
     {
         if(null === $record = self::$model -> find($id))
