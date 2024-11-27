@@ -732,7 +732,7 @@ class Form
 			$caption = $object -> getCaption();
 			$type = $object -> getType();
 			
-			if($type == 'many_to_one')
+			if($type === 'many_to_one')
 				continue;
 			
 			if($object -> getProperty('required'))
@@ -747,9 +747,9 @@ class Form
 
 				$html .= "<div class=\"field-name\">";
 								
-				if($type == "bool")
+				if($type === "bool")
 				{
-					if($format == 'divs')
+					if($format === 'divs')
 						$html .= "<label>".$object -> displayHtml()." ".$caption."</label></div>\n";
 					else
 					{
@@ -781,24 +781,24 @@ class Form
 			}
 			else if($format === 'inputs')
 			{
-				if($type == "bool")
+				if($type === "bool")
 				{
-					$html .= "<label>".$object -> displayHtml()." ".$caption."</label>\n";
-					continue;
+					$bool_id = "form-bool-".$object -> getName();
+					$html .= str_replace("<input ", "<input id=\"".$bool_id."\" ", $object -> displayHtml());
 				}
 			}
 			
-			if($type == "char" && $object -> getProperty('captcha'))
+			if($type === "char" && $object -> getProperty('captcha'))
 			{
 				$src = $this -> registry -> getSetting("MainPath").$object -> getProperty('captcha');
 				$html .= "<img src=\"".$src."\" />\n";
 			}
 
-			if($type == "enum" && $object -> getProperty('multiple_choice'))
+			if($type === "enum" && $object -> getProperty('multiple_choice'))
 				$html .= $object -> displayAsCheckboxes();
-			else if($type == "file" && $object -> getProperty('multiple'))
+			else if($type === "file" && $object -> getProperty('multiple'))
 				$html .= $object -> displayMultipleHtml();
-			else if($type == "many_to_many" && !$object -> getProperty('display_table'))
+			else if($type === "many_to_many" && !$object -> getProperty('display_table'))
 				$html .= $object -> displayAsSelect();
 			else
 				$html .= $object -> displayHtml('frontend');
