@@ -76,7 +76,7 @@ class Debug
 		}
 
 		echo "\n<pre style=\"white-space: pre-wrap; font-size: 14px !important; background: #222; color: #def474; padding: 20px;\">";
-		print_r($var);
+		print_r(is_string($var) ? htmlspecialchars($var, ENT_QUOTES) : $var);
 		echo "</pre>\n";
 	}
 
@@ -225,6 +225,12 @@ class Debug
 
 		if(Registry::get('Mode') !== 'production')
 		{
+			if(Http::isAjaxRequest())
+			{
+				header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
+				Http::responseJson(['error' => $error, 'http_code' => 500, 'file' => $file, 'line' => $line]);
+			}
+			
 			$debug_error = $error;
 
 			if($file !== '' && $line !== 0)
