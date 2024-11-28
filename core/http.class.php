@@ -156,4 +156,34 @@ class Http
     {
         return isset($_COOKIE, $_COOKIE[$key]) ? trim($_COOKIE[$key]) : $default;
     }
+	
+	/**
+     * Gets one value by key from GET global array.
+     * @param string $key name of parameter
+     * @param string $default value of parameter if key not existed
+     */
+    static public function fromGet(string $key, mixed $default = null): mixed
+    {
+        return isset($_GET, $_GET[$key]) ? trim($_GET[$key]) : $default;
+    }
+
+    /**
+     * Gets one value by key from POST global array.
+     * @param string $key name of parameter
+     * @param string $default value of parameter if key not existed
+     */
+    static public function fromPost(string $key, mixed $default = null): mixed
+    {
+        return isset($_POST, $_POST[$key]) ? trim($_POST[$key]) : $default;
+    }
+
+    /**
+     * Gets one value by key from REQUEST global array.
+     * @param string $key name of parameter
+     * @param string $default value of parameter if key not existed
+     */
+    static public function fromRequest(string $key, mixed $default = null): mixed
+    {
+        return isset($_REQUEST, $_REQUEST[$key]) ? trim($_REQUEST[$key]) : $default;
+    }
 }
