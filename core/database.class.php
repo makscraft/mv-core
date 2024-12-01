@@ -176,7 +176,7 @@ class Database
 	public function query(string $query)
 	{
 		if(Registry::get('DebugPanel') === true)
-			self::$total[] = Service::cutText($query, 800, ' ...');
+			self::$total[] = Service::cutText(htmlspecialchars($query, ENT_QUOTES), 800, ' ...');
 		
 		try
 		{
