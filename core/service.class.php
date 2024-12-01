@@ -377,7 +377,7 @@ class Service
 	 * Checks if PHP session is already started.
 	 * @return bool
 	 */
-	static public function sessionIsStarted()
+	static public function sessionIsStarted(): bool
 	{
 		if(version_compare(phpversion(), '5.4.0', '>='))			
 			return session_status() === PHP_SESSION_ACTIVE;
@@ -402,7 +402,7 @@ class Service
 	 * Compares hash value with given string.
 	 * @return string
 	 */
-	static public function checkHash(string $string, string $hash)
+	static public function checkHash(string $string, string $hash): bool
 	{
 		if(Registry::instance() -> getInitialVersion() < 2.2)
 			return (md5($string) == $hash);
@@ -416,7 +416,7 @@ class Service
 	 * @param string $algo optional param of algorithm name (can be 'random')
 	 * @return string
 	 */
-	static public function createHash(string $string, string $algo = '')
+	static public function createHash(string $string, string $algo = ''): string
 	{
 		$allowed = ["sha224", "sha256", "sha384", "sha512/224", "sha512/256", "sha512", "sha3-224", "sha3-256", "sha3-384",
 					"sha3-512", "ripemd160", "ripemd256", "ripemd320", "whirlpool", "tiger160,3", "tiger192,3",
@@ -497,9 +497,13 @@ class Service
 	 * @param int $length final approximate string length
 	 * @return string
 	 */
-	static public function mixNumberWithLetters(int $number, int $lenght)
+	static public function mixNumberWithLetters(int $number, int $lenght, bool $flat = false): string
 	{
-		$random = self::strongRandomString($lenght);
+		if($flat)
+			$random = substr(self::createHash(strval(time()), 'sha512'), 0, $lenght);
+		else
+			$random = self::strongRandomString($lenght);
+		
 		$signs = str_split(preg_replace('/\d/', '*', $random));
 		$number = str_split(strval($number));
 

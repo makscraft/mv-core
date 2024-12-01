@@ -98,6 +98,9 @@ abstract class ModelElement
 		$this -> name = $name;
 		$this -> caption = $caption;
 		$this -> type = $type;
+
+		if($type === 'password' && Registry::getInitialVersion() < 3.2)
+			$this -> setProperty('salt', '');
 		
 		$properties = get_object_vars($this); //Gets all existing vars of object
 
@@ -107,7 +110,7 @@ abstract class ModelElement
 					$this -> setProperty($property, $value);
 				else
 				{
-					$message = "Undefined extra parameter '".$property."' in element '".$name."' of model '";
+					$message = "Undefined extra parameter '".$property."' in field '".$name."' of model '";
 					$message .= ucfirst($extra_params['model'])."'.";
 					Debug :: displayError($message);
 				}
@@ -223,7 +226,7 @@ abstract class ModelElement
 		}
 		else
 		{
-			$message = "Undefined extra parameter '".$property."' in element '".$this -> name."' of model '";
+			$message = "Undefined extra parameter '".$property."' in field '".$this -> name."' of model '";
 			$message .= ucfirst($this -> model)."'.";
 
 			Debug :: displayError($message);

@@ -31,7 +31,7 @@ class Cache
 
 	public function __construct()
 	{
-      	$this -> db = Database :: instance();
+      	$this -> db = Database::instance();
 	}
 	
 	/**
@@ -39,7 +39,7 @@ class Cache
 	 */
 	static public function checkIfEnabled()
 	{
-		return (bool) Registry :: get('EnableCache');
+		return (bool) Registry::get('EnableCache');
 	}
 	
 	/**
@@ -48,11 +48,11 @@ class Cache
 	 */
 	public function save(string $key, mixed $content, mixed $models = [], int $lifetime = 0)
 	{
-		if(!self :: checkIfEnabled())
+		if(!self::checkIfEnabled())
 			return $content;
 		
 		if(!preg_match("/[A-z]/", $key))
-			Debug :: displayError("Key '".$key."' of the cached item must contain letters.");
+			Debug::displayError("Key '".$key."' of the cached item must contain letters.");
 		
 		$key = str_replace("'", '', $key);
 		$checked_models = [];
@@ -66,14 +66,14 @@ class Cache
 		{
 			//Checks if passed models names are valid
 			foreach($models as $value) 
-				if(Registry :: checkModel($value))
+				if(Registry::checkModel($value))
 					$checked_models[] = $value;
 	
 		}
 		else if($models !== '*')
 			return $content;
 
-		if(Registry :: getInitialVersion() < 3.0)
+		if(Registry::getInitialVersion() < 3.0)
 		{
 			//If this cache is deleted by any action in admin panel
 			if(!count($checked_models))
@@ -88,24 +88,24 @@ class Cache
 			$lifetime = $lifetime > 0 ? time() + $lifetime : 0;
 
 			if(random_int(1, 10) == 10)
-				self :: cleanByLifetime();
+				self::cleanByLifetime();
 		}
 				
 		$this -> db -> beginTransaction();
 
 		$this -> cleanByKey($key); //Deletes old cache with such key
 
-		if(Registry :: getInitialVersion() < 3.0)
-			$query = "INSERT INTO `".self :: CONTENT_TABLE."` (`key`,`content`)
+		if(Registry::getInitialVersion() < 3.0)
+			$query = "INSERT INTO `".self::CONTENT_TABLE."` (`key`,`content`)
 					  VALUES(".$this -> db -> secure($key).",".$this -> db -> secure($content).")";
 		else
-			$query = "INSERT INTO `".self :: CONTENT_TABLE."` (`key`,`content`,`until`)
+			$query = "INSERT INTO `".self::CONTENT_TABLE."` (`key`,`content`,`until`)
 					  VALUES(".$this -> db -> secure($key).",".$this -> db -> secure($content).", ".$lifetime.")";
 
 		$this -> db -> query($query);
 		
 		foreach($checked_models as $model) //Adds links for cache cleaning
-			$this -> db -> query("INSERT INTO `".self :: CLEANUP_TABLE."` (`key`,`model`)
+			$this -> db -> query("INSERT INTO `".self::CLEANUP_TABLE."` (`key`,`model`)
 								  VALUES(".$this -> db -> secure($key).",".$this -> db -> secure($model).")");
 				
 		$this -> db -> commitTransaction();
@@ -128,14 +128,14 @@ class Cache
 	 */
 	public function find(string $key)
 	{
-		if(!self :: checkIfEnabled())
+		if(!self::checkIfEnabled())
 			return;
 		
-		$value = $this -> db -> getRow("SELECT * FROM `".self :: CONTENT_TABLE."` 
+		$value = $this -> db -> getRow("SELECT * FROM `".self::CONTENT_TABLE."` 
 									   	WHERE `key`=".$this -> db -> secure($key));
 
 		if(is_array($value))
-			if(Registry :: getInitialVersion() < 3.0)
+			if(Registry::getInitialVersion() < 3.0)
 				return $value['content'];
 			else if(intval($value['until']) === 0 || time() < intval($value['until']))
 				return unserialize($value['content']);
@@ -157,13 +157,13 @@ class Cache
 	 */
 	static public function cleanByKey(string $key)
 	{
-		if(!self :: checkIfEnabled())
+		if(!self::checkIfEnabled())
 			return;
 		
-		$db = Database :: instance();
+		$db = Database::instance();
 		
-		$db -> query("DELETE FROM `".self :: CONTENT_TABLE."` WHERE `key`=".$db -> secure($key));
-		$db -> query("DELETE FROM `".self :: CLEANUP_TABLE."` WHERE `key`=".$db -> secure($key));
+		$db -> query("DELETE FROM `".self::CONTENT_TABLE."` WHERE `key`=".$db -> secure($key));
+		$db -> query("DELETE FROM `".self::CLEANUP_TABLE."` WHERE `key`=".$db -> secure($key));
 	}
 	
 	/**
@@ -171,14 +171,14 @@ class Cache
 	 */
 	static public function cleanByModel(string $model)
 	{		
-		if(!self :: checkIfEnabled())
+		if(!self::checkIfEnabled())
 			return;
 		
-		$keys = Database :: instance() -> getColumn("SELECT `key` FROM `".self :: CLEANUP_TABLE."` 
+		$keys = Database::instance() -> getColumn("SELECT `key` FROM `".self::CLEANUP_TABLE."` 
 								 					 WHERE `model`='*' OR `model`='".$model."'");
 
 		foreach($keys as $key)
-			self :: cleanByKey($key);
+			self::cleanByKey($key);
 	}
 
 	/**
@@ -186,11 +186,11 @@ class Cache
 	 */
 	static public function cleanByLifetime()
 	{
-		$keys = Database :: instance() -> getColumn("SELECT `key` FROM `".self :: CONTENT_TABLE."` 
+		$keys = Database::instance() -> getColumn("SELECT `key` FROM `".self::CONTENT_TABLE."` 
 								 					 WHERE `until`>'0' AND `until`<='".time()."'");
 
 		foreach($keys as $key)
-			self :: cleanByKey($key);		
+			self::cleanByKey($key);		
 	}
 	
 	/**
@@ -198,11 +198,11 @@ class Cache
 	 */
 	static public function cleanAll()
 	{
-		if(!self :: checkIfEnabled())
+		if(!self::checkIfEnabled())
 			return;
 		
-		Database :: $adapter -> clearTable(self :: CONTENT_TABLE);
-		Database :: $adapter -> clearTable(self :: CLEANUP_TABLE);
+		Database::$adapter -> clearTable(self::CONTENT_TABLE);
+		Database::$adapter -> clearTable(self::CLEANUP_TABLE);
 	}
 	
 	/**
@@ -247,13 +247,13 @@ class Cache
 	 */
 	static public function getRoutesMapFromCache()
 	{
-		$file = Registry :: get('IncludePath').'userfiles/cache/';
-		$file .= 'routes-map-'.Registry :: get('Build').'.php';
+		$file = Registry::get('IncludePath').'userfiles/cache/';
+		$file .= 'routes-map-'.Registry::get('Build').'.php';
 
 		if(!is_file($file))
 			return;
 
-		$time = filemtime(Registry :: get('IncludePath').'config/routes.php');
+		$time = filemtime(Registry::get('IncludePath').'config/routes.php');
 		$cache = include_once($file);
 
 		if($time == $cache['RoutesFileTime'])
@@ -270,12 +270,12 @@ class Cache
 		if(!is_file($env))
 			return;
 
-		$settings = Registry :: getAllSettings();
-		$settings['ConfigFilesHash'] = Service :: getFilesModificationTimesHash($config_files);
+		$settings = Registry::getAllSettings();
+		$settings['ConfigFilesHash'] = Service::getFilesModificationTimesHash($config_files);
 		$settings['EnvFileTime'] = filemtime($env);
-		$settings['CheckConfigFilesUntil'] = time() + intval(Registry :: get('CacheFilesCheckTime') ?? 300);
+		$settings['CheckConfigFilesUntil'] = time() + intval(Registry::get('CacheFilesCheckTime') ?? 300);
 
-		self :: saveConfigCacheIntoFile($settings, 'env');
+		self::saveConfigCacheIntoFile($settings, 'env');
 	}
 
 	/**
@@ -292,7 +292,7 @@ class Cache
 
 		foreach($files as $file)
 			if(is_file($folder.$file) && strpos($file, $key.'-') === 0)
-				if(Service :: getExtension($file) === 'php')
+				if(Service::getExtension($file) === 'php')
 					unlink($folder.$file);
 	}
 
@@ -304,13 +304,13 @@ class Cache
 		$cache_folder = Registry:: get('IncludePath').'userfiles/cache/';
 		
 		if(!is_dir($cache_folder))
-			Filemanager :: createDirectory($cache_folder);
+			Filemanager::createDirectory($cache_folder);
 
-		self :: cleanConfigCacheFilesByKey($file_key);
+		self::cleanConfigCacheFilesByKey($file_key);
 
 		$content = "<?php\nreturn ".var_export($data, true).";";
 
-		$file = $cache_folder.$file_key.'-'.(Registry :: get('Build') ?? '0').'.php';
+		$file = $cache_folder.$file_key.'-'.(Registry::get('Build') ?? '0').'.php';
 		file_put_contents($file, $content);
 
 		if(PHP_OS_FAMILY === 'Darwin')
@@ -331,6 +331,6 @@ class Cache
 				if(is_file($cache_folder.$object))
 					unlink($cache_folder.$object);
 				else
-					Installation :: removeDirectory($cache_folder.$object);
+					Installation::removeDirectory($cache_folder.$object);
 	}
 }

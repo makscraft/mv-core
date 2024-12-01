@@ -323,13 +323,15 @@ class Login
 	
 	public function cancelRemember()
 	{
-		$cookie = $this -> getAutoLoginCookieName();
+		$key = $this -> getAutoLoginCookieName();
 
-		$time = Registry :: get('AutoLoginLifeTime');
-		$time = $time ? time() + $time : time() + 3600 * 24 * 31;
+		$time = Registry::get('AutoLoginLifeTime');
+		$time = $time ? time() + $time : time() + 3600 * 24 * 30;
 
 		$options = ['expires' => $time, 'path' => Registry :: get('AdminPanelPath')];
-		Http :: setCookie($cookie, '', $options);
+
+		if(Http::getCookie($key))
+			Http::setCookie($key, '', $options);
 
 		return $this;
 	}
