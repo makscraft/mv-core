@@ -2,7 +2,7 @@
 /**
  * MV - content management framework for developing internet sites and applications.
  * License: MIT
- * Copyright: Maxim Zaykov
+ * Copyright: Maksim Zaikov
  * 
  * http://mv-framework.com
  * http://mv-framework.ru
