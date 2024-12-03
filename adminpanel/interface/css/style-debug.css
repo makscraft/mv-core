@@ -45,7 +45,34 @@ bottom: 53px; border-radius: 4x; padding: 15px 1%; width: 100%; left: 0; display
 
 @media all and (max-width: 1300px)
 {
+    .mv-debug-panel, #mv-debug-panel-queries-list{padding-left: 2%; padding-right: 2%;}
+    .mv-debug-panel.wrapped{width: 60px !important;}
     .mv-debug-panel > *{margin-right: 2%;}
     .mv-debug-panel > div.sql-section{white-space: normal;}
     #mv-debug-panel-queries{margin: 3px 0 0 0; display: inline-block;}
+}
+
+@media all and (max-width: 1150px)
+{
+    .mv-debug-panel{display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px;}
+    .mv-debug-panel > *{margin: 0 !important;}
+}
+
+@media all and (max-width: 800px)
+{
+    .mv-debug-panel{grid-template-columns: 1fr 1fr 1fr;}
+}
+
+@media all and (max-width: 600px)
+{
+    .mv-debug-panel{grid-template-columns: 1fr 1fr;}
+}
+
+@media all and (max-width: 400px)
+{
+    .mv-debug-panel{display: flex; flex-direction: column; padding: 15px 3%; gap: 7px; align-items: flex-start;}
+    #mv-debug-panel-queries-list{padding-left: 3%; padding-right: 3%;}
+    .mv-debug-panel > img{margin-bottom: 5px !important;}
+    .mv-debug-panel.wrapped{justify-content: center;}
+    .mv-debug-panel.wrapped img{margin: 0 !important;}
 }
