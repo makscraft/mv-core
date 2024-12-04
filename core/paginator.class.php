@@ -192,6 +192,8 @@ class Paginator
 			'total' => $this -> total,
 			'limit' => $this -> limit,
 			'page' => $this -> page,
+			'pages_left' => ceil($this -> page - 1),
+			'pages_right' => ceil($this -> intervals - $this -> page),
 			'intervals' => $this -> intervals,
 			'first' => $this -> start,
 			'last' => $last
@@ -433,13 +435,23 @@ class Paginator
 			
          	$html .= ">".$value."</a>\n";
       	}
-      
+		
       	if($current_left > 5 && $this -> intervals > 10) //If we need to add the very first page
-         	$html = "<a class=\"very-first\" href=\"".$path.str_replace("number", 1, $pattern).">...</a>\n".$html;
-            
+		{
+			$href = $path.str_replace("number", 1, $pattern);
+         	$html = "<a class=\"very-first\" href=\"".$href.">1</a>\n<span class=\"skip\">...</span>\n".$html;
+		}
+        
       	if($current_right > 5 && $this -> intervals > 10) //Id we add very last page
-         	$html .= "<a class=\"very-last\" href=\"".$path.str_replace("number", $this -> intervals, $pattern).">...</a>\n";     
-      
+		{
+			$href = $path.str_replace("number", $this -> intervals, $pattern);
+
+			if($current_right != 6)
+				$html .= "<span class=\"skip\">...</span>\n";
+         	
+			$html .= "<a class=\"very-last\" href=\"".$href.">".$this -> intervals."</a>\n";
+		}
+		
       	return $html;
    	}
    
