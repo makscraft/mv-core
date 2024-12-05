@@ -832,7 +832,9 @@ $(document).ready(function()
   	$("#container").click(function()
 	{
   		$("div.multi-actions-menu ul, #operations-menu, #fields-list div.list").hide();
-  		$("#models-list").removeClass('open');
+  		
+		if($("#models-list").hasClass('open'))
+			$('#models-buttons span').click();
 	});
   	
   	//Refers to model
@@ -843,7 +845,7 @@ $(document).ready(function()
   	});
   	
   	//Stops event if click in models list
-  	$("#models-list,#fields-list div.list").click(function(event)
+  	$("#models-list, #fields-list div.list").click(function(event)
 	{
 		event.stopPropagation();
 	});
