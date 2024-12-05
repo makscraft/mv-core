@@ -124,13 +124,15 @@ class Session
     /**
      * Sets one value by key into current session container.
      */
-    static public function set(string $key, mixed $value)
+    static public function set(string $key, mixed $value): mixed
     {
         if(self::$current === null)
             Debug::displayError('Session container is not started. You need to run Session::start() before.');
 
         self::$container['data'][$key] = $value;
         self::flush();
+
+        return $value;
     }
 
     /**
