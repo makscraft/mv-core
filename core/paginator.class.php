@@ -1,7 +1,9 @@
 <?php
 /**
- * Class for splitting the long lists of records into pages.
- * Creates parts of SQL queries to use in LIMIT constructions.
+ * Class for splitting the long lists of records/items into pages.
+ * Creates parts of SQL queries to use in LIMIT construction.
+ * 
+ * Use getState() method to get all actual parameters.
  */
 class Paginator
 {
@@ -188,16 +190,34 @@ class Paginator
 		else
 			$last = $this -> total - 1;
 
-		return [
+		$items_left = ($this -> page - 1) * $this -> limit;
+
+		if($this -> page == $this -> intervals)
+			$items_right = 0;
+		else
+			$items_right = $this -> total - $items_left - $this -> limit;
+
+		$state = [
 			'total' => $this -> total,
 			'limit' => $this -> limit,
 			'page' => $this -> page,
-			'pages_left' => ceil($this -> page - 1),
-			'pages_right' => ceil($this -> intervals - $this -> page),
-			'intervals' => $this -> intervals,
-			'first' => $this -> start,
-			'last' => $last
+			'pages_total' => $this -> intervals,
+			'pages_left' => $this -> page - 1,
+			'pages_right' => $this -> intervals - $this -> page,
+			'item_from' => $this -> start,
+			'item_to' => $last,
+			'items_left' => $items_left,
+			'items_right' => $items_right
 		];
+
+		if(Registry::getInitialVersion() < 3.2)
+			$state = array_merge($state, [
+				'intervals' => $this -> intervals,
+				'first' => $this -> start,
+				'last' => $last
+			]);
+
+		return $state;
 	}
    
 	/**
@@ -249,6 +269,7 @@ class Paginator
    
    /**
 	* Chaeck if we have any pages before or after the current one.
+	* @param string $type 'prev' or 'next'
 	* @return bool
     */
    public function checkPrevNext(string $type): bool
@@ -342,13 +363,14 @@ class Paginator
    
    /**
 	* Displays select options (limits of elements per page).
+	* @param array $limits list of limit values [1,10,15, ...]
     * @return string html options for select tag
     */	
-   	public function displayPagerLimits(array $values): string
+   	public function displayPagerLimits(array $limits): string
    	{
    	  	$html = '';
    	  
-   	  	foreach($values as $value)
+   	  	foreach($limits as $value)
    	  	{
    	  	 	$html .= "<option value=\"".$value."\"";
    	  	 
@@ -363,6 +385,8 @@ class Paginator
 	
 	/**
 	 * Displays html links of pagination (current page is in the center of interval).
+	 * @param string $path base url to add the page numbers
+	 * @param $smart [deprecated]
 	 * @return string html code
 	 */
    	public function display(string $path, bool $smart = false): string
@@ -457,6 +481,8 @@ class Paginator
    
 	/**
 	 * Displays html select options with limits values or links with limits values.
+	 * @param array $limits list of limit values [1,10,15, ...]
+	 * @param string $path base url to add the page number
 	 * @return string html code
 	 */
    	public function displayLimits(array $limits, string $path, string $format = 'links')
@@ -481,6 +507,8 @@ class Paginator
    	
 	/**
 	 * Displays html link for previous page (if exists).
+	 * @param string $caption name/title of the prev link
+	 * @param string $path base url to add the page number
 	 * @return string html link code
 	 */	
    	public function displayPrevLink(string $caption, string $path): string
@@ -498,6 +526,8 @@ class Paginator
 
 	/**
 	 * Displays html link for next page (if exists).
+	 * @param string $caption name/title of the next link
+	 * @param string $path base url to add the page number
 	 * @return string html link code
 	 */	
    	public function displayNextLink(string $caption, string $path): string
@@ -513,9 +543,12 @@ class Paginator
 	   return '';
    	}
 
-	   public function __call($method, $arguments)
-	   {		
-		   if($method === "getIntervals")
-			   return $this -> getLast();
-	   }
+	/**
+	 * Old versions of MV support.
+	 */
+	public function __call($method, $arguments)
+	{		
+		if($method === 'getIntervals')
+			return $this -> getLast();
+	}
 }
