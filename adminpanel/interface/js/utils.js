@@ -915,7 +915,24 @@ $(document).ready(function()
 	//Shows / hides list of models
 	$("#models-buttons span").click(function()
 	{
-		$("#models-list").toggleClass('open');
+		if($("#models-list").hasClass("open"))
+		{
+			$("#models-list").animate({top: '-200%', opacity: 0}, 500);
+
+			setTimeout(() => {
+				$("#models-list").removeClass("open").css({top: '', opacity: '', display: '', transition: ''});
+			}, 800);
+		}
+		else
+		{
+			$("#models-list").addClass('open')
+							 .css({display: 'block', top: '85px', opacity: 0.8})
+							 .animate({top: '70px', opacity: 1}, 400, function()
+							 {
+								$("#models-list").css('transition', 'top 0.5s ease');
+							 });
+		}
+
 		return false;
 	});
 	 	  	

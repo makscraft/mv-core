@@ -61,10 +61,9 @@ background: url("../images/arrow-models.png") right no-repeat; transition: all 0
 #user-settings li a{color: #f26061;}
 #user-name{max-width: 190px; overflow: hidden; margin-left: 0 !important;}
 
-#models-list{position: absolute; top: 85px; left: 0; padding: 18px 5% 13px 5%; display: block; z-index: 10000; width: 90%; 
+#models-list{position: absolute; top: 85px; left: 0; padding: 18px 5% 13px 5%; z-index: 10000; width: 90%; 
 background: #eeeded; box-shadow: 0 0 9px #999; -webkit-box-shadow: 0 0 7px #777; -moz-box-shadow: 0 0 9px #999;
-transition: all 0.5s ease; opacity: 0;}
-#models-list.open{display: block; top: 70px; opacity: 1;}
+opacity: 0; display: none;}
 #models-list table{margin: 0 0 0 -17px;}
 #models-list table.models-list-table td a:hover{background: #fff;}
 
@@ -93,14 +92,15 @@ background-position: center 18px;}
 #index-icons ul li:last-child{border-bottom-right-radius: 4px; border-top-right-radius: 4px;}
 
 /* Search string and results */
-#header-search{width: 42%; height: 31px;}
+#header-search{width: 42%; height: 32px;}
+#header-search form{width: 100%;}
 #header-search form > div{display: flex;}
-#header-search input.string{height: 31px; width: 81%; padding: 6px 2%; border: none; border-top-left-radius: 2px; 
-border-bottom-left-radius: 2px; background: #fff url("../images/icon-search.svg") right 7px center no-repeat;
+#header-search input.string{height: 31px; width: 85%; padding: 6px 2%; border: none; border-top-left-radius: 4px; 
+border-bottom-left-radius: 4px; background: #fff url("../images/icon-search.svg") right 12px center no-repeat;
 box-sizing: border-box;}
-#header-search input.search-button{float: left; width: 15%; border: none; color: #fff; height: 31px;
-background: url("../images/button-color.jpg") top repeat-x; cursor: pointer; border-top-right-radius: 2px; 
-border-bottom-right-radius: 2px; box-sizing: border-box;}
+#header-search input.search-button{width: 15%; border: none; color: #fff; height: 31px;
+background: url("../images/button-color.jpg") top repeat-x; cursor: pointer; border-top-right-radius: 4px; 
+border-bottom-right-radius: 4px; box-sizing: border-box;}
 #header-search.search-page{padding-top: 0;}
 
 #index-search.search-page{max-width: 1200px; width: 100%;}
@@ -196,7 +196,7 @@ font-weight: normal; line-height: 14px;}
 .model-table td{padding: 7px 4px; border-bottom-width: 0 !important;}
 .model-table td:has(.single-action){white-space: nowrap;}
 .model-table input[type='checkbox']{position: relative; bottom: -1px; right: -1px;}
-.model-table small.online{padding: 0 5px; color: #1464ba; background: #e3e0e0; margin-left: 5px; border-radius: 3px;}
+.model-table small.online{padding: 0 5px; color: #1464ba; background: #e3e0e0; margin-left: 5px; border-radius: 4px;}
 .model-table td.centered{text-align: center;}
 .model-table th.check-all{padding-left: 4px; width: 40px;}
 .model-table th.actions{width: 85px;}
@@ -295,7 +295,7 @@ margin-bottom: 17px; align-items: flex-start;}
 .model-elements-form td.text input, .model-elements-form td.numeric input, .model-elements-form td.date input, 
 .model-elements-form select, .model-elements-form textarea, .ui-autocomplete-input, .m2m-not-selected-search,
 .m2m-selected-search, #csv-settings table select, .autocomplete-input{border: 1px solid #918b8b; padding: 5px 1%; 
-border-radius: 3px; box-sizing: border-box;}
+border-radius: 4px; box-sizing: border-box;}
 .model-elements-form td > input[type='text'], .model-elements-form td > select{width: 40%; height: 33px;}
 .model-elements-form td.numeric > input[type='text'], .model-elements-form td.text > input[type='password'], 
 .model-elements-form td.date > input[type='text']{width: 18%;}
@@ -328,7 +328,7 @@ height: 30px; margin-top: 3px;}
 overflow-x: hidden; min-width: none !important; max-width: none !important; padding: 0 !important;}
 .m2m-wrapper select option{padding: 1px 3px 0 3px;}
 span.m2m-left, span.m2m-right, span.m2m-up, span.m2m-down{width: 30px; height: 30px; display: block; 
-position: relative; cursor: pointer; margin: 2px 0; border-radius: 3px;}
+position: relative; cursor: pointer; margin: 2px 0; border-radius: 4px;}
 span.m2m-left{background: #eeeded url("../images/arrow-left.svg") center no-repeat;}
 span.m2m-right{background: #eeeded url("../images/arrow-right.svg") center no-repeat;}
 span.m2m-up{background: #eeeded url("../images/arrow-up.svg") center no-repeat;}
@@ -383,9 +383,9 @@ font-family: 'PantonSemiBold' !important;}
 border-color: #858f9c !important;}
 
 /* Pagination */
-.pager{text-align: right; position: relative; float: right; width: 100%; padding: 15px 0 0 0;}
-.pager div{float: right;}
-.pager a{padding: 5px 7px 8px 7px; float: left; position: relative; height: 14px; display: block;}
+.pager{position: relative; width: 100%; padding: 15px 0 0 0;}
+.pager div{display: flex; justify-content: flex-end; gap: 2px;}
+.pager a{padding: 5px 8px 8px 8px; float: left; position: relative; height: 14px; display: block;}
 .pager span{padding: 5px 12px 0 0; float: left; position: relative; display: block;}
 .pager-limit{text-align: left; text-align: right; float: right;}
 .pager-limit span{padding: 0 5px 0 0;}
@@ -396,6 +396,8 @@ border-color: #858f9c !important;}
 .pager a.pager-prev{background: url("../images/arrow-left.svg") center no-repeat;}
 .pager a.pager-next{background: url("../images/arrow-right.svg") center no-repeat;}
 .pager a.pager-last{background: url("../images/arrow-last.svg") center no-repeat;}
+.pager a.pager-first, .pager a.pager-prev, .pager a.pager-next, .pager a.pager-last{padding-left: 0;
+padding-right: 0; width: 24px;}
 .pager a.active, .pager a:hover{color: #1e1e1e; text-decoration: none; background-color: #e3e0e0; border-radius: 4px; 
 -moz-border-radius: 4px; -webkit-border-radius: 4px;}
 
@@ -530,8 +532,8 @@ width: 15%; color: #1464ba; cursor: pointer;}
 #rights-table span{margin-left: 10px;}
 #rights-table td.model-name{padding-left: 7px; cursor: pointer; color: #1464ba;}
 
-#model-table-form td.edit-string input{width: 95%; border: 1px solid #bbb; padding: 5px; border-radius: 3px;}
-#model-table-form td.edit-number input{width: 70px; border: 1px solid #bbb; padding: 5px; border-radius: 3px;}
+#model-table-form td.edit-string input{width: 95%; border: 1px solid #bbb; padding: 5px; border-radius: 4px;}
+#model-table-form td.edit-number input{width: 70px; border: 1px solid #bbb; padding: 5px; border-radius: 4px;}
 #model-table-form td.quick-error-value input{background: #fbd689;}
 
 td:has(#send-admin-info-email){width: auto;}
