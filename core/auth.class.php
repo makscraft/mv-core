@@ -345,26 +345,36 @@ class Auth
     /**
      * Sets remember me cookie for record of current model.
      */
-    static public function remember(Record $record)
+    static public function remember(Record $record): bool
     {
         if(is_null(self::$current) || !self::$containers[self::$current]['remember_me'])
-            return;
+            return false;
 
         $value = self::generateRememberMeCookieToken($record);
         $time = time() + ((self::$containers[self::$current]['remember_me_lifetime'] ?? 30) * 3600 * 24);
 
         Http::setCookie(self::generateCookieStorageKey(), $value, ['expires' => $time]);
+
+        return true;
     }
 
     /**
      * Removes remember me cookie for current model and drops autologin.
      */
-    static public function forget()
+    static public function forget(): bool
     {
+        if(is_null(self::$current))
+            return false;
+
         $key = self::generateCookieStorageKey();
 
-        if(!is_null(self::$current) && Http::getCookie($key))
-            Http::setCookie($key, '');
+        if(Http::getCookie($key))
+        {
+            Http::setCookie($key, '', ['expires' => time() - 60]);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -536,7 +546,7 @@ class Auth
 
         return [
             'browser' => Debug::browser(),
-            'browser_digits' => preg_replace('/\D/', '', md5(Debug::browser().Registry::get('SecretCode'))),
+            'browser_digits' => (int) preg_replace('/\D/', '', md5(Debug::browser().Registry::get('SecretCode'))),
             'secret' => Registry::get('SecretCode'),
             'digits' => $record ? strlen(strval($record -> id)) : 0,
             'id_offset' => preg_replace('/\D/', '', Registry::get('SecretCode')),
