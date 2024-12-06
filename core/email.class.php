@@ -16,16 +16,16 @@ class Email
 	 */
 	static public function setTemplate($name)
 	{
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 		$file = $registry -> getSetting("IncludePath")."customs/emails/".$name.".php";
 		
 		unset($email_template);
-		self :: $template = [];
+		self::$template = [];
 		
 		if(!is_file($file))
 		{
 			if($name != "default")
-				Log :: add("Unable to load email template with file name '".$name.".php' from folder customs/emails/");
+				Log::add("Unable to load email template with file name '".$name.".php' from folder customs/emails/");
 			
 			return;
 		}
@@ -35,10 +35,10 @@ class Email
 		if(isset($email_template) && is_array($email_template))
 		{
 			if(isset($email_template["body"]) && strpos($email_template["body"], "{message}") !== false)
-				self :: $template["body"] = $email_template["body"];
+				self::$template["body"] = $email_template["body"];
 				
 			if(isset($email_template["css"]) && is_array($email_template["css"]) && count($email_template["css"]))
-				self :: $template["css"] = $email_template["css"];
+				self::$template["css"] = $email_template["css"];
 		}
 	}
 
@@ -51,7 +51,7 @@ class Email
 								array $headers = [], 
 								array $attachments = [])
 	{
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 
 		include_once $registry -> getSetting("IncludeAdminPath")."phpmailer/src/PHPMailer.php";
 		include_once $registry -> getSetting("IncludeAdminPath")."phpmailer/src/SMTP.php";
@@ -62,13 +62,13 @@ class Email
    		if(!$from && isset($_SERVER["SERVER_NAME"]))
    			$from = "no-reply@".$_SERVER["SERVER_NAME"];
 		
-		if(!count(self :: $template))
-			self :: setTemplate("default");
+		if(!count(self::$template))
+			self::setTemplate("default");
 				
 		//If template is set up we parse it
-		if(isset(self :: $template["body"]) && self :: $template["body"])
+		if(isset(self::$template["body"]) && self::$template["body"])
 		{
-			$message = str_replace("{message}", $message, self :: $template["body"]);
+			$message = str_replace("{message}", $message, self::$template["body"]);
 			$message = str_replace("{subject}", $subject, $message);
 			
 			if($registry -> getSetting("EmailSignature"))
@@ -78,7 +78,7 @@ class Email
 			$message .= "\r\n".$registry -> getSetting("EmailSignature");
 				
 		//Add domain name into message
-		$domain = Registry :: get('MainPath') == '/' ? 'DomainName' : 'HttpPath';
+		$domain = Registry::get('MainPath') == '/' ? 'DomainName' : 'HttpPath';
 		$message = str_replace("{domain}", $registry -> getSetting($domain), $message);
 		$message = preg_replace("/\s*([-a-z0-9_\.]+@[-a-z0-9_\.]+\.[a-z]{2,5})/i", ' <a href="mailto:$1">$1</a>', $message);
 
@@ -97,7 +97,7 @@ class Email
 			    $mail -> SMTPAuth   = true;
 			    $mail -> Username   = $registry -> getSetting("SMTPUsername");
 			    $mail -> Password   = $registry -> getSetting("SMTPPassword");
-			    $mail -> SMTPSecure = PHPMailer :: ENCRYPTION_SMTPS;
+			    $mail -> SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
 			    $mail -> Port       = $registry -> getSetting("SMTPPort");
 	   		}
 
@@ -112,7 +112,7 @@ class Email
 			   		$mail -> setFrom($from);
 		   	}
 
-	   		foreach(self :: explodeEmailAddress($recipient) as $to)
+	   		foreach(self::explodeEmailAddress($recipient) as $to)
 			{
 				if(is_array($to) && count($to) == 2)
 					$mail -> addAddress($to[0], $to[1]);
@@ -129,7 +129,7 @@ class Email
 
 			$mail -> isHTML(true);
 			$mail -> Subject = $subject;
-			$mail -> Body = self :: addCssStyles($message);			
+			$mail -> Body = self::addCssStyles($message);			
 
 			$result = $mail -> send();
 		}
@@ -137,10 +137,19 @@ class Email
 		{
 			if(!isset($result) || !$result)
 			{
-				if(Registry :: onDevelopment())
-					Debug :: displayError('PHPMailer error: '.$mail -> ErrorInfo);
+				$error = $mail -> ErrorInfo;
+
+				if(Registry::onDevelopment())
+				{
+					$error .= "\n<small>EmailSender: ".Registry::get('EmailMode')."</small>";
+
+					foreach(['SMTPHost', 'SMTPPort', 'SMTPUsername', 'SMTPPassword', 'EmailFrom'] as $key)
+						$error .= "\n<small>".str_replace('SMTP', '', $key).": ".htmlspecialchars(Registry::get($key))."</small>";
+
+					Debug::displayError('PHPMailer error: '.nl2br($error));
+				}
 				else
-					Log :: add('PHPMailer error: '.$mail -> ErrorInfo);
+					Log::add('PHPMailer error: '.$error);
 			}
 		}
 
@@ -177,14 +186,14 @@ class Email
 	 */
 	static public function addCssStyles(string $message)
 	{
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 		$css_templates = $registry -> getSetting('EmailCssStyles');
 		
 		if(!is_array($css_templates))
 			$css_templates = [];
 		
-		if(isset(self :: $template["css"]) && count(self :: $template["css"]))
-			foreach(self :: $template["css"] as $key => $value)
+		if(isset(self::$template["css"]) && count(self::$template["css"]))
+			foreach(self::$template["css"] as $key => $value)
 				$css_templates[$key] = $value;
 		
 		$common_styles = false;
