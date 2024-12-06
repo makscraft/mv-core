@@ -5,8 +5,8 @@
     font-style: normal;
 }			
 
-*{margin: 0; padding: 0; box-sizing: border-box;}
 body.debug-page{font: 14px/140% 'PantonSemiBold'; background: #eee;}
+body.debug-page *, .mv-debug-panel, .mv-debug-panel *{margin: 0; padding: 0; box-sizing: border-box;}
 #debug-area .inner{width: 92%; margin: 0 auto;}
 #debug-area header{height: 70px; background: #333; margin-bottom: 30px; color: #fff;}
 #debug-area header div.inner{display: flex; align-items: center; height: 100%;}
