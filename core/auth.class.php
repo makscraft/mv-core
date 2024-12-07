@@ -457,7 +457,7 @@ class Auth
         
         $first = Service::mixNumberWithLetters($record -> id + $base['id_offset'], $base['digits'] + mt_rand(10, 20), true);
         $first = str_replace($base['first_separator_flat'], '', $first);
-        $second = Service::createHash($base['record_data'].$lifetime.$base['secret'], 'gost');
+        $second = Service::createHash($base['record_data'].$lifetime.$base['secret'].self::$current, 'gost');
         $third = Service::mixNumberWithLetters(($lifetime - $base['filetime_offset']), mt_rand(10, 20), true);
         $third = str_replace($base['second_separator_flat'], '', $third);
         
@@ -492,7 +492,7 @@ class Auth
             return null;
 
         $base = self::getCryptoBase($record);
-        $check = Service::createHash($base['record_data'].$time.$base['secret'], 'gost');
+        $check = Service::createHash($base['record_data'].$time.$base['secret'].self::$current, 'gost');
 
         return $check === $second ? $record : null;
     }
@@ -515,6 +515,72 @@ class Auth
         $record -> save();
 
         return true;
+    }
+
+    /**
+     * Creates token value for email confirmation URL.
+     */
+    static public function generateEmailConfirmationToken(Record $record, int $lifetime_days = 1): string
+    {
+        if(is_null(self::$current))
+            return '';
+
+        if(null === $element = self::$model -> findElementByProperty('type', 'email'))
+            return '';
+
+        $email_field = $element -> getName();
+
+        if(!$record -> $email_field)
+            return '';
+
+        $lifetime = time() + 3600 * 24 * $lifetime_days;
+        $base = self::getCryptoBase();
+        $email = $record -> $email_field;
+        
+        $first = Service::mixNumberWithLetters($record -> id + $base['id_offset'], $base['digits'] + mt_rand(5, 10), true);
+        $first = str_replace($base['first_separator_flat'], '', $first);
+        $second = Service::createHash($lifetime.$email.$base['secret'].self::$current, 'gost');
+        $third = Service::mixNumberWithLetters(($lifetime - $base['filetime_offset']), mt_rand(5, 10), true);
+        $third = str_replace($base['second_separator_flat'], '', $third);
+
+        return $first.$base['first_separator_flat'].$second.$base['second_separator_flat'].$third;
+    }
+
+    /**
+     * Checks email confirmation token, according to current model.
+     * @return ?Record object of user with needed email or null if failed
+     */
+    static public function checkEmailConfirmationToken(string $token): ?Record
+    {
+        $token = trim($token);
+
+        if($token === '' || is_null(self::$current))
+            return null;
+
+        if(null === $element = self::$model -> findElementByProperty('type', 'email'))
+            return '';
+
+        $email_field = $element -> getName();
+        $base = self::getCryptoBase();
+        $first_separator = strpos($token, $base['first_separator_flat']);
+        $second_separator = strrpos($token, $base['second_separator_flat']);
+        $first = substr($token, 0, $first_separator);
+        $second = substr($token, $first_separator + 1, $second_separator - $first_separator - 1);
+        $third = substr($token, $second_separator + 1);
+
+        $id = (int) preg_replace('/\D/', '', $first) - $base['id_offset'];
+        $lifetime = (int) preg_replace('/\D/', '', $third) + $base['filetime_offset'];
+        
+        if(time() > $lifetime)
+            return null;
+        
+        if(null === $record = self::checkActiveUserWithIdFromToken($id))
+            return null;
+
+        $email = $record -> $email_field;
+        $check = Service::createHash($lifetime.$email.$base['secret'].self::$current, 'gost');
+
+        return $check === $second ? $record : null;
     }
 
     /* Helpers */
