@@ -397,7 +397,7 @@ class Model extends ModelBase
 					$this -> elements[$name] -> setDisplaySelects(false); 
 				
 				if(($type == "file" || $type == "image") && is_file($value))
-					$this -> elements[$name] -> setRealValue($value, "");
+					$this -> elements[$name] -> setRealValue($value, '');
 				else if($type == "order" || $type == "parent")
 				{
 					if($type == "order" && !$value)
@@ -1017,7 +1017,7 @@ class Model extends ModelBase
 				if(count($fields_list))
 				{
 					$active = ($index == $current_tab) ? " class=\"active\"" : '';
-					$hidden_tr = ($current_tab == $index) ? "" : " no-display";
+					$hidden_tr = ($current_tab == $index) ? '' : " no-display";
 					$tabs_html .= "<li".$active." id=\"tab-group-".$index."\">".$name."</li>";
 					
 					foreach($fields_list as $field)
@@ -1683,7 +1683,7 @@ class Model extends ModelBase
 						$row[$name] = !is_null($processed_value) ? $processed_value : $row[$name];
 					}						
 						
-					$css_quick_change = "";
+					$css_quick_change = '';
 					
 					if($this -> checkIfFieldEditable($name))
 						if(in_array($type, array("char", "url", "redirect", "email", "phone")))
@@ -1813,7 +1813,7 @@ class Model extends ModelBase
 	{
 		$has_right = ($action_type == 'delete') ? 'delete' : 'update';
 		$has_right = $this -> user -> checkModelRights($this -> getModelClass(), $has_right);
-		$name = str_replace(["&quot;", "&#039;", "&lt;script&gt;", "<script>"], "", $name); //Fix js message bug
+		$name = str_replace(["&quot;", "&#039;", "&lt;script&gt;", "<script>"], '', $name); //Fix js message bug
 		$token = $this -> generateSingleActionToken($id);
 		
 		if($action_type == 'delete' || $action_type == 'restore')
@@ -1909,18 +1909,18 @@ class Model extends ModelBase
 		return $this;
 	}	
 	
-	public function getEmptyRecord()
+	public function getEmptyRecord(): Record
 	{
 		$empty_content = [];
 		
 		foreach($this -> elements as $name => $object)
 			if($object -> getType() != 'many_to_one')
-				$empty_content[$name] = "";
+				$empty_content[$name] = '';
 		
-		return new Record($empty_content, clone $this);
+		return new Record($empty_content, $this);
 	}
 
-	public function findRecordOrGetEmpty(array $params)
+	public function findRecordOrGetEmpty(array $params): Record
 	{
 		$record = $this -> findRecord($params);
 
@@ -2031,7 +2031,7 @@ class Model extends ModelBase
 							}
 				}
 
-		$this -> filter = new Filter($filters_data, 'frontend', clone $this);
+		$this -> filter = new Filter($filters_data, 'frontend', $this);
 				
 		return $this;
 	}
@@ -2193,7 +2193,7 @@ class Model extends ModelBase
 	
 	public function displayEnumOptions($field)
 	{
-		$html = "";
+		$html = '';
 		
 		if(!$object = $this -> getElement($field))
 			return $html;
