@@ -55,10 +55,10 @@ abstract class ModelInitial
 			
 		if(isset($params['table->']) && $params['table->'] !== $this -> table)
 		{
-			if(!Registry :: checkModel($params['table->']))
-				Debug :: displayError("Unable to retreive record from table '".$params['table->']."', no such table, or such model.");
+			if(!Registry::checkModel($params['table->']))
+				Debug::displayError("Unable to retreive record from table '".$params['table->']."', no such table, or such model.");
 
-			$model_object = new (Registry :: getModelClassByTable($params['table->']));
+			$model_object = new (Registry::getModelClassByTable($params['table->']));
 		}
 		else
 			$model_object = $this;
@@ -68,15 +68,17 @@ abstract class ModelInitial
 			if($this -> registry -> getInitialVersion() < 1.11)
 				$this -> id = $content['id'];
 			
-			if(Registry :: getInitialVersion() < 3.0)
-			{
-				foreach($model_object -> getElements() as $name => $object)
-					if($object -> getType() == 'many_to_many')
-					{
-						$ids = $object -> setRelatedId($content['id']) -> getSelectedValues();
-						$content[$name] = implode(',', $ids);
-					}
-			}
+			foreach($model_object -> getElements() as $name => $object)
+				if($object -> getType() === 'many_to_many' && Registry::getInitialVersion() < 3.0)
+				{
+					$ids = $object -> setRelatedId($content['id']) -> getSelectedValues();
+					$content[$name] = implode(',', $ids);
+				}
+				else if($object -> getType() === 'text' && $object -> getProperty('json'))
+				{
+					$value = json_decode($content[$name], true) ?? [];
+					$content[$name] = is_array($value) ? $value : [];
+				}
 		}
 		
 		return $content ? new Record($content, $model_object) : null;
@@ -158,14 +160,14 @@ abstract class ModelInitial
 				
 				if(array_key_exists('table->', $params))
 				{
-					$model_object = new (Registry :: getModelClassByTable($params['table->']));
+					$model_object = new (Registry::getModelClassByTable($params['table->']));
 					$element = $model_object -> getElement($name);
 				}
 				else
 					$element = $this -> getElement($name);
 
 				if($element === null)
-					Debug :: displayError("Undefined field '".$name."' in query parameters.");
+					Debug::displayError("Undefined field '".$name."' in query parameters.");
 				
 				$table_m2m = $element -> getProperty('linking_table');
 				$opposite_id = $element -> getOppositeId();
@@ -193,8 +195,8 @@ abstract class ModelInitial
 	 */
 	static public function processSQLConditions(array $params)
 	{
-		$registry = Registry :: instance();
-		$db = Database :: instance();
+		$registry = Registry::instance();
+		$db = Database::instance();
 
 		$where = [];
 		$query = $order = $limit = '';
@@ -233,7 +235,7 @@ abstract class ModelInitial
 				$order = " ORDER BY FIELD(id, ".str_replace("'", "", $value).")";
 			}			
 			else if($key == "order->" && $value == "random")
-				$order = ' '.Database :: $adapter -> randomOrdering();
+				$order = ' '.Database::$adapter -> randomOrdering();
 			else if(is_array($value) || strpos($key, "->in") !== false || strpos($key, "->not-in") !== false)
 			{
 				$field = str_replace(["->in", "->not-in"], "", $key);
@@ -358,7 +360,7 @@ abstract class ModelInitial
 		foreach($params as $field => $value)
 		{
 			$value = htmlspecialchars(trim($value), ENT_QUOTES);
-			$value = Service :: cleanHtmlSpecialChars($value);
+			$value = Service::cleanHtmlSpecialChars($value);
 			$fields[] = $field."=".$this -> db -> secure($value);
 		}
 			
@@ -411,7 +413,7 @@ abstract class ModelInitial
 	 */
 	public function clearTable(string $table = '')
 	{
-		Database :: $adapter -> clearTable($table !== '' ? $table : $this -> table);
+		Database::$adapter -> clearTable($table !== '' ? $table : $this -> table);
 				
 		return $this;
 	}
@@ -462,8 +464,8 @@ abstract class ModelInitial
 	public function cropImage(string $image, int $width, int $height)
 	{
 		$arguments = func_get_args();
-		$params = self :: processImageArguments($arguments);
-		$image = Service :: addFileRoot((string) $image);
+		$params = self::processImageArguments($arguments);
+		$image = Service::addFileRoot((string) $image);
 		
 		if(!$image || !is_file($image))
 			return $params["no-image-text"];
@@ -474,7 +476,7 @@ abstract class ModelInitial
 		$method = (isset($arguments[5]) && $arguments[5] == "resize") ? "compress" : "crop";
 
 		$src = $imager -> $method($image, $folder, $width, $height);
-		$file = Service :: removeFileRoot(Registry :: get('DocumentRoot').$src);
+		$file = Service::removeFileRoot(Registry::get('DocumentRoot').$src);
 		
 		if(isset($params["watermark"]) && !$imager -> wasCreatedErlier())
 		{
@@ -499,7 +501,7 @@ abstract class ModelInitial
 	 */
 	static public function getFirstImage(string $value)
 	{
-		$images = MultiImagesModelElement :: unpackValue($value);
+		$images = MultiImagesModelElement::unpackValue($value);
 
 		return $images[0]['image'] ?? '';
 	}
@@ -512,11 +514,11 @@ abstract class ModelInitial
 	 */
 	static public function extractImages(string $value, ?string $no_comments = '')
 	{
-		$images = MultiImagesModelElement :: unpackValue($value);
+		$images = MultiImagesModelElement::unpackValue($value);
 		$no_comments = $no_comments == 'no-comments';
 		$result = [];
 
-		if(!$no_comments && Registry :: getInitialVersion() >= 3.0)
+		if(!$no_comments && Registry::getInitialVersion() >= 3.0)
 			return $images;
 
 		foreach($images as $image)

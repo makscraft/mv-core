@@ -177,12 +177,20 @@ class Record extends Content
 					continue;
 				}
 
+				if($object -> getProperty('json'))
+				{
+					$value = is_array($value) ? $value : json_decode(trim($value), true);
+					$prepared_values[$field] = is_array($value) ? json_encode($value) : '';
+
+					continue;
+				}
+
 				$search = array("'", "\t");
 				$replace = array("&#039;", "");
 				$value = is_string($value) ? $value : "";
 				$prepared_values[$field] = str_replace($search, $replace, $value);
-						
-				if(!$object -> getProperty("rich_text"))
+								
+				if(!$object -> getProperty('rich_text'))
 				{
 					$search = array("&", "<", ">", '"', "\\");
 					$replace = array("&amp;", "&lt;", "&gt;", "&quot;", "&#92;");		
@@ -294,7 +302,7 @@ class Record extends Content
 		{	
 			$params = [];
 			$prepared_values = $this -> prepareContentValues();
-			
+						
 			foreach($prepared_values as $field => $value)
 				if($this -> model -> getElement($field))
 					$params[$field] = $value;

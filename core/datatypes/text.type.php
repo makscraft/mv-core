@@ -21,6 +21,8 @@ class TextModelElement extends CharModelElement
 	protected $display_method;
 	
 	protected $virtual = false;
+
+	protected $json = false;
 	
 	public function setValue($value)
 	{
@@ -44,7 +46,13 @@ class TextModelElement extends CharModelElement
 			$replace = array("&amp;", "&#039;", "&lt;", "&gt;", "&quot;", "&#92;");
 		}
 		
-		$this -> value = trim(str_ireplace($search, $replace, $this -> value));
+		if($this -> json)
+		{
+			$value = is_array($value) ? $value : json_decode(trim($value), true);
+			$this -> value = is_array($value) ? json_encode($value) : '';
+		}
+		else
+			$this -> value = trim(str_ireplace($search, $replace, $this -> value));
 		
 		return $this;
 	}
