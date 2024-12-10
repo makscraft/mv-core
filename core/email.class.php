@@ -2,6 +2,9 @@
 /**
  * Class for sending email messages.
  */
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 class Email
 {
 	/**
@@ -53,6 +56,7 @@ class Email
 	{
 		$registry = Registry::instance();
 
+		include_once $registry -> getSetting("IncludeAdminPath")."phpmailer/src/Exception.php";
 		include_once $registry -> getSetting("IncludeAdminPath")."phpmailer/src/PHPMailer.php";
 		include_once $registry -> getSetting("IncludeAdminPath")."phpmailer/src/SMTP.php";
 
