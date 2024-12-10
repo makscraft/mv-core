@@ -77,6 +77,8 @@ class Builder
 	 */
 	public function __construct()
 	{
+		$this -> checkAndDisplayUnderMaintenanceScreen();
+
 		ob_start();
 		
 		$this -> registry = Registry :: instance(); //Langs and settings
@@ -234,5 +236,23 @@ class Builder
 					include_once Registry :: get('IncludeAdminPath').'controls/debug-panel.php';
 			}
 		}
+	}
+
+	/**
+	 * Displays under maintainance screen if the setting 'UnderMaintenance' allows.
+	 * 'UnderMaintenance' setting comes from config/setup.php file.
+	 * 
+	 * Stops futher code execution.
+	 */
+	protected function checkAndDisplayUnderMaintenanceScreen()
+	{
+		if(!Registry::get('UnderMaintenance'))
+			return;
+
+		$custom = Registry::get('IncludePath').'views/under-maintenance.php';
+		$base = Registry::get('IncludeAdminPath').'views/under-maintenance.php';
+
+		include_once is_file($custom) ? $custom : $base;
+		exit();
 	}
 }
