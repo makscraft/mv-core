@@ -785,6 +785,8 @@ class Form
 				{
 					$bool_id = "form-bool-".$object -> getName();
 					$html .= str_replace("<input ", "<input id=\"".$bool_id."\" ", $object -> displayHtml());
+					
+					continue;
 				}
 			}
 			
@@ -792,6 +794,7 @@ class Form
 			{
 				$src = $this -> registry -> getSetting("MainPath").$object -> getProperty('captcha');
 				$html .= "<img src=\"".$src."\" />\n";
+				
 			}
 
 			if($type === "enum" && $object -> getProperty('multiple_choice'))
