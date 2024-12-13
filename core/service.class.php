@@ -391,7 +391,7 @@ class Service
 	 */
 	static public function makeHash(string $string, int $cost = 10)
 	{
-		if(Registry::instance() -> getInitialVersion() < 2.2)
+		if(Registry::instance() -> getInitialVersion() < 2.2 && $cost === 10)
 			return md5($string);
 		
 		$options = array("cost" => $cost);
@@ -404,7 +404,7 @@ class Service
 	 */
 	static public function checkHash(string $string, string $hash): bool
 	{
-		if(Registry::instance() -> getInitialVersion() < 2.2)
+		if(Registry::instance() -> getInitialVersion() < 2.2 && !preg_match('/^\$2y\$\d/', $hash))
 			return (md5($string) == $hash);
 		
 		return password_verify($string, $hash);
