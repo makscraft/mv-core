@@ -17,7 +17,10 @@ class PasswordModelElement extends CharModelElement
 		parent::prepareValue();
 		
 		if(Registry::getInitialVersion() < 2.2)
-			$this -> value = md5($this -> value);
+		{
+			if(!preg_match('/^[a-f0-9]{32}$/i', $this -> value))
+				$this -> value = md5($this -> value);
+		}
 		else
 			$this -> value = $this -> hashPasswordValue();
 		
