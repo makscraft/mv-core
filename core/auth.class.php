@@ -58,6 +58,9 @@ class Auth
      */
     static public function useModel(string $model_class)
     {
+        if(self::$current == $model_class && is_object(self::$model))
+            return;
+		
         $model = self::analyzeModel($model_class);
         self::generateContainerSettings($model);
 
