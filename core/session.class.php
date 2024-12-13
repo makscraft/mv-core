@@ -108,7 +108,9 @@ class Session
             return false;
 
         unset($_SESSION[self::generateKey($container)]);
-        self::$current = self::$container = null;
+
+        if(self::$current === $container)
+            self::$current = self::$container = null;
 
         return true;
     }
