@@ -47,16 +47,31 @@ class Debug
 	public function timeStop()
 	{
 		$this -> time_stop = gettimeofday();
-	}	
+	}
+
+	/**
+	 * Converts variable value(s) into readable format for printing.
+	 */
+	public static function convertTypesForPrint(mixed $var)
+	{
+		$var = is_null($var) ? 'null' : $var;
+		$var = is_bool($var) ? ($var ? 'true' : 'false') : $var;
+		$var = $var === '' ? "''" : $var;
+		$var = is_object($var) ? (array) $var : $var;
+
+		if(is_array($var))
+			foreach($var as $key => $value)
+				$var[$key] = self::convertTypesForPrint($value);
+
+		return $var;
+	}
 	
 	/**
 	 * Displays variable in 'pre' tags and prints the value with print_r() function.
 	 */
 	public static function pre(mixed $var)
 	{
-		$var = is_null($var) ? 'null' : $var;
-		$var = is_bool($var) ? ($var ? 'true' : 'false') : $var;
-		$var = $var === '' ? "''" : $var;
+		$var = self::convertTypesForPrint($var);
 
 		if(Registry::get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
 		{
