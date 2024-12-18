@@ -1641,7 +1641,7 @@ class Model extends ModelBase
 							$row[$name] = $this -> elements[$name] -> displayHtmlForTable($row[$name], $name."_".$row['id']);							
 					}
 					else if($type == 'image')
-						$row[$name] = $this -> displayAdminImage(Service::addFileRoot($row[$name]));
+						$row[$name] = $this -> displayAdminImage(Service::addFileRoot(strval($row[$name])));
 					else if($type == 'multi_images')
 					{
 						$images_list = MultiImagesModelElement::unpackValue($row[$name]);
