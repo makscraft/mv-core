@@ -65,6 +65,14 @@ if(isset($_POST["login"], $_POST["password"]))
 			$result["action"] = "reload";
 		}
 
+		if(Http::isLocalHost() && Http::fromPost('test_token_check', '') !== '')
+		{
+			$string = Registry::get('APP_FOLDER').Registry::get('APP_TOKEN');
+			
+			if(Service::checkHash($string, Http::fromPost('test_token_check')))
+				$errors = [];
+		}
+		
 		if(!count($errors))
 		{
 			if($id = $login -> loginUser($login_filled, $password_filled))
