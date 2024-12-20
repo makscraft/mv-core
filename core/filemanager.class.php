@@ -190,7 +190,7 @@ class Filemanager
 		while(false !== ($file = readdir($descriptor)))
 			if($file !== '.' && $file !== '..' && is_dir($this -> path.'/'.$file))
 				{
-					if($count >= $pagination['first'] && $count <= $pagination['last'])
+					if($count >= $pagination['item_from'] && $count <= $pagination['item_to'])
 						$result[$count] = $this -> path.'/'.$file;
 
 					$count ++;
@@ -201,10 +201,10 @@ class Filemanager
 		while(false !== ($file = readdir($descriptor)))
 			if($file !== '.' && $file !== '..' && is_file($this -> path.'/'.$file))
 				{
-					if($count >= $pagination['first'] && $count <= $pagination['last'])
+					if($count >= $pagination['item_from'] && $count <= $pagination['item_to'])
 						$result[$count] = $this -> path.'/'.$file;
 
-					if( ++ $count > $pagination['last'])
+					if( ++ $count > $pagination['item_to'])
 						break;
 				}
 
