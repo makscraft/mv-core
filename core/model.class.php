@@ -1,8 +1,8 @@
 <?php
 /**
  * Main parent class for all regular models.
- * Many methods and vars are extended from parent classes.
- * Contains methods for both application front and admin panel.
+ * Provides shared methods and properties inherited by child classes.
+ * Includes functionality for both the application front and admin panel.
  */
 class Model extends ModelBase
 {

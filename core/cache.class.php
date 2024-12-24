@@ -1,7 +1,7 @@
 <?php
 /**
  * Cache manager class.
- * Keeps data in database or filesysytem and cleans it when needed.
+ * Stores data in the database or filesystem and handles cleanup when necessary.
  */
 class Cache
 {  

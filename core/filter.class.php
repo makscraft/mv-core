@@ -1,7 +1,7 @@
 <?php
 /**
- * Filters manager in admin panel and front of application.
- * Collects data from GET and composes SQL query fragment as a  result.
+ * Filters manager for admin panel and front of the application.
+ * Collects data from GET and composes SQL query conditions.
  */
 class Filter
 {

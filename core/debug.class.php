@@ -1,7 +1,7 @@
 <?php
 /**
- * Class for detecting bugs, time measuring and browser detection.
- * Also displays errors during the work code.
+ * Class for bug detection, performance timing, and browser identification.
+ * Also responsible for displaying errors during code execution.
  */
 class Debug
 {	

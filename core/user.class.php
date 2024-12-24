@@ -1,8 +1,8 @@
 <?php
 /**
- * Manages the users and their rights in admin panel.
- * Main class for checking the authorization of users in MV admin area.
- * Also manages the users righs to access to the MV modules.
+ * Manages users and their access rights in the admin panel.
+ * Core class for verifying user authorization within the MV admin area.
+ * Also controls user permissions for accessing MV modules.
  */
 class User
 {

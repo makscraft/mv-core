@@ -1,9 +1,9 @@
 <?php
 /**
- * Class for splitting the long lists of records/items into pages.
- * Creates parts of SQL queries to use in LIMIT construction.
+ * Class for paginating long lists of records/items.
+ * Generates SQL query components for the LIMIT clause.
  * 
- * Use getState() method to get all actual parameters.
+ * Use the getState() method to retrieve the current pagination parameters.
  */
 class Paginator
 {

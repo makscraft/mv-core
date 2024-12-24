@@ -1,8 +1,7 @@
 <?php
 /**
- * Base class of any model (regular or simple typed).
- * Contains main objects and properties.
- * Defines many operations which will be used in child classes.
+ * Base class for all models (regular or simple typed).
+ * Contains core objects, properties, and defines common operations for child classes.
  */
 abstract class ModelBase extends ModelInitial
 {	

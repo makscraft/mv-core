@@ -1,8 +1,8 @@
 <?php
 /**
- * Resizes and/or cuts the images to needed size for thumbnails.
- * Calculates the ratio of width and height.
- * Creates new small images depending on image type.
+ * Resizes and/or crops images to generate thumbnails.
+ * Calculates the aspect ratio based on the width and height.
+ * Creates resized versions of images according to their type.
  */
 class Imager
 {

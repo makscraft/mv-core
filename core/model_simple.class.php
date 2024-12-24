@@ -1,8 +1,7 @@
 <?php
 /**
- * Simple type of model, managing key / value storage.
- * Usually this type of model keeps settings and other data 
- * which does not need to be represented as many similar rows (records).
+ * Simple model type managing key/value storage.
+ * Typically used for storing settings and other data that doesn't require multiple similar records.
  */
 class ModelSimple extends Model
 {

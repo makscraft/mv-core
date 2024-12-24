@@ -1,6 +1,6 @@
 <?php
 /**
- * Export / import of models data into CSV files, which can be opend in MS Excel.
+ * Export / import of models data into CSV files, which can be opened in MS Excel.
  */
 class Csv
 {

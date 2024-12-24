@@ -1,8 +1,7 @@
 <?php
 /**
- * Logs manager class. 
- * Also saves users operations into history in admin panel.
- * Log files of the framework are located at the /log/ folder.
+ * Manages logging and tracks user operations in the admin panel.
+ * Framework log files are stored in the /log/ directory.
  */
 class Log extends Model
 {

@@ -1,10 +1,10 @@
 <?php
 /**
- * Authorization processor for MV framework with session and remeber me methods.
- * Supports multiple models accounts at one time with individual sets of options.
- * Keeps session and cookie data in separate containers.
+ * Handles user authorization for the MV framework, including session management and "remember me" functionality.
+ * Supports multiple account models simultaneously, each with its own configuration options.
+ * Stores session and cookie data in separate containers for enhanced security.
  * 
- * Always start with Auth::useModel(YourModel::class) method call.
+ * Always begin by calling the Auth::useModel(YourModel::class) method to initialize the desired account model.
  */
 class Auth
 {

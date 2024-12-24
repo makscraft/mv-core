@@ -1,8 +1,8 @@
 <?php
 /**
- * Parent base class for MV plugins.
- * Plugins must be activated by adding into array in config/plugins.php.
- * Objects of plugins are being constructed automatically in Builder $mv object.
+ * Base class for MV plugins.
+ * Plugins are activated by adding them to the array in config/plugins.php.
+ * Plugin objects are instantiated automatically within the Builder $mv object.
  */
 abstract class Plugin extends ModelInitial
 {

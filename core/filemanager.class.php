@@ -1,10 +1,9 @@
 <?php
 /**
- * File manager class for admin panel of MV framework.
- * Operates with files and folders, can also cleanup old useless files.
- * Root directory is /userfiles/.
+ * File manager for the admin panel of MV framework.
+ * Manages files and directories, including cleaning up obsolete files.
+ * The root directory is /userfiles/.
  */
-
 class Filemanager
 {
 	/**

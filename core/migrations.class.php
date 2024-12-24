@@ -1,6 +1,6 @@
 <?php
 /**
- * Class for managing database modifications from admin panel.
+ * Class for managing database modifications from admin panel or CLI.
  */
 class Migrations
 {

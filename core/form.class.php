@@ -1,9 +1,9 @@
 <?php
 /**
- * This class is a forms constructor and processor.
- * Creates form from model or from given array of fields.
- * Collects and shows validation errors.
- * Can create and use CSRF security tokens.
+ * Form builder and processor class.
+ * Generates forms from models or custom field arrays.
+ * Handles and displays validation errors.
+ * Supports CSRF token generation and validation.
  */
 class Form
 {

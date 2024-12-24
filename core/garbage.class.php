@@ -1,8 +1,8 @@
 <?php
 /**
- * Garbage model contains deleted records of all models in admin panel.
- * Records go to garbage after delete in admin panel or by delete() method of model from frontend.
- * Also records can be restored from garbage or deleted finally with all data and old versions.
+ * Garbage model stores deleted records from all models in the admin panel.
+ * Records are moved to the garbage after deletion in the admin panel or via the delete() method from the front.
+ * Records can either be restored or permanently deleted, including all associated data and versions.
  */
 class Garbage extends Model
 {

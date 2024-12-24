@@ -1,8 +1,8 @@
 <?php
 /**
- * Keeps all configurations of application and current version of MV core.
- * Works on the singleton pattern.
- * Any setting can be retreived by using Registry::get('option_name') method.
+ * Singleton class that stores all application configurations and the current version of the MV core.
+ * This class provides access to configuration settings throughout the application.
+ * Any configuration value can be retrieved using the Registry::get('option_name') method.
  */
 class Registry
 {

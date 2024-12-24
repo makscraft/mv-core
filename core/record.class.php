@@ -1,9 +1,9 @@
 <?php
 /**
- * Main class for records management (similar to Active Record).
- * Record does not extend the methods of model, it uses only own methods.
- * This class is used mostly at the front of project.
- * Contains CRUD methods and base methods for passing the content into records.
+ * Main class for managing records (similar to Active Record pattern).
+ * Records do not inherit methods from the model; they use their own specific methods.
+ * Primarily used at the frontend of the project.
+ * Includes CRUD operations and core methods for handling content within records.
  */
 class Record extends Content
 {

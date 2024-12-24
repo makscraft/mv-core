@@ -1,6 +1,6 @@
 <?php
 /**
- * WW editor class, created to add editor to the textareas in admin panel.
+ * WW editor class, created to add visual editor for the textareas in admin panel.
  */
 class Editor
 {

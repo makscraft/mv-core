@@ -1,8 +1,9 @@
 <?php
 /**
- * Session manager for MV applications, uses native PHP session.
- * Keeps sessions data in separate containers, stored with hashed keys.
- * Default session has label 'front' and can be used anywhere like Session::get/set('key', 'value').
+ * Session manager for MV applications, utilizing native PHP sessions.
+ * Stores session data in separate containers with hashed keys.
+ * The default session is labeled 'front' and can be accessed using 
+ * Session::get/set('key', 'value') anywhere in the application.
  */
 class Session
 {

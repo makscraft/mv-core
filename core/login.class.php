@@ -1,8 +1,8 @@
 <?php
 /**
- * Class for authorization of users in admin panel.
- * Also contains methods for auto login and recovering admin's password.
- * Creates CSRF token for login form and recover password form.
+ * Handles user authorization in the admin panel.
+ * Includes methods for auto-login and password recovery.
+ * Generates CSRF tokens for the login and password recovery forms.
  */
 class Login
 {

@@ -1,9 +1,9 @@
 <?php
 /**
- * Manages versions history of records in model tables.
- * Keeps copies of records values, including many-to-many.
- * Contains methods to clenup versions of deleted records.
- */ 
+ * Manages the version history of records in model tables.
+ * Stores record copies, including many-to-many relationships.
+ * Includes methods for cleaning up versions of deleted records.
+ */
 class Versions
 {
 	/**

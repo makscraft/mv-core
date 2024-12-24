@@ -1,7 +1,8 @@
 <?php
 /**
- * Routing manager, checks the requested url, analyzes it and includes needed template (view) to display the page.
- * Also removes dangerous symbols and GET params from the url.
+ * Routing manager responsible for handling the requested URL.
+ * Analyzes the URL and includes the appropriate template (view) for the page.
+ * Cleans up dangerous symbols and GET parameters from the URL.
  */
 class Router
 {   
@@ -380,7 +381,7 @@ class Router
    	}
    	
 	/**
-	 * Old method...
+	 * Legacy method...
 	 */
    	public function defineSelectParams(int $index, string $url_field = '')
    	{	

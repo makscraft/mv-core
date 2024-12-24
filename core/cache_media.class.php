@@ -1,8 +1,8 @@
 <?php
 /**
- * Cache manager for media files (css and javascript ones).
- * Combines content of included files into one cache file.
- * Keeps data in files in ~/userfiles/cache/media folder.
+ * Cache manager for media files (CSS and JavaScript).
+ * Combines the content of included files into a single cache file.
+ * Stores cached data in the ~/userfiles/cache/media folder.
  */
 class CacheMedia
 {

@@ -1,8 +1,8 @@
 <?php
 /**
- * Localization manager form MV admin panel and front.
- * Works with translations, dates and numbers.
- * Takes source files from /adminpanel/i18n/ and /customs/i18n/ folders.
+ * Localization manager for both the MV admin panel and front.
+ * Handles translations, date formatting, and number localization.
+ * Loads source files from /adminpanel/i18n/ and /customs/i18n/ directories.
  */
 class I18n
 {
@@ -19,7 +19,7 @@ class I18n
 	private static $region;
 
 	/**
-	 * Current region name like 'English', 'Português'
+	 * Current region name like 'English', 'Português'.
 	 * @var string
 	 */
 	private static $name;

@@ -1,8 +1,8 @@
 <?php
 /**
- * Main front object of application. Contains all common variables, models, plugins and pathes.
- * Accessors create models objects on the fly, by __call() method.
- * Plugins objects are being created right at the Builder instanse.
+ * The main front object of the application, holding all core variables, models, plugins, and paths.
+ * Models are dynamically created on demand through the __call() method.
+ * Plugin objects are instantiated directly within the Builder instance.
  */
 class Builder
 {

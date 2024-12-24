@@ -1,8 +1,8 @@
 <?php
 /**
- * Class for sorting the rows when getting results from SQL queries.
- * Takes values from GET, checks them and passes into SQL query.
- * Usually we need to put the object inside the class where we perform select() method.
+ * Class for sorting rows when fetching results from SQL queries.
+ * Retrieves sorting parameters from GET, validates them, and integrates them into the SQL query.
+ * Typically, this object is used within the class where the select() method is called.
  */
 class Sorter
 {  
