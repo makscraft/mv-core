@@ -1,7 +1,12 @@
 <?php
-$region = Registry::get('Region');
-$maintenance = Registry::get('UnderMaintenance');
-$message = is_string($maintenance) ? $maintenance : '';
+if(class_exists('Registry'))
+{
+    $region = Registry::get('Region');
+    $maintenance = Registry::get('UnderMaintenance');
+    $message = is_string($maintenance) ? $maintenance : '';
+}
+
+$message ??= 'Application is under maintenance.';
 
 if($message === '')
     if($region === 'ru')

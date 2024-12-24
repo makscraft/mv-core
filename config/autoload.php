@@ -1,15 +1,14 @@
 <?php
 /**
  * MV - content management framework for developing internet sites and applications.
+ * Main autoload file of the application.
+ * 
  * License: MIT
  * Copyright: Maksim Zaikov
  * 
  * http://mv-framework.com
  * http://mv-framework.ru
  */
-
-if(version_compare(phpversion(), '8.0', '<'))
-	exit('To run MV framework you need PHP version 8.0 or later.');
 
 ini_set('display_errors', 1);
 
@@ -24,6 +23,13 @@ else
 	$mvIncludePath = str_replace('\\', '/', $mvIncludePath);
 
 	$mvCorePath = realpath(__DIR__.'/../core').DIRECTORY_SEPARATOR;
+}
+
+if(version_compare(phpversion(), '8.0', '<'))
+{
+	$message = 'Ensure the application runs on PHP version 8.0 or higher for full compatibility.';
+	include $mvCorePath.'../adminpanel/views/under-maintenance.php';
+	exit();
 }
 
 require_once $mvIncludePath.'config/setup.php';
