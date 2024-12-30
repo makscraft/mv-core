@@ -1,6 +1,6 @@
 <?php
 /**
- * Simple model type managing key/value storage.
+ * Simple model type managing key/value storage in database.
  * Typically used for storing settings and other data that doesn't require multiple similar records.
  */
 class ModelSimple extends Model
@@ -22,11 +22,11 @@ class ModelSimple extends Model
 		if(isset($this -> model_elements) && count($this -> model_elements))
 			foreach($this -> model_elements as $field)
 				if(in_array($field[1], $forbidden_types))
-					Debug :: displayError("Data type '".$field[1]."' (field '".$field[2]."' in model '".get_class($this)."') is not allowed in simple models.");
+					Debug::displayError("Data type '".$field[1]."' (field '".$field[2]."' in model '".get_class($this)."') is not allowed in simple models.");
 				else if($field[1] == 'enum' && isset($field[3]) && array_key_exists('foreign_key', $field[3]))
-					Debug :: displayError("Data type 'enum' (field '".$field[2]."' in model '".get_class($this)."') can not have 'foreign key' parameter in simple models.");
+					Debug::displayError("Data type 'enum' (field '".$field[2]."' in model '".get_class($this)."') can not have 'foreign key' parameter in simple models.");
 					
-		parent :: __construct();
+		parent::__construct();
 	}
 	
 	/**
@@ -52,7 +52,7 @@ class ModelSimple extends Model
 	{
 		if($element = $this -> getElement($field))
 			if($element -> getType() === 'multi_images')
-				return MultiImagesModelElement :: unpackValue($this -> __get($field));
+				return MultiImagesModelElement::unpackValue($this -> __get($field));
 
 		return [];
 	}
@@ -139,7 +139,7 @@ class ModelSimple extends Model
 			//Adds roots for files and images to check before update
 			foreach($this -> elements as $name => $object)
 				if($object -> getType() == "file" || $object -> getType() == "image")
-					$source[$name] = Service :: addFileRoot((string) $source[$name]);
+					$source[$name] = Service::addFileRoot((string) $source[$name]);
 			
 			$this -> getDataFromArray($source);
 		}
@@ -147,7 +147,7 @@ class ModelSimple extends Model
 		$version_dump = [];
 		
 		//Does not run transaction if it's already started 
-		$in_transaction = (method_exists(Database :: $pdo, "inTransaction")) ? Database :: $pdo -> inTransaction() : true;
+		$in_transaction = (method_exists(Database::$pdo, "inTransaction")) ? Database::$pdo -> inTransaction() : true;
 		
 		if(!$in_transaction)
 			$this -> db -> beginTransaction();
@@ -178,10 +178,10 @@ class ModelSimple extends Model
 				}
 				
 				$param = ($type == 'date' || $type == 'date_time') ? "sql" : "";
-				$value = Service :: cleanHtmlSpecialChars($object -> getValue($param));
+				$value = Service::cleanHtmlSpecialChars($object -> getValue($param));
 				
 				if($type == 'image' || $type == 'file')
-					$value = Service :: removeFileRoot($value);
+					$value = Service::removeFileRoot($value);
 						
 				$this -> db -> query("UPDATE `".$this -> table."` 
 									  SET `value`=".$this -> db -> secure($value)." 
@@ -203,15 +203,27 @@ class ModelSimple extends Model
 			
 			//Writes to log if new version was saved or versions are disallowed
 			if(!$versions_limit || $this -> versions -> save($version_dump, $this -> user))
-				Log :: write($this -> getModelClass(), $this -> id, $this -> getName(), $this -> user -> getId(), "update");
+				Log::write($this -> getModelClass(), $this -> id, $this -> getName(), $this -> user -> getId(), "update");
 				
-			Cache :: cleanByModel($this -> getModelClass());
+			Cache::cleanByModel($this -> getModelClass());
 		}
 			
 		if(!$in_transaction)
 			$this -> db -> commitTransaction();
 			
 		return $this;
+	}
+
+	/**
+	 * Return all values of current model's keys.
+	 * @return array with keys and values
+	 */
+	public function all(): array
+	{
+		if(!$this -> data_loaded)
+			$this -> getDataFromDb();
+
+		return $this -> data;
 	}
 	
 	/**
@@ -329,6 +341,6 @@ class ModelSimple extends Model
 		else if($method == "updateData")
 			return $this -> update();
 		else
-			Debug :: displayError("Call to undefiend method '".$method."' of simple model '".get_class($this)."'.");			
+			Debug::displayError("Call to undefiend method '".$method."' of simple model '".get_class($this)."'.");			
 	}
 }
