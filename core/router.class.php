@@ -269,7 +269,8 @@ class Router
 
 		foreach($mvFrontendRoutes as $route => $view)
 		{
-			$view = preg_replace('/^\//', '', $view);
+			$view = preg_replace('/^\//', '', trim($view));
+			$route = trim($route);
 
 			if($route == '/' || $route == 'index')
 				$map['/'] = $view;
