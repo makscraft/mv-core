@@ -50,7 +50,7 @@ class Router
 		$this -> url = count($this -> url_parts) ? '/'.implode('/', $this -> url_parts) : '/';
 
 		//Older versions fix
-		if($this -> url !== '/' && Registry :: getInitialVersion() < 3.0)
+		if($this -> url !== '/' && Registry::getInitialVersion() < 3.0)
 			$this -> url = implode('/', $this -> url_parts).'/';
    	}
    
@@ -151,13 +151,13 @@ class Router
 	 */
 	public function defineRoute()
 	{
-		if(Registry :: getInitialVersion() < 3.0)
+		if(Registry::getInitialVersion() < 3.0)
 			return $this -> defineRouteOldVersions();
 
 		//Tries to get routes map from cache, or creates new one
-		if(null === $map = Cache :: getRoutesMapFromCache())
+		if(null === $map = Cache::getRoutesMapFromCache())
 		{
-			require_once Registry :: get('IncludePath').'config/routes.php';
+			require_once Registry::get('IncludePath').'config/routes.php';
 			$map = $this -> analyzeRoutesList($mvFrontendRoutes) -> createRoutesMap($mvFrontendRoutes);
 		}
 
@@ -209,10 +209,10 @@ class Router
 			$this -> route = $map['Map']['fallback'];
 
 		//Name of needed file (view) to include in ~/index.php
-		$file = Registry :: get('IncludePath').'views/'.$this -> route;
+		$file = Registry::get('IncludePath').'views/'.$this -> route;
 		      
       	if(!file_exists($file))
-         	Debug :: displayError("Router: the file of requested view not found ".$file);
+         	Debug::displayError("Router: the file of requested view not found ".$file);
 
 		$this -> route_404 = $map['Map']['e404'];
 		
@@ -224,7 +224,7 @@ class Router
 	 */
    	public function defineRouteOldVersions()
    	{
-		require_once Registry :: get('IncludePath').'config/routes.php';
+		require_once Registry::get('IncludePath').'config/routes.php';
 		
 		$this -> route_404 = $mvFrontendRoutes['404'];
 		
@@ -250,10 +250,10 @@ class Router
           	$this -> route = $mvFrontendRoutes['default'];
 		
 		//Name of needed file (view)
-		$file = Registry :: get('IncludePath').'views/'.$this -> route;
+		$file = Registry::get('IncludePath').'views/'.$this -> route;
       
       	if(!file_exists($file))
-         	Debug :: displayError('Router: the file of requested view not found '.$file);
+         	Debug::displayError('Router: the file of requested view not found '.$file);
          	
       	return $file; //Name of view file to include
    	}
@@ -285,19 +285,30 @@ class Router
 			}
 		}
 
-		$file = Registry :: get('IncludePath').'config/routes.php';
+		$file = Registry::get('IncludePath').'config/routes.php';
 
 		$data = [
-			'Build' => Registry :: get('Build') ?? 0,
+			'Build' => Registry::get('Build') ?? 0,
 			'Time' => time(),
 			'RoutesFileTime' => filemtime($file),
 			'Map' => $map
 		];
 
-		Cache :: cleanConfigCacheFilesByKey('routes-map');
-		Cache :: saveConfigCacheIntoFile($data, 'routes-map');
+		Cache::cleanConfigCacheFilesByKey('routes-map');
+		Cache::saveConfigCacheIntoFile($data, 'routes-map');
 
 		return $data;
+	}
+
+	/**
+	 * Retruns current cached routes map.
+	 * @return array list of routes based on config/routes.php file.
+	 */
+	public function getRoutesMap(): array
+	{
+		$cache = Cache::getRoutesMapFromCache();
+		
+		return is_array($cache) && isset($cache['Map']) ? $cache['Map'] : [];
 	}
 
 	/**
@@ -325,7 +336,7 @@ class Router
 				$error = ", such kind of route is not supported.";
 
 			if($error)
-				Debug :: displayError("Invalid route '".$route."' in file ~/config/routes.php ".$error);
+				Debug::displayError("Invalid route '".$route."' in file ~/config/routes.php ".$error);
 		}
 
 		return $this;
@@ -355,7 +366,7 @@ class Router
 	 */
    	private function defineUrlCut()
    	{
-      	$site_path = Registry :: get('MainPath');
+      	$site_path = Registry::get('MainPath');
       
       	if($site_path != '/')
          	return substr_count($site_path, '/') - 1;

@@ -254,7 +254,7 @@ class Cache
 			return;
 
 		$time = filemtime(Registry::get('IncludePath').'config/routes.php');
-		$cache = include_once($file);
+		$cache = include($file);
 
 		if($time == $cache['RoutesFileTime'])
 			return $cache;
