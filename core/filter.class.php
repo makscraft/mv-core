@@ -45,7 +45,7 @@ class Filter
 	
 	public function __construct(array $fields, string $source = '', object $model = null)
 	{
-		if(is_object($model) && Registry :: checkModel($model -> getModelClass()))
+		if(is_object($model) && Registry::checkModel($model -> getModelClass()))
 			$this -> model = $model;
 
 		//If the filters start from application front, we simply pass their data
@@ -79,7 +79,7 @@ class Filter
 						if(in_array($type, $as_numerics))
 							foreach(['from', 'to'] as $key)
 								if(isset($_GET[$name."-cond-".$key]))
-									if(array_key_exists($_GET[$name."-cond-".$key], self :: NUMERIC_CONDITIONS))
+									if(array_key_exists($_GET[$name."-cond-".$key], self::NUMERIC_CONDITIONS))
 										$conditions[$key] = $_GET[$name."-cond-".$key];
 						
 						foreach(['from', 'to'] as $key)
@@ -141,12 +141,12 @@ class Filter
 			if(isset($params["empty_value"]) && $params["empty_value"])
 				$this -> fields[$name]["empty_value"] = $params["empty_value"];
 			else
-				$this -> fields[$name]["empty_value"] = I18n :: locale("not-defined");
+				$this -> fields[$name]["empty_value"] = I18n::locale("not-defined");
 		}		
 		
 		if(isset($_GET[$name]))
 		{
-			$value = self :: checkFieldValue($type, trim($_GET[$name]), $this -> fields[$name]);
+			$value = self::checkFieldValue($type, trim($_GET[$name]), $this -> fields[$name]);
 		
 			if($value != "")
 				$this -> fields[$name]["value"] = $value;
@@ -156,7 +156,7 @@ class Filter
 				if($key == $name."-from" || $key == $name."-to")
 				{
 					$condition = $key == $name."-from" ? "gte" : "lte";
-					$value = Filter :: checkFieldValue($type, trim($value), $this -> fields[$name]);
+					$value = Filter::checkFieldValue($type, trim($value), $this -> fields[$name]);
 			
 					if($value != "")
 						$this -> fields[$name]["conditions"][$condition] = $value;
@@ -185,7 +185,7 @@ class Filter
 	{
 		$checked_value = '';
 		$arguments = func_get_args(); //We need the list of possible enum values
-		$db = Database :: instance();
+		$db = Database::instance();
 		
 		//Check of fields values of different types
 		if(in_array($type, array('char','url','redirect','email','text','phone')))
@@ -220,7 +220,7 @@ class Filter
 				
 				if($value == -1)
 					$checked_value = -1;
-				else if(Database :: instance() -> getCount($arguments[2]['table'], "`id`='".$value."'"))
+				else if(Database::instance() -> getCount($arguments[2]['table'], "`id`='".$value."'"))
 					$checked_value = $value;
 			}
 			else if(isset($arguments[2]['values_list']) && array_key_exists(intval($value), $arguments[2]['values_list']))
@@ -239,9 +239,9 @@ class Filter
 			$checked_value = strval(floatval($value));
 		else if(in_array($type, array('bool','image','file','multi_images')) && ($value == '0' || $value == '1'))
 			$checked_value = $value;
-		else if($type == 'date' && I18n :: checkDateFormat($value))
+		else if($type == 'date' && I18n::checkDateFormat($value))
 				$checked_value = $value;
-		else if($type == 'date_time' && I18n :: checkDateFormat($value, "with-time"))
+		else if($type == 'date_time' && I18n::checkDateFormat($value, "with-time"))
 				$checked_value = $value;
 				
 		return $checked_value;
@@ -249,7 +249,7 @@ class Filter
 	
 	public function getParamsForSQL()
 	{
-		$conditions = self :: NUMERIC_CONDITIONS;
+		$conditions = self::NUMERIC_CONDITIONS;
 		$sql = [];
 
 		 //Sql query construction		
@@ -271,10 +271,10 @@ class Filter
 			else if($data['type'] == 'date' || $data['type'] == 'date_time') //Date values
 			{
 				if(isset($data['value']['from']) && $data['value']['from'])
-					$sql[] = "`".$name."`>='".I18n :: dateForSQL($data['value']['from'])."'";
+					$sql[] = "`".$name."`>='".I18n::dateForSQL($data['value']['from'])."'";
 				
 				if(isset($data['value']['to']) && $data['value']['to'])
-					$sql[] = "`".$name."`<='".(I18n :: dateForSQL($data['value']['to']))."'";
+					$sql[] = "`".$name."`<='".(I18n::dateForSQL($data['value']['to']))."'";
 			}
 			else if(($data['type'] == 'enum' || $data['type'] == 'bool') && 
 					 isset($data['value']) && $data['value'] != '') //Enum values
@@ -301,7 +301,7 @@ class Filter
 					$sql[] = "(`".$name."`='' OR `".$name."` IS NULL)";
 				else
 				{
-					$operator = Database :: $adapter -> regularExpression();
+					$operator = Database::$adapter -> regularExpression();
 					$value = intval($data['value']);
 					
 					$regexp = "`".$name."` ".$operator." '^".$value."$' OR ";
@@ -313,7 +313,7 @@ class Filter
 			}			
 			else if(isset($data['value']) && $data['value'] != '') //String values
 			{
-				if(Registry :: get('DbEngine') == 'sqlite')
+				if(Registry::get('DbEngine') == 'sqlite')
 					$sql[] = "`".$name."` REGEXP '".$data['value']."'";
 				else
 					$sql[] = "`".$name."` LIKE '%".$data['value']."%'";
@@ -618,7 +618,7 @@ class Filter
 	
 	public function ifAnyFilterApplied()
 	{
-		$conditions = array_keys(self :: NUMERIC_CONDITIONS);
+		$conditions = array_keys(self::NUMERIC_CONDITIONS);
 		
 		foreach($this -> fields as $data)
 			if(isset($data['value']) && $data['value'] != '')
@@ -643,7 +643,7 @@ class Filter
    	public function getConditions()
    	{
 		//To transform the condition
-   		$conditions = self :: NUMERIC_CONDITIONS; 
+   		$conditions = self::NUMERIC_CONDITIONS; 
    		
    		$sql = [];
    		
@@ -652,7 +652,7 @@ class Filter
    			   isset($data['value']) && $data['value'] != '' && !isset($data['conditions']))
    			{
    				if($data['type'] == 'date' || $data['type'] == 'date_time')
-   					$sql[$name] = I18n :: dateForSQL($data['value']); //Single field with no intervals
+   					$sql[$name] = I18n::dateForSQL($data['value']); //Single field with no intervals
    				else if($data['type'] == 'enum' && isset($data["display_checkbox"]) && $data["display_checkbox"])
    					$sql[$name."->in"] = $data['value']; //Multiple choise enum filter				
    				else
@@ -678,7 +678,7 @@ class Filter
 				foreach($data['conditions'] as $condition => $value)
 				{
 					if($data['type'] == 'date' || $data['type'] == 'date_time')
-						$value = I18n :: dateForSQL($value);
+						$value = I18n::dateForSQL($value);
 					
 					
 					$sql[$name.$conditions[$condition]] = $value;
@@ -691,6 +691,7 @@ class Filter
    	{
    		$fields = array_keys($this -> fields);
    		$single_field = $one_interval_part = false;
+		$is_wrapped = Registry::getInitialVersion() >= 3.21;
    		$html = '';
 
 		if(is_array($allowed)) //If we pass fields names to display
@@ -709,16 +710,22 @@ class Filter
    			if(array_key_exists($name, $this -> fields))
 	   		{
 	   			$data = $this -> fields[$name];
-	   			
+
+				if($is_wrapped)
+				   $html .= "<div class=\"filter-wrapper\">\n";
+
 	   			if($data['type'] == 'many_to_many' && (!isset($data['display_checkbox']) || !$data['display_checkbox']))
 	   			{
 	   				$value = (isset($data["value"]) && $data["value"] != "") ? $data["value"] : "";
-	   				$empty_value = I18n :: locale('not-defined');
+	   				$empty_value = I18n::locale('not-defined');
 	   				
 	   				if(isset($data['empty_value']) && $data['empty_value'])
 	   					$empty_value = $data['empty_value'];
 	   				
 	   				$html .= $this -> createSelectTag($name, array_flip($data['values_list']), $value, $empty_value);
+
+					if($is_wrapped)
+					   $html .= "</div>\n";
 
 	   				continue;
 	   			}
@@ -730,9 +737,12 @@ class Filter
 		   				$html .= "<div class=\"filter-input filter-checkbox\">\n".$this -> displayCheckbox($name);
 		   				$html .= "<label for=\"filter-".$name."\">".$data['caption']."</label>\n</div>\n";
 						
+					   if($is_wrapped)
+						   $html .= "</div>\n";
+	   
 		   				continue;
-		   			}					
-	   			
+		   			}				
+
 	   			if(!$single_field) //Interval field which shuld look like one input
 	   				$html .= "<div class=\"filter-name\">".$data['caption']."</div>\n";
 	   			
@@ -744,9 +754,9 @@ class Filter
 				if(in_array($data['type'], ['bool','image','file','multi_images']))
 				{
 					$select_data = [
-						I18n :: locale('not-defined') => '', 
-						I18n :: locale('yes') => '1', 
-						I18n :: locale('no') => '0'
+						I18n::locale('not-defined') => '', 
+						I18n::locale('yes') => '1', 
+						I18n::locale('no') => '0'
 					];
 
 					$html .= $this -> createSelectTag($name, $select_data, $value);
@@ -813,7 +823,7 @@ class Filter
 					{						
 						$checked = (isset($data["value"]) && $data["value"] != "") ? $data["value"] : "";
 						$columns = intval($data['display_radio']);
-						$html_ = Service :: displayOrderedFormTable($data['values_list'], $columns, $checked, $name, "radio");
+						$html_ = Service::displayOrderedFormTable($data['values_list'], $columns, $checked, $name, "radio");
 					}
 					else
 						$html_ = $this -> createSelectTag($name, $select_data, $value, $empty_value);
@@ -828,13 +838,13 @@ class Filter
 					{						
 						if($data['type'] == 'date' || $data['type'] == 'date_time')
 						{
-							$text_from = I18n :: locale("date-from");
-							$text_to = I18n :: locale("date-to");
+							$text_from = I18n::locale("date-from");
+							$text_to = I18n::locale("date-to");
 						}
 						else
 						{
-							$text_from = I18n :: locale("number-from");
-							$text_to = I18n :: locale("number-to");						
+							$text_from = I18n::locale("number-from");
+							$text_to = I18n::locale("number-to");						
 						}
 						
 						$value = (isset($data['conditions']['gte']) && $data['conditions']['gte'] != '') ? $data['conditions']['gte'] : '';
@@ -863,10 +873,13 @@ class Filter
 				else if($data['type'] == 'many_to_many')
 				{
 					$checked = (isset($data["value"]) && $data["value"]) ? explode(",", $data["value"]) :  [];
-					$html .= Service :: displayOrderedFormTable($data['values_list'], $data['display_checkbox'], $checked, $name);
+					$html .= Service::displayOrderedFormTable($data['values_list'], $data['display_checkbox'], $checked, $name);
 				}
 				
 				if(!$single_field)
+					$html .= "</div>\n";
+
+				if($is_wrapped)
 					$html .= "</div>\n";
 	   		}
 	   		
@@ -1055,7 +1068,7 @@ class Filter
    	
    	public function setDisplayEnumCheckboxes(string $field, int $columns, bool $empty_checkbox = false)
    	{
-   		$db = Database :: instance();
+   		$db = Database::instance();
 		
    		if(isset($this -> fields[$field]) && 
    		   ($this -> fields[$field]["type"] == "enum" || $this -> fields[$field]["type"] == "many_to_many"))
