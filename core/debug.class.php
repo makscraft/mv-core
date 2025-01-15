@@ -22,11 +22,16 @@ class Debug
 	 * @var int
 	 */
 	public $time_stop;
+
+	/**
+	 * Buffer to collect ounput of pre() method before exit.
+	 */
+	private static $buffer = [];
 		
 	public function __construct($show_info = false)
 	{
 		//Starts the time measuring if the flag is passed
-		if($show_info)
+		if($show_info && Registry::getInitialVersion() < 3)
 		{
 			$this -> show_info = true;
 			$this -> timeStart();
@@ -60,8 +65,19 @@ class Debug
 		$var = is_object($var) ? (array) $var : $var;
 
 		if(is_array($var))
+		{
+			$var_ = [];
+			
 			foreach($var as $key => $value)
-				$var[$key] = self::convertTypesForPrint($value);
+			{
+				$key = str_replace("\0", ':', $key);
+				$key = preg_replace('/^:+/', '', $key);
+
+				$var_[$key] = self::convertTypesForPrint($value);
+			}
+
+			$var = $var_;
+		}
 
 		return $var;
 	}
@@ -72,6 +88,7 @@ class Debug
 	public static function pre(mixed $var)
 	{
 		$var = self::convertTypesForPrint($var);
+		self::$buffer[] = $var;
 
 		if(Registry::get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
 		{
@@ -103,7 +120,16 @@ class Debug
 		if(ob_get_length())
 			ob_end_clean();
 
+		foreach(self::$buffer as $one)
+			self::pre($one);
+
 		self::pre($var);
+
+		echo "\n<style>
+				html, body{margin:0; padding: 0; background: #eee;}
+				pre{margin: 0;}
+				pre:nth-child(2n){background: #2d2d2d !important;}
+			  </style>\n";
 		exit();
 	}
 
@@ -279,6 +305,9 @@ class Debug
 		
 		Registry::set('ErrorAlreadyLogged', true);
 		
+		if(Registry :: get('DebugPanel') && Registry :: onDevelopment() && !Http :: isAjaxRequest())
+			include_once Registry :: get('IncludeAdminPath').'controls/debug-panel.php';
+
 		if($exit)
 			exit();
 	}

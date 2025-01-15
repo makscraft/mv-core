@@ -8,7 +8,11 @@ $route = 'views/'.$GLOBALS['mv'] -> router -> getRoute();
 $cookie_path = Registry::get('MainPath');
 $wrapped = isset($_COOKIE['_mv_debug_panel']) && $_COOKIE['_mv_debug_panel'] == 'wrapped' ? ' wrapped' : '';
 ?>
+
+<?php if(!Registry::get('ErrorAlreadyLogged')): ?>
 <link rel="stylesheet" type="text/css" href="<?php echo $admin_panel_path; ?>interface/css/style-debug.css<?php echo $cache_drop; ?>" />
+<?php endif; ?>
+
 <div class="mv-debug-panel<?php echo $wrapped; ?>">
     <img id="mv-debug-panel-logo" src="<?php echo $admin_panel_path; ?>interface/images/logo.svg<?php echo $cache_drop; ?>" alt="MV logo" />
     <div>Build: <?php echo (int) Registry::get('Build'); ?></div>
@@ -30,7 +34,7 @@ $wrapped = isset($_COOKIE['_mv_debug_panel']) && $_COOKIE['_mv_debug_panel'] == 
 <script>
     window.onload = function()
     {
-        let sql_list_bottom = document.getElementsByClassName('mv-debug-panel')[0].offsetHeight + 3;
+        let sql_list_bottom = document.getElementsByClassName('mv-debug-panel')[0].offsetHeight + 2;
 
         document.getElementById('mv-debug-panel-queries').onclick = function()
         {
