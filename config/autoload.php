@@ -90,7 +90,7 @@ if(isset($mvSetupSettings['Build']))
 		if($check || $cache['Mode'] !== 'production')
 		{
 			$hash = Service::getFilesModificationTimesHash($mvConfigFiles);
-			$env = $mvIncludePath.'.env';
+			$env = $mvIncludePath.$cache['EnvFile'];
 
 			if($hash == $cache['ConfigFilesHash'])
 				if(!is_file($env) || filemtime($env) == $cache['EnvFileTime'])

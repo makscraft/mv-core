@@ -47,7 +47,7 @@ class Registry
 			$settings_list['MainPath'] = '/'.preg_replace('/^\/?(.+[^\/])\/?$/', '$1', $settings_list['MainPath']).'/';
 
 		//Some servers have trailing slash in DOCUMENT_ROOT, some not...
-		$settings_list['DocumentRoot'] = preg_replace('/\/$/', '', $_SERVER['DOCUMENT_ROOT']);	
+		$settings_list['DocumentRoot'] = preg_replace('/\/$/', '', $_SERVER['DOCUMENT_ROOT']);
 
 		//Absolute path to userfiles folder
 		$settings_list['FilesPath'] = $settings_list['IncludePath'].$settings_list['FilesPath'].'/';
@@ -159,9 +159,21 @@ class Registry
 	public function loadEnvironmentSettings()
 	{
 		$env = self::$settings['IncludePath'].'.env';
-
+		
 		if(!is_file($env))
-			return $this;
+		{
+			$other_envs = ['.local', '.development', '.stage', '.demo', '.production'];
+			
+			foreach($other_envs as $variant)
+				if(is_file($env.$variant))
+				{
+					$env .= $variant;
+					break;
+				}
+
+			if(!is_file($env))
+				return $this;
+		}
 
 		$data = parse_ini_file($env, false, INI_SCANNER_TYPED);
 
@@ -189,7 +201,8 @@ class Registry
 
 		self::$settings['AdminPanelPath'] = self::$settings['MainPath'].self::$settings['AdminFolder'].'/';
 		self::$settings['HttpPath'] = self::$settings['DomainName'].self::$settings['MainPath'];
-		self::$settings['HttpAdminPanelPath'] = self::$settings['DomainName'].self::$settings['AdminPanelPath'];		
+		self::$settings['HttpAdminPanelPath'] = self::$settings['DomainName'].self::$settings['AdminPanelPath'];
+		self::$settings['EnvFile'] = basename($env);
 
 		return $this;
 	}

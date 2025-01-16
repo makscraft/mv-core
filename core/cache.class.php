@@ -265,7 +265,7 @@ class Cache
 	 */
 	static public function createMainConfigFile($config_files)
 	{
-		$env = Registry:: get('IncludePath').'.env';
+		$env = Registry::get('IncludePath').Registry::get('EnvFile');
 
 		if(!is_file($env))
 			return;
