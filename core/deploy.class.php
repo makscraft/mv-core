@@ -1,4 +1,7 @@
 <?php
+
+use FTP\Connection;
+
 /**
  * 
  */
@@ -13,10 +16,18 @@ class Deploy
         'settings' => []
     ];
 
+    private $connection;
+
     public function __construct(string $type, string $env = 'production')
     {
         $this -> state['type'] = $type;
         $this -> state['env'] = $env;
+    }
+
+    public function __destruct()
+    {
+        if(is_object($this -> connection) && $this -> connection instanceof Connection)
+            ftp_close($this -> connection);
     }
 
     public function analyzeLocalHost(): bool
@@ -75,6 +86,27 @@ class Deploy
      */
     public function upload(): array
     {
+        if(!$this -> connectFTP())
+            return [];
+
+        //$data = ftp_rawlist($this -> connection, '.', true);
+        $files = ftp_nlist($this -> connection, '-al ./');
+        $this -> state['initial_deploy'] = (count($files) === 2 && $files[0] === '.' && $files[1] === '..');
+
+        if(!in_array('deploy', $files))
+        {
+            ftp_mkdir($this -> connection, './deploy');
+            ftp_mkdir($this -> connection, './deploy/backups');
+        }
+
+        //$files = ftp_nlist($this -> connection, '-al ./');
+        $root = Registry::get('IncludePath').'.env';
+        //$root = Registry::get('IncludePath').'index.php';
+        $root = Registry::get('IncludePath');
+        $this -> uploadFileOrDirectory($root);
+
+        //Debug::pre($files);
+
         return [];
     }
 
@@ -97,12 +129,112 @@ class Deploy
 
     /* FTP connection */
 
-    private function connectFTP()
+    public function connectFTP(): bool
     {
+        try{
+            $host = $this -> state['settings']['connection']['host'];
+            $port = $this -> state['settings']['connection']['port'];
+            $login = $this -> state['settings']['connection']['login'];
+            $password = $this -> state['settings']['connection']['password'];
 
+            if(false === $connection = ftp_connect($host, $port, 10))
+                throw new Exception('Unable to connect to host: '.$host);
+            else if(true !== ftp_login($connection,  $login,  $password))
+                throw new Exception('Unable to login into host '.$host.' with login: '.$login);
+        }
+        catch(Exception $error)
+        {
+            $this -> state['errors'][] = $error -> getMessage();
+        }
+
+        if(is_object($connection) && $connection instanceof Connection)
+        {
+            ftp_pasv($connection, true);
+            $this -> connection = $connection;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function uploadFileOrDirectory($path)
+    {
+        $base = basename($path);
+        $is_root = realpath(Registry::get('IncludePath')) === realpath($path);
+
+        if($base === '.git' || $base === '.svn')
+            return;
+
+        //Debug::pre(realpath(Registry::get('IncludePath')));
+        //Debug::pre($is_root);
+
+        if(is_file($path))
+        {
+            $remote = Service::removeFileRoot($path);
+            ftp_put($this -> connection, './'.$remote, $path, FTP_BINARY);
+        }
+        else if(is_dir($path))
+        {
+            $files = scandir($path);
+            $remote_data = ftp_nlist($this -> connection, './');
+            //Debug::pre($files);
+
+            foreach($files as $file)
+            {
+                if($is_root && is_dir($path.$file) && $file !== 'core')
+                    continue;
+
+                if($file !== '.' && $file !== '..')
+                    if(is_dir($path.$file))
+                    {
+                        $remote = Service::removeFileRoot($path.$file);
+                        Debug::pre($remote);
+
+                        if(!in_array($file, $remote_data))
+                            ftp_mkdir($this -> connection, './'.$remote);
+
+                        foreach(scandir($path.$file) as $one)
+                        {
+                            //Debug::pre($path.$file.'/'.$one.'/');
+                            $this -> uploadFileOrDirectory($path.$file.'/'.$one);
+                        }
+                        
+                    }
+                    else if(is_file($path.$file))
+                    {
+                        $this -> uploadFileOrDirectory($path.$file);
+                    }
+                
+                // $remote = Service::removeFileRoot($path.$file);
+                // Debug::pre($remote);
+                //Debug::pre($path.$file);
+                //$this -> uploadFileOrDirectory($path.$file);
+            }
+                // if($file !== '.' && $file !== '..')
+                //     if(is_dir($path.$file))
+                //     {
+
+                //     }
+                //     else if(is_file($path.$file))
+                //     {
+
+                //     }
+
+            // {
+            //     if(is_file($file))
+            //         ftp_put($this -> connection, $file, $path.$file, FTP_BINARY);
+            // }
+        }
+
+        //$files = scandir($path);
+        //Debug::pre($files);
     }
 
     /* SFTP connection */
 
+    private function connectSFTP()
+    {
 
+    }
 }
