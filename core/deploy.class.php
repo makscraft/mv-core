@@ -50,10 +50,19 @@ class Deploy
         
         $this -> state['settings'] = $settings[$this -> state['env']];
 
+        if(!isset($this -> state['settings']['skip']) || !is_array($this -> state['settings']['skip']))
+            $this -> state['settings']['skip'] = [];
+
+        foreach($this -> state['settings']['skip'] as $key => $one)
+        {
+            $one = $this -> state['settings']['skip'][$key] = preg_replace('/^\//', '', $one);
+            $this -> state['settings']['skip'][$key] = preg_replace('/\/$/', '', $one);
+        }
+
         foreach($this -> state['settings']['connection'] as $key => $value)
             if(!$value)
                 $this -> state['errors'][] = 'Configuration settings is not set: '.$key;
-        
+
         if(count($this -> state['errors']))
             return false;
 
@@ -84,12 +93,11 @@ class Deploy
     /**
      * 
      */
-    public function upload(): array
+    public function prepare()
     {
         if(!$this -> connectFTP())
-            return [];
-
-        //$data = ftp_rawlist($this -> connection, '.', true);
+            return null;
+        
         $files = ftp_nlist($this -> connection, '-al ./');
         $this -> state['initial_deploy'] = (count($files) === 2 && $files[0] === '.' && $files[1] === '..');
 
@@ -99,11 +107,41 @@ class Deploy
             ftp_mkdir($this -> connection, './deploy/backups');
         }
 
+        $deployer = Registry::get('IncludePath').'/deployer.php';
+        ftp_put($this -> connection, './deployer.php', $deployer, FTP_BINARY);
+
+        $url = $this -> state['settings']['connection']['domain'].'/deployer.php?action=health';
+        $json = json_decode(file_get_contents($url), true);
+        
+        //Debug::pre($json);
+
+        if(!is_array($json) || !$json['success'])
+        {
+            return null;
+        }
+
+        //Debug::pre(file_get_contents($url));
+        //$response = file()
+
+        return $this;
+    }
+
+    public function upload(): array
+    {
+        // if(!$this -> connectFTP())
+        //     return [];
+
+        //$data = ftp_rawlist($this -> connection, '.', true);
+        
+        
+
+
+
         //$files = ftp_nlist($this -> connection, '-al ./');
         $root = Registry::get('IncludePath').'.env';
         //$root = Registry::get('IncludePath').'index.php';
         $root = Registry::get('IncludePath');
-        $this -> uploadFileOrDirectory($root);
+        $this -> uploadFileOrDirectory($root, '.');
 
         //Debug::pre($files);
 
@@ -112,7 +150,14 @@ class Deploy
 
     public function backup(): array
     {
-        //Installation::copyDirectory();
+        if(!$this -> state['settings']['backup'])
+            return [];
+
+        if(!$this -> connectFTP())
+            return [];
+
+        $files = ftp_nlist($this -> connection, '-al ./');
+        Debug::pre($files);
 
         return [];
     }
@@ -158,77 +203,38 @@ class Deploy
         return false;
     }
 
-    public function uploadFileOrDirectory($path)
+    public function uploadFileOrDirectory($source_path, $remote_path)
     {
-        $base = basename($path);
-        $is_root = realpath(Registry::get('IncludePath')) === realpath($path);
+        if(is_dir($source_path))
+            $source_path = preg_replace('/\/$/', '', $source_path);
 
-        if($base === '.git' || $base === '.svn')
-            return;
+        $is_root = realpath(Registry::get('IncludePath')) === realpath($source_path);        
+        $files = scandir($source_path);
+        $skip = $this -> state['settings']['skip'];
 
-        //Debug::pre(realpath(Registry::get('IncludePath')));
-        //Debug::pre($is_root);
-
-        if(is_file($path))
+        foreach($files as $file)
         {
-            $remote = Service::removeFileRoot($path);
-            ftp_put($this -> connection, './'.$remote, $path, FTP_BINARY);
-        }
-        else if(is_dir($path))
-        {
-            $files = scandir($path);
-            $remote_data = ftp_nlist($this -> connection, './');
-            //Debug::pre($files);
+            if($is_root && is_dir($source_path.'/'.$file) && $file !== 'core')
+                continue;
 
-            foreach($files as $file)
+            if($file === '.' || $file === '..' || $file === '.git' || $file === '.svn')
+                continue;
+
+            $check = Service::removeFileRoot($source_path.'/'.$file);
+
+            if(in_array($check, $skip))
+                continue;
+
+            if(is_file($source_path.'/'.$file))
+                ftp_put($this -> connection, $remote_path.'/'.$file, $source_path.'/'.$file, FTP_BINARY);
+            else if(is_dir($source_path.'/'.$file))
             {
-                if($is_root && is_dir($path.$file) && $file !== 'core')
-                    continue;
+                if(ftp_nlist($this -> connection, $remote_path.'/'.$file) === false)
+                    ftp_mkdir($this -> connection, $remote_path.'/'.$file);
 
-                if($file !== '.' && $file !== '..')
-                    if(is_dir($path.$file))
-                    {
-                        $remote = Service::removeFileRoot($path.$file);
-                        Debug::pre($remote);
-
-                        if(!in_array($file, $remote_data))
-                            ftp_mkdir($this -> connection, './'.$remote);
-
-                        foreach(scandir($path.$file) as $one)
-                        {
-                            //Debug::pre($path.$file.'/'.$one.'/');
-                            $this -> uploadFileOrDirectory($path.$file.'/'.$one);
-                        }
-                        
-                    }
-                    else if(is_file($path.$file))
-                    {
-                        $this -> uploadFileOrDirectory($path.$file);
-                    }
-                
-                // $remote = Service::removeFileRoot($path.$file);
-                // Debug::pre($remote);
-                //Debug::pre($path.$file);
-                //$this -> uploadFileOrDirectory($path.$file);
+                $this -> uploadFileOrDirectory($source_path.'/'.$file, $remote_path.'/'.$file);
             }
-                // if($file !== '.' && $file !== '..')
-                //     if(is_dir($path.$file))
-                //     {
-
-                //     }
-                //     else if(is_file($path.$file))
-                //     {
-
-                //     }
-
-            // {
-            //     if(is_file($file))
-            //         ftp_put($this -> connection, $file, $path.$file, FTP_BINARY);
-            // }
         }
-
-        //$files = scandir($path);
-        //Debug::pre($files);
     }
 
     /* SFTP connection */
