@@ -17,13 +17,18 @@ class AdminPanel
 
     public function __construct(User $user = null)
     {
-        Registry :: set('AdminPanelEnvironment', true);
+        Registry::set('AdminPanelEnvironment', true);
         
-        if(!Service :: sessionIsStarted())
+        if(!Service::sessionIsStarted())
             session_start();
 
-        $_SESSION['mv']['flash_messages'] ??= [];
-        $_SESSION['mv']['flash_parameters'] ??= [];
+        Session::start('adminpanel');
+        
+        $session_data = ['settings', 'flash_messages', 'flash_parameters'];
+
+        foreach($session_data as $key)
+            if(Session::get($key) === null)
+                Session::set($key, []);
 
         if(is_object($user))
             $this -> setUser($user);
@@ -41,14 +46,33 @@ class AdminPanel
 	}
 
     /**
+     * 
+     */
+    public function defineRequestedView()
+    {
+        $view = '';
+
+        if(empty($_GET))
+            $view = 'view-index.php';
+        else if($view = Http::fromGet('view', ''))
+            $view = 'view-'.$view.'.php';
+
+        $view = trim(str_replace(['..', '/', '\/'], '', $view));
+        $file = Registry::get('IncludeAdminPath').'views/'.$view;
+
+        return is_file($file) ? $file : Registry::get('IncludeAdminPath').'views/view-404.php';
+    }
+
+    /**
      * Returns the current limit for pagination.
      * @return int limit value
      */
     static public function getPaginationLimit(): int
     {
-        $limit = intval($_SESSION['mv']['settings']['pager-limit'] ?? 10);
+        Session::start('adminpanel');
+        $limit = Session::get('settings')['paginator-limit'] ?? 10;
 
-        return in_array($limit, self :: PAGINATION_LIMITS) ? $limit : 10;
+        return in_array($limit, self::PAGINATION_LIMITS) ? $limit : 10;
     }
 
     /**
@@ -59,13 +83,15 @@ class AdminPanel
     {
         $limit = intval($limit);
 
-        if(!in_array($limit, self :: PAGINATION_LIMITS))
+        if(!in_array($limit, self::PAGINATION_LIMITS))
             return false;
 
-        $_SESSION['mv']['settings']['pager-limit'] = $limit;
+        $settings = Session::get('settings');
+        $settings[['paginator-limit']] = $limit;
+        Session::set('settings', $settings);
 
         if(is_object($this -> user))
-            $this -> user -> saveSettings($_SESSION['mv']['settings']);
+            $this -> user -> saveSettings($settings);
 
         return true;
     }

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
 <title><?php echo I18n::locale('mv'); ?></title>
 <?php 
-$admin_panel_path = $registry -> getSetting('AdminPanelPath');
+$admin_panel_path = Registry::get('AdminPanelPath');
 $admin_media_path = Registry::get('AdminFolder').'/interface/';
 $cache_drop = CacheMedia::instance()::getDropMark();
 
@@ -108,42 +108,43 @@ else
 <div id="container">
    <div id="header">
 	      <div class="inner">
-	      <a id="logo" href="<?php echo $admin_panel_path; ?>">
-		     <img src="<?php echo $admin_panel_path; ?>interface/images/logo.svg<?php echo $cache_drop; ?>" alt="MV logo" />
-	      </a>
-	      <div id="models-buttons">
-	         <ul>
-	            <li>
-	                <span><?php echo I18n::locale("modules"); ?></span>
-					<div id="models-list">
-						<?php echo $system -> menu -> displayModelsMenu(); ?>
+			<a id="logo" href="<?php echo $admin_panel_path; ?>">
+				<img src="<?php echo $admin_panel_path; ?>interface/images/logo.svg<?php echo $cache_drop; ?>" alt="MV logo" />
+			</a>
+			<div id="models-buttons">
+				<ul>
+					<li>
+						<span><?php echo I18n::locale("modules"); ?></span>
+						<div id="models-list">
+							<?php echo $system -> menu -> displayModelsMenu(); ?>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div id="header-search">
+				<form action="<?php echo $admin_panel_path; ?>" method="get">
+					<div>
+						<?php
+							$header_search_value = "";
+							
+							if(isset($search_text) && Http::fromGet('view') == 'search')
+								$header_search_value = $search_text;
+						?>
+						<input class="string" type="text" name="text" placeholder="<?php echo I18n::locale('search-in-all-modules'); ?>" value="<?php echo $header_search_value; ?>" />
+						<input type="submit" class="search-button" value="<?php echo I18n::locale('find'); ?>" />
+						<input type="hidden" name="view" value="search" />
 					</div>
-	            </li>
-	         </ul>
-	      </div>
-	      <div id="header-search">
-				<form action="<?php echo $admin_panel_path; ?>controls/search.php" method="get">
-	   			   <div>
-                      <?php
-                      	  $header_search_value = "";
-                      	  
-                      	  if(isset($search_text) && preg_match("/\/search\.php$/", $_SERVER["SCRIPT_FILENAME"]))
-                      	  	$header_search_value = $search_text;
-                      ?>
-				      <input class="string" type="text" name="text" placeholder="<?php echo I18n::locale('search-in-all-modules'); ?>" value="<?php echo $header_search_value; ?>" />
-				      <input type="submit" class="search-button" value="<?php echo I18n::locale('find'); ?>" />
-				   </div>
 				</form>
-		    </div>      
-	      <div id="user-settings">
-	       <ul>
-	         <li id="user-name"><span class="skin-color"><?php echo $system -> user -> getField('name'); ?></span></li>
-	         <li><a href="<?php echo $admin_panel_path; ?>controls/user-settings.php"><?php echo I18n::locale("my-settings"); ?></a></li>
-	         <?php $logout_link = $admin_panel_path."login?logout=".Login::getLogoutToken(); ?>
-	         <li><a href="<?php echo $registry -> getSetting('MainPath') ?>" target="_blank"><?php echo I18n::locale("to-site"); ?></a></li>
-	         <li><a href="<?php echo $logout_link; ?>"><?php echo I18n::locale("exit"); ?></a></li>
-	       </ul>
-	      </div>
-      </div>
-   </div>
-   <?php echo $system -> displayWarningMessages(); ?>
+			</div>
+			<div id="user-settings">
+				<ul>
+					<li id="user-name"><span class="skin-color"><?php echo $system -> user -> getField('name'); ?></span></li>
+					<li><a href="<?php echo $admin_panel_path; ?>controls/user-settings.php"><?php echo I18n::locale("my-settings"); ?></a></li>
+					<?php $logout_link = $admin_panel_path."login?logout=".Login::getLogoutToken(); ?>
+					<li><a href="<?php echo $registry -> getSetting('MainPath') ?>" target="_blank"><?php echo I18n::locale("to-site"); ?></a></li>
+					<li><a href="<?php echo $logout_link; ?>"><?php echo I18n::locale("exit"); ?></a></li>
+				</ul>
+			</div>
+      	</div>
+   	</div>
+   	<?php echo $system -> displayWarningMessages(); ?>

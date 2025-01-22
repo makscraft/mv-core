@@ -226,12 +226,14 @@ top: 7px; cursor: pointer; background: url("../images/message-update.svg") no-re
 .form-errors{background: #fbd689;}
 .form-no-errors{background: #deee85;}
 
-.flash-message{margin: 0 5px 20px 0px; padding: 15px 10px; width: 60%; clear: both; border-radius: 4px; 
--moz-border-radius: 4px; -webkit-border-radius: 4px; background: #fdccfa;}
-.flash-message div{margin-bottom: 10px;}
-.flash-message div:last-child{margin-bottom: 0;}
+.flash-message{margin: 0 5px 20px 0px; padding: 15px 10px; width: 100%; clear: both; border-radius: 4px; 
+-moz-border-radius: 4px; -webkit-border-radius: 4px; background: #fabdf6; box-sizing: border-box;}
+.flash-message > *{margin-bottom: 10px;}
+.flash-message > *:last-child{margin-bottom: 0;}
 .flash-message.error{background: #fbd689;}
 .flash-message.success{background: #deee85;}
+.flash-message.info{background: #c0dbf7;}
+.flash-message.centered{text-align: center;}
 
 div.file-input{padding: 0 0 5px 0; float: left; height: 40px;}
 div.file-input div.help-text{padding: 3px 0 0 0;}

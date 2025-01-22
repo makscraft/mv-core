@@ -1,4 +1,7 @@
 <?php
+if(!isset($GLOBALS['mv']))
+    return;
+
 $cache_drop = CacheMedia::getDropMark();
 $admin_panel_path = Registry::get('AdminPanelPath');
 $version = Registry::getCorePackageVersion();

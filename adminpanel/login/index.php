@@ -34,6 +34,7 @@ if(isset($_GET['logout']) && $_GET['logout'] == Login::getLogoutToken())
 	Filemanager::makeModelsFilesCleanUp();
 
 	unset($_SESSION["login"]);
+   Session::destroy('adminpanel');
 	$login -> cancelRemember() -> reload("login/");
 }
 
