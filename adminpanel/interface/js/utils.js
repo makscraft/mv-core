@@ -559,13 +559,14 @@ $(document).ready(function()
 	//Changes the limit of records per page
 	$("div.pager-limit select").live("change", function()
 	{
-		var params = $(this).parent().find("input").val();
-		var href = mVobject.adminPanelPath;
+		let name = $(this).parent().find("input").attr("name");
+		let params = $(this).parent().find("input").val();
+		let href = mVobject.adminPanelPath;
 		
 		if(params == 'filemanager')
 			href += "controls/filemanager.php?pager-limit=" + this.value;
-		else if(params.match(/search\.php/))
-			href += params + "&pager-limit=" + this.value;
+		else if(mVobject.currentView == "search")
+			href += "?view=search&" + name + "=" + params + "&pager-limit=" + this.value;
 		else
 			href += "model/?" + params + "&pager-limit=" + this.value;
 		

@@ -1,4 +1,7 @@
 <?php
+
+use function PHPSTORM_META\elementType;
+
 /**
  * Class is under construction ...
  */
@@ -9,6 +12,12 @@ class AdminPanel
 	 * @var User
 	 */ 
 	public $user;
+
+    /**
+     * Current view template in admin panes.
+     * @var string
+     */
+    private $view = '';
 
     /**
      * Available limits for pagination in admin panel, for all modules.
@@ -31,7 +40,21 @@ class AdminPanel
                 Session::set($key, []);
 
         if(is_object($user))
+        {
             $this -> setUser($user);
+
+            if(Session::get('settings') == [])
+                Session::set('settings', $user -> loadSettings());
+        }
+    }
+
+    /**
+     * Returns current view name form GET.
+     * @return string
+     */
+    public function getCurrentView()
+    {
+        return $this -> view;
     }
 
     /**
@@ -46,22 +69,47 @@ class AdminPanel
 	}
 
     /**
-     * 
+     * Looks for the view file to include, based on GET data.
+     * @return string view file name to show
      */
-    public function defineRequestedView()
+    public function defineRequestedView(): string
     {
         $view = '';
 
         if(empty($_GET))
+        {
             $view = 'view-index.php';
+            $this -> view = 'index';
+        }
         else if($view = Http::fromGet('view', ''))
+        {
+            $this -> view = $view;
             $view = 'view-'.$view.'.php';
+        }
 
         $view = trim(str_replace(['..', '/', '\/'], '', $view));
         $file = Registry::get('IncludeAdminPath').'views/'.$view;
 
-        return is_file($file) ? $file : Registry::get('IncludeAdminPath').'views/view-404.php';
+        if(is_file($file))
+            return $file;
+        else
+        {
+            $this -> view = '404';
+            return Registry::get('IncludeAdminPath').'views/view-404.php';
+        }
     }
+
+    /**
+     * 
+     */
+    public function createCSRFToken()
+	{
+		$token = $_SERVER["REMOTE_ADDR"].$_SERVER["HTTP_USER_AGENT"];
+		$token .= $this -> user -> getField("login").$this -> user -> getField("password");
+        $token .= Registry::get('SecretCode');
+		
+		return Service :: createHash($token, "random");
+	}
 
     /**
      * Returns the current limit for pagination.
@@ -86,14 +134,27 @@ class AdminPanel
         if(!in_array($limit, self::PAGINATION_LIMITS))
             return false;
 
-        $settings = Session::get('settings');
-        $settings[['paginator-limit']] = $limit;
-        Session::set('settings', $settings);
-
-        if(is_object($this -> user))
-            $this -> user -> saveSettings($settings);
+        $this -> updateUserSessionSetting('paginator-limit', $limit);
 
         return true;
+    }
+
+    public function getUserSessionSetting(string $key)
+    {
+        Session::start('adminpanel');
+        $settings = Session::get('settings');
+
+        return array_key_exists($key, $settings) ? $settings[$key] : null;
+    }
+
+    public function updateUserSessionSetting(string $key, mixed $value)
+    {
+        Session::start('adminpanel');
+        $settings = Session::get('settings');
+        $settings[$key] = $value;
+        Session::set('settings', $settings);
+
+        $this -> user -> updateSetting($key, $value);
     }
 
     public function addFlashMessage(string $type, string $message)

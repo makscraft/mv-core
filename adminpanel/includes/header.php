@@ -23,6 +23,7 @@ else
 <script type="text/javascript">
 mVobject.mainPath = '<?php echo $registry -> getSetting('MainPath'); ?>';
 mVobject.adminPanelPath = '<?php echo $admin_panel_path; ?>';
+mVobject.currentView = '<? echo isset($admin_panel) ? $admin_panel -> getCurrentView() : '' ?>';
 mVobject.urlParams = '<?php if(isset($system -> model)) echo $system -> model -> getAllUrlParams(array('pager','filter','model','parent','id')); ?>';
 <?php
 if(isset($system -> model))
@@ -54,7 +55,7 @@ if(isset($system -> model -> filter))
       echo "mVobject.allParentsFilter = '".$caption."';\n";
    else if(isset($system -> model -> pager))
       echo "mVobject.startOrder = ".($system -> model -> pager -> getStart() + 1).";\n";
-	  
+
 $region = $registry -> getSetting('Region');
 ?>
 mVobject.region = '<?php echo $region; ?>';
@@ -139,7 +140,7 @@ else
 			<div id="user-settings">
 				<ul>
 					<li id="user-name"><span class="skin-color"><?php echo $system -> user -> getField('name'); ?></span></li>
-					<li><a href="<?php echo $admin_panel_path; ?>controls/user-settings.php"><?php echo I18n::locale("my-settings"); ?></a></li>
+					<li><a href="<?php echo $admin_panel_path; ?>?view=user-settings"><?php echo I18n::locale("my-settings"); ?></a></li>
 					<?php $logout_link = $admin_panel_path."login?logout=".Login::getLogoutToken(); ?>
 					<li><a href="<?php echo $registry -> getSetting('MainPath') ?>" target="_blank"><?php echo I18n::locale("to-site"); ?></a></li>
 					<li><a href="<?php echo $logout_link; ?>"><?php echo I18n::locale("exit"); ?></a></li>

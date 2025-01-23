@@ -63,11 +63,11 @@ class User
 	public function __construct($id)
 	{
 		//Sets tables and needed objects, also gets the users rights
-		$this -> registry = Registry :: instance(); //Langs and settings
-		$this -> db = DataBase :: instance(); //Manages database
+		$this -> registry = Registry::instance(); //Langs and settings
+		$this -> db = DataBase::instance(); //Manages database
 
 		 //Current user's data
-		$this -> content = $this -> db -> getRow("SELECT * FROM `".self :: TABLE."` 
+		$this -> content = $this -> db -> getRow("SELECT * FROM `".self::TABLE."` 
 		                                          WHERE `id`=".intval($id));
 		
 		if(!isset($this -> content['id']) || !$this -> content['id'])
@@ -79,11 +79,11 @@ class User
 		$this -> id = $this -> content['id']; //Sets user id
 		
 		//Gets user's rights in amdin panel
-		$this -> rights = $this -> db -> getAll("SELECT * FROM `".self :: RIGHTS_TABLE."` 
+		$this -> rights = $this -> db -> getAll("SELECT * FROM `".self::RIGHTS_TABLE."` 
 		                                         WHERE `user_id`='".$this -> id."'");
 		
 		//Changes the format of rights for the class methods
-		$this -> rights = Users :: arrangeRights($this -> rights);
+		$this -> rights = Users::arrangeRights($this -> rights);
 		
 		if($this -> id)  //Object to control the session for this user	
 			$this -> session = new UserSession($this -> id);
@@ -122,7 +122,7 @@ class User
  		
  		if($password)
  		{
- 			$password = (Registry :: instance() -> getInitialVersion() >= 2.2) ? $password : md5($password);
+ 			$password = (Registry::instance() -> getInitialVersion() >= 2.2) ? $password : md5($password);
  			$_SESSION['mv']['user']['password'] = md5($password);
  		}
  	}
@@ -131,7 +131,7 @@ class User
  	{
  		$settings = base64_encode(json_encode($settings));
  		
- 		$this -> db -> query("UPDATE `".self :: TABLE."` 
+ 		$this -> db -> query("UPDATE `".self::TABLE."` 
  							  SET `settings`=".$this -> db -> secure($settings)." 
  							  WHERE `id`='".$this -> id."'");
  	}
@@ -139,7 +139,7 @@ class User
  	public function loadSettings()
  	{
  		$data = $this -> db -> getCell("SELECT `settings` 
- 										FROM `".self :: TABLE."`  
+ 										FROM `".self::TABLE."`  
  										WHERE `id`='".$this -> id."'");
  		
 		return json_decode(base64_decode(strval($data)), true);
@@ -161,7 +161,7 @@ class User
 		if($this -> id == 1) 
 			return true;
 			
-		$all_modules = array_merge(array_keys(Registry :: get('ModelsLower')), 
+		$all_modules = array_merge(array_keys(Registry::get('ModelsLower')), 
 								  ["users", "log", "garbage", "file_manager"]);
 		
 		$module = strtolower($module);
@@ -177,7 +177,7 @@ class User
 		//Check the rights inside the any amdin panel page related to module (edit, create, ...) and redirects if no right
 		if(!$this -> checkModelRights($module, $right))
 		{
-			$this -> error = I18n :: locale("error-no-rights");
+			$this -> error = I18n::locale("error-no-rights");
             include $this -> registry -> getSetting("IncludeAdminPath")."controls/internal-error.php";
 		}
 	}

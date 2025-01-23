@@ -184,7 +184,7 @@ class Paginator
 	public function getState(): array
 	{
 		if($this -> intervals <= 1)
-			$last = $this -> total - 1;
+			$last = $this -> total ? $this -> total - 1 : 0;
 		else if($this -> page < $this -> intervals)
 			$last = ($this -> page * $this -> limit) - 1;
 		else
@@ -192,7 +192,7 @@ class Paginator
 
 		$items_left = ($this -> page - 1) * $this -> limit;
 
-		if($this -> page == $this -> intervals)
+		if($this -> page == $this -> intervals || !$this -> intervals)
 			$items_right = 0;
 		else
 			$items_right = $this -> total - $items_left - $this -> limit;
@@ -203,7 +203,7 @@ class Paginator
 			'page' => $this -> page,
 			'pages_total' => $this -> intervals,
 			'pages_left' => $this -> page - 1,
-			'pages_right' => $this -> intervals - $this -> page,
+			'pages_right' => $this -> intervals ? $this -> intervals - $this -> page : 0,
 			'item_from' => $this -> start,
 			'item_to' => $last,
 			'items_left' => $items_left,
