@@ -190,7 +190,7 @@ class Migrations
 	public function displayMigrationsList()
 	{
 		if(!count($this -> migrations_list))
-			return "<p>Migrations not found.</p>\n";
+			return "<div class=\"flash-message info\"><div>New migrations not found.</div></div>\n";
 		
 		$html = "";
 		

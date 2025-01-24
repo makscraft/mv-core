@@ -141,6 +141,7 @@ class Registry
 		class_alias('ModelSimple', 'Model_Simple');
 		class_alias('Paginator', 'Pager');
 		class_alias('AdminPanel', 'Admin_Panel');
+		class_alias('FlashMessages', 'Flash_Messages');
 
 		return $this;
 	}

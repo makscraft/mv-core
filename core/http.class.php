@@ -201,6 +201,7 @@ class Http
         
         self::sendStatusCodeHeader(302);        
         header('Location: '.$url);
+        exit();
     }
 
     /**
@@ -210,6 +211,7 @@ class Http
     {
         self::sendStatusCodeHeader($status);
         header('Location: '.$url);
+        exit();
     }
 
     /**

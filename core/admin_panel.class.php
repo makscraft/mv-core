@@ -33,7 +33,7 @@ class AdminPanel
 
         Session::start('adminpanel');
         
-        $session_data = ['settings', 'flash_messages', 'flash_parameters'];
+        $session_data = ['settings'];
 
         foreach($session_data as $key)
             if(Session::get($key) === null)
@@ -157,46 +157,15 @@ class AdminPanel
         $this -> user -> updateSetting($key, $value);
     }
 
-    public function addFlashMessage(string $type, string $message)
+    public function defineCurrentUserRegion()
     {
-        $_SESSION['mv']['flash_messages'][$type] ??= [];
-        $_SESSION['mv']['flash_messages'][$type][] = $message;
+        $region = $this -> getUserSessionSetting('region');
+
+        if(!I18n::checkRegion($region))
+            $region = I18n::defineRegion();
+        
+        I18n::setRegion($region);
 
         return $this;
-    }
-
-    public function displayAndClearFlashMessages(): string
-    {
-        $html = '';
-
-        foreach($_SESSION['mv']['flash_messages'] as $type => $messages)
-        {
-            $html .= "<div class=\"flash-message ".$type."\">\n";
-
-            foreach($messages as $message)
-                $html .= "<div>".$message."</div>\n";
-
-            $html .= "</div>\n";
-        }
-
-        $_SESSION['mv']['flash_messages'] = [];
-
-        return $html;
-    }
-
-    static public function addFlashParameter(string $key, mixed $value)
-    {
-        if(is_numeric($value) || is_string($value) || is_array($value))
-            $_SESSION['mv']['flash_parameters'][$key] = $value;
-    }
-
-    static public function getFlashParameter(string $key): mixed
-    {
-        return $_SESSION['mv']['flash_parameters'][$key] ?? null;
-    }
-
-    static public function clearFlashParameters()
-    {
-        $_SESSION['mv']['flash_parameters'] = [];
     }
 }

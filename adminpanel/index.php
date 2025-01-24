@@ -2,6 +2,7 @@
 include_once '../config/autoload.php';
 $system = new System();
 $admin_panel = new AdminPanel($system -> user);
+$admin_panel -> defineCurrentUserRegion();
 $view = $admin_panel -> defineRequestedView();
 
 //Debug::pre($view);

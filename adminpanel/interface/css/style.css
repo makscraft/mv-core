@@ -220,13 +220,13 @@ span.translit{display: inline-block; background: red; width: 20px; height: 20px;
 top: 7px; cursor: pointer; background: url("../images/message-update.svg") no-repeat;}
 
 /* Alerts and flash messages */
-.form-errors, .form-no-errors{margin: 0 5px 20px 0px; padding: 5px 10px; width: 60%; clear: both; border-radius: 4px; 
--moz-border-radius: 4px; -webkit-border-radius: 4px;}
-.form-errors p, .form-no-errors p{margin: 5px 0; padding-left: 5px;}
+.form-errors, .form-no-errors{margin: 0 0 20px 0; padding: 15px 1.4%; width: 100%; clear: both; border-radius: 4px; 
+-moz-border-radius: 4px; -webkit-border-radius: 4px; box-sizing: border-box; display: flex; flex-direction: column;
+gap: 6px;}
 .form-errors{background: #fbd689;}
 .form-no-errors{background: #deee85;}
 
-.flash-message{margin: 0 5px 20px 0px; padding: 15px 10px; width: 100%; clear: both; border-radius: 4px; 
+.flash-message{margin: 0 5px 20px 0px; padding: 15px 1.4%; width: 100%; clear: both; border-radius: 4px; 
 -moz-border-radius: 4px; -webkit-border-radius: 4px; background: #fabdf6; box-sizing: border-box;}
 .flash-message > *{margin-bottom: 10px;}
 .flash-message > *:last-child{margin-bottom: 0;}
@@ -234,7 +234,10 @@ top: 7px; cursor: pointer; background: url("../images/message-update.svg") no-re
 .flash-message.success{background: #deee85;}
 .flash-message.info{background: #c0dbf7;}
 .flash-message.centered{text-align: center;}
+#model-form .flash-message, #model-form .form-errors, #model-form .form-no-errors{width: calc(15% + 500px);}
+div.migrations-page .form-errors, div.migrations-page .flash-message{width: 100% !important;}
 
+/* File input */
 div.file-input{padding: 0 0 5px 0; float: left; height: 40px;}
 div.file-input div.help-text{padding: 3px 0 0 0;}
 div.file-input span.file{float: left;}
@@ -292,17 +295,18 @@ div.images-error p{padding: 0 0 5px 0;}
 .model-elements-form > table > tr, .model-elements-form > table > tbody > tr{display: flex; flex-direction: row; 
 margin-bottom: 17px; align-items: flex-start;}
 .model-elements-form > table td.field-name{width: 13%; padding-right: 2%;}
-.model-elements-form > table td.field-content{width: 87%;}
+.model-elements-form > table td.field-content{width: 85%;}
 
 .model-elements-form td.text input, .model-elements-form td.numeric input, .model-elements-form td.date input, 
 .model-elements-form select, .model-elements-form textarea, .ui-autocomplete-input, .m2m-not-selected-search,
 .m2m-selected-search, #csv-settings table select, .autocomplete-input{border: 1px solid #918b8b; padding: 5px 1%; 
 border-radius: 4px; box-sizing: border-box;}
-.model-elements-form td > input[type='text'], .model-elements-form td > select{width: 40%; height: 36px;}
+.model-elements-form td > input[type='text'], .model-elements-form td > select{width: 500px; height: 36px;}
 .model-elements-form td.numeric > input[type='text'], .model-elements-form td.text > input[type='password'], 
-.model-elements-form td.date > input[type='text']{width: 18%; height: 36px;}
+.model-elements-form td.date > input[type='text']{width: 250px; height: 36px;}
 .model-elements-form td > input.autocomplete-input{padding-right: 28px;}
 .model-elements-form td > textarea{width: 100%;}
+.model-elements-form td.error-field > *{border-color: #fbd689 !important; background-color: #fdf4e1}
 
 .model-elements-form td.bottom-navigation{padding: 12px 15px 10px 15px; background: #eeeded; position: fixed; left: 0;
 bottom: 0px; width: 100%; z-index: 100;}
@@ -536,7 +540,7 @@ width: 15%; color: #1464ba; cursor: pointer;}
 
 #model-table-form td.edit-string input{width: 95%; border: 1px solid #bbb; padding: 5px; border-radius: 4px;}
 #model-table-form td.edit-number input{width: 70px; border: 1px solid #bbb; padding: 5px; border-radius: 4px;}
-#model-table-form td.quick-error-value input{background: #fbd689;}
+#model-table-form td.quick-error-value input{background-color: #fdf4e1;}
 
 td:has(#send-admin-info-email){width: auto;}
 #send-admin-info-email{margin: 0 4px 0 0; position: relative;}
@@ -632,19 +636,15 @@ padding-left: 23px}
 @media all and (max-width: 1400px)
 {
     #model-form.one-column.migrations-page{width: 80%;}
-    .model-elements-form td > input[type="text"], .model-elements-form td > select{width: 60%;}
-    .model-elements-form td.numeric > input[type="text"], .model-elements-form td.date > input[type="text"]{width: 35%;}
 }
 
 @media all and (max-width: 1300px)
 {
     #header div.inner{width: 96%;}
-    #header-search{width: 34%;}
-    #header-search .string{width: 76%;}
-    #header-search .search-button{width: 20%;}
+    #header-search{width: 40%;}
+    #header-search .string{width: 75%;}
+    #header-search .search-button{width: 25%;}
     
     #search-results div{width: 100%;}
-    .model-elements-form table td.field-name{width: 20%;}
-    .model-elements-form table td.field-content{width: 80%;}
     #models-list{width: 96%; padding-left: 2%; padding-right: 2%;}
 }

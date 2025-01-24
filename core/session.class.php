@@ -19,6 +19,9 @@ class Session
      */
     private static $container = null;
 
+    /**
+     * Disabled constructor.
+     */
     private function __construct() {}
 
     /**
@@ -56,7 +59,7 @@ class Session
     {
         return $container.'_'.md5($container.Registry::get('SecretCode').session_id());
     }
-
+    
     /**
      * Saves the current container data into session global array.
      */
