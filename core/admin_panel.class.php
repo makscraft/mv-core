@@ -87,10 +87,9 @@ class AdminPanel
             $view = 'view-'.$view.'.php';
             $view = trim(str_replace(['..', '/', '\/'], '', $view));
         }        
-        else if($model = Http::fromGet('model', '') && $action = Http::fromGet('action', ''))
+        else if($model = Http::fromGet('model', ''))
         {
-            Debug::exit($model);
-
+            $action = Http::fromGet('action', '');
             $actions = ['index', 'create', 'update', 'simple'];
             
             if(in_array($action, $actions) && Registry::checkModel($model))
@@ -176,5 +175,14 @@ class AdminPanel
         I18n::setRegion($region);
 
         return $this;
+    }
+
+    public function displayInternalError(string $error_key = '')
+	{
+		$error_key = $error_key === '' ? 'error-occurred' : $error_key;
+		$interal_error_text = I18n::locale($error_key);
+		
+        include Registry::get('IncludeAdminPath').'controls/internal-error.php';
+        exit();
     }
 }

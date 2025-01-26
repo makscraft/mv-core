@@ -57,7 +57,9 @@ class System
 	public function __construct()
 	{
 		ob_start();
-		session_start();
+
+		if(!Service::sessionIsStarted())
+			session_start();
 		
 		$this -> registry = Registry :: instance();
 		
