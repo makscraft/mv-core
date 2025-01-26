@@ -23,7 +23,7 @@
           </a>
         </li>
 		  <li class="filemanager">
-	      <a href="<?php echo Registry::get('AdminPanelPath'); ?>controls/filemanager.php">
+	      <a href="<?php echo Registry::get('AdminPanelPath'); ?>?view=filemanager">
             <span><?php echo I18n::locale("file-manager"); ?></span>
             <?php echo I18n::locale("index-file-manager-icon"); ?>
           </a>

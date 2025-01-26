@@ -564,7 +564,7 @@ $(document).ready(function()
 		let href = mVobject.adminPanelPath;
 		
 		if(params == 'filemanager')
-			href += "controls/filemanager.php?pager-limit=" + this.value;
+			href += "?view=filemanager&pager-limit=" + this.value;
 		else if(mVobject.currentView == "search")
 			href += "?view=search&" + name + "=" + params + "&pager-limit=" + this.value;
 		else

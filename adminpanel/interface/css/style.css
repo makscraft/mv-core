@@ -390,14 +390,11 @@ border-color: #858f9c !important;}
 
 /* Pagination */
 .pager{position: relative; width: 100%; padding: 15px 0 0 0;}
-.pager div{display: flex; justify-content: flex-end; gap: 2px;}
-.pager a{padding: 5px 8px 8px 8px; float: left; position: relative; height: 14px; display: block;}
-.pager span{padding: 5px 12px 0 0; float: left; position: relative; display: block;}
-.pager-limit{text-align: left; text-align: right; float: right;}
-.pager-limit span{padding: 0 5px 0 0;}
-.pager-limit select{border: 1px solid #ccc; padding: 3px 5px; border-radius: 4px; -moz-border-radius: 4px;
--webkit-border-radius: 4px;}
-.pager-limit select option{padding: 0 5px 1px 5px;}
+.pager *{box-sizing: border-box;}
+.pager div{display: flex; justify-content: flex-end; gap: 2px; align-items: center; height: 30px;}
+.pager a{height: 30px; min-width: 30px; display: flex; align-items: center; justify-content: center;
+padding: 0 10px; transition: all 0.5s ease;}
+.pager span{padding:  0 12px 0 0; display: inline-block;}
 .pager a.pager-first{background: url("../images/arrow-first.svg") center no-repeat;}
 .pager a.pager-prev{background: url("../images/arrow-left.svg") center no-repeat;}
 .pager a.pager-next{background: url("../images/arrow-right.svg") center no-repeat;}
@@ -407,6 +404,13 @@ padding-right: 0; width: 24px;}
 .pager a.active, .pager a:hover{color: #1e1e1e; text-decoration: none; background-color: #e3e0e0; border-radius: 4px; 
 -moz-border-radius: 4px; -webkit-border-radius: 4px;}
 
+.pager-limit{text-align: left; text-align: right; float: right;}
+.pager-limit span{padding: 0 5px 0 0;}
+.pager-limit select{border: 1px solid #e3e0e0; padding: 0 10px; border-radius: 4px; -moz-border-radius: 4px;
+-webkit-border-radius: 4px; box-sizing: border-box; height: 30px; text-align: center;}
+.pager-limit select option{padding: 0 5px 1px 5px;}
+
+/* Breadcrumbs */
 .parents-path{clear: both; font-size: 14px; margin: -5px 0 20px 0;}
 .parents-path :first-child{margin-left: 0;}
 .parents-path a{margin: 0 4px;}

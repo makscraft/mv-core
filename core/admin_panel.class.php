@@ -85,9 +85,18 @@ class AdminPanel
         {
             $this -> view = $view;
             $view = 'view-'.$view.'.php';
-        }
+            $view = trim(str_replace(['..', '/', '\/'], '', $view));
+        }        
+        else if($model = Http::fromGet('model', '') && $action = Http::fromGet('action', ''))
+        {
+            Debug::exit($model);
 
-        $view = trim(str_replace(['..', '/', '\/'], '', $view));
+            $actions = ['index', 'create', 'update', 'simple'];
+            
+            if(in_array($action, $actions) && Registry::checkModel($model))
+                $this -> view = $view = 'model/view-'.$action.'.php';
+        }
+        
         $file = Registry::get('IncludeAdminPath').'views/'.$view;
 
         if(is_file($file))

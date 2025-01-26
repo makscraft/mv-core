@@ -62,28 +62,27 @@ class Filemanager
 
 	public function __construct()
 	{
-		$_SESSION['mv']['file_manager'] ??= [];
-		$_SESSION['mv']['file_manager']['path'] ??= Registry::get('FilesPath');
+		Session::start('adminpanel');		
+		$data = Session::get('file_manager', []);
+		$data['path'] ??= Registry::get('FilesPath');
 
 		$regexp = Service::prepareRegularExpression(Registry::get('FilesPath'));
-		$path = $_SESSION['mv']['file_manager']['path'];
+		$path = $data['path'];
 		$match = preg_match('/^'.$regexp.'/ui', $path);
 
 		if(!$match || $path === '/' || strpos($path, '..') !== false || !is_dir($path))
-			$path = $_SESSION['mv']['file_manager']['path'] = Registry::get('FilesPath');
-
+			$path = $data['path'] = Registry::get('FilesPath');
+		
 		foreach(self::FORBIDDEN_FILES as $forbidden)
 			if(realpath($path) == realpath(Registry::get('FilesPath').$forbidden))
 			{
-				$path = $_SESSION['mv']['file_manager']['path'] = Registry::get('FilesPath');
+				$path = $data['path'] = Registry::get('FilesPath');
 				break;
 			}
 
 		$this -> in_root = realpath(Registry::get('FilesPath')) === realpath($path);
 
-		$this -> path = preg_replace('/\/$/', '', $path);
-		$_SESSION['mv']['file_manager']['path'] = $this -> path;
-
+		$data['path'] = $this -> path = preg_replace('/\/$/', '', $path);
 		$limit = AdminPanel::getPaginationLimit();
 		$this -> total = $this -> countFilesInDirectory($this -> path);
 
@@ -91,6 +90,8 @@ class Filemanager
 			$this -> total --;
 
 		$this -> pagination = new Paginator($this -> total, $limit);
+		
+		Session::set('file_manager', $data);
 	}
 
 	public function setUser(User $user)
@@ -133,17 +134,21 @@ class Filemanager
 	public function navigate(string $path): bool
 	{
 		$path = trim($path);
+		$data = Session::get('file_manager');
+		$current_path = $data['path'];
 
 		if($path === 'back')
 		{
 			if($this -> in_root)
 				return false;
 			
-			$back = realpath($_SESSION['mv']['file_manager']['path'].'/..');
+			
+			$back = realpath($current_path.'/..');
 
 			if($back !== false)
-			{
-				$_SESSION['mv']['file_manager']['path'] = str_replace('\\', '/', $back);
+			{				
+				$data['path'] = str_replace('\\', '/', $back);
+				Session::set('file_manager', $data);
 
 				return true;
 			}
@@ -155,7 +160,8 @@ class Filemanager
 			if($folder == '' || preg_match('/[\.`\/\\\]+/', $folder) || !is_dir($this -> path.'/'.$folder))
 				return false;
 
-			$_SESSION['mv']['file_manager']['path'] .= '/'.$folder;
+			$data['path'] .= '/'.$folder;
+			Session::set('file_manager', $data);
 
 			return true;
 		}
@@ -228,7 +234,7 @@ class Filemanager
 		$imager = new Imager();
 		$img_max_weight = 1024 * 1024 * 3;
 		$secret = Registry::get('SecretCode');
-		$highlight = AdminPanel::getFlashParameter('highlight') ?? '';
+		$highlight = Session::get('highlight', '');
 		$can_delete = $this -> user -> checkModelRights('filemanager', 'delete');
 
 		foreach($files as $file)
@@ -305,11 +311,11 @@ class Filemanager
 			$html .= "<td class=\"name\">";
 
 			if($file === '..')
-				$html .= "<a href=\"?navigation=back\"> .. ".mb_strtolower(I18n::locale('back'))."</a>";
+				$html .= "<a href=\"?view=filemanager&navigation=back\"> .. ".mb_strtolower(I18n::locale('back'))."</a>";
 			else if($disable)
 				$html .= basename($file);
 			else if(is_dir($file))
-				$html .= "<a href=\"?navigation=folder-".urlencode(basename($href))."\">".basename($file)."</a>";
+				$html .= "<a href=\"?view=filemanager&navigation=folder-".urlencode(basename($href))."\">".basename($file)."</a>";
 			else
 				$html .= "<a target=\"_blank\" href=\"".$href."\">".basename($file)."</a>";
 
@@ -343,7 +349,7 @@ class Filemanager
 			$html .= "</tr>\n";
 		}
 
-		AdminPanel::clearFlashParameters();
+		Session::remove('highlight');
 
 		return $html;
 	}
@@ -383,7 +389,7 @@ class Filemanager
 				'message' => I18n::locale('file-uploaded')
 			];
 
-			AdminPanel::addFlashParameter('highlight', $this -> path.'/'.$object -> getProperty('file_name'));
+			Session::set('highlight', $this -> path.'/'.$object -> getProperty('file_name'));
 		}
 
 		return $result;
@@ -419,7 +425,7 @@ class Filemanager
 				'message' => I18n::locale('folder-created')
 			];
 
-			AdminPanel::addFlashParameter('highlight', $this -> path.'/'.$name);
+			Session::set('highlight', $this -> path.'/'.$name);
 		}
 
 		return $result;

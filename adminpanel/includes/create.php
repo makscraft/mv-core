@@ -1,6 +1,8 @@
 <?php
-if($system -> user -> checkModelRights($system -> model -> getModelClass(), "create"))
-	$action = "location.href='".$registry -> getSetting('AdminPanelPath')."model/create.php?".$url_params."'";
+$class_name = $system -> model -> getModelClass();
+
+if($system -> user -> checkModelRights($class_name, "create"))
+	$action = "location.href='".Registry::get('AdminPanelPath')."?action=create&".$url_params."'";
 else
 	$action = "$.modalWindow.open(mVobject.locale('no_rights'), {css_class: 'alert'});";
 ?>
