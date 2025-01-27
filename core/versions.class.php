@@ -97,9 +97,9 @@ class Versions
 		return $this -> limit;
 	}
 	
-	public function setVersion(int $version)
+	public function setVersion($version)
 	{
-		$this -> version = $version;
+		$this -> version = intval($version);
 
 		return $this;
 	}
@@ -116,7 +116,7 @@ class Versions
 		return $this;
 	}
 		
-	public function checkVersion(int $version)
+	public function checkVersion($version)
 	{
 		return (bool) $this -> db -> getCount($this -> table, "`model`='".$this -> model."' 
 																AND `version`='".intval($version)."'"); 

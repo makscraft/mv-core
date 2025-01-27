@@ -24,37 +24,37 @@ else
 mVobject.mainPath = '<?php echo $registry -> getSetting('MainPath'); ?>';
 mVobject.adminPanelPath = '<?php echo $admin_panel_path; ?>';
 mVobject.currentView = '<? echo isset($admin_panel) ? $admin_panel -> getCurrentView() : '' ?>';
-mVobject.urlParams = '<?php if(isset($system -> model)) echo $system -> model -> getAllUrlParams(array('pager','filter','model','parent','id')); ?>';
+mVobject.urlParams = '<?php if(isset($model)) echo $model -> getAllUrlParams(array('pager','filter','model','parent','id')); ?>';
 <?php
-if(isset($system -> model))
-   echo "mVobject.currentModel = '".$system -> model -> getModelClass()."';\n";
+if(isset($model))
+   echo "mVobject.currentModel = '".$model -> getModelClass()."';\n";
 
-if(isset($system -> model -> sorter))
-   echo "mVobject.sortField = '".$system -> model -> sorter -> getField()."';\n";
+if(isset($model -> sorter))
+   echo "mVobject.sortField = '".$model -> sorter -> getField()."';\n";
 
-if(isset($system -> model))
+if(isset($model))
 {
-	$parent = $system -> model -> findForeignParent();
-	$linked_order_fields = $system -> model -> findDependedOrderFilters();	
+	$parent = $model -> findForeignParent();
+	$linked_order_fields = $model -> findDependedOrderFilters();	
 }
 
-if(isset($parent) && is_array($parent) && isset($system -> model -> filter))
-	if(!$system -> model -> filter -> allowChangeOrderLinkedWithEnum($parent['name']))
+if(isset($parent) && is_array($parent) && isset($model -> filter))
+	if(!$model -> filter -> allowChangeOrderLinkedWithEnum($parent['name']))
 		echo "mVobject.relatedParentFilter = '".$parent['caption']."';\n";
 
 if(isset($linked_order_fields) && count($linked_order_fields))
 	foreach($linked_order_fields as $name => $data)
-		if(!$system -> model -> filter -> allowChangeOrderLinkedWithEnum($data[0]))
+		if(!$model -> filter -> allowChangeOrderLinkedWithEnum($data[0]))
 			echo "mVobject.dependedOrderFields.".$name." = '".$data[1]."';\n";
 		
-$has_applied_filters = (int) (isset($system -> model -> filter) && $system -> model -> filter -> ifAnyFilterApplied());
+$has_applied_filters = (int) (isset($model -> filter) && $model -> filter -> ifAnyFilterApplied());
 echo "mVobject.hasAppliedFilters = ".$has_applied_filters.";\n";      
       
-if(isset($system -> model -> filter))
-   if($caption = $system -> model -> filter -> ifFilteredByAllParents())
+if(isset($model -> filter))
+   if($caption = $model -> filter -> ifFilteredByAllParents())
       echo "mVobject.allParentsFilter = '".$caption."';\n";
-   else if(isset($system -> model -> pager))
-      echo "mVobject.startOrder = ".($system -> model -> pager -> getStart() + 1).";\n";
+   else if(isset($model -> pager))
+      echo "mVobject.startOrder = ".($model -> pager -> getStart() + 1).";\n";
 
 $region = $registry -> getSetting('Region');
 ?>

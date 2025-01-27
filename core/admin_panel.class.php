@@ -24,6 +24,12 @@ class AdminPanel
      */
     public const PAGINATION_LIMITS = [5, 10, 15, 20, 30, 50, 100, 200, 300, 500];
 
+    /**
+	 * Versions manager object.
+	 * @var object Versions
+	 */
+	public $versions;
+
     public function __construct(User $user = null)
     {
         Registry::set('AdminPanelEnvironment', true);
@@ -185,4 +191,19 @@ class AdminPanel
         include Registry::get('IncludeAdminPath').'controls/internal-error.php';
         exit();
     }
+
+    public function runVersions(object $model)
+	{
+		$this -> versions = new Versions($model -> getModelClass(), $model -> getId());
+		$this -> versions -> setLimit($model -> getVersionsLimit());
+		
+		return $this;
+	}
+	
+	public function passVersionContent(object $model)
+	{
+		$model -> read($this -> versions -> load());
+		
+		return $this;
+	}
 }

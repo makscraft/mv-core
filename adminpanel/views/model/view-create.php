@@ -16,36 +16,65 @@ if($model -> getParentId())
 $url_params = $back_url_params = $model -> getAllUrlParams(['parent','model','filter','pager']);
 $current_tab = $model -> checkCurrentTab();
 
+if(Http::isPostRequest() && 'create' === Http::fromGet('action'))
+{
+	$admin_panel -> user -> extraCheckModelRights($model -> getModelClass(), 'create');
+
+	$form_errors = $model -> getDataFromPost() -> validate();
+	
+    if($admin_panel -> createCSRFToken() !== Http::fromPost('adminpanel_csrf_token'))
+    {
+        $model -> addError(I18n::locale('error-wrong-token'));
+		$form_errors = true;
+    }
+
+	if(!$form_errors)
+	{
+		$new_id = $model -> create();
+		$redirect = Registry::get('AdminPanelPath').'?model='.$model -> getModelClass();
+		
+		if(Http::fromGet('edit') !== null)
+			$url_params = str_replace('&current-tab='.$current_tab, '', $url_params);
+		
+		if(Http::fromGet('continue') !== null)
+			$redirect .= '&action=create';
+		else if(Http::fromGet('edit') !== null)
+			$redirect .= '&action=update&id='.$new_id;
+		
+		$redirect .= $url_params ? '&'.$url_params : '';
+		FlashMessages::add('success', I18n::locale('done-create'));
+
+		Http::redirect($redirect);
+	}
+}
+
 include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 ?>
 <div id="columns-wrapper">
 	<div id="model-form">
-       <div class="column-inner">
-	       <h3 class="column-header with-navigation">
+        <div class="column-inner">
+	        <h3 class="column-header with-navigation">
                 <?php 
                 	echo $model -> getName();
                 	echo "<span class=\"header-info\">".I18n::locale("create-record")."</span>\n";
                 ?>
 				<span id="header-navigation">
                 	<input class="button-light" type="button" id="top-save-button" value="<?php echo I18n::locale('save'); ?>" />
-                	<input class="button-dark button-back" type="button" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath').'model/?'.$back_url_params; ?>'" value="<?php echo I18n::locale('cancel'); ?>" />
+                	<input class="button-dark button-back" type="button" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath').'?'.$back_url_params; ?>'" value="<?php echo I18n::locale('cancel'); ?>" />
 				</span>
-           </h3>
-           <?php      
+            </h3>
+            <?php      
 	           if(isset($form_errors) && $form_errors)
-    	          echo $model -> displayFormErrors();
-    	       else if(isset($_SESSION["message"]["created"]))
-    	       {
-			      echo "<div class=\"form-no-errors\"><p>".I18n::locale('done-create')."</p></div>\n";
-			      unset($_SESSION["message"]);
-    	       }
-			      
-			   if($file_name = $model -> checkIncludeCode("create-top.php"))
+    	        	echo $model -> displayFormErrors();
+				else if(FlashMessages::hasAny())
+				  	echo FlashMessages::displayAndClear();
+			    
+			    if($file_name = $model -> checkIncludeCode("create-top.php"))
 			   		include $file_name;
 			   		
-			   if($file_name = $model -> checkIncludeCode("action-top.php"))
+			    if($file_name = $model -> checkIncludeCode("action-top.php"))
 			   		include $file_name;
-           ?>
+            ?>
 		   <form method="post" id="<?php echo $model -> getModelClass(); ?>" enctype="multipart/form-data" action="?<?php echo $url_params; ?>&action=create" class="model-elements-form">
               <?php
               	  $form_html = $model -> displayModelFormInAdminPanel('create', $current_tab);
@@ -68,8 +97,8 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 			            <input class="button-light" type="button" id="submit-button" value="<?php echo I18n::locale('save'); ?>" />
 	                    <input class="button-light" type="button" id="continue-button" value="<?php echo I18n::locale('create-and-continue'); ?>" />
 	                    <input class="button-light" type="button" id="create-edit-button" value="<?php echo I18n::locale('create-and-edit'); ?>" />
-                        <input class="button-dark" id="model-cancel" type="button" rel="<?php echo $registry -> getSetting('AdminPanelPath')."model/?".$back_url_params; ?>" value="<?php echo I18n::locale('cancel'); ?>" />
-                        <input type="hidden" name="admin-panel-csrf-token" value="<?php echo $system -> getToken(); ?>" />
+                        <input class="button-dark" id="model-cancel" type="button" rel="<?php echo $registry -> getSetting('AdminPanelPath')."?".$back_url_params; ?>" value="<?php echo I18n::locale('cancel'); ?>" />
+                        <input type="hidden" name="adminpanel_csrf_token" value="<?php echo $admin_panel -> createCSRFToken(); ?>" />
 			         </td>
 		         </tr>
 		      </table>

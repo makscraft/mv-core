@@ -1014,10 +1014,10 @@ $(document).ready(function()
   	    $("table.model-table tr:eq(" + row.index() + ")").addClass("moved-line");	  
   	});
   	
-  	//Reload the list of versions after pager action
+  	//Reload the list of versions after the paginator action
   	function updateVersionsList(params)
   	{
-  		var version = get_params = "";
+  		let version = get_params = '';
   		
   		if(location.href.match(/\?.*version=\d+/))
   		{
@@ -1051,7 +1051,7 @@ $(document).ready(function()
   	//Vesions pager actions
   	$("#versions-pager div.pager a").live("click", function()
   	{
-  		var versions_page = $(this).attr("href");
+		let versions_page = $(this).attr("href");
   		versions_page = "&versions-page=" + parseInt(versions_page.replace(/.*versions-page=(\d+).*/, "$1"));
   		updateVersionsList(versions_page);
   		
@@ -1061,7 +1061,7 @@ $(document).ready(function()
   	//Sets new limit for versions pager
   	$("#versions-pager div.limit select").live("change", function() 
   	{
-  		var pager_limit = "&versions-pager-limit=" + parseInt($(this).val());
+  		let pager_limit = "&versions-pager-limit=" + parseInt($(this).val());
   		updateVersionsList(pager_limit);
   	});
   	  	

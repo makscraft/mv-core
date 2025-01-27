@@ -53,7 +53,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'create' && !empty($_POST))
 			$url_to_go .= "update.php?".$url_params."&id=".$new_id;
 		else
 			$url_to_go .= "?".$url_params;
-			
+		
 		$_SESSION["message"]["created"] = true;
 		$_SESSION["message"]["done"] = "create";
 

@@ -712,6 +712,11 @@ class Model extends ModelBase
 			}			
 		}
 		
+		$in_transaction = (method_exists(Database::$pdo, "inTransaction")) ? Database::$pdo -> inTransaction() : true;
+		
+		if(!$in_transaction)
+			$this -> db -> beginTransaction();
+
 		if(method_exists($this, "beforeCreate")) //Trigger before creating a record 
 		{
 			$result_values = $this -> beforeCreate($version_dump);
@@ -754,6 +759,9 @@ class Model extends ModelBase
 			$this -> afterCreate($this -> id, $version_dump);
 			
 		Cache::cleanByModel($this -> getModelClass());
+
+		if(!$in_transaction)
+			$this -> db -> commitTransaction();
 		
 		return $this -> id;
 	}
@@ -872,7 +880,12 @@ class Model extends ModelBase
 			}
 			else if($type != 'many_to_one')		
 				$version_dump[$name] = $value;
-		}		
+		}
+
+		$in_transaction = (method_exists(Database::$pdo, "inTransaction")) ? Database::$pdo -> inTransaction() : true;
+		
+		if(!$in_transaction)
+			$this -> db -> beginTransaction();
 		
 		if(method_exists($this, "beforeUpdate"))
 		{
@@ -920,6 +933,9 @@ class Model extends ModelBase
 			$this -> afterUpdate($this -> id, $version_dump);
 			
 		Cache::cleanByModel($this -> getModelClass());
+
+		if(!$in_transaction)
+			$this -> db -> commitTransaction();
 				
 		return $this;
 	}
@@ -936,7 +952,12 @@ class Model extends ModelBase
 		
 		if(isset($arguments[0]) && is_array($arguments[0]))
 			$content = array_merge($content, $arguments[0]);
-			
+		
+		$in_transaction = (method_exists(Database::$pdo, "inTransaction")) ? Database::$pdo -> inTransaction() : true;
+		
+		if(!$in_transaction)
+			$this -> db -> beginTransaction();
+
 		if(method_exists($this, "beforeDelete"))
 			if($this -> beforeDelete($this -> id, $content) === false)
 				return $this; //Stop operation and exit if false was returned by pre action
@@ -971,6 +992,9 @@ class Model extends ModelBase
 		$this -> drop();
 		
 		Cache::cleanByModel($this -> getModelClass());
+
+		if(!$in_transaction)
+			$this -> db -> commitTransaction();
 		
 		return $this;
 	}
@@ -1832,8 +1856,8 @@ class Model extends ModelBase
 		else if($action_type == 'update')
 		{
 			$html = "<a title=\"".I18n::locale("edit")."\" href=\"";
-			$html .= $this -> registry -> getSetting('AdminPanelPath')."model/";
-			$html .= "update.php?".$this -> getAllUrlParams(array('parent','model','pager','filter'));
+			$html .= $this -> registry -> getSetting('AdminPanelPath')."?model=".$this -> getModelClass();
+			$html .= "&action=update".$this -> getAllUrlParams(['parent','pager','filter']);
 			$html .= "&id=".$id."\" class=\"single-action action-".$action_type."\"></a>\n";
 		}
 		

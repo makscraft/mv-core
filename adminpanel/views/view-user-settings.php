@@ -31,12 +31,7 @@ if(Http::isPostRequest() && Http::fromGet('action') === 'update')
 			I18n::saveRegion($model -> getValue('region'));
 		}
 
-        $model -> removeElement('region');
-		
-		$db -> beginTransaction();
-		$model -> update('self-update');
-		$db -> commitTransaction();
-		
+        $model -> removeElement('region') -> update('self-update');
 		FlashMessages::add('success', I18n::locale('done-update'));
 		
 		if($skin = Http::fromPost('admin-panel-skin'))
