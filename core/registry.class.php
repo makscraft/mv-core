@@ -162,7 +162,7 @@ class Registry
 		
 		if(!is_file($env))
 		{
-			$other_envs = ['.local', '.development', '.stage', '.demo', '.production'];
+			$other_envs = ['.local', '.development', '.stage', '.demo', '.test', '.production'];
 			
 			foreach($other_envs as $variant)
 				if(is_file($env.$variant))
