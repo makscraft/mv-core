@@ -21,16 +21,16 @@ else
 ?>
 <script type="text/javascript" src="<?php echo $admin_panel_path; ?>interface/js/mv.js<?php echo $cache_drop; ?>"></script>
 <script type="text/javascript">
-mVobject.mainPath = '<?php echo $registry -> getSetting('MainPath'); ?>';
-mVobject.adminPanelPath = '<?php echo $admin_panel_path; ?>';
-mVobject.currentView = '<? echo isset($admin_panel) ? $admin_panel -> getCurrentView() : '' ?>';
-mVobject.urlParams = '<?php if(isset($model)) echo $model -> getAllUrlParams(array('pager','filter','model','parent','id')); ?>';
+MVobject.mainPath = '<?php echo $registry -> getSetting('MainPath'); ?>';
+MVobject.adminPanelPath = '<?php echo $admin_panel_path; ?>';
+MVobject.currentView = '<? echo isset($admin_panel) ? $admin_panel -> getCurrentView() : '' ?>';
+MVobject.urlParams = '<?php if(isset($model)) echo $model -> getAllUrlParams(array('pager','filter','model','parent','id')); ?>';
 <?php
 if(isset($model))
-   echo "mVobject.currentModel = '".$model -> getModelClass()."';\n";
+   echo "MVobject.currentModel = '".$model -> getModelClass()."';\n";
 
 if(isset($model -> sorter))
-   echo "mVobject.sortField = '".$model -> sorter -> getField()."';\n";
+   echo "MVobject.sortField = '".$model -> sorter -> getField()."';\n";
 
 if(isset($model))
 {
@@ -40,26 +40,26 @@ if(isset($model))
 
 if(isset($parent) && is_array($parent) && isset($model -> filter))
 	if(!$model -> filter -> allowChangeOrderLinkedWithEnum($parent['name']))
-		echo "mVobject.relatedParentFilter = '".$parent['caption']."';\n";
+		echo "MVobject.relatedParentFilter = '".$parent['caption']."';\n";
 
 if(isset($linked_order_fields) && count($linked_order_fields))
 	foreach($linked_order_fields as $name => $data)
 		if(!$model -> filter -> allowChangeOrderLinkedWithEnum($data[0]))
-			echo "mVobject.dependedOrderFields.".$name." = '".$data[1]."';\n";
+			echo "MVobject.dependedOrderFields.".$name." = '".$data[1]."';\n";
 		
 $has_applied_filters = (int) (isset($model -> filter) && $model -> filter -> ifAnyFilterApplied());
-echo "mVobject.hasAppliedFilters = ".$has_applied_filters.";\n";      
+echo "MVobject.hasAppliedFilters = ".$has_applied_filters.";\n";      
       
 if(isset($model -> filter))
    if($caption = $model -> filter -> ifFilteredByAllParents())
-      echo "mVobject.allParentsFilter = '".$caption."';\n";
+      echo "MVobject.allParentsFilter = '".$caption."';\n";
    else if(isset($model -> pager))
-      echo "mVobject.startOrder = ".($model -> pager -> getStart() + 1).";\n";
+      echo "MVobject.startOrder = ".($model -> pager -> getStart() + 1).";\n";
 
 $region = $registry -> getSetting('Region');
 ?>
-mVobject.region = '<?php echo $region; ?>';
-mVobject.dateFormat = '<?php echo I18n::getDateFormat(); ?>';
+MVobject.region = '<?php echo $region; ?>';
+MVobject.dateFormat = '<?php echo I18n::getDateFormat(); ?>';
 </script>
 <?php
 

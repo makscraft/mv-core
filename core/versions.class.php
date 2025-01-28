@@ -143,7 +143,7 @@ class Versions
 		if(!$this -> last_version) //If it was no versions before
 			return "<tr><td colspan=\"3\">".I18n :: locale('versions-no-yet')."</td></tr>\n";
 			
-		$html = "";
+		$html = '';
 		
 		$result = $this -> db -> query("SELECT * FROM `".$this -> table."` 
 										WHERE `model`='".$this -> model."' 

@@ -6,7 +6,7 @@ $(document).ready(function()
 		$.ajax({
 			type: "POST",
 			data: "continue=1",
-			url: mVobject.adminPanelPath + "ajax/session.php"
+			url: MVobject.adminPanelPath + "ajax/session.php"
 		});
 	}
 	
@@ -26,7 +26,7 @@ $(document).ready(function()
 		let selected = false;
 
 		if($(item).val())
-			if(selected = mVobject.convertDateIntoInternational($.trim($(item).val())))
+			if(selected = MVobject.convertDateIntoInternational($.trim($(item).val())))
 				selected = [selected];
 
 		let airDatepickerCalendar = new AirDatepicker(item, {
@@ -45,8 +45,8 @@ $(document).ready(function()
 
 		if(typeof airDatepickerLocale !== 'undefined')
 		{
-			if(mVobject.dateFormat)
-				airDatepickerLocale.dateFormat = mVobject.dateFormat.replace('mm', 'MM');
+			if(MVobject.dateFormat)
+				airDatepickerLocale.dateFormat = MVobject.dateFormat.replace('mm', 'MM');
 
 			airDatepickerCalendar.update({locale: airDatepickerLocale});
 		}
@@ -161,12 +161,12 @@ $(document).ready(function()
 	function addUploadedMultiImage(element_area_id, data)
 	{
 		let image = "<div class=\"images-wrapper\"><div class=\"controls\" id=\"" + data.image + "\">"; 
-		image += "<span class=\"first\" title=\"" + mVobject.locale("move_first") + "\"></span> ";
-		image += "<span class=\"left\" title=\"" + mVobject.locale("move_left") + "\"></span>";
-		image += "<span class=\"right\" title=\"" + mVobject.locale("move_right") + "\"></span> ";
-		image += "<span class=\"last\" title=\"" + mVobject.locale("move_last") + "\"></span>";
-		image += "<span class=\"comment\" title=\"" + mVobject.locale("add_edit_comment") + "\"></span>";
-		image += "<span class=\"delete\" title=\"" + mVobject.locale("delete") + "\"></span></div>";
+		image += "<span class=\"first\" title=\"" + MVobject.locale("move_first") + "\"></span> ";
+		image += "<span class=\"left\" title=\"" + MVobject.locale("move_left") + "\"></span>";
+		image += "<span class=\"right\" title=\"" + MVobject.locale("move_right") + "\"></span> ";
+		image += "<span class=\"last\" title=\"" + MVobject.locale("move_last") + "\"></span>";
+		image += "<span class=\"comment\" title=\"" + MVobject.locale("add_edit_comment") + "\"></span>";
+		image += "<span class=\"delete\" title=\"" + MVobject.locale("delete") + "\"></span></div>";
 		
 		let big_image = data.small_image.replace("admin/", "");
 		
@@ -194,7 +194,7 @@ $(document).ready(function()
 			return;
 		}
 		
-		$('form.model-elements-form').attr("action", mVobject.adminPanelPath + "ajax/upload-images.php");		
+		$('form.model-elements-form').attr("action", MVobject.adminPanelPath + "ajax/upload-images.php");		
 		$(this).parents(element_area_id).find("div.upload-one div.loading").addClass("small-loader");
 		$("#sku-products-combinations input[type='text']").prop("disabled", true);
 		
@@ -207,7 +207,7 @@ $(document).ready(function()
 				$(element_area_id + " div.images-error").remove();
 				$("form div.upload-one div.loading").removeClass("small-loader");
 
-				let errors_message = "<p>" + mVobject.locale("error_data_transfer") + "</p>";
+				let errors_message = "<p>" + MVobject.locale("error_data_transfer") + "</p>";
 				$(element_area_id).prepend("<div class=\"images-error\">" + errors_message + "</div>");
 			}, 
 			success: function(data)
@@ -227,7 +227,7 @@ $(document).ready(function()
         			
        				if(data.wrong_files)
 				    {
-       					errors_message += "<p>" + mVobject.locale("not_uploaded_files");
+       					errors_message += "<p>" + MVobject.locale("not_uploaded_files");
        					errors_message += ": " + data.wrong_files + ".</p>";
 				    }
        				
@@ -267,7 +267,7 @@ $(document).ready(function()
 			if(!number)
 			{
 				area.find("input[type='hidden']").val('');
-				area.prepend("<p class=\"no-images\">" + mVobject.locale("no_images") + "</p>");
+				area.prepend("<p class=\"no-images\">" + MVobject.locale("no_images") + "</p>");
 
 				return;
 			}
@@ -478,7 +478,7 @@ $(document).ready(function()
 			$.ajax({
 				type: "POST",
 				dataType: "html",
-				url: mVobject.adminPanelPath + "ajax/filters.php",
+				url: MVobject.adminPanelPath + "ajax/filters.php",
 				data: "model=" + model.replace(/^model-/, "") + "&add-filter=" + name,
 				success: function(data)
 				{
@@ -526,12 +526,12 @@ $(document).ready(function()
 	//Change the visibility of model filters in session
 	function changeFilterVisibility(value)
 	{
-		var params = "model=" + mVobject.currentModel + "&show-filters=" + (value ? "1" : "0");
+		var params = "model=" + MVobject.currentModel + "&show-filters=" + (value ? "1" : "0");
 				
 		$.ajax({
 			type: "POST",
 			dataType: "text",
-			url: mVobject.adminPanelPath + "ajax/filters.php",
+			url: MVobject.adminPanelPath + "ajax/filters.php",
 			data: params
 		});		
 	}
@@ -561,11 +561,11 @@ $(document).ready(function()
 	{
 		let name = $(this).parent().find("input").attr("name");
 		let params = $(this).parent().find("input").val();
-		let href = mVobject.adminPanelPath;
+		let href = MVobject.adminPanelPath;
 		
 		if(params == 'filemanager')
 			href += "?view=filemanager&pager-limit=" + this.value;
-		else if(mVobject.currentView == "search")
+		else if(MVobject.currentView == "search")
 			href += "?view=search&" + name + "=" + params + "&pager-limit=" + this.value;
 		else
 			href += "model/?" + params + "&pager-limit=" + this.value;
@@ -602,7 +602,7 @@ $(document).ready(function()
 		
 		if(css_class == "has-no-rights" || css_class == "has-no-rights-0" || css_class == "has-no-rights-1")
 		{
-			$.modalWindow.open(mVobject.locale("no_rights"), {css_class: "alert"});
+			$.modalWindow.open(MVobject.locale("no_rights"), {css_class: "alert"});
 			return;
 		}
 		
@@ -635,7 +635,7 @@ $(document).ready(function()
 			$.ajax({
 				type: "POST",
 				data: "check=1",
-				url: mVobject.adminPanelPath + "ajax/session.php",
+				url: MVobject.adminPanelPath + "ajax/session.php",
 				success: function(data)
 				{	
 					if(!data)
@@ -647,7 +647,7 @@ $(document).ready(function()
 			
 			if(pager_limit > 0)
 			{
-				$.modalWindow.open(mVobject.locale("quick_edit_limit", {number: pager_limit}), {css_class: "alert"});
+				$.modalWindow.open(MVobject.locale("quick_edit_limit", {number: pager_limit}), {css_class: "alert"});
 				return;
 			}
 			
@@ -687,12 +687,12 @@ $(document).ready(function()
 			
 			$("input.save-quick-edit").click(function() //Save all values
 			{
-				var params = "model=" + mVobject.currentModel + "&" + $("#model-table-form").serialize();
+				var params = "model=" + MVobject.currentModel + "&" + $("#model-table-form").serialize();
 				
 				$.ajax({
 					type: "POST",
 					dataType: "json",
-					url: mVobject.adminPanelPath + "ajax/quick-edit.php",
+					url: MVobject.adminPanelPath + "ajax/quick-edit.php",
 					data: params,
 					success: function(data)
 					{	
@@ -720,14 +720,14 @@ $(document).ready(function()
 	{
 		if($(this).hasClass("has-no-rights"))
 		{
-			$.modalWindow.open(mVobject.locale("no_rights"), {css_class: "alert"});
+			$.modalWindow.open(MVobject.locale("no_rights"), {css_class: "alert"});
 			return;
 		}
 		
 		$.ajax({
 			type: "POST",
 			dataType: "text",
-			url: mVobject.adminPanelPath + "ajax/multi-actions.php",
+			url: MVobject.adminPanelPath + "ajax/multi-actions.php",
 			data: "empty-recycle-bin=count",
 			success: function(data)
 			{	
@@ -739,10 +739,10 @@ $(document).ready(function()
 					return;
 				}
 				
-				var message = mVobject.locale("delete_many", {number_records: data});
+				var message = MVobject.locale("delete_many", {number_records: data});
 				recycleBinRecordsCount = parseInt(data);
 				$("#message-confirm-delete div.message").removeClass("update").addClass("delete").html(message);
-				$("#message-confirm-delete").overlay(mVobject.paramsForDialogs).load();
+				$("#message-confirm-delete").overlay(MVobject.paramsForDialogs).load();
 				$("#message-confirm-delete #butt-ok").attr("name", "method->emptyRecycleBin");
 			}
 		});
@@ -810,7 +810,7 @@ $(document).ready(function()
 		$.ajax({
 			type: "POST",
 			dataType: "json",
-			url: mVobject.adminPanelPath + "ajax/bool-change.php",
+			url: MVobject.adminPanelPath + "ajax/bool-change.php",
 			data: "id=" + this.id + "&admin-panel-csrf-token=" + $("input[name='admin-panel-csrf-token']").val(),
 			success: function(data)
 			{
@@ -873,11 +873,11 @@ $(document).ready(function()
 		
 		$.ajax({ //Writes params into session on the server
 			type: "POST",
-			url: mVobject.adminPanelPath + "ajax/display-fields.php",
-			data: mVobject.urlParams + "&model_display_fields=" + params.join(","),
+			url: MVobject.adminPanelPath + "ajax/display-fields.php",
+			data: MVobject.urlParams + "&model_display_fields=" + params.join(","),
 			success: function(data)
 			{
-				location.href = mVobject.adminPanelPath + "model/?" + mVobject.urlParams;
+				location.href = MVobject.adminPanelPath + "model/?" + MVobject.urlParams;
 			}
 		});
 	});
@@ -945,28 +945,28 @@ $(document).ready(function()
   		let field = $(this).parents('div').attr('class').replace(' ordering-area', '');
   		model_field = field.replace(/^move_position_/, '');
   		
-  		if(model_field != mVobject.sortField)
+  		if(model_field != MVobject.sortField)
   		{
-			$.modalWindow.open(mVobject.locale("sort_by_column"), {css_class: "alert"});
+			$.modalWindow.open(MVobject.locale("sort_by_column"), {css_class: "alert"});
   			return;
   		}
-  		else if(mVobject.allParentsFilter)
+  		else if(MVobject.allParentsFilter)
   		{
-  			let data_ = {field: mVobject.allParentsFilter};
-			$.modalWindow.open(mVobject.locale("all_parents_filter", data_), {css_class: "alert"});
+  			let data_ = {field: MVobject.allParentsFilter};
+			$.modalWindow.open(MVobject.locale("all_parents_filter", data_), {css_class: "alert"});
   			return;
   		}
-  		else if(mVobject.relatedParentFilter)
+  		else if(MVobject.relatedParentFilter)
   		{
-  			let data_ = {field: mVobject.relatedParentFilter};
-			$.modalWindow.open(mVobject.locale("parent_filter_needed", data_), {css_class: "alert"});
+  			let data_ = {field: MVobject.relatedParentFilter};
+			$.modalWindow.open(MVobject.locale("parent_filter_needed", data_), {css_class: "alert"});
 
   			return;
   		}
-  		else if(typeof(mVobject.dependedOrderFields[model_field]) != "undefined")
+  		else if(typeof(MVobject.dependedOrderFields[model_field]) != "undefined")
   		{
-  			let data_ = {field: mVobject.dependedOrderFields[model_field]};
-			$.modalWindow.open(mVobject.locale("parent_filter_needed", data_), {css_class: "alert"});
+  			let data_ = {field: MVobject.dependedOrderFields[model_field]};
+			$.modalWindow.open(MVobject.locale("parent_filter_needed", data_), {css_class: "alert"});
 
   			return;
   		}
@@ -985,7 +985,7 @@ $(document).ready(function()
   				break;
   		}
 		
-		let start_order = mVobject.startOrder;
+		let start_order = MVobject.startOrder;
 		let data_for_ajax = [];
 		
 		$("table.model-table tr:gt(0)").each(function()
@@ -997,13 +997,13 @@ $(document).ready(function()
 			data_for_ajax.push(id.replace(/.*_(\d+)$/, "$1") + "-" + start_order ++);
 		});
 		
-		data_for_ajax = "orders_update_data=" + data_for_ajax.join("_") + "&" + mVobject.urlParams;
+		data_for_ajax = "orders_update_data=" + data_for_ajax.join("_") + "&" + MVobject.urlParams;
 		data_for_ajax += "&model_field=" + model_field;
 		data_for_ajax += "&admin-panel-csrf-token=" + $("input[name='admin-panel-csrf-token']").val();
 		
 		$.ajax({
 			type: "POST",
-			url: mVobject.adminPanelPath + "ajax/orders.php",
+			url: MVobject.adminPanelPath + "ajax/orders.php",
 			data: data_for_ajax
 		});
 		
@@ -1030,9 +1030,9 @@ $(document).ready(function()
   		
 		$.ajax({
 			type: "POST",
-			url: mVobject.adminPanelPath + "ajax/versions.php" + get_params,
+			url: MVobject.adminPanelPath + "ajax/versions.php" + get_params,
 			dataType: "html",
-			data: mVobject.urlParams + params + version,
+			data: MVobject.urlParams + params + version,
 			success: function(data)
 			{
 				if(!data)
@@ -1092,7 +1092,7 @@ $(document).ready(function()
   		let field = $(this).parents(".m2m-wrapper").find("input[type='hidden']").attr("name");
   		let ids = $(this).parents(".m2m-wrapper").find("input[type='hidden']").val();
   		let this_ = this;
-  		let params = mVobject.urlParams + "&query=" + request + "&field=" + field + "&ids=" + ids;
+  		let params = MVobject.urlParams + "&query=" + request + "&field=" + field + "&ids=" + ids;
 		
   		if(!request)
   		{
@@ -1105,7 +1105,7 @@ $(document).ready(function()
   		
 		$.ajax({
 			type: "GET",
-			url: mVobject.adminPanelPath + "ajax/m2m-search.php",
+			url: MVobject.adminPanelPath + "ajax/m2m-search.php",
 			dataType: "html",
 			data: params,
 			success: function(data)
@@ -1178,7 +1178,7 @@ $(document).ready(function()
 	
 	//Main global search in admin panel
     var options = { 
-		serviceUrl: mVobject.adminPanelPath + "ajax/search.php", 
+		serviceUrl: MVobject.adminPanelPath + "ajax/search.php", 
 		deferRequestBy: 200,
 		noCache: true,
 		onSelect: function(data, value, elem)
@@ -1194,7 +1194,7 @@ $(document).ready(function()
     {
 		$.ajax({
 			type: "POST",
-			url: mVobject.adminPanelPath + "ajax/switch.php",
+			url: MVobject.adminPanelPath + "ajax/switch.php",
 			dataType: "html",
 			data: "switch-off=warnings",
 			success: function(data)
@@ -1219,7 +1219,7 @@ $(document).ready(function()
 			
 			$.ajax({
 				type: "POST",
-				url: mVobject.adminPanelPath + "ajax/autocomplete.php",
+				url: MVobject.adminPanelPath + "ajax/autocomplete.php",
 				dataType: "text",
 				data: "action=translit&string=" + encodeURIComponent(value),
 				success: function(data)
@@ -1259,14 +1259,14 @@ $(document).ready(function()
 		let params = $(this).attr("id").split("-");
 		
 		if(params[2] == "deny")
-			$.modalWindow.open(mVobject.locale("no_rights"), {css_class: "alert"});
+			$.modalWindow.open(MVobject.locale("no_rights"), {css_class: "alert"});
 		else
 		{
 			let action_key = params[1] + "_one";
-			let message = mVobject.locale(action_key, {name: name});
+			let message = MVobject.locale(action_key, {name: name});
 			
 			var href = "id=" + params[2] + "&admin-model-action-token=" + params[3] + "&action=" + params[1]; 
-			href = mVobject.adminPanelPath + "model/?" + mVobject.urlParams + "&" + href;
+			href = MVobject.adminPanelPath + "model/?" + MVobject.urlParams + "&" + href;
 			
 			$.modalWindow.open(message, {css_class: params[1], url: href});
 		}
@@ -1295,7 +1295,7 @@ function removeDeletedRecords()
 	$.ajax({
 		type: "POST",
 		dataType: "text",
-		url: mVobject.adminPanelPath + "ajax/multi-actions.php",
+		url: MVobject.adminPanelPath + "ajax/multi-actions.php",
 		data: "empty-recycle-bin=process&iterations-left=" + recycleBinDeleteIterations,
 		success: function(data)
 		{
@@ -1324,7 +1324,7 @@ var keepAutocompleteData = {text: "", id: false, field: false};
 //Runs autocomplete for ling lists
 function runAutocomplete(element)
 {
-	var data = mVobject.urlParams.split("&");
+	var data = MVobject.urlParams.split("&");
 	var input_params = {};
 	
 	$("input.autocomplete-input, input.autocomplete-multi").live("keyup", function()
@@ -1345,7 +1345,7 @@ function runAutocomplete(element)
 		input_params.ids = $(element).next().attr("id");
 	
     var options = { 
-	serviceUrl: mVobject.adminPanelPath + "ajax/autocomplete.php", 
+	serviceUrl: MVobject.adminPanelPath + "ajax/autocomplete.php", 
 	deferRequestBy: 200,
 	noCache: true,
 	params: input_params,
@@ -1397,11 +1397,11 @@ function exportIntoCSV()
 {
 	if(!$.trim($("input[name='csv_fields']").val()))
 	{
-		$.modalWindow.open(mVobject.locale("select_fields"), {css_class: "alert"});
+		$.modalWindow.open(MVobject.locale("select_fields"), {css_class: "alert"});
 		return;
 	}
 
-	location.href = mVobject.adminPanelPath + "ajax/compose-csv.php?" + $("#csv-settings").serialize();
+	location.href = MVobject.adminPanelPath + "ajax/compose-csv.php?" + $("#csv-settings").serialize();
 }
 
 //Action of import daa from csv file into model's table
@@ -1412,12 +1412,12 @@ function importFromCSV()
 	
 	if(!$.trim($("input[name='csv_fields']").val()))
 	{
-		$.modalWindow.open(mVobject.locale("select_fields"), {css_class: "alert"});
+		$.modalWindow.open(MVobject.locale("select_fields"), {css_class: "alert"});
 		return;
 	}
 	else if(!$("#csv_file").val())
 	{
-		$.modalWindow.open(mVobject.locale("select_csv_file"), {css_class: "alert"});
+		$.modalWindow.open(MVobject.locale("select_csv_file"), {css_class: "alert"});
 		return;
 	}
 	
@@ -1431,7 +1431,7 @@ function importFromCSV()
 			$("div.form-no-errors, div.form-errors").remove();
 			$("#csv-upload-loader").removeClass("small-loader");
 			
-			var message = '<div class="form-errors"><p>' + mVobject.locale("error_data_transfer");
+			var message = '<div class="form-errors"><p>' + MVobject.locale("error_data_transfer");
 			message += request.responseText ? "<br />" + request.responseText : ""; 
 			message += '</p></div>';
 
@@ -1459,7 +1459,7 @@ function importFromCSV()
 //Immediate showing of skin when we change select value by adding of css file
 function applySelectedSkin(select)
 {
-	var path = mVobject.adminPanelPath + "interface/skins/" + $(select).val() + "/skin.css";
+	var path = MVobject.adminPanelPath + "interface/skins/" + $(select).val() + "/skin.css";
 	var css_file = '<link id="skin-css" rel="stylesheet" type="text/css" href="' + path +'" />';
 	
 	$("#skin-css").remove();
@@ -1493,7 +1493,7 @@ function openSkinChooseDialog(skins)
 		$.ajax({
 			type: "POST",
 			dataType: "text",
-			url: mVobject.adminPanelPath + "ajax/display-fields.php",
+			url: MVobject.adminPanelPath + "ajax/display-fields.php",
 			data: "set-user-skin=" + $("#choose-skin-select").val(),
 			success: function(data)
 			{

@@ -67,7 +67,7 @@ include $registry -> getSetting('IncludeAdminPath').'includes/header.php';
 			if($system -> user -> checkModelRights('file_manager', 'create'))
 				$submit_button = "type=\"submit\"";
 			else
-				$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(mVobject.locale('no_rights'), {css_class: 'alert'});\"";
+				$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(MVobject.locale('no_rights'), {css_class: 'alert'});\"";
 		?>
 
 		<div id="filemanager-navigation">

@@ -17,8 +17,8 @@ if(isset($_GET["locale"]) && I18n::getRegion() == $_GET["locale"])
 	
 	header("Content-Type: application/javascript; charset=utf-8");
 
-	echo "mVobject.region = \"".I18n::getRegion()."\";\n\n";
-	echo "mVobject.localePackage = {\n";
+	echo "MVobject.region = \"".I18n::getRegion()."\";\n\n";
+	echo "MVobject.localePackage = {\n";
 	
 	foreach($keys as $key)
 		$data[] = str_replace("-", "_", $key).': '.'"'.I18n::locale($key).'"';

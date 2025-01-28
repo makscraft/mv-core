@@ -9,15 +9,18 @@ if(isset($_POST['model'], $_POST['id']) && $system -> registry -> checkModel($_P
 {			
 	$model = new $_POST['model']();
 	$model -> setId($_POST['id']);
+	$is_simple_model = get_parent_class($model) === 'ModelSimple';
 	
-	$url_params = $model -> getAllUrlParams(array('parent','model','filter','pager','id'));
-	$current_tab = $model -> checkCurrentTab();
-
-	if($current_tab)
-		$url_params .= "&current-tab=".$current_tab;
+	if($is_simple_model)
+		$url_params = 'model='.$model -> getModelClass().'&action=simple';
+	else
+		$url_params = $model -> getAllUrlParams(['parent','model','filter','pager','id']).'&action=update';
+	
+	if($current_tab = $model -> checkCurrentTab())
+		$url_params .= '&current-tab='.$current_tab;
 		
 	$admin_panel -> runVersions($model);
-	$admin_panel -> versions -> setUrlParams($url_params.'&action=update');
+	$admin_panel -> versions -> setUrlParams($url_params);
 	
 	$id_check = ($_POST['id'] == -1) ? true : $model -> checkRecordById($model -> getId());
 	

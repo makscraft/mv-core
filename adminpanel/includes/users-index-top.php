@@ -5,7 +5,7 @@ $(document).ready(function()
 	$.ajax({
 		type: "POST",
 		dataType: "json",
-		url: mVobject.adminPanelPath + "ajax/session.php",
+		url: MVobject.adminPanelPath + "ajax/session.php",
 		data: "get-online-users=1",
 		success: function(data)
 		{           

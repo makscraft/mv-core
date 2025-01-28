@@ -1,7 +1,7 @@
 /**
  * JS object with settings and custom functions for MV framework admin panel.
  */
-var mVobject = {
+var MVobject = {
 
 	//Root path of the project
 	mainPath: '',	

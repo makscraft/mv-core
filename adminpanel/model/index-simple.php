@@ -112,7 +112,7 @@ include $registry -> getSetting("IncludeAdminPath")."includes/header.php";
                    	if($system -> user -> checkModelRights($system -> model -> getModelClass(), "update"))
                    		$submit_button = "type=\"button\" id=\"submit-button\"";
                    	else
-                   		$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(mVobject.locale('no_rights'), {css_class: 'alert'});\"";
+                   		$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(MVobject.locale('no_rights'), {css_class: 'alert'});\"";
                 ?>                 
 	           <input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n::locale('update'); ?>" />
 	           <input class="button-dark" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath'); ?>'" type="button" value="<?php echo I18n::locale('cancel'); ?>" />

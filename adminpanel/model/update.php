@@ -148,8 +148,8 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
                         	}
                         	else
                         	{
-                        		$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(mVobject.locale('no_rights'), {css_class: 'alert'});\"";
-                        		$continue_button = "onclick=\"$.modalWindow.open(mVobject.locale('no_rights'), {css_class: 'alert'});\"";
+                        		$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(MVobject.locale('no_rights'), {css_class: 'alert'});\"";
+                        		$continue_button = "onclick=\"$.modalWindow.open(MVobject.locale('no_rights'), {css_class: 'alert'});\"";
                         	}
                         ?>
                         <?php if($system -> model -> getEditableFields() !== false): ?>

@@ -14,7 +14,7 @@ $(document).ready(function()
 {
 	$.modalWindow = {
 		
-	cancel_text: mVobject.locale("cancel"),
+	cancel_text: MVobject.locale("cancel"),
 	
 	extra_html: "",
 	

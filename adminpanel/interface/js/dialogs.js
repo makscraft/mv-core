@@ -9,7 +9,7 @@ var dialogs = {
 			var message_ = message;
 			
 			if(message_.match(/^\{\w+\}$/))
-				message = mVobject.locale(message.replace(/\{(.*)\}/, "$1"), params);
+				message = MVobject.locale(message.replace(/\{(.*)\}/, "$1"), params);
 			
 			return message;
 		},
@@ -21,7 +21,7 @@ var dialogs = {
 				
 			//Adds the text of message
 			$("#message-alert div.message").html(this.prepareMessage(message, params));
-	    	$("#message-alert").overlay(mVobject.paramsForDialogs).load();
+	    	$("#message-alert").overlay(MVobject.paramsForDialogs).load();
 		},
 		
 		//Message when delete one element pushing the button with cross "x"
@@ -40,12 +40,12 @@ var dialogs = {
 			
 			$("#message-confirm-delete div.message").addClass(css_class);
 			
-			var href = url.match(/\.php/) ? url : mVobject.adminPanelPath + "model/?" + mVobject.urlParams + "&" + url;
+			var href = url.match(/\.php/) ? url : MVobject.adminPanelPath + "model/?" + MVobject.urlParams + "&" + url;
 			
 			$("#message-confirm-delete #butt-ok").attr("name", "href->" + href);  	
 	    				
 			//Shows overlay window
-	    	$("#message-confirm-delete").overlay(mVobject.paramsForDialogs).load();
+	    	$("#message-confirm-delete").overlay(MVobject.paramsForDialogs).load();
 		},
 		
 		showRenameMessage: function(message, form, name)
@@ -53,7 +53,7 @@ var dialogs = {
 			$("#message-confirm-delete div.message").html(this.prepareMessage(message, {name: name}));			
 			$("#message-confirm-delete div.message").removeClass("restore").removeClass("delete").addClass("update");
 			$("#message-confirm-delete #butt-ok").attr("name", "form->" + form);  				
-	    	$("#message-confirm-delete").overlay(mVobject.paramsForDialogs).load();			
+	    	$("#message-confirm-delete").overlay(MVobject.paramsForDialogs).load();			
 		},
 		
 		showDeleteFilesMessage: function()
@@ -68,7 +68,7 @@ var dialogs = {
 			$.ajax({
 				type: "POST",
 				dataType: "text",
-				url: mVobject.adminPanelPath + "ajax/filemanager.php",
+				url: MVobject.adminPanelPath + "ajax/filemanager.php",
 				data: "number_files=" + number,
 				success: function(data)
 				{
@@ -79,7 +79,7 @@ var dialogs = {
 					$("#message-confirm-delete #butt-ok").attr("name", "form->#filemanager-form");
 
 					//Shows overlay window
-			    	$("#message-confirm-delete").overlay(mVobject.paramsForDialogs).load();
+			    	$("#message-confirm-delete").overlay(MVobject.paramsForDialogs).load();
 				}
 			});
 		},
@@ -107,12 +107,12 @@ var dialogs = {
 					checked_elements.push(id)
 			});
 			
-			ajax_params += "&ids=" + checked_elements.join(',') + "&" + mVobject.urlParams;
+			ajax_params += "&ids=" + checked_elements.join(',') + "&" + MVobject.urlParams;
 			
 			$.ajax({
 				type: "POST",
 				dataType: "xml",
-				url: mVobject.adminPanelPath + "ajax/multi-actions.php",
+				url: MVobject.adminPanelPath + "ajax/multi-actions.php",
 				data: ajax_params,
 				success: function(data)
 				{
@@ -188,10 +188,10 @@ var dialogs = {
 							{
 								var html = "<div class=\"multi-value-select long-list\">";
 								html += "<select class=\"long-list-multi-value\">";
-								html += "<option value=\"search\">" + mVobject.locale("search_by_name") + "</option>";
+								html += "<option value=\"search\">" + MVobject.locale("search_by_name") + "</option>";
 								
 								if($(data).find('response').find('empty_value').text() == "1")
-									html += "<option value=\"reset\">" + mVobject.locale("not_defined") + "</option>";
+									html += "<option value=\"reset\">" + MVobject.locale("not_defined") + "</option>";
 								
 								html += "</select>";
 								html += "<input type=\"text\" value=\"\" class=\"autocomplete-multi\" />";
@@ -248,7 +248,7 @@ var dialogs = {
 					let css_class = (multi_action == 'delete') ? 'delete' : 'update'; 
 					$("#message-confirm-delete div.message").removeClass("update restore delete").addClass(css_class);
 					
-					let form_action = mVobject.adminPanelPath + "model/?" + mVobject.urlParams;
+					let form_action = MVobject.adminPanelPath + "model/?" + MVobject.urlParams;
 					form_action +=  "&multi_action=" + multi_action;
 					
 					if(type == 'many_to_many' || type == 'group')
@@ -263,10 +263,10 @@ var dialogs = {
 					$("#model-table-form").attr("action", form_action);
 					
 					//Adds the text of message
-					$("#message-confirm-delete div.message").html(mVobject.locale(message_key, locale_params)).append(html);
+					$("#message-confirm-delete div.message").html(MVobject.locale(message_key, locale_params)).append(html);
 
 					//Displays modal window
-					$("#message-confirm-delete").overlay(mVobject.paramsForDialogs).load();
+					$("#message-confirm-delete").overlay(MVobject.paramsForDialogs).load();
 
 					//Extra js plugins
 					runAutocomplete("input.autocomplete-multi");

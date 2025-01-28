@@ -171,6 +171,25 @@ class AdminPanel
         $this -> user -> updateSetting($key, $value);
     }
 
+    public function getModelSessionSetting(string $model, string $key)
+    {
+        Session::start('adminpanel');
+        $settings = Session::get('settings');
+        $settings[$model] ??= [];
+
+        return array_key_exists($key, $settings[$model]) ? $settings[$model][$key] : null;
+    }
+
+    public function updateModelSessionSetting(string $model, string $key, mixed $value)
+    {
+        Session::start('adminpanel');
+        $settings = Session::get('settings');
+        $settings[$model] ??= [];
+        $settings[$model][$key] = $value;
+        
+        Session::set('settings', $settings);
+    }
+
     public function defineCurrentUserRegion()
     {
         $region = $this -> getUserSessionSetting('region');
