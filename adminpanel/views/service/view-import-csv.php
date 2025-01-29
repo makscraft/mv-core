@@ -1,10 +1,7 @@
 <?php
-include_once "../../config/autoload.php";
-
-$system = new System();
-$system -> detectModel();
-$system -> user -> extraCheckModelRights($system -> model -> getModelClass(), "update");
-$back_path = $registry -> getSetting("AdminPanelPath")."model/?model=".$system -> model -> getModelClass();
+$model = new (Http::fromGet('model'));
+$admin_panel -> user -> extraCheckModelRights($model -> getModelClass(), "update");
+$back_path = $registry -> getSetting("AdminPanelPath")."?model=".$model -> getModelClass()."&action=index";
 $upload_path = $registry -> getSetting("AdminPanelPath")."ajax/upload-csv.php";
 $csv_manager = new Csv();
 
@@ -12,12 +9,12 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 ?>
 <div id="columns-wrapper">
    <div id="model-table">
-         <h3 class="column-header"><?php echo I18n::locale("import-csv"); ?><span class="header-info"><?php echo $system -> model -> getName(); ?></span></h3>
+         <h3 class="column-header"><?php echo I18n::locale("import-csv"); ?><span class="header-info"><?php echo $model -> getName(); ?></span></h3>
          <p class="csv-notice"><?php echo I18n::locale('choose-fields-import-csv'); ?></p>
             <form id="csv-settings" method="post" enctype="multipart/form-data" action="<?php echo $upload_path; ?>">
-				<?php echo $csv_manager -> displayFieldsLists($system -> model); ?>            
+				<?php echo $csv_manager -> displayFieldsLists($model); ?>            
                <div class="clear">
-                  <input type="hidden" name="model" value="<?php echo $system -> model -> getModelClass(); ?>" />
+                  <input type="hidden" name="model" value="<?php echo $model -> getModelClass(); ?>" />
                </div>
 	            <table>               
                    <tr>

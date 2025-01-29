@@ -389,7 +389,7 @@ font-family: 'PantonSemiBold' !important;}
 border-color: #858f9c !important;}
 
 /* Pagination */
-.pager{position: relative; width: 100%; padding: 15px 0 0 0;}
+.pager{position: relative; width: 100%; padding: 20px 0 0 0; clear: both;}
 .pager *{box-sizing: border-box;}
 .pager div{display: flex; justify-content: flex-end; gap: 2px; align-items: center; height: 30px;}
 .pager a{height: 30px; min-width: 30px; display: flex; align-items: center; justify-content: center;
@@ -406,7 +406,7 @@ padding-right: 0; width: 24px;}
 
 .pager-limit{text-align: left; text-align: right; float: right;}
 .pager-limit span{padding: 0 5px 0 0;}
-.pager-limit select{border: 1px solid #e3e0e0; padding: 0 10px; border-radius: 4px; -moz-border-radius: 4px;
+.pager-limit select{border: 1px solid #e3e0e0; padding: 0 5px; border-radius: 4px; -moz-border-radius: 4px;
 -webkit-border-radius: 4px; box-sizing: border-box; height: 30px; text-align: center;}
 .pager-limit select option{padding: 0 5px 1px 5px;}
 

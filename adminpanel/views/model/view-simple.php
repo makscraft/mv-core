@@ -89,27 +89,27 @@ include $registry -> getSetting("IncludeAdminPath")."includes/header.php";
                 if(is_array($form_html))
                	    echo $form_html[1];
             ?>
-	      <table>
+	      	<table>
 	            <?php
 	                echo is_array($form_html) ? $form_html[0] : $form_html;
 		   	  	  
 	                if($file_name = $model -> checkIncludeCode("index-form.php"))
 			   	       include $file_name;
-	         ?>
-	         <tr class="model-form-navigation">
-	           <td colspan="2" class="bottom-navigation">
-                <?php
-                   	if($admin_panel -> user -> checkModelRights($model -> getModelClass(), "update"))
-                   		$submit_button = "type=\"button\" id=\"submit-button\"";
-                   	else
-                   		$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(MVobject.locale('no_rights'), {css_class: 'alert'});\"";
-                ?>                 
-	            <input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n::locale('update'); ?>" />
-	            <input class="button-dark" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath'); ?>'" type="button" value="<?php echo I18n::locale('cancel'); ?>" />
-                <input type="hidden" name="adminpanel_csrf_token" value="<?php echo $admin_panel -> createCSRFToken(); ?>" />
-	         </td>
-	      </tr>
-	      </table>          
+	         	?>
+	        	<tr class="model-form-navigation">
+					<td colspan="2" class="bottom-navigation">
+						<?php
+							if($admin_panel -> user -> checkModelRights($model -> getModelClass(), "update"))
+								$submit_button = "type=\"button\" id=\"submit-button\"";
+							else
+								$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(MVobject.locale('no_rights'), {css_class: 'alert'});\"";
+						?>                 
+						<input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n::locale('update'); ?>" />
+						<input class="button-dark" onclick="location.href='<?php echo $registry -> getSetting('AdminPanelPath'); ?>'" type="button" value="<?php echo I18n::locale('cancel'); ?>" />
+						<input type="hidden" name="adminpanel_csrf_token" value="<?php echo $admin_panel -> createCSRFToken(); ?>" />
+					</td>
+	      		</tr>
+		    </table>          
 	    </form>
         <?php 
 		    if($file_name = $model -> checkIncludeCode("index-bottom.php"))

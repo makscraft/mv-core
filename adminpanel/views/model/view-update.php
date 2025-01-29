@@ -25,6 +25,7 @@ else
 
 $url_params = $model -> getAllUrlParams(['parent','model','filter','pager','id']);
 $back_url_params = $model -> getAllUrlParams(['parent','model','filter','pager']);
+$back_url_params .= '&action=index';
 
 if($current_tab = $model -> checkCurrentTab())
     $url_params .= '&current-tab='.$current_tab;
@@ -47,16 +48,18 @@ if(Http::isPostRequest() && 'update' === Http::fromGet('action'))
     if(!$form_errors)
     {
         $model -> update();
-		$redirect = Registry::get('AdminPanelPath').'?model='.$model -> getModelClass();		
 		
 		if(Http::fromGet('continue') !== null)
-			$redirect .= '&action=update';
+			$url_params .= '&action=update';
         else
+		{
             $url_params = str_replace('&current-tab='.$current_tab, '', $url_params);
-		
-		$redirect .= $url_params ? '&'.$url_params : '';
-		FlashMessages::add('success', I18n::locale('done-update'));
+			$url_params = preg_replace('/.id=\d+/', '',$url_params).'&action=index';
+		}
 
+		$redirect = Registry::get('AdminPanelPath').'?'.$url_params;
+
+		FlashMessages::add('success', I18n::locale('done-update'));
 		Http::redirect($redirect);
     }
 }
@@ -139,7 +142,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
                         <?php if($model -> getEditableFields() !== false): ?>
                             <input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n::locale('save'); ?>" />
                             <input class="button-light" type="button" <?php echo $continue_button; ?> value="<?php echo I18n::locale('update-and-continue'); ?>" />                        
-                            <input class="button-dark" id="model-cancel" type="button" rel="<?php echo $registry -> getSetting('AdminPanelPath')."model/?".$back_url_params; ?>" value="<?php echo I18n::locale('cancel'); ?>" />
+                            <input class="button-dark" id="model-cancel" type="button" rel="<?php echo $registry -> getSetting('AdminPanelPath')."?".$back_url_params; ?>" value="<?php echo I18n::locale('cancel'); ?>" />
                         <?php endif; ?>
                         <input type="hidden" name="adminpanel_csrf_token" value="<?php echo $admin_panel -> createCSRFToken(); ?>" />
 			         </td>

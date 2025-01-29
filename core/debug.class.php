@@ -107,9 +107,14 @@ class Debug
 			return;
 		}
 
-		echo "\n<pre style=\"white-space: pre-wrap; word-wrap: anywhere; font-size: 14px !important; background: #222; color: #def474; padding: 20px;\">";
-		print_r(is_string($var) ? htmlspecialchars($var, ENT_QUOTES) : $var);
-		echo "</pre>\n";
+		if(Http::isAjaxRequest())
+			print_r(is_string($var) ? htmlspecialchars($var, ENT_QUOTES) : $var);
+		else
+		{		
+			echo "\n<pre style=\"white-space: pre-wrap; word-wrap: anywhere; font-size: 14px !important; background: #222; color: #def474; padding: 20px;\">";
+			print_r(is_string($var) ? htmlspecialchars($var, ENT_QUOTES) : $var);
+			echo "</pre>\n";
+		}
 	}
 
 	/**

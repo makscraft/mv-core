@@ -14,6 +14,7 @@ if($model -> getParentId())
 	$model -> setValue($model -> getParentField(), $model -> getParentId());
 
 $url_params = $back_url_params = $model -> getAllUrlParams(['parent','model','filter','pager']);
+$back_url_params .= '&action=index';
 $current_tab = $model -> checkCurrentTab();
 
 if(Http::isPostRequest() && 'create' === Http::fromGet('action'))
@@ -30,20 +31,20 @@ if(Http::isPostRequest() && 'create' === Http::fromGet('action'))
 
 	if(!$form_errors)
 	{
-		$new_id = $model -> create();
-		$redirect = Registry::get('AdminPanelPath').'?model='.$model -> getModelClass();
-		
 		if(Http::fromGet('edit') !== null)
 			$url_params = str_replace('&current-tab='.$current_tab, '', $url_params);
-		
+
+		$new_id = $model -> create();
+		$redirect = Registry::get('AdminPanelPath').'?'.$url_params;
+				
 		if(Http::fromGet('continue') !== null)
 			$redirect .= '&action=create';
 		else if(Http::fromGet('edit') !== null)
 			$redirect .= '&action=update&id='.$new_id;
+		else
+			$redirect .= '&action=index';
 		
-		$redirect .= $url_params ? '&'.$url_params : '';
 		FlashMessages::add('success', I18n::locale('done-create'));
-
 		Http::redirect($redirect);
 	}
 }

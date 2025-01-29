@@ -118,7 +118,8 @@ $(document).ready(function()
 			});
 		}
 		
-		$(this).parents("div.m2m-wrapper").find("input[type='hidden']").val(values.join(","));
+		if(typeof values != 'undefined')
+			$(this).parents("div.m2m-wrapper").find("input[type='hidden']").val(values.join(","));
 	});
 	
 	//Deletes the file and shows back the file input
@@ -404,8 +405,8 @@ $(document).ready(function()
 	//Filters form processing
 	$("#filters-submit").click(function()
 	{		
-		var values = $("#admin-filters").find(":input, select, :checkbox:checked").serializeArray();
-		var filled_values = [];
+		let values = $("#admin-filters").find(":input, select, :checkbox:checked").serializeArray();
+		let filled_values = [];
 		
 		$.each(values, function(key, val) //Collects only filled fields of form
 		{
@@ -420,8 +421,9 @@ $(document).ready(function()
 		
 		filled_values = filled_values.join("&").replace("initial-form-params=", "");
 		filled_values = filled_values.replace("+", "%2B");
-		var path = document.location.href.replace(/\?.*$/, "");
-		document.location = path + "?" + filled_values;
+
+		let path = document.location.href.replace(/\?.*$/, "");
+		document.location = path + "?" + filled_values + '&action=index';
 		
 		return false;
 	});
@@ -432,9 +434,10 @@ $(document).ready(function()
 		$("#admin-filters input:text").val("");
 		$("#admin-filters select option").removeAttr("selected");
 		
-		var params = $("input[name='initial-form-params']").val();
-		var path = document.location.href.replace(/\?.*$/, "");
-		document.location = path + "?" + params;
+		let params = $("input[name='initial-form-params']").val();
+		let path = document.location.href.replace(/\?.*$/, "");
+
+		document.location = path + "?" + params + '&action=index';
 	});
 	
 	//Submits the search form when press 'enter' in the text field
@@ -568,7 +571,7 @@ $(document).ready(function()
 		else if(MVobject.currentView == "search")
 			href += "?view=search&" + name + "=" + params + "&pager-limit=" + this.value;
 		else
-			href += "model/?" + params + "&pager-limit=" + this.value;
+			href += "?" + params + "&action=index&pager-limit=" + this.value;
 		
 		location.href = href;
 	});
@@ -877,7 +880,10 @@ $(document).ready(function()
 			data: MVobject.urlParams + "&model_display_fields=" + params.join(","),
 			success: function(data)
 			{
-				location.href = MVobject.adminPanelPath + "model/?" + MVobject.urlParams;
+				let path = MVobject.adminPanelPath + '?'+ MVobject.urlParams;
+				path += '&action=' + MVobject.currentView;
+				
+				location.href = path;
 			}
 		});
 	});

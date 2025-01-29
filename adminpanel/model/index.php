@@ -275,7 +275,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
                <input class="button-light<?php if($show_filters_column) echo " no-display"; ?>" type="button" id="show-filters" value="<?php echo I18n::locale('filters'); ?>" />
                <input class="button-list" type="button" id="fields-list-button" value="<?php echo I18n::locale('display-fields'); ?>" />
                <div class="list">
-                     <div class="m2m-wrapper">
+                    <div class="m2m-wrapper">
                         <div class="column">
 					       <div class="header"><?php echo I18n::locale("not-selected"); ?></div>
 		                   <select class="m2m-not-selected" multiple="multiple">
@@ -300,11 +300,11 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
                            <span class="m2m-down" title="<?php echo I18n::locale('move-down'); ?>"></span>						
                         </div>
 					    <input type="hidden" value="" name="display-table-fields" />
-					 </div>
-                     <div class="controls">
+					</div>
+                    <div class="controls">
                         <input class="apply button-light" type="button" value="<?php echo I18n::locale('apply') ?>" />
                         <input class="cancel button-dark" value="<?php echo I18n::locale('cancel') ?>" type="button" />
-                     </div>
+                    </div>
                </div>
                <?php
                		if($system -> model -> getModelClass() != "log" && $system -> model -> getModelClass() != "garbage")

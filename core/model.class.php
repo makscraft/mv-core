@@ -1568,12 +1568,12 @@ class Model extends ModelBase
 					
 					if($name == 'name' && $this -> parent_field)
 						if($model_redirect = $this -> checkModelRedirect($row)) //If redirect to other model
-							$row[$name] = "<a class=\"to-children\" href=\"?model=".$model_redirect."\">".$row[$name]."</a>\n";
+							$row[$name] = "<a class=\"to-children\" href=\"?model=".$model_redirect."&action=index\">".$row[$name]."</a>\n";
 						else if($this -> elements[$this -> parent_field] -> checkAllowedDepth($row['id'], get_class($this)))
 						{
 							//Adds link for the parent type name if depth allowes it
 							$clear_name = $row[$name];
-							$row[$name] = "<a href=\"?model=".$this -> getModelClass()."&".$this -> parent_field."=";
+							$row[$name] = "<a href=\"?model=".$this -> getModelClass()."&action=index&".$this -> parent_field."=";
 							$row[$name] .= $row['id']."\">".$clear_name."</a>\n";
 						}
 					
@@ -1595,7 +1595,7 @@ class Model extends ModelBase
 						{
 							if($this -> display_params['foreign_keys_admin_links']) //Link to foreign key model record
 							{
-								$href = "update.php?model=".strtolower($this -> elements[$name] -> getProperty('foreign_key'));
+								$href = "?action=update&model=".strtolower($this -> elements[$name] -> getProperty('foreign_key'));
 					   			$row[$name] = "<a href=\"".$href."&id=".$row[$name]."\">".$foreign_keys[$name][$row[$name]]."</a>\n";
 							}
 					   		else
@@ -1878,7 +1878,7 @@ class Model extends ModelBase
 		
 		if($start_id != -1)
 		{
-			$html = "<a href=\"?model=".$this -> getModelClass()."&".$this -> parent_field."=-1\">";
+			$html = "<a href=\"?model=".$this -> getModelClass()."&action=index&".$this -> parent_field."=-1\">";
 			$html .= I18n::locale('root-catalog')."</a> ";
 			
 			$data = $this -> elements[$this -> parent_field] -> displayPath($start_id);
@@ -1889,7 +1889,7 @@ class Model extends ModelBase
 			if($length)
 				foreach($data as $id => $name)
 					if($i ++ < $length)
-						$html .= "/ <a href=\"?model=".$this -> getModelClass()."&".$this -> parent_field."=".$id."\">".$name."</a> ";
+						$html .= "/ <a href=\"?model=".$this -> getModelClass()."&action=index&".$this -> parent_field."=".$id."\">".$name."</a> ";
 					else
 						$html .= " / <span>".$name."</span>";			
 		}

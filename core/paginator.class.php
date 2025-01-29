@@ -57,11 +57,13 @@ class Paginator
 	 */
 	public function setLimit(int $limit)
 	{
-	   $this -> limit = intval($limit);
-	   $this -> intervals = (int) ceil($this -> total / $this -> limit);
+		$this -> limit = intval($limit);
+		$this -> intervals = (int) ceil($this -> total / $this -> limit);
 
-	   if(!empty($_GET) && isset($_GET['page'])) //If we have current page number in GET we take it
-		  $this -> definePage(intval($_GET['page'])); //and determine the current elements to show on the page
+		if(!empty($_GET) && isset($_GET['page'])) //If we have current page number in GET we take it
+			$this -> definePage(intval($_GET['page'])); //and determine the current elements to show on the page
+
+		return $this;
 	}
  
 	/**
@@ -69,8 +71,10 @@ class Paginator
 	 */
 	public function setTotal(int $total) 
 	{
-	   $this -> total = $total;
-	   $this -> setLimit($this -> limit); //Recount the params
+		$this -> total = $total;
+		$this -> setLimit($this -> limit); //Recount the params
+
+		return $this;
 	}
 
 	/**
@@ -78,7 +82,7 @@ class Paginator
 	 */
 	public function setPage(int $page) 
 	{
-		$this -> definePage($page);
+		return $this -> definePage($page);
 	}
    
 	/**
@@ -148,6 +152,8 @@ class Paginator
          	$this -> page = $page;
          
      	$this -> start = ($this -> page - 1) * $this -> limit;
+
+		 return $this;
    	}   
 
 	/**
@@ -230,8 +236,18 @@ class Paginator
 			
 		return $this;
 	}
-	
 
+	/**
+	 * Adds more url parameters for current pagination.
+	 * @return self
+	 */
+	public function addMoreUrlParams(string $url_params)
+	{
+		$this -> url_params .= ($this -> url_params ? '&' : '?').$url_params;
+			
+		return $this;
+	}
+	
 	/**
 	 * Returns string of url GET params.
 	 * @return string like page=23

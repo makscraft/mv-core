@@ -3,7 +3,8 @@ include "../../config/autoload.php";
 
 Http::isAjaxRequest('post', true);
 $system = new System('ajax');
-		
+$admin_panel = new AdminPanel($system -> user);
+
 if(isset($_POST['model'], $_POST['add-filter']) && $system -> registry -> checkModel($_POST['model']))
 {
 	$system -> runModel($_POST['model']);
@@ -14,5 +15,8 @@ if(isset($_POST['model'], $_POST['add-filter']) && $system -> registry -> checkM
 else if(isset($_POST['model'], $_POST['show-filters']) && $system -> registry -> checkModel($_POST['model']))
 {
 	$system -> runModel($_POST['model']);
-	$_SESSION['mv']['settings'][$system -> model -> getModelClass()]['show-filters'] = $_POST['show-filters'] ? 1 : 0;	
+
+	$admin_panel -> updateModelSessionSetting($system -> model -> getModelClass(),
+											  'show-filters',
+											  ($_POST['show-filters'] ? 1 : 0));
 }
