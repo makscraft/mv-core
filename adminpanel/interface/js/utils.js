@@ -601,7 +601,7 @@ $(document).ready(function()
 	//Starts multi action dialog
 	$("div.multi-actions-menu ul li").click(function()
 	{
-		var css_class = $(this).attr("class");
+		let css_class = $(this).attr("class");
 		
 		if(css_class == "has-no-rights" || css_class == "has-no-rights-0" || css_class == "has-no-rights-1")
 		{
@@ -609,8 +609,8 @@ $(document).ready(function()
 			return;
 		}
 		
-		var multi_action = css_class.replace("multi-", "");
-		var multi_value = "";
+		let multi_action = css_class.replace("multi-", "");
+		let multi_value = "";
 		
 		if(multi_action.match(/-(0|1)$/))
 		{
@@ -1271,8 +1271,8 @@ $(document).ready(function()
 			let action_key = params[1] + "_one";
 			let message = MVobject.locale(action_key, {name: name});
 			
-			var href = "id=" + params[2] + "&admin-model-action-token=" + params[3] + "&action=" + params[1]; 
-			href = MVobject.adminPanelPath + "model/?" + MVobject.urlParams + "&" + href;
+			let href = "id=" + params[2] + "&admin-model-action-token=" + params[3] + "&operation=" + params[1]; 
+			href = MVobject.adminPanelPath + "?" + MVobject.urlParams + "&action=index&" + href;
 			
 			$.modalWindow.open(message, {css_class: params[1], url: href});
 		}

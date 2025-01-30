@@ -234,4 +234,27 @@ class AdminPanel
 		
 		return $this;
 	}
+
+    public function allowDeleteRecord($model, $id)
+    {
+        $error = '';
+        $arguments = [];
+
+        if(!$model -> checkRecordById($id))
+            $error = 'error-wrong-record';
+        else if($model -> getModelClass() == 'users' && intval($id) == 1)
+            $error = 'no-delete-root';
+
+        if($model_class = $model -> setId($id) -> checkForChildren())
+            if(Registry::checkModel($model_class))            
+            {
+                $error = 'no-delete-model';
+                $arguments['module'] = (new $model_class) -> getName();
+            }
+            else
+                $error = 'no-delete-parent';
+
+        
+        return $error ? I18n::locale($error, $arguments) : '';
+    }
 }

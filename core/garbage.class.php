@@ -114,6 +114,11 @@ class Garbage extends Model
 			}
 		}
 		
+		$in_transaction = (method_exists(Database::$pdo, "inTransaction")) ? Database::$pdo -> inTransaction() : true;
+		
+		if(!$in_transaction)
+			$this -> db -> beginTransaction();
+
 		//SQL to get record back to model table
 		$query = "INSERT INTO `".$content['module']."`(".implode(',', $names).") VALUES(".implode(',', $values).")";
 
@@ -140,6 +145,9 @@ class Garbage extends Model
 				$model -> afterRestore($content['content']['id'], $content['content']);
 				
 			Cache :: cleanByModel($content['module']);
+
+			if(!$in_transaction)
+				$this -> db -> commitTransaction();
 		}
 		else
 		{

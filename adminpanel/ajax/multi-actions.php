@@ -4,7 +4,7 @@ include "../../config/autoload.php";
 Http::isAjaxRequest('post', true);
 $system = new System('ajax');
 
-//Process of garbage cleaup
+//Process of garbage cleanup
 if(isset($_POST['empty-recycle-bin']))
 {
 	$system -> runModel("garbage");

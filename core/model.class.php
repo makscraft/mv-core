@@ -1584,9 +1584,9 @@ class Model extends ModelBase
 						$simple_model = (get_parent_class($model_object) == "ModelSimple");
 						
 						if(!$simple_model && $this -> countRecords(array("table->" => $row["module"], "id" => $row["row_id"])))
-							$row[$name] = "<a href=\"update.php?model=".$row["module"]."&id=".$row["row_id"]."\">".$row[$name]."</a>\n";
+							$row[$name] = "<a href=\"?model=".$row["module"]."&action=update&id=".$row["row_id"]."\">".$row[$name]."</a>\n";
 						else if($simple_model)
-						    $row[$name] = "<a href=\"index-simple.php?model=".$row["module"]."\">".$row[$name]."</a>\n";
+						    $row[$name] = "<a href=\"?model=".$row["module"]."&action=simple\">".$row[$name]."</a>\n";
 					}
 				
 					if(isset($foreign_keys[$name])) //If we need to show the value of foreign key
@@ -1632,8 +1632,8 @@ class Model extends ModelBase
 						if($row[$name] && $this -> elements[$name] -> getProperty('foreign_key') && 
 						   $this -> display_params['foreign_keys_admin_links'])
 						   {
-								$href = "update.php?model=".strtolower($this -> elements[$name] -> getProperty('foreign_key'));
-					   			$row[$name] = "<a href=\"".$href."&id=".$save_value."\">".$row[$name]."</a>\n";
+								$href = "?model=".strtolower($this -> elements[$name] -> getProperty('foreign_key'));
+					   			$row[$name] = "<a href=\"".$href."&action=update&id=".$save_value."\">".$row[$name]."</a>\n";
 						   }
 					}
 					else if($type == 'int')

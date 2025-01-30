@@ -12,17 +12,15 @@ $sorting = $admin_panel -> getModelSessionSetting($model -> getModelClass(), 'so
 if($model -> checkIfAdminSortingFieldAllowed($sorting[0]))
     $model -> sorter -> setParams($sorting[0], $sorting[1]);
 
-$url_params = $model -> getAllUrlParams(['model','parent','filter','pager']);
+$url_params = $model -> getAllUrlParams(['model','parent','filter','pager']).'&action=index';
 $show_filters_column = $admin_panel -> getModelSessionSetting($model -> getModelClass(), 'show-filters') ?? true;
 
+//Cange of pagination limit
 if($limit = Http::fromGet('pager-limit'))
     if($admin_panel -> savePaginationLimit($limit))
-        Http::reload($url_params.'&action=index');
+        Http::reload($url_params);
 
-// $model -> pager -> setLimit($_SESSION['mv']['settings']['pager-limit']);
-// $model -> processUrlRarams();
-// $url_params = $model -> getAllUrlParams(array('model','parent','filter','pager'));
-
+//Sorting tuning
 $model -> sorter -> addMoreUrlParams('action=index');
 
 if(Http::isGetRequest() && isset($_GET['sort-field'], $_GET['sort-order']))
@@ -33,13 +31,98 @@ if(Http::isGetRequest() && isset($_GET['sort-field'], $_GET['sort-order']))
                                               'sorting',
                                               [Http::fromGet('sort-field'), Http::fromGet('sort-order')]);
 
-    Http::reload($url_params.'&action=index');
+    Http::reload($url_params);
 }
 
+$operation = Http::fromGet('operation');
+$model_id = Http::fromGet('id');
 
-//Debug::exit($_SESSION);
+//Single actions
+if(Http::isGetRequest() && $operation && $model_id && $model -> getModelClass() != 'log')
+{
+	$check_token = $model -> generateSingleActionToken($model_id);
 
+	if($check_token !== Http::fromGet('admin-model-action-token'))
+    {
+		FlashMessages::add('error', I18n::locale('error-wrong-token'));
+		Http::reload($url_params);
+    }
 
+	if($operation == 'delete' && $model -> checkDisplayParam('delete_actions'))
+	{
+		$admin_panel -> user -> extraCheckModelRights($model -> getModelClass(), "delete");
+		
+		if('' !== $error = $admin_panel -> allowDeleteRecord($model, $model_id))
+		{
+			FlashMessages::add('error', $error);
+			Http::reload($url_params);
+		}
+
+		$model -> setId($model_id) -> delete();
+
+		if(!count($model -> getErrors()))
+			FlashMessages::add('success', I18n::locale('done-delete'));
+		else
+			FlashMessages::add('error', $model -> displayFormErrors());
+
+		Http::reload($url_params);
+	}
+	else if($operation === 'restore' && $model -> getModelClass() === 'garbage')
+	{
+		$admin_panel -> user -> extraCheckModelRights('garbage', 'update');		
+		
+		if($model -> setId($model_id) -> restore() !== false)
+			FlashMessages::add('success', I18n::locale('done-restore'));
+		else
+			FlashMessages::add('error', $model -> displayFormErrors());
+		
+		Http::reload($url_params);
+	}
+}
+
+//Bulk actions
+if(Http::isPostRequest() && Http::fromGet('multi_value') !== null && $multi_action = Http::fromGet('multi_action'))
+	if($model -> checkDisplayParam('update_actions') && $model -> checkDisplayParam('mass_actions'))
+	{
+		set_time_limit(300);
+
+		if($admin_panel -> createCSRFToken() !== Http::fromPost('adminpanel_csrf_token'))
+		{
+			FlashMessages::add('error', I18n::locale('error-wrong-token'));
+			Http::reload($url_params);
+		}
+
+		$multi_rights = $multi_action == 'delete' ? 'delete' : 'update';
+		$system -> user -> extraCheckModelRights($model -> getModelClass(), $multi_rights);
+		
+		$db = Database::instance();
+		$db -> beginTransaction();		
+		$error = $model -> applyMultiAction(
+			Http::fromGet('multi_action'),
+			urldecode(Http::fromGet('multi_value'))
+		);
+		$db -> commitTransaction();
+
+		if(!$error)
+		{
+			$done = ($multi_action == 'delete' || $multi_action == 'restore') ? $multi_action : 'update';
+			FlashMessages::add('success', I18n::locale('done-'.$done));
+		}
+		else
+		{
+			if($multi_action == 'restore' || ($multi_action == 'delete' && !preg_match('/^not-deleted/', $error)))
+				FlashMessages::add('error', $error);
+			else if(strpos($error, 'datatype-error form-errors'))
+				FlashMessages::add('error', $error);
+			else
+			{
+				$error = explode("=", $error);
+				FlashMessages::add('error', $error[1] ?? '');
+			}
+		}
+
+		Http::reload($url_params);
+	}
 
 //Columns list in main table
 $display_fields = $admin_panel -> getModelSessionSetting($model -> getModelClass(), 'display-fields');
@@ -101,42 +184,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
          	<?php
 				if(FlashMessages::hasAny())
 					echo FlashMessages::displayAndClear();
-
-		 /*
-         	if(isset($_SESSION["message"]["done"]) && in_array($_SESSION["message"]["done"], array('create','update','delete','restore')))
-          		echo "<div class=\"form-no-errors\"><p>".I18n::locale('done-'.$_SESSION["message"]["done"])."</p></div>\n";
-			else if(isset($_SESSION["message"]['not-deleted']))
-         	{
-         		if($_SESSION["message"]['not-deleted'] == 'root')
-         			$message = 'no-delete-root';
-         		else if($_SESSION["message"]['not-deleted'])
-         			$message = 'no-delete-model';
-         		else
-         			$message = 'no-delete-parent';
-         		
-         		$arguments = [];
-         		
-         		if($_SESSION["message"]['not-deleted'] && $_SESSION["message"]['not-deleted'] != 'root' && 
-         		   $registry -> checkModel($_SESSION["message"]['not-deleted']))
-         		{
-         			$model_class = trim($_SESSION["message"]['not-deleted']);
-         			$object = new $model_class();
-         			$arguments['module'] = $object -> getName();
-         		}
-         		
-         		echo "<div class=\"form-errors\"><p>".I18n::locale($message, $arguments)."</p></div>\n";         		
-         	}
-         	else if(isset($_SESSION["message"]["custom-errors"]) && $_SESSION["message"]["custom-errors"])
-			      echo $_SESSION["message"]["custom-errors"];
-         	else if(isset($_SESSION["message"]["token-error"]))
-         	{
-			      echo "<div class=\"form-errors\"><p>".I18n::locale("error-failed")." ";
-			      echo I18n::locale("error-wrong-token")."</p></div>\n";
-         	}			
-			      
-			unset($_SESSION["message"]);
-			*/
-
+			
 	        if($model -> getParentField() && $model -> getParentId())
 	            echo "<div class=\"parents-path\">\n".$model -> displayParentsPath($model -> getParentId())."</div>\n";
 	        
@@ -217,7 +265,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
             </div>
         </div>
 
-        <form id="model-table-form" method="post" action="?<?php echo $model -> getAllUrlParams(['model','parent','filter','pager']); ?>">
+        <form id="model-table-form" method="post" action="?<?php echo $model -> getAllUrlParams(['model','parent','filter','pager']); ?>&action=index">
             <?php echo $model -> displaySortableTable(); ?>
             <input type="hidden" name="adminpanel_csrf_token" value="<?php echo $admin_panel -> createCSRFToken(); ?>" />
         </form>

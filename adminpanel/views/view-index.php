@@ -5,19 +5,19 @@
 <div id="index-icons">
 	<ul>
 		<li class="users">
-	      <a href="<?php echo Registry::get('AdminPanelPath'); ?>model/?model=users">
+	      <a href="<?php echo Registry::get('AdminPanelPath'); ?>?model=users&action=index">
             <span><?php echo I18n::locale("users"); ?></span>
             <?php echo I18n::locale("index-users-icon"); ?>
           </a>
 	    </li>
 		  <li class="garbage">
-	      <a href="<?php echo Registry::get('AdminPanelPath'); ?>model/?model=garbage">
+	      <a href="<?php echo Registry::get('AdminPanelPath'); ?>?model=garbage&action=index">
             <span><?php echo I18n::locale("garbage"); ?></span>
             <?php echo I18n::locale("index-garbage-icon"); ?>
           </a>
         </li>
 		  <li class="history">
-	      <a href="<?php echo Registry::get('AdminPanelPath'); ?>model/?model=log">
+	      <a href="<?php echo Registry::get('AdminPanelPath'); ?>?model=log&action=index">
             <span><?php echo I18n::locale("logs"); ?></span>
             <?php echo I18n::locale("index-history-icon"); ?>
           </a>

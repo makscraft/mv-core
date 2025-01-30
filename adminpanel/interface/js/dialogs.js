@@ -248,7 +248,7 @@ var dialogs = {
 					let css_class = (multi_action == 'delete') ? 'delete' : 'update'; 
 					$("#message-confirm-delete div.message").removeClass("update restore delete").addClass(css_class);
 					
-					let form_action = MVobject.adminPanelPath + "model/?" + MVobject.urlParams;
+					let form_action = MVobject.adminPanelPath + "?" + MVobject.urlParams + "&action=index";
 					form_action +=  "&multi_action=" + multi_action;
 					
 					if(type == 'many_to_many' || type == 'group')
