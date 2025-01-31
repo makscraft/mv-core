@@ -899,7 +899,7 @@ class Model extends ModelBase
 						$version_dump[$name] = $fields_and_values[$name] = $value;
 					}				
 		}
-			
+		
 		foreach($fields_and_values as $name => $value) //Prepearing values for SQL query
 			$values[] = "`".$name."`=".$this -> db -> secure($value);
 

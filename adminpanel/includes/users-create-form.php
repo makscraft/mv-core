@@ -12,15 +12,13 @@
 		      <th><?php echo I18n::locale('edit'); ?></th>
 		      <th><?php echo I18n::locale('delete'); ?></th>
 	      </tr>
-	      <?php
-	      	  echo $system -> model -> displayUsersRights(); 
-	      ?>
+	      <?php echo $model -> displayUsersRights(); ?>
       </table>      
    </td>
 </tr>
 <tr>
    <td class="field-name" colspan="2">
-      <?php $checked = (isset($_POST["send_admin_info_email"]) && $_POST["send_admin_info_email"]) ? " checked=\"checked\"" : ""; ;?>
+      <?php $checked = (Http::fromPost('send_admin_info_email')) ? " checked=\"checked\"" : ""; ;?>
       <input type="checkbox"<?php echo $checked; ?> id="send-admin-info-email" name="send_admin_info_email" value="1" />
       <label for="send-admin-info-email"><?php echo I18n::locale("send-user-info"); ?></label>
    </td>

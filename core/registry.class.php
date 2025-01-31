@@ -11,7 +11,7 @@ class Registry
 	 * Works together with 'Version' setting from config/settings.php 
 	 * @var float
 	 */
-	private static $version = 3.2;
+	private static $version = 3.3;
 	
 	/**
 	 * Instance of singleton pattern to keep only one copy of object.

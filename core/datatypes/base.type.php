@@ -149,7 +149,7 @@ abstract class ModelElement
 	 */
 	public function getValue() 
 	{
-		return $this -> value; 
+		return $this -> value;
 	}
 	
 	/**

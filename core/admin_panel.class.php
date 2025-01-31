@@ -89,9 +89,9 @@ class AdminPanel
         }
         else if($view = Http::fromGet('view', ''))
         {
+            $view = trim(str_replace(['..', '/', '\/'], '', $view));
             $this -> view = $view;
             $view = 'view-'.$view.'.php';
-            $view = trim(str_replace(['..', '/', '\/'], '', $view));
         }        
         else if($service = Http::fromGet('service', ''))
         {
@@ -110,8 +110,16 @@ class AdminPanel
                 $view = 'model/view-'.$action.'.php';
             }
         }
-        
-        $file = Registry::get('IncludeAdminPath').'views/'.$view;
+        else if($ajax = Http::fromGet('ajax', ''))
+        {
+            $this -> view = $ajax = trim(str_replace(['..', '/', '\/'], '', $ajax));
+            $view = $ajax.'.php';
+        }
+
+        if(Http::fromGet('ajax') && (Http::isAjaxRequest() || $ajax === 'upload-editor'))
+            $file = Registry::get('IncludeAdminPath').'ajax/'.$view;
+        else
+            $file = Registry::get('IncludeAdminPath').'views/'.$view;
 
         if(is_file($file))
             return $file;

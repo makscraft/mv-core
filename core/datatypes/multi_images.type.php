@@ -109,8 +109,10 @@ class MultiImagesModelElement extends CharModelElement
 		}
 		
 		$html .= "</div>\n";
-		$maximum = ini_get("max_file_uploads");
+
+		$maximum = ini_get('max_file_uploads');
 		$maximum = $maximum <= 20 ? $maximum : 20;
+		$value = $this -> value && $this -> value != '[]' ? base64_encode(strval($this -> value)) : '';
 		
 		$html .= "<div class=\"upload-buttons\">\n<div class=\"upload-one\" ";
 		$html .= "id=\"max-quantity-".$maximum."\">\n";
@@ -118,7 +120,7 @@ class MultiImagesModelElement extends CharModelElement
 		$html .= "<input type=\"file\" multiple id=\"multi-images-".$this -> name."\" ";
 		$html .= "name=\"multi-images-".$this -> name."[]\" />\n";
 		$html .= "<div class=\"loading\"></div>\n";
-		$html .= "<input type=\"hidden\" name=\"".$this -> name."\" value=\"".base64_encode(strval($this -> value))."\" /></div>\n";
+		$html .= "<input type=\"hidden\" name=\"".$this -> name."\" value=\"".$value."\" /></div>\n";
 		$html .= "</div></div>\n".$this -> addHelpText();
 		
 		return $html;

@@ -196,7 +196,7 @@ font-weight: normal; line-height: 14px;}
 .model-table td{padding: 7px 4px; border-bottom-width: 0 !important;}
 .model-table td:has(.single-action){white-space: nowrap;}
 .model-table input[type='checkbox']{position: relative; bottom: -1px; right: -1px;}
-.model-table small.online{padding: 0 5px; color: #1464ba; background: #e3e0e0; margin-left: 5px; border-radius: 4px;}
+.model-table small.online{padding: 2px 6px; background: #deee85; color: #086408; margin-left: 5px; border-radius: 4px;}
 .model-table td.centered{text-align: center;}
 .model-table th.check-all{padding-left: 4px; width: 40px;}
 .model-table th.actions{width: 85px;}
@@ -223,14 +223,14 @@ top: 7px; cursor: pointer; background: url("../images/message-update.svg") no-re
 .form-errors, .form-no-errors{margin: 0 0 20px 0; padding: 15px 1.4%; width: 100%; clear: both; border-radius: 4px; 
 -moz-border-radius: 4px; -webkit-border-radius: 4px; box-sizing: border-box; display: flex; flex-direction: column;
 gap: 6px;}
-.form-errors{background: #fdf4e1; color: #ff1d1d;}
+.form-errors{background: #fdf4e1; color: #ff1d1d; border: 1px solid #fbd689;}
 .form-no-errors{background: #deee85;}
 
 .flash-message{margin: 0 5px 20px 0px; padding: 15px 1.4%; width: 100%; clear: both; border-radius: 4px; 
 -moz-border-radius: 4px; -webkit-border-radius: 4px; background: #fabdf6; box-sizing: border-box;}
 .flash-message > *{margin-bottom: 10px;}
 .flash-message > *:last-child{margin-bottom: 0;}
-.flash-message.error{background: #fdf4e1; color: #ff1d1d;}
+.flash-message.error{background: #fdf4e1; color: #ff1d1d; border: 1px solid #fbd689}
 .flash-message.success{background: #deee85; color: #086408;}
 .flash-message.info{background: #c0dbf7;}
 .flash-message.centered{text-align: center;}
@@ -238,7 +238,7 @@ gap: 6px;}
 div.migrations-page .form-errors, div.migrations-page .flash-message{width: 100% !important;}
 
 /* File input */
-div.file-input{padding: 0 0 5px 0; float: left; height: 40px;}
+div.file-input{padding: 5px; display: inline-block;}
 div.file-input div.help-text{padding: 3px 0 0 0;}
 div.file-input span.file{float: left;}
 div.file-input span.delete, div.image-input span.delete{cursor: pointer; margin: -4px 0 0 6px; height: 23px; float: left;
@@ -285,8 +285,10 @@ width: 290px;}
 .images-wrapper > a{display: block; width: 122px; margin: 0 auto;}
 .images-wrapper > a > img{display: block; max-width: 100%; max-height: 85px; margin: 0 auto;}
 
-div.images-error{border-radius: 4px; background: #fbd689; font-size: 13px; margin: 0 0 15px 0; padding: 10px 10px 5px 10px;}
-div.images-error p{padding: 0 0 5px 0;}
+div.images-error{border-radius: 4px; border-color: #fbd689 !important; background-color: #fdf4e1;
+margin: 0 0 20px 0; padding: 14px; display: flex; flex-direction: column;
+gap: 6px; color: #ff1d1d;}
+div.images-error p{margin: 0; padding: 0; font-size: 14px; line-height: 18px;}
 
 /* Form to create and update record */
 .model-elements-form{clear: both; margin-bottom: 15px;}
@@ -307,12 +309,15 @@ border-radius: 4px; box-sizing: border-box;}
 .model-elements-form td > input.autocomplete-input{padding-right: 28px;}
 .model-elements-form td > textarea{width: 100%;}
 .model-elements-form td.error-field > *{border-color: #fbd689 !important; background-color: #fdf4e1}
+.model-elements-form td.error-field > .m2m-wrapper{background: inherit;}
+.model-elements-form td.error-field > .m2m-wrapper select.m2m-selected{border-color: #fbd689 !important; 
+background-color: #fdf4e1}
 
 .model-elements-form td.bottom-navigation{padding: 12px 15px 10px 15px; background: #eeeded; position: fixed; left: 0;
 bottom: 0px; width: 100%; z-index: 100;}
 
 /* Image input */
-.image-input{float: left; position: relative;}
+.image-input{padding: 5px; display: inline-block;}
 .image-input div.help-text{padding: 3px 0 0 0;}
 .image-input .picture{float: left; text-align: left; padding: 0 10px 0 0; max-width: 150px}
 .image-input .picture img{max-width: 100%}
@@ -544,7 +549,8 @@ width: 15%; color: #1464ba; cursor: pointer;}
 
 #model-table-form td.edit-string input{width: 95%; border: 1px solid #bbb; padding: 5px; border-radius: 4px;}
 #model-table-form td.edit-number input{width: 70px; border: 1px solid #bbb; padding: 5px; border-radius: 4px;}
-#model-table-form td.quick-error-value input{background-color: #fdf4e1;}
+#model-table-form td.quick-error-value input{background-color: #fdf4e1; border: 1px solid #fbd689;
+color: #ff1d1d;}
 
 td:has(#send-admin-info-email){width: auto;}
 #send-admin-info-email{margin: 0 4px 0 0; position: relative;}

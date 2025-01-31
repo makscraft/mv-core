@@ -15,9 +15,9 @@ class Editor
 		$html = '';
 
 		$region = Registry::get('Region');
-		$region = ($region == 'en' || $region == 'am' || $region == 'us') ? 'uk' : $region;
+		$region = ($region == 'en' || $region == 'am' || $region == 'us') ? 'en' : $region;
 		$region_path = Registry::get('AdminPanelPath').'i18n/'.$region.'/';
-		$upload_path = Registry::get('AdminPanelPath').'controls/upload.php?ck-image';
+		$upload_path = Registry::get('AdminPanelPath').'?ajax=upload-editor&ck-image';
   
 		if(!self::$instance)
 		{

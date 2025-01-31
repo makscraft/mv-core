@@ -6,7 +6,7 @@ $(document).ready(function()
 		$.ajax({
 			type: "POST",
 			data: "continue=1",
-			url: MVobject.adminPanelPath + "ajax/session.php"
+			url: MVobject.adminPanelPath + "?ajax=session"
 		});
 	}
 	
@@ -638,7 +638,7 @@ $(document).ready(function()
 			$.ajax({
 				type: "POST",
 				data: "check=1",
-				url: MVobject.adminPanelPath + "ajax/session.php",
+				url: MVobject.adminPanelPath + "?ajax=session",
 				success: function(data)
 				{	
 					if(!data)
@@ -646,7 +646,7 @@ $(document).ready(function()
 				}
 			});
 			
-			var pager_limit = parseInt($(this).attr("id").replace("quick-limit-", ""));
+			let pager_limit = parseInt($(this).attr("id").replace("quick-limit-", ""));
 			
 			if(pager_limit > 0)
 			{
@@ -659,7 +659,7 @@ $(document).ready(function()
 			//Wraps table values into inputs in order to edit them
 			$("#model-table-form td.edit-string, #model-table-form td.edit-number").each(function()
 			{
-				var value = $.trim($(this).html());
+				let value = $.trim($(this).html());
 				
 				if($(this).hasClass("edit-number"))
 					value = value.replace(",", ".").replace(/\s/gi, "");
@@ -682,7 +682,7 @@ $(document).ready(function()
 			//Extra buttons if we have long list of records on our page
 			if($("table.model-table tr").size() > 11)
 			{
-				var extra_buttons = $("input.cancel-quick-edit, input.save-quick-edit").clone();
+				let extra_buttons = $("input.cancel-quick-edit, input.save-quick-edit").clone();
 				extra_buttons.appendTo($("#bottom-actions-menu"));
 			}
 			
@@ -690,23 +690,23 @@ $(document).ready(function()
 			
 			$("input.save-quick-edit").click(function() //Save all values
 			{
-				var params = "model=" + MVobject.currentModel + "&" + $("#model-table-form").serialize();
+				let params = "model=" + MVobject.currentModel + "&" + $("#model-table-form").serialize();
 				
 				$.ajax({
 					type: "POST",
 					dataType: "json",
-					url: MVobject.adminPanelPath + "ajax/quick-edit.php",
+					url: MVobject.adminPanelPath + "?ajax=quick-edit",
 					data: params,
 					success: function(data)
-					{	
+					{
 						if(!data || (data.updated && !data.general_errors && !data.wrong_fields))
 							location.reload();
 						
 						if(data.general_errors) //Top error message
 						{
 							$("div.form-errors").remove();
-							var message = '<div class="form-errors">' + data.general_errors + '</div>';
-							$(message).insertAfter("#model-table h3.column-header").hide().fadeIn(400);
+							let message = '<div class="form-errors">' + data.general_errors + '</div>';
+							$(message).insertAfter("#model-table h3.column-header").hide().fadeIn(500);
 						}
 						
 						$("#model-table-form td").removeClass("quick-error-value");
@@ -813,8 +813,8 @@ $(document).ready(function()
 		$.ajax({
 			type: "POST",
 			dataType: "json",
-			url: MVobject.adminPanelPath + "ajax/bool-change.php",
-			data: "id=" + this.id + "&admin-panel-csrf-token=" + $("input[name='admin-panel-csrf-token']").val(),
+			url: MVobject.adminPanelPath + "?ajax=bool-change",
+			data: "id=" + this.id + "&adminpanel_csrf_token=" + $("input[name='adminpanel_csrf_token']").val(),
 			success: function(data)
 			{
 				if(data && data.title && data.css_class)
@@ -1160,8 +1160,8 @@ $(document).ready(function()
 		$("#model-form-tabs ul li").removeClass("active");
 		$(this).addClass("active");
 		
-		var group = $(this).attr("id").replace("tab-group-", "");
-		var action = $("form.model-elements-form").attr("action").replace(/&current-tab=\d+/, "");
+		let group = $(this).attr("id").replace("tab-group-", "");
+		let action = $("form.model-elements-form").attr("action").replace(/&current-tab=\d+/, "");
 		action += "&current-tab=" + $(this).attr("id").replace("tab-group-", "");
 		
 		$("form.model-elements-form").attr("action", action);

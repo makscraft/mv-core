@@ -15,7 +15,9 @@ if($model -> getParentId())
 
 $url_params = $back_url_params = $model -> getAllUrlParams(['parent','model','filter','pager']);
 $back_url_params .= '&action=index';
-$current_tab = $model -> checkCurrentTab();
+
+if($current_tab = $model -> checkCurrentTab())
+	$url_params .= '&current-tab='.$current_tab;
 
 if(Http::isPostRequest() && 'create' === Http::fromGet('action'))
 {

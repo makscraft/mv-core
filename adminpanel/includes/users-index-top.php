@@ -1,11 +1,10 @@
-
 <script type="text/javascript">
 $(document).ready(function()
 {
 	$.ajax({
 		type: "POST",
 		dataType: "json",
-		url: MVobject.adminPanelPath + "ajax/session.php",
+		url: MVobject.adminPanelPath + "?ajax=session",
 		data: "get-online-users=1",
 		success: function(data)
 		{           
