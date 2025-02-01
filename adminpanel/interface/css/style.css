@@ -231,7 +231,7 @@ gap: 6px;}
 .flash-message > *{margin-bottom: 10px;}
 .flash-message > *:last-child{margin-bottom: 0;}
 .flash-message.error{background: #fdf4e1; color: #ff1d1d; border: 1px solid #fbd689}
-.flash-message.success{background: #deee85; color: #086408;}
+.flash-message.success{background: #ccfd91; color: #086408;}
 .flash-message.info{background: #c0dbf7;}
 .flash-message.centered{text-align: center;}
 #model-form .flash-message, #model-form .form-errors, #model-form .form-no-errors{width: calc(15% + 500px);}
@@ -285,7 +285,7 @@ width: 290px;}
 .images-wrapper > a{display: block; width: 122px; margin: 0 auto;}
 .images-wrapper > a > img{display: block; max-width: 100%; max-height: 85px; margin: 0 auto;}
 
-div.images-error{border-radius: 4px; border-color: #fbd689 !important; background-color: #fdf4e1;
+div.images-error{border-radius: 4px; border: 1px solid #fbd689; background-color: #fdf4e1;
 margin: 0 0 20px 0; padding: 14px; display: flex; flex-direction: column;
 gap: 6px; color: #ff1d1d;}
 div.images-error p{margin: 0; padding: 0; font-size: 14px; line-height: 18px;}
@@ -646,6 +646,7 @@ padding-left: 23px}
 @media all and (max-width: 1400px)
 {
     #model-form.one-column.migrations-page{width: 80%;}
+    #model-form .flash-message, #model-form .form-errors, #model-form .form-no-errors{width: auto;}
 }
 
 @media all and (max-width: 1300px)

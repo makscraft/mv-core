@@ -68,7 +68,7 @@ class Versions
 	
 	public function __construct(string $model, int $row_id)
 	{
-		$this -> db = Database :: instance();
+		$this -> db = Database::instance();
 		
 		$this -> model = $model;
 		$this -> row_id = $row_id;
@@ -141,7 +141,7 @@ class Versions
 	public function display()
 	{
 		if(!$this -> last_version) //If it was no versions before
-			return "<tr><td colspan=\"3\">".I18n :: locale('versions-no-yet')."</td></tr>\n";
+			return "<tr><td colspan=\"3\">".I18n::locale('versions-no-yet')."</td></tr>\n";
 			
 		$html = '';
 		
@@ -175,13 +175,13 @@ class Versions
 			
 			$html .= "<tr".$css_class.">\n";
 			$html .= "<td class=\"number\">".$row['version']."</td>\n";
-			$html .= "<td class=\"date\"><p class=\"date\"><span>".I18n :: locale("date")."</span> ";
-			$html .= I18n :: dateFromSQL($row['date'], "no-seconds")."</p>\n";
-			$html .= "<p class=\"user\"><span>".I18n :: locale("user")."</span> ".$user."</p></td>\n";
+			$html .= "<td class=\"date\"><p class=\"date\"><span>".I18n::locale("date")."</span> ";
+			$html .= I18n::dateFromSQL($row['date'], "no-seconds")."</p>\n";
+			$html .= "<p class=\"user\"><span>".I18n::locale("user")."</span> ".$user."</p></td>\n";
 			$html .= "<td class=\"rollback\">";
 			
 			if(!$css_class)
-				$html .= "<a href=\"?".$url_params."\">".I18n :: locale('rollback')."</a>";
+				$html .= "<a href=\"?".$url_params."\">".I18n::locale('rollback')."</a>";
 			
 			$html .= "</td>\n</tr>\n";
 		}		
@@ -192,7 +192,7 @@ class Versions
 	public function load()
 	{
 		if($this -> version) //Gats the content of version
-				return Service :: unserializeArray($this -> db -> getCell(
+				return Service::unserializeArray($this -> db -> getCell(
 											  "SELECT `content` FROM `".$this -> table."`  
 								  			   WHERE `model`='".$this -> model."' 
 								  			   AND `row_id`='".$this -> row_id."'  
@@ -204,7 +204,7 @@ class Versions
 		if(!$this -> limit || ($this -> last_version && !$this -> checkLastChanges($content)))
 			return false; //If it was no any changes or versions are disallowed
 			
-		$dump = Service :: serializeArray($content); //Packs all fields
+		$dump = Service::serializeArray($content); //Packs all fields
 		$next_version_number = $this -> last_version + 1;
 		
 		$user_id = (is_object($user) && get_class($user) == "User") ? $user -> getId() : 0;
@@ -217,21 +217,30 @@ class Versions
 		
 		//Deletes versions which exceed the limit for this model
 		if($this -> total + 1 > $this -> limit)
-		{
-			$ids = $this -> db -> getColumn("SELECT `id` FROM `".$this -> table."` 
-								  		 	 WHERE `model`='".$this -> model."' 
-								 		 	 AND `row_id`='".$this -> row_id."'
-								  		 	 ORDER BY `date` DESC 
-								  		 	 LIMIT ".($this -> limit + 1));
-			
-			if(count($ids))
-				$this -> db -> query("DELETE FROM `".$this -> table."` 
-									  WHERE `model`='".$this -> model."' 
-									  AND `row_id`='".$this -> row_id."' 
-									  AND `id` NOT IN(".implode(",", $ids).")");
-		}
+			$this -> reduceVersionsQuantity();
 		
 		return true;
+	}
+
+	public function reduceVersionsQuantity()
+	{
+		$model_object = new $this -> model();
+		$files_fields = $model_object -> defineFilesTypesFields();
+
+		$rows = $this -> db -> getAll("SELECT * FROM `".$this -> table."` 
+									   WHERE `model`='".$this -> model."' 
+									   AND `row_id`='".$this -> row_id."'
+									   ORDER BY `date` DESC 
+									   LIMIT ".($this -> limit + 1).", 10000");
+
+		foreach($rows as $row)
+		{
+			/*
+			Clean files after version reduce may delete files of very previous version.
+			$this -> cleanFiles(Service::unserializeArray($row['content']), $files_fields);
+			*/
+			$this -> db -> query("DELETE FROM `".$this -> table."` WHERE `id`='".$row['id']."'");
+		}
 	}
 	
 	public function clean()
@@ -245,7 +254,7 @@ class Versions
 
 		//Deletes all files of all versions of record
 		while($row = $this -> db -> fetch($result, "ASSOC"))
-			$this -> cleanFiles(Service :: unserializeArray($row['content']), $files_fields);
+			$this -> cleanFiles(Service::unserializeArray($row['content']), $files_fields);
 		
 		return $this -> cleanRecordVersions();
 	}
@@ -269,15 +278,15 @@ class Versions
 				{
 					$files = [];
 
-					foreach(MultiImagesModelElement :: unpackValue($data) as $image)
-						$files[] = Service :: addFileRoot($image['image']);
+					foreach(MultiImagesModelElement::unpackValue($data) as $image)
+						$files[] = Service::addFileRoot($image['image']);
 				}
 				else //Regular images and files
-					$files = [Service :: addFileRoot($data)];
+					$files = [Service::addFileRoot($data)];
 
 				foreach($files as $real_file) //Deletes files of record
 					if($real_file && is_file($real_file))
-						if(self :: checkModelFilesCopies($real_file))
+						if(self::checkModelFilesCopies($real_file))
 							@unlink($real_file);
 			}
 	}
@@ -289,7 +298,7 @@ class Versions
 		$folder = explode("-", $folder);
 		$file = basename($file);
 		
-		if(Registry :: checkModel($folder[0]) && ($folder[1] == "files" || $folder[1] == "images"))
+		if(Registry::checkModel($folder[0]) && ($folder[1] == "files" || $folder[1] == "images"))
 		{
 			$model = new $folder[0]();
 			$fields = $model -> defineFilesTypesFields();

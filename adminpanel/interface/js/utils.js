@@ -1225,7 +1225,7 @@ $(document).ready(function()
 			
 			$.ajax({
 				type: "POST",
-				url: MVobject.adminPanelPath + "ajax/autocomplete.php",
+				url: MVobject.adminPanelPath + "?ajax=autocomplete",
 				dataType: "text",
 				data: "action=translit&string=" + encodeURIComponent(value),
 				success: function(data)
@@ -1351,7 +1351,7 @@ function runAutocomplete(element)
 		input_params.ids = $(element).next().attr("id");
 	
     var options = { 
-	serviceUrl: MVobject.adminPanelPath + "ajax/autocomplete.php", 
+	serviceUrl: MVobject.adminPanelPath + "?service=autocomplete",
 	deferRequestBy: 200,
 	noCache: true,
 	params: input_params,
@@ -1407,7 +1407,7 @@ function exportIntoCSV()
 		return;
 	}
 
-	location.href = MVobject.adminPanelPath + "ajax/compose-csv.php?" + $("#csv-settings").serialize();
+	location.href = MVobject.adminPanelPath + "?service=compose-csv&" + $("#csv-settings").serialize();
 }
 
 //Action of import daa from csv file into model's table

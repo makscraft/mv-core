@@ -907,7 +907,7 @@ class Model extends ModelBase
 							  SET ".implode(",", $values)." 
 							  WHERE `id`='".$this -> id."'");
 		
-		$this -> versions = new Versions($this -> table, $this -> id);
+		$this -> versions = new Versions($this -> getModelClass(), $this -> id);
 		$versions_limit = $this -> getVersionsLimit();
 		
 		if(!$versions_limit)
@@ -1699,17 +1699,20 @@ class Model extends ModelBase
 					}
 					
 					if(trim(strval($row[$name])) == '' && $type != 'bool')
-						$row[$name] = "-";
+						$row[$name] = '-';
+
+					$allow_quick_edit = true;
 						
 					if(method_exists($this, "processAdminModelTableFields"))
 					{
 						$processed_value = $this -> processAdminModelTableFields($name, $row_initial);
 						$row[$name] = !is_null($processed_value) ? $processed_value : $row[$name];
-					}						
+						$allow_quick_edit = is_null($processed_value);
+					}
 						
 					$css_quick_change = '';
 					
-					if($this -> checkIfFieldEditable($name))
+					if($this -> checkIfFieldEditable($name) && $allow_quick_edit)
 						if(in_array($type, array("char", "url", "redirect", "email", "phone")))
 							$css_quick_change = ' id="quick-edit-'.$name.'-'.$row['id'].'" class="edit-string"';
 						else if($type == "int" || $type == "float")
@@ -2171,7 +2174,7 @@ class Model extends ModelBase
 				$this -> db -> query("DELETE FROM `".$object -> getProperty("linking_table")."` 
 						  		      WHERE `".$object -> getOppositeId()."`='".$id."'");
 		
-		$versions = new Versions($this -> table, $id);
+		$versions = new Versions($this -> getModelClass(), $id);
 		$versions -> clean() -> cleanFiles($content, $this -> defineFilesTypesFields());
 
 		if(!$in_transaction)

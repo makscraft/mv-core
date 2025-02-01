@@ -81,7 +81,7 @@ if(Router::isLocalHost())
 else
 	echo CacheMedia::getJavaScriptCache();
 ?>
-<script type="text/javascript" src="<?php echo $admin_panel_path; ?>ajax/autocomplete.php?locale=<?php echo $region; ?>"></script>
+<script type="text/javascript" src="<?php echo $admin_panel_path; ?>?service=locale&region=<?php echo $region; ?>"></script>
 
 <?php
 $skin = $system -> user -> getUserSkin();
