@@ -1,15 +1,13 @@
 <?php
-include "../../config/autoload.php";
-
 Http::isAjaxRequest('get', true);
-$system = new System('ajax');
 
-if(isset($_GET['query']))
+if($query = Http::fromGet('query'))
 {
-	$request = trim(htmlspecialchars(urldecode($_GET["query"]), ENT_QUOTES));
+	$searcher = new Searcher();
+	$request = trim(htmlspecialchars(urldecode($query), ENT_QUOTES));
 	$request = preg_replace("/[\.,:;!\?\"'\+\(\)\[\}\^\$\*]/", "", $request);
 	
-	$result = $system -> searchInAllModelsAjax($request, false);
+	$result = $searcher -> searchInAllModelsAjax($request, false);
 	
 	$result = [
 		'query' => $request,  

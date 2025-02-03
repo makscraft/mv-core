@@ -481,7 +481,7 @@ $(document).ready(function()
 			$.ajax({
 				type: "POST",
 				dataType: "html",
-				url: MVobject.adminPanelPath + "ajax/filters.php",
+				url: MVobject.adminPanelPath + "?ajax=filters",
 				data: "model=" + model.replace(/^model-/, "") + "&add-filter=" + name,
 				success: function(data)
 				{
@@ -529,12 +529,12 @@ $(document).ready(function()
 	//Change the visibility of model filters in session
 	function changeFilterVisibility(value)
 	{
-		var params = "model=" + MVobject.currentModel + "&show-filters=" + (value ? "1" : "0");
+		let params = "model=" + MVobject.currentModel + "&show-filters=" + (value ? "1" : "0");
 				
 		$.ajax({
 			type: "POST",
 			dataType: "text",
-			url: MVobject.adminPanelPath + "ajax/filters.php",
+			url: MVobject.adminPanelPath + "?ajax=filters",
 			data: params
 		});		
 	}
@@ -730,7 +730,7 @@ $(document).ready(function()
 		$.ajax({
 			type: "POST",
 			dataType: "text",
-			url: MVobject.adminPanelPath + "ajax/multi-actions.php",
+			url: MVobject.adminPanelPath + "?ajax=multi-actions",
 			data: "empty-recycle-bin=count",
 			success: function(data)
 			{	
@@ -876,7 +876,7 @@ $(document).ready(function()
 		
 		$.ajax({ //Writes params into session on the server
 			type: "POST",
-			url: MVobject.adminPanelPath + "ajax/display-fields.php",
+			url: MVobject.adminPanelPath + "?ajax=display-fields",
 			data: MVobject.urlParams + "&model_display_fields=" + params.join(","),
 			success: function(data)
 			{
@@ -1005,11 +1005,11 @@ $(document).ready(function()
 		
 		data_for_ajax = "orders_update_data=" + data_for_ajax.join("_") + "&" + MVobject.urlParams;
 		data_for_ajax += "&model_field=" + model_field;
-		data_for_ajax += "&admin-panel-csrf-token=" + $("input[name='admin-panel-csrf-token']").val();
+		data_for_ajax += "&adminpanel_csrf_token=" + $("input[name='adminpanel_csrf_token']").val();
 		
 		$.ajax({
 			type: "POST",
-			url: MVobject.adminPanelPath + "ajax/orders.php",
+			url: MVobject.adminPanelPath + "?ajax=orders",
 			data: data_for_ajax
 		});
 		
@@ -1110,8 +1110,8 @@ $(document).ready(function()
   			params += "&self_id=" + $(this).parents("div.m2m-wrapper").attr("id").replace("group-self-id-", "");
   		
 		$.ajax({
-			type: "GET",
-			url: MVobject.adminPanelPath + "ajax/m2m-search.php",
+			type: "POST",
+			url: MVobject.adminPanelPath + "?ajax=m2m-search",
 			dataType: "html",
 			data: params,
 			success: function(data)
@@ -1183,8 +1183,8 @@ $(document).ready(function()
 	});
 	
 	//Main global search in admin panel
-    var options = { 
-		serviceUrl: MVobject.adminPanelPath + "ajax/search.php", 
+    let global_search_options = { 
+		serviceUrl: MVobject.adminPanelPath + "?ajax=search", 
 		deferRequestBy: 200,
 		noCache: true,
 		onSelect: function(data, value, elem)
@@ -1193,7 +1193,7 @@ $(document).ready(function()
 		}
     };
 
-    $("#header-search input.string").autocomplete(options);
+    $("#header-search input.string").autocomplete(global_search_options);
     
     //Top alert message in admin panel
     $("#hide-system-warnings").on("click", function()
@@ -1301,7 +1301,7 @@ function removeDeletedRecords()
 	$.ajax({
 		type: "POST",
 		dataType: "text",
-		url: MVobject.adminPanelPath + "ajax/multi-actions.php",
+		url: MVobject.adminPanelPath + "?ajax=multi-actions",
 		data: "empty-recycle-bin=process&iterations-left=" + recycleBinDeleteIterations,
 		success: function(data)
 		{
@@ -1499,7 +1499,7 @@ function openSkinChooseDialog(skins)
 		$.ajax({
 			type: "POST",
 			dataType: "text",
-			url: MVobject.adminPanelPath + "ajax/display-fields.php",
+			url: MVobject.adminPanelPath + "?ajax=display-fields",
 			data: "set-user-skin=" + $("#choose-skin-select").val(),
 			success: function(data)
 			{

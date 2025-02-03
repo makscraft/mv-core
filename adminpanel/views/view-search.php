@@ -5,7 +5,7 @@ if('' !== $search_text = Http::fromGet('text', ''))
 $search_text = Service::cleanHtmlSpecialChars($search_text);	
 
 if($search_text && mb_strlen($search_text) > 1)
-    $result = $system -> searchInAllModels($search_text);
+    $result = (new Searcher) -> searchInAllModels($search_text);
 else
     $result = ['number' => 0, 'html' => []];
 

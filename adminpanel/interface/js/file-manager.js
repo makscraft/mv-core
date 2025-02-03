@@ -1,5 +1,5 @@
 
-MVobject.fileManagerAjaxPath = MVobject.adminPanelPath + 'ajax/filemanager.php';
+MVobject.fileManagerAjaxPath = MVobject.adminPanelPath + '?ajax=filemanager';
 
 $(document).ready(function()
 {

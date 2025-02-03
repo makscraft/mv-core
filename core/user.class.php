@@ -224,8 +224,13 @@ class User
 		
 		if((is_dir($path.$name) && is_file($path.$name."/skin.css")) || $name == "none")
 		{
-			$_SESSION['mv']['settings']['skin'] = $name;
+			Session::start('adminpanel');
+			$settings = Session::get('settings');
+			$settings['skin'] = $name;
+			Session::set('settings', $settings);
+
 			$this -> updateSetting("skin", $name);
+			
 			return 1;
 		}		
 	}

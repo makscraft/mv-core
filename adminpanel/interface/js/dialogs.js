@@ -55,34 +55,6 @@ var dialogs = {
 			$("#message-confirm-delete #butt-ok").attr("name", "form->" + form);  				
 	    	$("#message-confirm-delete").overlay(MVobject.paramsForDialogs).load();			
 		},
-		
-		showDeleteFilesMessage: function()
-		{
-			var number = $("table.model-table tr:gt(0) :checkbox:checked").size();
-			
-			if(!number)
-				return;
-			
-			var _this = this;
-			
-			$.ajax({
-				type: "POST",
-				dataType: "text",
-				url: MVobject.adminPanelPath + "ajax/filemanager.php",
-				data: "number_files=" + number,
-				success: function(data)
-				{
-					var message = _this.prepareMessage('{delete_files}', {number_files: data});
-					$("#message-confirm-delete div.message").addClass('delete').text(message);
-					
-					//Sets action to do if OK pressed
-					$("#message-confirm-delete #butt-ok").attr("name", "form->#filemanager-form");
-
-					//Shows overlay window
-			    	$("#message-confirm-delete").overlay(MVobject.paramsForDialogs).load();
-				}
-			});
-		},
 
 		//Message for mass action under many elements at one time (delete or update) 
 		showMultiActionMessage: function(multi_action, multi_value)
@@ -112,7 +84,7 @@ var dialogs = {
 			$.ajax({
 				type: "POST",
 				dataType: "xml",
-				url: MVobject.adminPanelPath + "ajax/multi-actions.php",
+				url: MVobject.adminPanelPath + "?ajax=multi-actions",
 				data: ajax_params,
 				success: function(data)
 				{

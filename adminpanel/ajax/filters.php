@@ -1,22 +1,14 @@
 <?php
-include "../../config/autoload.php";
-
 Http::isAjaxRequest('post', true);
-$system = new System('ajax');
-$admin_panel = new AdminPanel($system -> user);
+$model = Http::fromPost('model');
 
-if(isset($_POST['model'], $_POST['add-filter']) && $system -> registry -> checkModel($_POST['model']))
+if(Registry::checkModel($model))
 {
-	$system -> runModel($_POST['model']);
-	
-	header("Content-Type: text/html");
-	echo $system -> model -> filter -> displayAdminFilters($_POST['add-filter'], false);
-}
-else if(isset($_POST['model'], $_POST['show-filters']) && $system -> registry -> checkModel($_POST['model']))
-{
-	$system -> runModel($_POST['model']);
+	$model = new $model();
+	$model -> loadRelatedData() -> runPagerFilterSorter() -> setUser($admin_panel -> user);
 
-	$admin_panel -> updateModelSessionSetting($system -> model -> getModelClass(),
-											  'show-filters',
-											  ($_POST['show-filters'] ? 1 : 0));
+	if($filter = Http::fromPost('add-filter'))
+		Http::responseHtml($model -> filter -> displayAdminFilters($filter, false));
+	else if(null !== $show = Http::fromPost('show-filters'))	
+		$admin_panel -> updateModelSessionSetting($model -> getModelClass(), 'show-filters', ($show ? 1 : 0));
 }

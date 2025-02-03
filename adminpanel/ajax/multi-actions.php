@@ -1,18 +1,15 @@
 <?php 
-include "../../config/autoload.php";
-
 Http::isAjaxRequest('post', true);
-$system = new System('ajax');
 
 //Process of garbage cleanup
 if(isset($_POST['empty-recycle-bin']))
 {
-	$system -> runModel("garbage");
+	$model = new Garbage();
 	
-	if($system -> user -> checkModelRights("garbage", "delete"))
+	if($admin_panel -> user -> checkModelRights("garbage", "delete"))
 		if($_POST['empty-recycle-bin'] == "count") //If just count records to delete from garbage
 		{
-			if(!$garbage_number = $system -> db -> getCount("garbage"))
+			if(!$garbage_number = Database::instance() -> getCount("garbage"))
 				exit();
 			
 			$arguments = array('number' => $garbage_number, 'records' => '*number');
@@ -23,12 +20,12 @@ if(isset($_POST['empty-recycle-bin']))
 			sleep(1);
 			set_time_limit(180);			
 			
-			$system -> model -> emptyGarbage(50);
+			$model -> emptyGarbage(50);
 			
 			if(intval($_POST['iterations-left']) == 1)
 			{
 				Filemanager::makeModelsFilesCleanUp();
-				$_SESSION["message"]["done"] = "delete";
+				FlashMessages::add('success', 'done-delete');
 			}
 		}
 	
@@ -37,16 +34,17 @@ if(isset($_POST['empty-recycle-bin']))
 
 //Response when call bulk operation in main table of model in admin panel
 $xml = "<response>\n";
+$model = Http::fromPost('model');
 
-if(isset($_POST['model']) && ($system -> registry -> checkModel($_POST['model']) || $_POST['model'] == 'garbage'))
+if($model && (Registry::checkModel($model) || $model == 'garbage'))
 {
 	$ids = explode(',', $_POST['ids']);
 	$simple_types = array("date", "date_time", "int", "float");
 	
 	if($_POST['action'] != 'delete' && $_POST['action'] != 'restore')
 	{
-		$system -> runModel(strtolower($_POST['model']));
-		$object = $system -> model -> getElement($_POST['action']);
+		$model = new $model();
+		$object = $model -> getElement($_POST['action']);
 		
 		if(!$object)
 			$xml .= "<error>1</error>\n";
@@ -70,7 +68,7 @@ if(isset($_POST['model']) && ($system -> registry -> checkModel($_POST['model'])
 			if($object -> getProperty("long_list"))
 				$xml .= "<long_list>".intval($object -> getProperty("long_list"))."</long_list>\n";
 			else
-				$xml .= "<values_list>\n".$system -> model -> defineAvailableParents($ids)."</values_list>\n";
+				$xml .= "<values_list>\n".$model -> defineAvailableParents($ids)."</values_list>\n";
 		}
 		else if(($object -> getType() == 'many_to_many' ||  $object -> getType() == 'group') && 
 		        ($_POST['value'] == "add" || $_POST['value'] == "remove"))

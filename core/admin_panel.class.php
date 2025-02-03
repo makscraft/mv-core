@@ -186,6 +186,8 @@ class AdminPanel
         Session::set('settings', $settings);
 
         $this -> user -> updateSetting($key, $value);
+
+        return $settings;
     }
 
     public function getModelSessionSetting(string $model, string $key)
@@ -205,6 +207,8 @@ class AdminPanel
         $settings[$model][$key] = $value;
         
         Session::set('settings', $settings);
+
+        return $settings;
     }
 
     public function defineCurrentUserRegion()
