@@ -1,5 +1,5 @@
 <?php
-include_once "../../config/autoload.php";
+include_once '../../config/autoload.php';
 sleep(1);
 
 $login = new Login();
@@ -7,29 +7,36 @@ $i18n = I18n::instance();
 $region = I18n::defineRegion();
 $i18n -> setRegion($region);
 
-if(isset($_GET["code"], $_GET["token"]) && $_GET["code"] && $_GET["token"])
-	if(!$login -> checkNewPasswordParams($_GET["code"], $_GET["token"]))
+if(isset($_GET['code'], $_GET['token']) && $_GET['code'] && $_GET['token'])
+	if(!$login -> checkNewPasswordParams($_GET['code'], $_GET['token']))
 	{
-		$_SESSION['login']['message'] = I18n::locale("password-not-confirmed");
-		$_SESSION['login']['message-css'] = "errors";
+		$_SESSION['login']['message'] = I18n::locale('password-not-confirmed');
+		$_SESSION['login']['message-css'] = 'errors';
 		
-		$login -> reload("login/");
+		$login -> reload('login/');
 	}
 	else
-		$login -> reload("login/recover.php");
-		
-if(!isset($_SESSION['login']['change-password']))
-	$login -> reload("login/");
+		$login -> reload('login/recover.php');
 
-$fields = array(array("{password}", "password", "password", array("required" => true,
-																					   "letters_required" => true,
-																					   "digits_required" => true)),
-					 array("{password-repeat}", "password", "password_repeat", array("required" => true,
-																										  "letters_required" => true,
-																										  "digits_required" => true)));
+if(!isset($_SESSION['login']['change-password']))
+	$login -> reload('login/');
+
+$fields = [
+	['{password}', 'password', 'password', [
+			'required' => true,
+			'letters_required' => true,
+			'digits_required' => true
+		]
+	],
+	['{password-repeat}', 'password', 'password_repeat', [
+			'letters_required' => true,
+			'digits_required' => true
+		]
+	]
+];
 
 $form = new Form($fields);
-$errors = array();
+$errors = [];
 
 if(!empty($_POST))
 {
@@ -39,24 +46,24 @@ if(!empty($_POST))
 		$errors[] = $form -> displayOneError($error);
 	
 	if(!count($errors) && $form -> password != $form -> password_repeat)
-		$errors[] = I18n::locale("passwords-must-match");
+		$errors[] = I18n::locale('passwords-must-match');
 	
-	if(!isset($_SESSION["login"]["ajax-token"]) || $_SESSION["login"]["ajax-token"] != Login::getAjaxInitialToken())
-		$errors[] = I18n::locale("error-wrong-token");
+	if(!isset($_SESSION['login']['ajax-token']) || $_SESSION['login']['ajax-token'] != Login::getAjaxInitialToken())
+		$errors[] = I18n::locale('error-wrong-token');
 
-	if(!isset($_POST["js-token"]) || $_POST["js-token"] != Login::getJavaScriptToken())
-		$errors[] = I18n::locale("error-wrong-token");
+	if(!isset($_POST['js-token']) || $_POST['js-token'] != Login::getJavaScriptToken())
+		$errors[] = I18n::locale('error-wrong-token');
 
-	if(!isset($_POST["admin-login-csrf-token"]) || $_POST["admin-login-csrf-token"] != Login::getTokenCSRF())
-		$errors[] = I18n::locale("error-wrong-token");
+	if(!isset($_POST['admin-login-csrf-token']) || $_POST['admin-login-csrf-token'] != Login::getTokenCSRF())
+		$errors[] = I18n::locale('error-wrong-token');
 	
 	if(!count($errors))
 	{
 		$login -> saveNewPassword($_SESSION['login']['change-password'], $form -> password);
-		$_SESSION['login']['message'] = I18n::locale("password-confirmed");
-		$_SESSION['login']['message-css'] = "success";
+		$_SESSION['login']['message'] = I18n::locale('password-confirmed');
+		$_SESSION['login']['message-css'] = 'success';
 		 
-		$login -> reload("login/");
+		$login -> reload('login/');
 	}
 }
 

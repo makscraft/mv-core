@@ -195,7 +195,7 @@ $(document).ready(function()
 			return;
 		}
 		
-		$('form.model-elements-form').attr("action", MVobject.adminPanelPath + "ajax/upload-images.php");		
+		$('form.model-elements-form').attr("action", MVobject.adminPanelPath + "?ajax=upload-images");		
 		$(this).parents(element_area_id).find("div.upload-one div.loading").addClass("small-loader");
 		$("#sku-products-combinations input[type='text']").prop("disabled", true);
 		
@@ -1032,11 +1032,11 @@ $(document).ready(function()
   		}
   		  		
   		if($("form.model-elements-form").attr("action").match(/current-tab=\d+/))
-  			get_params = "?" + $("form.model-elements-form").attr("action").replace(/.*(current-tab=\d+).*/, "$1");
+  			get_params = "&" + $("form.model-elements-form").attr("action").replace(/.*(current-tab=\d+).*/, "$1");
   		
 		$.ajax({
 			type: "POST",
-			url: MVobject.adminPanelPath + "ajax/versions.php" + get_params,
+			url: MVobject.adminPanelPath + "?ajax=versions" + get_params,
 			dataType: "html",
 			data: MVobject.urlParams + params + version,
 			success: function(data)
@@ -1200,8 +1200,8 @@ $(document).ready(function()
     {
 		$.ajax({
 			type: "POST",
-			url: MVobject.adminPanelPath + "ajax/switch.php",
-			dataType: "html",
+			url: MVobject.adminPanelPath + "?ajax=autocomplete",
+			dataType: "text",
 			data: "switch-off=warnings",
 			success: function(data)
 			{

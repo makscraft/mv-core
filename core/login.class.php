@@ -174,8 +174,7 @@ class Login
 	
 	public function reload(string $path = '')
 	{
-		header("Location: ".$this -> registry -> getSetting("AdminPanelPath").$path);
-		exit();		
+		Http::redirect(Registry::get('AdminPanelPath').$path);
 	}
 	
 	public function sendUserPassword(array $user_data)

@@ -1,17 +1,16 @@
 <?php 
-include '../../config/autoload.php';
-
 Http::isAjaxRequest('post', true);
-$system = new System('ajax');
+$model = Http::fromPost('model');
+$field = Http::fromPost('current_multi_images_field');
 $json = [];
 
-if(isset($_POST['model'], $_POST['current_multi_images_field']) && !empty($_FILES))
-	if($system -> registry -> checkModel($_POST['model']))
+if($model && $field && !empty($_FILES))
+	if(Registry::checkModel($model))
 	{
-		$system -> runModel(strtolower($_POST['model']));
-		$json = $system -> model -> uploadMultiImages($_POST['current_multi_images_field']);
+		$model = new $model();
+		$json = $model -> uploadMultiImages($_POST['current_multi_images_field']);
 	}
 	else
-		$json = array('error' => I18n::locale('upload-file-error'));
+		$json = ['error' => I18n::locale('upload-file-error')];
 
 Http::responseJson($json);

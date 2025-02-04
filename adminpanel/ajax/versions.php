@@ -1,14 +1,12 @@
 <?php
-include "../../config/autoload.php";
-
 Http::isAjaxRequest('post', true);
-$system = new System('ajax');
-$admin_panel = new AdminPanel($system -> user);
+$model = Http::fromPost('model');
+$id = Http::fromPost('id');
 
-if(isset($_POST['model'], $_POST['id']) && $system -> registry -> checkModel($_POST['model']))
+if($model && $id && Registry::checkModel($_POST['model']))
 {			
-	$model = new $_POST['model']();
-	$model -> setId($_POST['id']);
+	$model = new $model();
+	$model -> setId($id);
 	$is_simple_model = get_parent_class($model) === 'ModelSimple';
 	
 	if($is_simple_model)
@@ -32,5 +30,6 @@ if(isset($_POST['model'], $_POST['id']) && $system -> registry -> checkModel($_P
 		$admin_panel -> updateUserSessionSetting('versions-pager-limit', intval($limit));
 
 	header('Content-Type: text/html');
-	include $system -> registry -> getSetting('IncludeAdminPath')."includes/versions.php";
+	include Registry::get('IncludeAdminPath')."includes/versions.php";
+	exit();
 }

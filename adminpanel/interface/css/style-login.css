@@ -20,7 +20,7 @@ li{list-style: none;}
 
 html{height: 100%;}
 body{margin: 0; color: #eee; font: 14px "PantonSemiBold"; position: relative; height: 100%;
-background: #131313 url("../images/login-back.jpg?30") bottom center no-repeat; background-size: cover;}
+background: #131313 url("../images/login-back.jpg?33") top center no-repeat; background-size: cover;}
 
 #container{min-width: 700px; margin: 0 auto; position: relative;}
 #login-area{width: 380px; padding: 130px 0 0 0; margin: 0 auto;}
@@ -32,10 +32,10 @@ margin: 0 0 25px 0; font-size: 18px; display: flex; align-items: flex-end; line-
 .header-loading{margin: 17px 0 0 20px !important;}
 #header.error{margin-bottom: 17px;}
 
-div.errors, div.success{background: #f26061; padding: 6px 12px 6px 12px; border-radius: 4px; margin-bottom: 12px;
-width: 280px;}
+div.errors, div.success{padding: 6px 12px 6px 12px; border-radius: 4px; margin-bottom: 12px; width: 280px;}
+div.errors{color: #ff1d1d; border: 1px solid #fbd689; background: #fdf4e1}
 div.success{background: #deee85;}
-div.errors p{color: #fff; margin: 0 0 1px 0;}
+div.errors p{margin: 0 0 1px 0;}
 div.success p{margin: 0 0 1px 0; color: #333;}
 
 form.login-form div.line{display: flex; align-items: center; margin-bottom: 10px;}
@@ -44,11 +44,11 @@ form.login-form div.line input[type='text'], form.login-form div.line input[type
 padding: 5px 10px; border-radius: 4px; width: 170px; background: #eee}
 form.login-form div.line div.captcha{display: flex; flex-direction: column; align-items: flex-start;}
 form.login-form div.line div.captcha img{border-radius: 4px; margin-bottom: 5px;}
-form.login-form input.submit, a.submit{background: #918b8b; position: relative; cursor: pointer; border-radius: 4px; 
-color: #fff; width: auto; padding: 6px 30px; outline: none;}
+form.login-form input.submit, a.submit{background: #63b3f9; position: relative; cursor: pointer; border-radius: 4px; 
+color: #fff; width: auto; padding: 6px 30px; outline: none; transition: all 0.5s ease;}
 a.submit{text-decoration: none;}
 form.login-form div.submit{width: 280px; display: flex; justify-content: flex-end; margin-bottom: 15px;}
-form.login-form input.submit:hover, a.submit:hover{background: #807979;}
+form.login-form input.submit:hover, a.submit:hover{background: #3aa3ff;}
 form.login-form input.submit:active{position: relative; top: 1px; left: 1px;}
 form.login-form div.remind{margin: 0 0 12px 0;}
 

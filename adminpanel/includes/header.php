@@ -148,4 +148,4 @@ else
 			</div>
       	</div>
    	</div>
-   	<?php echo $system -> displayWarningMessages(); ?>
+   	<?php echo $admin_panel -> displayWarningMessages(); ?>

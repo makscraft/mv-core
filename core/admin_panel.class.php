@@ -139,7 +139,7 @@ class AdminPanel
 		$token .= $this -> user -> getField("login").$this -> user -> getField("password");
         $token .= Registry::get('SecretCode');
 		
-		return Service :: createHash($token, "random");
+		return Service::createHash($token, "random");
 	}
 
     /**
@@ -269,4 +269,49 @@ class AdminPanel
         
         return $error ? I18n::locale($error, $arguments) : '';
     }
+
+    public function displayWarningMessages()
+	{
+        Session::start('adminpanel');
+
+        if(true === Session::get('hide-warnings'))
+            return;
+
+		$message = [];
+		
+		if(!Router::isLocalHost() && Registry::onDevelopment())
+			$message[] = I18n::locale("warning-development-mode");
+			
+		$root_password = Database::instance() -> getCell("SELECT `password` FROM `users` WHERE `id`='1'");
+			
+		if(!Router::isLocalHost() && Service::checkHash("root", $root_password))
+			$message[] = I18n::locale("warning-root-password");
+
+		$logs_folder = Registry::get("IncludePath")."log/";
+		
+		if(is_dir($logs_folder) && !is_writable($logs_folder))
+			$message[] = I18n::locale("warning-logs-folder");
+			
+		$files_folders = array("", "files/", "images/", "models/", "tmp/", "tmp/filemanager/");
+		$files_root = Registry::get("FilesPath");
+		
+		foreach($files_folders as $folder)
+			if(is_dir($files_root.$folder) && !is_writable($files_root.$folder))
+			{
+				$message[] = I18n::locale("warning-userfiles-folder");
+				break;
+			}
+        
+		if(count($message))
+		{
+			$html = "<div id=\"admin-system-warnings\">\n";
+
+			foreach($message as $string)
+				$html .= "<p>".$string."</p>\n";
+   
+			return $html."<span id=\"hide-system-warnings\">".I18n::locale("hide")."</span>\n</div>\n";
+		}
+		else
+            Session::set('hide-warnings', true);
+	}
 }
