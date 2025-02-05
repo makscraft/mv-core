@@ -47,7 +47,7 @@ $(document).ready(function()
                   $(new_captcha).load(function()
                   {
                       $("form.login-form div.captcha > img").replaceWith(new_captcha);
-                      $("form.login-form div.captcha input").val("");
+                      $("form.login-form div.captcha input").val('');
 
                       $("form.login-form div.captcha").parent().removeClass("hidden");
                   });

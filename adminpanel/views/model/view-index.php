@@ -93,7 +93,7 @@ if(Http::isPostRequest() && Http::fromGet('multi_value') !== null && $multi_acti
 		}
 
 		$multi_rights = $multi_action == 'delete' ? 'delete' : 'update';
-		$system -> user -> extraCheckModelRights($model -> getModelClass(), $multi_rights);
+		$admin_panel -> user -> extraCheckModelRights($model -> getModelClass(), $multi_rights);
 		
 		$db = Database::instance();
 		$db -> beginTransaction();		

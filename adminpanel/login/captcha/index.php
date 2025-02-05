@@ -1,6 +1,6 @@
 <?php
 include_once "../../../config/autoload.php";
-Session::start('adminpanel_login');
+Session::start('admin_panel_login');
 
 $captcha = '';
 $image = imagecreate(120, 30);   

@@ -49,13 +49,13 @@ class Login
 		if(!Service::sessionIsStarted())
 			session_start();
 
-		Session::start('adminpanel_login');
+		Session::start('admin_panel_login');
 		
 		if(!Session::get('token'))
 			Session::set('token', Service::strongRandomString(50));
 
 		//Deletes old adminpanel session data
-		Session::destroy('adminpanel');
+		Session::destroy('admin_panel');
 	}
 
 	public function reload(string $path = '')
@@ -139,25 +139,26 @@ class Login
 		return ['id' => $id, 'token' => '$2y$12$'.$parts[1]];		
 	}
 	
-	public function loginUser(string $login, string $password)
+	public function loginUser(string $login, string $password, bool $autologin = false)
 	{
-		if(!isset($_SERVER["HTTP_USER_AGENT"]))
+		if(!isset($_SERVER['HTTP_USER_AGENT']))
 			return false;
 		
 		$row = $this -> db -> getRow("SELECT * FROM `".self::TABLE."` 
 							  	      WHERE `login`=".$this -> db -> secure($login));
 		
-		$arguments = func_get_args();
-		$autologin = (isset($arguments[2]) && $arguments[2] == "autologin");
-		
 		//Compares the data came from user and status of user. If the user in blocked we don't let in
 		if($row && $row['login'] == $login && ($row['active'] || $row['id'] == 1) && 
 		  (Service::checkHash($password, $row['password']) || ($autologin && $row['password'] == $password)))
 		{
-			$_SESSION['mv']['user']['id'] = $row['id'];
-			$_SESSION['mv']['user']['password'] = md5($row['password']);
-			$_SESSION['mv']['user']['token'] = Service::strongRandomString(50);
+			Session::start('admin_panel');
 			
+			Session::set('user', [
+				'id' => $row['id'],
+				'password' => md5($row['password']),
+				'token' => Service::strongRandomString(50)
+			]);
+
 			$data = "`date_last_visit`=".$this -> db -> now('with-seconds');
 			
 			if(!$row["date_registered"] || $row["date_registered"] == "0000-00-00 00:00:00")
@@ -165,9 +166,9 @@ class Login
 			
 			//Updates the last visit of user
 			$this -> db -> query("UPDATE `".self::TABLE."` SET ".$data." WHERE `id`='".$row['id']."'");
-						
-			$session = new UserSession($row['id']); //Start new session for this user
-			$session -> startSession();
+			
+			//Starts new session for this user
+			(new UserSession($row['id'])) -> startSession();
 			
 			return $row['id'];
 		}
@@ -321,11 +322,7 @@ class Login
 	public function cancelRemember()
 	{
 		$key = $this -> getAutoLoginCookieName();
-
-		$time = Registry::get('AutoLoginLifeTime');
-		$time = $time ? time() + $time : time() + 3600 * 24 * 30;
-
-		$options = ['expires' => $time, 'path' => Registry::get('AdminPanelPath')];
+		$options = ['expires' => time() - 3600, 'path' => Registry::get('AdminPanelPath')];
 
 		if(Http::getCookie($key))
 			Http::setCookie($key, '', $options);
@@ -347,7 +344,7 @@ class Login
 		$check = $user["email"].$user["id"].$user["login"].$user["password"].$secret.Debug::browser();
 
 		if(password_verify($check, $params["token"]))
-			return $this -> loginUser($user['login'], $user['password'], 'autologin');
+			return $this -> loginUser($user['login'], $user['password'], true);
 
 		return false;
 	}

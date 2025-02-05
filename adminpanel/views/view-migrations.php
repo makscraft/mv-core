@@ -6,7 +6,7 @@ $errors = false;
 
 if($admin_panel -> user -> getId() != 1)
 {
-	$system -> error = I18n::locale('error-no-rights');
+	$interal_error_text = I18n::locale('error-no-rights');
 	include Registry::get('IncludeAdminPath')."controls/internal-error.php";
 }
 

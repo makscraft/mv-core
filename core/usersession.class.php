@@ -34,22 +34,25 @@ class UserSession
 	 * @var int
 	 */ 
 	private $id;
-	
-	public function __construct(int $id)
+
+	/**
+	 * Pass the current admin id and sets tables and db object.
+	 */
+	public function __construct($id)
 	{
-		//Pass the current admin id and sets tables and db object.
-		
-		$this -> registry = Registry :: instance();
-		$this -> db = DataBase :: instance();
+		$this -> registry = Registry::instance();
+		$this -> db = DataBase::instance();
 		$this -> id = intval($id);
-		$this -> table = "users_sessions";
-		$this -> users_table = "users";
+		$this -> table = 'users_sessions';
+		$this -> users_table = 'users';
 	}
 	
+	/**
+	 * Begins new session for just authorized user.
+	 * Cleans up the old sessions data and incorrect users data.
+	 */
 	public function startSession()
 	{
-		//Begins new session for just authorized user
-		//Cleans up the old sessions data and incorrect users
 		$this -> db -> query("DELETE FROM `".$this -> table."` 
 		                      WHERE `user_id` NOT IN (SELECT `id` FROM `".$this -> users_table."`)
 		                      OR `session_id`='".session_id()."' 
@@ -62,16 +65,19 @@ class UserSession
 						       '".md5($_SERVER['HTTP_USER_AGENT'])."', ".$this -> db -> now().")");
 	}
 	
+	/**
+	 * Deletes session of current user from table.
+	 */
 	public function stopSession()
 	{
-		//Deletes session of current admin from table
 		$this -> db -> query("DELETE FROM `".$this -> table."` WHERE `session_id`='".session_id()."'");
 	}
 
+	/**
+	 * Checks if the current user's session is valid.
+	 */
 	public function checkSession() 
 	{
-		//Checks if the current user's session is valid
-		
 		//Time between last hit and current hit
 		if($this -> registry -> getSetting("DbEngine") == "sqlite")
 		{
@@ -80,7 +86,7 @@ class UserSession
 											WHERE `user_id`='".$this -> id."' 
 											AND `session_id`='".session_id()."'");
 			
-			$time = time() - I18n :: dateToTimestamp($time);
+			$time = time() - I18n::dateToTimestamp($time);
 		}
 		else
 			$time = $this -> db -> getCell("SELECT (".$this -> db -> unixTimeStamp('now')."-".
@@ -98,18 +104,22 @@ class UserSession
 		return (bool)($time < $this -> registry -> getSetting("SessionLifeTime") && $user == 1); //Checks both conditions
 	}
 
+	/**
+	 * Makes new time stamp (last hit) for current user session.
+	 */
 	public function continueSession()
 	{
-		//Makes new time stamp for current user session
 		$this -> db -> query("UPDATE `".$this -> table."` 
 		                      SET `last_hit`=".$this -> db -> now()." 
 							  WHERE `user_id`='".$this -> id."' 
 							  AND `session_id`='".session_id()."'");
 	}
-			
+	
+	/**
+	 * Checks the time from last user's hit in admin panel to define if this user is online.
+	 */
 	public function checkOnlineUsers()
 	{
-		//Checks the time from last user's hit in admin panel to say if this user is online
 		//Time between last hit and current moment
 		if($this -> registry -> getSetting("DbEngine") == "sqlite")
 		{
@@ -117,7 +127,7 @@ class UserSession
 			$users_ids = array();
 			
 			foreach($all_ids as $row)
-				if(time() - I18n :: dateToTimestamp($row["last_hit"]) <= $this -> registry -> getSetting("UserOnlineTime"))
+				if(time() - I18n::dateToTimestamp($row["last_hit"]) <= $this -> registry -> getSetting("UserOnlineTime"))
 					if(!in_array($row["user_id"], $users_ids))
 						$users_ids[] = $row["user_id"];
 		}

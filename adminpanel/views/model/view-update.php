@@ -71,7 +71,7 @@ else if(Http::isGetRequest() && $version = Http::fromGet('version'))
         $admin_panel -> passVersionContent($model);
     }
     else
-        $system -> displayInternalError('error-wrong-record');
+        $admin_panel -> displayInternalError('error-wrong-record');
 }
 else
     $model -> read();
@@ -128,7 +128,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 		         <tr class="model-form-navigation">
 			         <td colspan="2" class="bottom-navigation">
                         <?php 
-                        	if($system -> user -> checkModelRights($model -> getModelClass(), "update"))
+                        	if($admin_panel -> user -> checkModelRights($model -> getModelClass(), "update"))
                         	{
                         		$submit_button = "type=\"button\" id=\"submit-button\"";
                         		$continue_button = "id=\"continue-button\"";

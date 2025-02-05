@@ -12,7 +12,7 @@ if($token = Http::fromPost('data'))
 
 if(Http::requestHas('login', 'password'))
 {
-	Session::start('adminpanel_login');
+	Session::start('admin_panel_login');
 	$errors = [];
 	$result = ['errors' => '', 'action' => '', 'captcha' => false];
 
@@ -77,7 +77,13 @@ if(Http::requestHas('login', 'password'))
 				if(Http::fromPost('remember'))
 					$login -> rememberUser($id);
 			
-				Session::destroy('adminpanel_login');
+				if($back = Session::get('login-back-url'))
+				{
+					Session::start('admin_panel');
+					Session::set('login-back-url', $back);
+				}
+
+				Session::destroy('admin_panel_login');
 			
 				$user = new User($id);
 				$user -> updateSetting('region', I18n::defineRegion());

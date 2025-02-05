@@ -16,7 +16,8 @@ $is_loading_page = preg_match("/\/loading\.php/", $_SERVER["REQUEST_URI"]);
 
 if($is_loading_page)
 {
-	$url = Registry::get("AdminPanelPath");
+	$url = Registry::get('AdminPanelPath');
+	Session::start('admin_panel');
 	
 	if($url_back = Session::get('login-back-url'))
 	{

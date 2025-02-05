@@ -25,7 +25,7 @@ if(isset($_GET['action'], $_POST['csrf_token']) && in_array($_GET['action'], $al
 		$parameter = Http::fromPost('target', 'target');
 		$permission = ($action == 'createFolder' || $action == 'uploadFile') ? 'create' : 'delete';
 
-		$system -> user -> extraCheckModelRights('file_manager', $permission);
+		$admin_panel -> user -> extraCheckModelRights('file_manager', $permission);
 		$result = $filemanager -> $action($parameter);
 
 		if($result['message'] !== '')

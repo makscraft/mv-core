@@ -1,6 +1,6 @@
 <?php include Registry::get('IncludeAdminPath').'includes/header.php'; ?>
 <div class="index-models">
-   <?php echo $system -> menu -> displayModelsMenu(); ?>
+   <?php echo (new Menu) -> displayModelsMenu(); ?>
 </div>
 <div id="index-icons">
 	<ul>

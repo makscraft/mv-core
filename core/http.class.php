@@ -229,7 +229,7 @@ class Http
     /**
      * Sends status code HTTP header, according to current protocol.
      */
-    static public function sendStatusCodeHeader(int $status)
+    static public function sendStatusCodeHeader(int $status, bool $exit = false)
     {
         $headers = [
             100 => 'Continue',
@@ -290,6 +290,11 @@ class Http
         ];
 
         if(array_key_exists($status, $headers))
+        {
             header($_SERVER['SERVER_PROTOCOL'].' '.$status.' '.$headers[$status]);
+
+            if($exit)
+                exit();
+        }
     }
 }

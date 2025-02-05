@@ -34,8 +34,8 @@ if(Http::isPostRequest() && Http::fromGet('action') === 'update')
         $model -> removeElement('region') -> update('self-update');
 		FlashMessages::add('success', I18n::locale('done-update'));
 		
-		if($skin = Http::fromPost('admin-panel-skin'))
-		    $system -> user -> setUserSkin($skin);
+		if($skin = Http::fromPost('admin_panel_skin'))
+		    $admin_panel -> user -> setUserSkin($skin);
 		
         Http::reload('view=user-settings');
     }
@@ -46,7 +46,7 @@ include Registry::get('IncludeAdminPath').'includes/header.php';
 <script type="text/javascript">
 $(document).ready(function()
 {
-	$("tr:has(select[name='admin-panel-skin'])").insertAfter("tr:has(input[name='password_repeat'])");
+	$("tr:has(select[name='admin_panel_skin'])").insertAfter("tr:has(input[name='password_repeat'])");
 	$("tr:has(select[name='region'])").insertAfter("tr:has(input[name='password_repeat'])");
 	$("select[name='region'] option[value='']").remove();
 });   
@@ -64,7 +64,7 @@ $(document).ready(function()
 	          <table>
 		          <?php echo $model -> displayModelFormInAdminPanel(); ?>
                   <tr>
-                     <td class="field-name"><?php echo I18n::locale("admin-panel-skin"); ?></td>
+                     <td class="field-name"><?php echo I18n::locale("admin_panel_skin"); ?></td>
                      <td class="field-content">                        
                         <?php echo $admin_panel -> user -> displayUserSkinSelect(); ?>
                      </td>

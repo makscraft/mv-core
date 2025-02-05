@@ -84,7 +84,7 @@ else
 <script type="text/javascript" src="<?php echo $admin_panel_path; ?>?service=locale&region=<?php echo $region; ?>"></script>
 
 <?php
-$skin = $system -> user -> getUserSkin();
+$skin = $admin_panel -> user -> getUserSkin();
 
 if($skin)
 {
@@ -96,7 +96,7 @@ if($skin)
 }
 else
 {
-   $skins = $system -> user -> getAvailableSkins();
+   $skins = $admin_panel -> user -> getAvailableSkins();
    echo "<script type=\"text/javascript\">$(document).ready(function() { openSkinChooseDialog([\"".implode("\",\"", $skins)."\"]); });</script>\n";
 }
 ?>
@@ -117,7 +117,7 @@ else
 					<li>
 						<span><?php echo I18n::locale("modules"); ?></span>
 						<div id="models-list">
-							<?php echo $system -> menu -> displayModelsMenu(); ?>
+							<?php echo (new Menu) -> displayModelsMenu(); ?>
 						</div>
 					</li>
 				</ul>
@@ -139,7 +139,7 @@ else
 			</div>
 			<div id="user-settings">
 				<ul>
-					<li id="user-name"><span class="skin-color"><?php echo $system -> user -> getField('name'); ?></span></li>
+					<li id="user-name"><span class="skin-color"><?php echo $admin_panel -> user -> getField('name'); ?></span></li>
 					<li><a href="<?php echo $admin_panel_path; ?>?view=user-settings"><?php echo I18n::locale("my-settings"); ?></a></li>
 					<?php $logout_link = $admin_panel_path."login?logout=".Login::getLogoutToken(); ?>
 					<li><a href="<?php echo $registry -> getSetting('MainPath') ?>" target="_blank"><?php echo I18n::locale("to-site"); ?></a></li>

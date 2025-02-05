@@ -81,10 +81,10 @@ class Builder
 
 		ob_start();
 		
-		$this -> registry = Registry :: instance(); //Langs and settings
-      	$this -> db = DataBase :: instance(); //Manages database
+		$this -> registry = Registry::instance(); //Langs and settings
+      	$this -> db = DataBase::instance(); //Manages database
       
-      	if($this -> registry -> get('SessionSupport') && !Service :: sessionIsStarted())
+      	if($this -> registry -> get('SessionSupport') && !Service::sessionIsStarted())
         	session_start(); //Starts the session if needed
       
       	$this -> router = new Router(); //Object to analyze the requested page
@@ -131,9 +131,9 @@ class Builder
 			return $this -> plugins[$name];
 
 		//Automatic models objects lazy creating
-		if(Registry :: checkModel($name))
+		if(Registry::checkModel($name))
 		{
-			$models = Registry :: get('ModelsLower');
+			$models = Registry::get('ModelsLower');
 
 			if(isset($models[$name]))
 				return $this -> models[$models[$name]] = new $name();
@@ -145,7 +145,7 @@ class Builder
 			}
 		}
 
-		$plugins = Registry :: get('PluginsLower');
+		$plugins = Registry::get('PluginsLower');
 
 		if(isset($plugins[$name]))
 			return $this -> plugins[$plugins[$name]];
@@ -226,15 +226,10 @@ class Builder
 	 */
 	public function displayDebugPanel()
 	{
-		if(Registry :: get('DebugPanel') && !Http :: isAjaxRequest())
+		if(Registry::get('DebugPanel') && !Http::isAjaxRequest())
 		{
-			if(Registry :: onDevelopment())
-				include_once Registry :: get('IncludeAdminPath').'controls/debug-panel.php';
-			else if(isset($_SESSION['mv']['user']['id']))
-			{
-				if((new User($_SESSION['mv']['user']['id'])) -> checkUserLogin())
-					include_once Registry :: get('IncludeAdminPath').'controls/debug-panel.php';
-			}
+			if(Registry::onDevelopment())
+				include_once Registry::get('IncludeAdminPath').'controls/debug-panel.php';
 		}
 	}
 

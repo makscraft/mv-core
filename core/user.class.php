@@ -60,9 +60,11 @@ class User
 	 */ 
 	private $rights = [];
 	
+	/**
+	 * Sets tables and needed objects, also gets the users rights and starts session.
+	 */
 	public function __construct($id)
 	{
-		//Sets tables and needed objects, also gets the users rights
 		$this -> registry = Registry::instance(); //Langs and settings
 		$this -> db = DataBase::instance(); //Manages database
 
@@ -87,6 +89,9 @@ class User
 		
 		if($this -> id)  //Object to control the session for this user	
 			$this -> session = new UserSession($this -> id);
+
+		Session::start('admin_panel');
+		Session::set('settings', $this -> loadSettings());
 	}
 	
 	public function getContent() { return $this -> content; }
@@ -94,37 +99,20 @@ class User
  	public function getField($field) { return $this -> content[$field]; }
  	public function getError() { return $this -> error; }
 
-	public function checkUserLogin()
-	{ 		
- 		if(!isset($_SESSION['mv']['user']['id']) || !is_array($this -> content))
- 			return false;
-
- 		//We check user's password in db according to passed login
- 		$password = md5($this -> content['password']); //Hash of password to compare
-		
-		if($_SESSION['mv']['user']['id'] != $this -> content['id'] || $_SESSION['mv']['user']['password'] != $password
-		   || !$this -> session -> checkSession())
-			return false;
-		else if($this -> id != 1 && !$this -> content['active'])
-			return false;
-		else
-		{
-			$this -> session -> continueSession(); //Continues the current session in db
-			return true;
-		}
-
-		return false;
-	}
-	 	
- 	static public function updateLoginData($login, $password)
+	static public function updateLoginData($login, $password)
  	{
- 		$_SESSION['mv']['user']['login'] = $login;
+		Session::start('admin_panel');
+        $auth = Session::get('user');
+
+ 		$auth['login'] = $login;
  		
  		if($password)
  		{
- 			$password = (Registry::instance() -> getInitialVersion() >= 2.2) ? $password : md5($password);
- 			$_SESSION['mv']['user']['password'] = md5($password);
+ 			$password = (Registry::getInitialVersion() >= 2.2) ? $password : md5($password);
+ 			$auth['password'] = md5($password);
  		}
+
+		 Session::set('user', $auth);
  	}
  	
  	public function saveSettings($settings)
@@ -153,10 +141,12 @@ class User
  		
  		return $this;
  	}
- 		
-	public function checkModelRights($module, $right)
+ 	
+	/**
+	 * Checks if the user's credential for the modele exists.
+	 */
+	public function checkModelRights($module, $right): bool
 	{
-		//Checks if the right for the modele is exists.
 		//Root user has access to any module othe users must have rights via policy
 		if($this -> id == 1) 
 			return true;
@@ -172,9 +162,12 @@ class User
 		return (bool) $this -> rights[$module][$right];
 	}
 
+	/**
+	 * Check the rights inside the any amdin panel page related to module (edit, create, ...) 
+	 * and redirects if no rights.
+	 */
 	public function extraCheckModelRights($module, $right)
 	{
-		//Check the rights inside the any amdin panel page related to module (edit, create, ...) and redirects if no right
 		if(!$this -> checkModelRights($module, $right))
 		{
 			$this -> error = I18n::locale("error-no-rights");
@@ -193,27 +186,28 @@ class User
 	public function getUserSkin()
 	{
 		$path = $this -> registry -> getSetting("IncludeAdminPath")."interface/skins/";
+		Session::start('admin_panel');
+        $settings = Session::get('settings');
 		
-		if(isset($_SESSION['mv']['settings']['skin']) && $_SESSION['mv']['settings']['skin'])
-			if($_SESSION['mv']['settings']['skin'] == "none")
-				return "none";
-			else if(is_dir($path.$_SESSION['mv']['settings']['skin']) && 
-					is_file($path.$_SESSION['mv']['settings']['skin']."/skin.css"))
-				return $_SESSION['mv']['settings']['skin'];
+		if(isset($settings['skin']))
+			if($settings['skin'] == 'none')
+				return 'none';
+			else if(is_dir($path.$settings['skin']) && is_file($path.$settings['skin']."/skin.css"))
+				return $settings['skin'];
 	}
 	
 	public function getAvailableSkins()
 	{
-		$skins = array("mountains");
+		$skins = ['mountains'];
 		$path = $this -> registry -> getSetting("IncludeAdminPath")."interface/skins/";
 		
 		$folders = scandir($path);
 		
 		foreach($folders as $folder)
-			if(!preg_match("/^\./", $folder) && $folder != "mountains" && $folder != "default")
+			if(!preg_match("/^\./", $folder) && $folder != 'mountains' && $folder != 'default')
 				$skins[] = $folder;
 
-		$skins[] = "none";
+		$skins[] = 'none';
 				
 		return $skins;
 	}
@@ -224,7 +218,7 @@ class User
 		
 		if((is_dir($path.$name) && is_file($path.$name."/skin.css")) || $name == "none")
 		{
-			Session::start('adminpanel');
+			Session::start('admin_panel');
 			$settings = Session::get('settings');
 			$settings['skin'] = $name;
 			Session::set('settings', $settings);
@@ -237,19 +231,21 @@ class User
 	
 	public function displayUserSkinSelect()
 	{
+		Session::start('admin_panel');
+		$settings = Session::get('settings');
+
 		$path = $this -> registry -> getSetting("IncludeAdminPath")."interface/skins/";
-		$html = "<select name=\"admin-panel-skin\" id=\"user-settings-skin-select\">\n";
+		$html = "<select name=\"admin_panel_skin\" id=\"user-settings-skin-select\">\n";
 		$folders = array("none") + scandir($path);
 		
 		foreach($folders as $folder)
 			if(!preg_match("/^\./", $folder))
 			{
-				$selected = "";
+				$selected = '';
 				
-				if(isset($_POST['admin-panel-skin']) && $_POST['admin-panel-skin'] == $folder)
+				if(Http::fromPost('admin_panel_skin') == $folder)
 					$selected = ' selected="selected"';
-				else if(empty($_POST) && isset($_SESSION['mv']['settings']['skin']) && 
-						$_SESSION['mv']['settings']['skin'] == $folder)
+				else if(empty($_POST) && isset($settings['skin']) && $settings['skin'] == $folder)
 					$selected = ' selected="selected"';
 				
 				$html .= "<option".$selected." value=\"".$folder."\">".$folder."</option>\n";

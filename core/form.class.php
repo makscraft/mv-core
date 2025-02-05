@@ -100,16 +100,16 @@ class Form
 	 */
 	public function __construct(mixed $form_source, int $record_id = null)
 	{
-		$this -> i18n = I18n :: instance();
-		$this -> registry = Registry :: instance();
+		$this -> i18n = I18n::instance();
+		$this -> registry = Registry::instance();
 
 		//Form from model class
-		if(!is_array($form_source) && Registry :: checkModel($form_source))
+		if(!is_array($form_source) && Registry::checkModel($form_source))
 		{			
 			$model = new $form_source();
 			
 			if(get_parent_class($model) === "ModelSimple")
-				Debug :: displayError("It's forbidden to create forms from simple models.");
+				Debug::displayError("It's forbidden to create forms from simple models.");
 			
 			//Runs model
 			$model -> loadRelatedData();
@@ -135,7 +135,7 @@ class Form
 		{
 			$message = "The form fields source has not being passed. You need to pass the array of fields";
 			$message .= " or class name of existed model from folder '~models/'.";
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 	}
 	
@@ -155,9 +155,9 @@ class Form
 		{
 			$trace = debug_backtrace();
 			$message = "Call to undefiend method '".$method."' of Form class object";
-			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service :: removeDocumentRoot($trace[0]['file']);
+			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
 
-			Debug :: displayError($message, $trace[0]['file'], $trace[0]['line']);
+			Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);
 		}
 	}
 
@@ -245,7 +245,7 @@ class Form
 	 */
 	public function submit()
 	{
-		if(Http :: isPostRequest())
+		if(Http::isPostRequest())
 		{
 			$this -> getDataFromPost();
 			$this -> state['submitted'] = true;
@@ -271,7 +271,7 @@ class Form
 				if($type == "file" || $type == "image")
 				{
 					if($this -> record_id)
-						$value = Service :: addFileRoot($value);
+						$value = Service::addFileRoot($value);
 						
 					$this -> fields[$name] -> setRealValue($value, basename($value));
 				}	
@@ -297,8 +297,8 @@ class Form
 			if($type == 'image' || $type == 'file')
 			{
 				//Tmp files cleanup
-				Filemanager :: deleteOldFiles($this -> registry -> getSetting("FilesPath")."tmp/");
-				Filemanager :: deleteOldFiles($this -> registry -> getSetting("FilesPath")."tmp/filemanager/");
+				Filemanager::deleteOldFiles($this -> registry -> getSetting("FilesPath")."tmp/");
+				Filemanager::deleteOldFiles($this -> registry -> getSetting("FilesPath")."tmp/filemanager/");
 
 				if($type == "file" && $object -> getProperty("multiple")) //Multiple files processing
 				{
@@ -321,7 +321,7 @@ class Form
 				$old_value = '';
 
 				if(isset($_POST['value-'.$name]) && $_POST['value-'.$name])
-					$old_value = Service :: decodeBase64($_POST['value-'.$name]);
+					$old_value = Service::decodeBase64($_POST['value-'.$name]);
 
 				$images = $this -> getMultipleFilesData($name);
 				$object -> processMultipleImagesInForm($images, $old_value);
@@ -401,7 +401,7 @@ class Form
 	 */
 	public function addField(array $field_data)
 	{
-		Model :: checkElement($field_data);
+		Model::checkElement($field_data);
 
 		if(isset($field_data[3]['captcha'], $field_data[3]['session_key']))
 		{
@@ -413,7 +413,7 @@ class Form
 			unset($field_data[3]['session_key']);
 		}
 
-		$element = Model :: elementsFactory($field_data, 'Form');
+		$element = Model::elementsFactory($field_data, 'Form');
 		$type = $element -> getType();
 		$forbidden_types = ["parent", "many_to_one", "group", "many_to_many"];		
 
@@ -424,14 +424,14 @@ class Form
 				$message = "You must specify the folder for uploaded files for field '".$element -> getName()."' for the current form. ";
 				$message .= "Put the name of folder in extra parameter like 'files_folder' => 'uploads'. ";
 				$message .= "This folder will be created in folder 'userfiles' automatically.";
-				Debug :: displayError($message);
+				Debug::displayError($message);
 			}
 		}
 		else if(!$this -> model_class && in_array($type, $forbidden_types))
 		{
 			$message = "It's forbidden to use the field type '".$type."' in form which is created ";
 			$message .= "without model.";
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 
 		if($type == "enum")
@@ -517,7 +517,7 @@ class Form
 	 */
 	public function validate(?array $fields = null)
 	{
-		if(Registry :: getInitialVersion() >= 3.0 && !$this -> state['submitted'])
+		if(Registry::getInitialVersion() >= 3.0 && !$this -> state['submitted'])
 			return false;
 
 		foreach($this -> fields as $name => $object)
@@ -548,7 +548,7 @@ class Form
 			if($value != '')
 				if(!isset($_SESSION[$this -> captcha['session_key']]) || 
 					$_SESSION[$this -> captcha['session_key']] != $value)
-						$this -> addError(I18n :: locale('wrong-captcha').'.', $this -> captcha['field']);
+						$this -> addError(I18n::locale('wrong-captcha').'.', $this -> captcha['field']);
 		}
 
 		if($this -> used_tokens["regular"] && !$this -> checkTokenCSRF())
@@ -597,7 +597,7 @@ class Form
 	{
 		$object = isset($error[2], $this -> fields[$error[2]]) ? $this -> fields[$error[2]] : null;
 		  
-		return Model :: processErrorText($error, $object);
+		return Model::processErrorText($error, $object);
 	}
 	
 	/**
@@ -700,7 +700,7 @@ class Form
 		if(is_string($fields))
 			$fields = $fields === '*' ? [] : [$fields];
 
-		if(Registry :: getInitialVersion() < 3.0 && $format === '')
+		if(Registry::getInitialVersion() < 3.0 && $format === '')
 			$format = 'table';
 		else if($format === 'vertical')
 			$format = 'old';
@@ -1019,7 +1019,7 @@ class Form
 				if($type == "bool")
 				{
 					$key = $this -> fields[$name] -> getValue() ? "yes" : "no";
-					$message .= "<li>".$caption.I18n :: locale($key)."</li>\n";
+					$message .= "<li>".$caption.I18n::locale($key)."</li>\n";
 				}
 				else if($type == "many_to_many" && $this -> fields[$name] -> getValue())
 				{
@@ -1055,9 +1055,9 @@ class Form
 
 					if($type == 'multi_images')
 					{
-						foreach(MultiImagesModelElement :: unpackValue($value) as $image)
+						foreach(MultiImagesModelElement::unpackValue($value) as $image)
 						{
-							$link = Service :: setFullHttpPath($image['image']);
+							$link = Service::setFullHttpPath($image['image']);
 							$message .= "<li>".$caption."<a href=\"".$link."\" target=\"_blank\">".$link."</a></li>\n";
 						}
 					}
@@ -1067,13 +1067,13 @@ class Form
 
 						foreach($files as $file)
 						{
-							$link = Service :: setFullHttpPath($file);
+							$link = Service::setFullHttpPath($file);
 							$message .= "<li>".$caption."<a href=\"".$link."\" target=\"_blank\">".$link."</a></li>\n";
 						}						
 					}
 					else
 					{
-						$link = Service :: setFullHttpPath($value);
+						$link = Service::setFullHttpPath($value);
 						$message .= "<li>".$caption."<a href=\"".$link."\" target=\"_blank\">".$link."</a></li>\n";
 					}
 				}				
@@ -1127,7 +1127,7 @@ class Form
 				if($object -> getType() == "password")
 					unset($source[$field]);
 				else if($object -> getType() == "date" || $object -> getType() == "date_time")
-					$source[$field] = I18n :: formatDate($value);
+					$source[$field] = I18n::formatDate($value);
 		}
 
 		$this -> getDataFromArray($source); //Passes data into form fields
@@ -1275,8 +1275,8 @@ class Form
 	 */
 	static public function generateFormCookieKey()
 	{
-		$code = Debug :: browser().substr(Registry :: get('SecretCode'), 10, 10);
-		$code .= Registry :: get('DomainName');
+		$code = Debug::browser().substr(Registry::get('SecretCode'), 10, 10);
+		$code .= Registry::get('DomainName');
 
 		return 'form_'.substr(md5($code), 0, 8);
 	}
@@ -1287,16 +1287,16 @@ class Form
 	 */
 	static public function getCreateCookieKeyToken()
 	{
-		$key = self :: generateFormCookieKey();
+		$key = self::generateFormCookieKey();
 
 		if(isset($_COOKIE[$key]) && $_COOKIE[$key])
 			return trim($_COOKIE[$key]);
 		else
 		{
-			$token = Service :: strongRandomString(50);
+			$token = Service::strongRandomString(50);
 			$time = time() + 3600 * 24 * 30;
 			
-			Http :: setCookie($key, $token, ['expires' => $time]);
+			Http::setCookie($key, $token, ['expires' => $time]);
 			$_COOKIE[$key] = $token;
 
 			return $token;
@@ -1311,7 +1311,7 @@ class Form
 	 */
 	public function useAjaxTokenCSRF()
 	{
-		self :: createAjaxTokenCSRF();
+		self::createAjaxTokenCSRF();
 		$this -> used_tokens["ajax"] = true;
 		
 		return $this;
@@ -1323,15 +1323,15 @@ class Form
 	 */
 	static public function createAjaxTokenCSRF()
 	{
-		if(!self :: $ajax_csrf_token)
+		if(!self::$ajax_csrf_token)
 		{
-			$code = Registry :: get("SecretCode");
-			$key = self :: getCreateCookieKeyToken();
+			$code = Registry::get("SecretCode");
+			$key = self::getCreateCookieKeyToken();
 
-			self :: $ajax_csrf_token =  Service :: createHash($code.Debug :: browser().$key, "sha224");
+			self::$ajax_csrf_token =  Service::createHash($code.Debug::browser().$key, "sha224");
 		}
 				
-		return self :: $ajax_csrf_token;
+		return self::$ajax_csrf_token;
 	}
 
 	/**
@@ -1340,7 +1340,7 @@ class Form
 	 */
 	static public function createAndDisplayAjaxTokenCSRF()
 	{
-		return self :: displayAjaxTokenCSRF();
+		return self::displayAjaxTokenCSRF();
 	}
 
 	/**
@@ -1349,9 +1349,9 @@ class Form
 	 */
 	static public function displayAjaxTokenCSRF()
 	{
-		self :: createAjaxTokenCSRF();
+		self::createAjaxTokenCSRF();
 
-		return "<input type=\"hidden\" name=\"csrf_ajax_token\" value=\"".self :: $ajax_csrf_token."\" />\n";
+		return "<input type=\"hidden\" name=\"csrf_ajax_token\" value=\"".self::$ajax_csrf_token."\" />\n";
 	}
 
 	/**
@@ -1360,7 +1360,7 @@ class Form
 	 */
 	public function getAjaxTokenCSRF()
 	{
-	    return self :: $ajax_csrf_token;
+	    return self::$ajax_csrf_token;
 	}
 
 	/**
@@ -1369,7 +1369,7 @@ class Form
 	 */
 	public function checkAjaxTokenCSRF()
 	{
-	    return (isset($_POST["csrf_ajax_token"]) && $_POST["csrf_ajax_token"] == self :: $ajax_csrf_token);
+	    return (isset($_POST["csrf_ajax_token"]) && $_POST["csrf_ajax_token"] == self::$ajax_csrf_token);
 	}
 
 
@@ -1383,15 +1383,15 @@ class Form
 		$token = isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER["HTTP_USER_AGENT"] : "";
 		$token .= $_SERVER["REMOTE_ADDR"].$this -> model_class;
 		
-		if(Service :: sessionIsStarted())
+		if(Service::sessionIsStarted())
 		{
 			if(!isset($_SESSION["csrf-individual-token"]))
-				$_SESSION["csrf-individual-token"] = Service :: strongRandomString(50);
+				$_SESSION["csrf-individual-token"] = Service::strongRandomString(50);
 			
 			$token .= $_SESSION["csrf-individual-token"];
 		}
 
-		$this -> csrf_token = Service :: createHash($token.$this -> registry -> getSetting("SecretCode"));
+		$this -> csrf_token = Service::createHash($token.$this -> registry -> getSetting("SecretCode"));
 		$this -> used_tokens["regular"] = true;
 		
 		return $this;
@@ -1410,7 +1410,7 @@ class Form
 				if($error[2] == "csrf_individual_token")
 				{
 					$error[1] = str_replace(array("{", "}"), "", $error[1]);
-					$html .= "<p class=\"field-error\">".I18n :: locale($error[1])."</p>\n";
+					$html .= "<p class=\"field-error\">".I18n::locale($error[1])."</p>\n";
 				}
 		
 		return $html;
@@ -1442,7 +1442,7 @@ class Form
 	 */
 	public function useJqueryToken()
 	{
-		self :: createJqueryToken();
+		self::createJqueryToken();
 		$this -> used_tokens["jquery"] = true;
 	    
 	    return $this;
@@ -1453,15 +1453,15 @@ class Form
 	 */
 	static public function createJqueryToken()
 	{
-		if(!self :: $jquery_token)
+		if(!self::$jquery_token)
 		{
-			$key = self :: getCreateCookieKeyToken();
-			$token = Service :: createHash($key.Registry :: get("SecretCode").Debug :: browser(), "sha224");
+			$key = self::getCreateCookieKeyToken();
+			$token = Service::createHash($key.Registry::get("SecretCode").Debug::browser(), "sha224");
 			
-			self :: $jquery_token = preg_replace('/\D/', '', $token);
+			self::$jquery_token = preg_replace('/\D/', '', $token);
 		}
 
-	    return self :: $jquery_token;
+	    return self::$jquery_token;
 	}
 	
 	/**
@@ -1470,11 +1470,11 @@ class Form
 	 */
 	static public function displayJqueryToken()
 	{
-		self :: createJqueryToken();
+		self::createJqueryToken();
 
 	    $html = "\n<script type=\"text/javascript\"> $(document).ready(function(){";
 	    $html .= "$(\"form[method='post']\").append(\"<input type='hidden' name='jquery_check_code' ";
-	    $html .= "value='".self :: $jquery_token."' />\")";
+	    $html .= "value='".self::$jquery_token."' />\")";
 	    $html .= "}); </script>";
 	    
 	    return $html;
@@ -1486,7 +1486,7 @@ class Form
 	 */
 	static public function createAndDisplayJqueryToken()
 	{
-		return self :: displayJqueryToken();
+		return self::displayJqueryToken();
 	}
 
 	/**
@@ -1495,7 +1495,7 @@ class Form
 	 */
 	public function getJqueryToken()
 	{
-	    return self :: $jquery_token;
+	    return self::$jquery_token;
 	}
 
 	/**
@@ -1504,7 +1504,7 @@ class Form
 	 */
 	public function checkJqueryToken()
 	{
-	    return (isset($_POST["jquery_check_code"]) && $_POST["jquery_check_code"] == self :: $jquery_token);
+	    return (isset($_POST["jquery_check_code"]) && $_POST["jquery_check_code"] == self::$jquery_token);
 	}
 
 
@@ -1551,15 +1551,15 @@ class Form
 	{
 		$field = $object -> getName();
 		$limit = (int) $object -> getProperty("multiple");
-		$new_files = self :: getMultipleFilesData($field);
+		$new_files = self::getMultipleFilesData($field);
 		$old_files = [];
-		$salt = Registry :: get('SecretCode');
+		$salt = Registry::get('SecretCode');
 
 		foreach($_POST as $key => $value)
 			if(preg_match("/^multiple-".$field."-\w+$/", $key))
 			{
 				$parts = explode("-", $key);
-				$data = Service :: unserializeArray($value);
+				$data = Service::unserializeArray($value);
 
 				if(md5($data["file"].$salt) == $parts[2] && is_file($data["file"]))
 					$old_files[] = $data;
@@ -1571,7 +1571,7 @@ class Form
 		if(!count($new_files))
 			return;
 
-		$error = I18n :: locale("maximum-files-one-time", ["number" => $object -> getProperty("multiple")]).'.';
+		$error = I18n::locale("maximum-files-one-time", ["number" => $object -> getProperty("multiple")]).'.';
 		$max = $limit - count($old_files);
 
 		if($max <= 0)
@@ -1611,7 +1611,7 @@ class Form
 			$this -> fields[$field] -> setRealValue($file, basename($file));
 			
 			if($path = $this -> fields[$field] -> copyFile())
-				$values[] = ["name" => basename($path), "file" => Service :: removeFileRoot($path)];
+				$values[] = ["name" => basename($path), "file" => Service::removeFileRoot($path)];
 		}
 
 		$this -> fields[$field] -> setMultipleFiles($values);

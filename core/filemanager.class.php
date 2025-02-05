@@ -62,7 +62,7 @@ class Filemanager
 
 	public function __construct()
 	{
-		Session::start('adminpanel');		
+		Session::start('admin_panel');		
 		$data = Session::get('file_manager', []);
 		$data['path'] ??= Registry::get('FilesPath');
 

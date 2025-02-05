@@ -37,13 +37,16 @@ class AdminPanel
         if(!Service::sessionIsStarted())
             session_start();
 
-        Session::start('adminpanel');
+        Session::start('admin_panel');
         
         $session_data = ['settings'];
 
         foreach($session_data as $key)
             if(Session::get($key) === null)
                 Session::set($key, []);
+
+        if($time_zone = Registry::get('TimeZone'))
+            date_default_timezone_set($time_zone);                
 
         if(is_object($user))
         {
@@ -148,7 +151,7 @@ class AdminPanel
      */
     static public function getPaginationLimit(): int
     {
-        Session::start('adminpanel');
+        Session::start('admin_panel');
         $limit = Session::get('settings')['paginator-limit'] ?? 10;
 
         return in_array($limit, self::PAGINATION_LIMITS) ? $limit : 10;
@@ -172,7 +175,7 @@ class AdminPanel
 
     public function getUserSessionSetting(string $key)
     {
-        Session::start('adminpanel');
+        Session::start('admin_panel');
         $settings = Session::get('settings');
 
         return array_key_exists($key, $settings) ? $settings[$key] : null;
@@ -180,7 +183,7 @@ class AdminPanel
 
     public function updateUserSessionSetting(string $key, mixed $value)
     {
-        Session::start('adminpanel');
+        Session::start('admin_panel');
         $settings = Session::get('settings');
         $settings[$key] = $value;
         Session::set('settings', $settings);
@@ -192,7 +195,7 @@ class AdminPanel
 
     public function getModelSessionSetting(string $model, string $key)
     {
-        Session::start('adminpanel');
+        Session::start('admin_panel');
         $settings = Session::get('settings');
         $settings[$model] ??= [];
 
@@ -201,7 +204,7 @@ class AdminPanel
 
     public function updateModelSessionSetting(string $model, string $key, mixed $value)
     {
-        Session::start('adminpanel');
+        Session::start('admin_panel');
         $settings = Session::get('settings');
         $settings[$model] ??= [];
         $settings[$model][$key] = $value;
@@ -272,7 +275,7 @@ class AdminPanel
 
     public function displayWarningMessages()
 	{
-        Session::start('adminpanel');
+        Session::start('admin_panel');
 
         if(true === Session::get('hide-warnings'))
             return;
@@ -314,4 +317,33 @@ class AdminPanel
 		else
             Session::set('hide-warnings', true);
 	}
+
+    public function checkSessionAuthorization()
+    {
+        Session::start('admin_panel');
+        $auth = Session::get('user');
+
+        if(!$auth || !isset($auth['id']))
+            return false;
+
+        $row = Database::instance() -> getRow("SELECT * FROM `users` WHERE `id`='".intval($auth['id'])."'");
+
+        if(!$row['active'] && $row['id'] != 1)
+            return false;
+
+        if(md5($row['password']) != $auth['password'])
+            return false;
+        
+        return $row['id'];
+    }
+
+    public function checkCookieAuthorization()
+    {
+        $key = Login::getAutoLoginCookieName();
+        
+        if(!$cookie = Http::getCookie($key))
+            return false;
+
+        return (new Login) -> autoLogin($cookie);
+    }
 }

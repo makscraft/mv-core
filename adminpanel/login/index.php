@@ -18,7 +18,7 @@ else
 	$i18n -> setRegion($region);	
 }
 
-//Debug::exit($_SESSION);
+//Debug::exit();
 //unset($_SESSION['login']['change-password']);
 //$login -> cancelRemember();
 /*
@@ -37,7 +37,7 @@ if(Http::fromGet('logout') === Login::getLogoutToken())
 	Filemanager::makeModelsFilesCleanUp();
 
 	unset($_SESSION["login"]);
-   Session::destroy('adminpanel');
+   Session::destroy('admin_panel');
 	$login -> cancelRemember() -> reload("login/");
 }
 */

@@ -1,12 +1,21 @@
 <?php
 include_once '../config/autoload.php';
-$system = new System();
-$registry = Registry::instance();
-$admin_panel = new AdminPanel($system -> user);
+
+$admin_panel = new AdminPanel();
+
+if(!$user_id = $admin_panel -> checkSessionAuthorization())
+    $user_id = $admin_panel -> checkCookieAuthorization();
+
+if(!$user_id)
+    if(Http::isAjaxRequest())
+        Http::sendStatusCodeHeader(401, true);
+    else
+        Http::redirect(Registry::get('AdminPanelPath').'login/');
+
+$admin_panel -> setUser(new User($user_id));
+$admin_panel -> user -> session -> continueSession();
+
 $admin_panel -> defineCurrentUserRegion();
 $view = $admin_panel -> defineRequestedView();
-
-//Debug::pre($view);
-//Debug::pre($_SESSION);
 
 include_once $view;

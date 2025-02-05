@@ -14,27 +14,27 @@ if(!$object = $model -> loadRelatedData() -> getElement($field))
 
 if($object -> getType() == "parent")
 {			
-    $object -> setSelfModel(get_class($system -> model));
+    $object -> setSelfModel(get_class($model));
     
     if(isset($_GET['id']))
     {				
-        $object -> setSelfId(intval($_GET['id'])) -> getAvailbleParents($system -> model -> getTable());				
-        $result = $object -> getDataForAutocomplete($request, $system -> db);
+        $object -> setSelfId(intval($_GET['id'])) -> getAvailbleParents($model -> getTable());				
+        $result = $object -> getDataForAutocomplete($request, Database::instance());
     }
     else if(isset($_GET['ids']) && $_GET['ids'])
     {
         $ids = explode(",", $_GET['ids']);
-        $object -> getAvailbleParents($system -> model -> getTable());
-        $result = $system -> model -> getParentsForMultiAutocomplete($request, $ids);
+        $object -> getAvailbleParents($model -> getTable());
+        $result = $model -> getParentsForMultiAutocomplete($request, $ids);
     }
     else
     {
-        $object -> getAvailbleParents($system -> model -> getTable());
-        $result = $object -> getDataForAutocomplete($request, $system -> db);
+        $object -> getAvailbleParents($model -> getTable());
+        $result = $object -> getDataForAutocomplete($request, Database::instance());
     }
 }
 else
-    $result = $object -> getDataForAutocomplete($request, $system -> db);
+    $result = $object -> getDataForAutocomplete($request, Database::instance());
     
 if(isset($result["query"]))
     $result["query"] = htmlspecialchars_decode($result["query"], ENT_QUOTES);

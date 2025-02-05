@@ -1,5 +1,4 @@
 <?php
-$system = new System();
 $registry = Registry::instance();
 $path = Registry::get("AdminPanelPath");
 
