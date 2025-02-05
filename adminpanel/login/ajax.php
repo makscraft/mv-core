@@ -1,68 +1,65 @@
 <?php
-include "../../config/autoload.php";
+include '../../config/autoload.php';
 
 Http::isAjaxRequest('post', true);
+$login = new Login();
 
-if(!empty($_POST))
-	session_start();
+if($token = Http::fromPost('data'))
+{
+	Session::set('ajax-token', preg_replace('/\W/', '', $token));
+	exit();
+}
 
-if(isset($_POST["data"], $_SESSION["login"]) && $_POST["data"])
-	$_SESSION["login"]["ajax-token"] = preg_replace("/\W/", "", trim($_POST["data"]));
-
-if(isset($_POST["login"], $_POST["password"]))
-{	
-	$login = new Login();
-
+if(Http::requestHas('login', 'password'))
+{
+	Session::start('adminpanel_login');
 	$errors = [];
-	$result = ["errors" => "", "action" => "", "captcha" => false];
+	$result = ['errors' => '', 'action' => '', 'captcha' => false];
+
 	$login_attempts = $login -> checkAllAttemptsFromIp();
-	$login_filled = isset($_POST['login']) ? trim(htmlspecialchars($_POST['login'], ENT_QUOTES)) : "";
-	$password_filled = isset($_POST['password']) ? trim(htmlspecialchars($_POST['password'], ENT_QUOTES)) : "";
+	$login_filled = htmlspecialchars(Http::fromPost('login', ''), ENT_QUOTES);
+	$password_filled = htmlspecialchars(Http::fromPost('password', ''), ENT_QUOTES);
 
 	if(!$login_filled)
-		$errors[] = I18n::locale("complete-login");
+		$errors[] = I18n::locale('complete-login').'.';
 	
 	if(!$password_filled)
-		$errors[] = I18n::locale("complete-password");
+		$errors[] = I18n::locale('complete-password').'.';
 
 	if($login_attempts >= Login::ATTEMPTS_NUMBER)
 	{
-		if(!isset($_POST['captcha']) || !trim($_POST['captcha']))
-			$errors[] = I18n::locale("complete-captcha");
-		else if(!isset($_SESSION['login']['captcha']) || md5(trim($_POST['captcha'])) != $_SESSION['login']['captcha'])
-			$errors[] = I18n::locale("wrong-captcha");
+		if(!Http::fromPost('captcha'))
+			$errors[] = I18n::locale('complete-captcha').'.';
+		else if(Http::fromPost('captcha') !== Session::get('captcha'))
+			$errors[] = I18n::locale('wrong-captcha').'.';
 
 		sleep(1);
 	}
 
 	if($login_attempts + 1 >= Login::ATTEMPTS_NUMBER)
-	{
-		$result["captcha"] = time();
-		$_SESSION['login']['captcha'] = Service::randomString(7);
-	}
+		$result['captcha'] = time();
 
 	if($login_filled && $password_filled && !count($errors))
 	{
 		if($login_attempts < Login::ATTEMPTS_NUMBER)
 			$login -> addNewLoginAttempt($login_filled);
 
-		if(!isset($_SESSION["login"]["ajax-token"]) || $_SESSION["login"]["ajax-token"] != Login::getAjaxInitialToken())
+		if(Session::get('ajax-token') != Login::getAjaxInitialToken())
 		{
-			unset($_SESSION["login"]["ajax-token"]);
-			$errors[] = I18n::locale("error-wrong-token");
-			$result["action"] = "reload";
+			$errors[] = I18n::locale('error-wrong-token');
+			$result['action'] = 'reload';
 		}
 
-		if(!isset($_POST["js-token"]) || $_POST["js-token"] != Login::getJavaScriptToken())
+		if(Http::fromPost('js_token') != Login::getJavaScriptToken())
 		{
-			$errors[] = I18n::locale("error-wrong-token");
-			$result["action"] = "reload";
+			$errors[] = I18n::locale('error-wrong-token');
+			$result['action'] = 'reload';
 		}
 
-		if(!isset($_POST["admin-login-csrf-token"]) || $_POST["admin-login-csrf-token"] != Login::getTokenCSRF())
+		if(Http::fromPost('admin_login_csrf_token') != Login::getTokenCSRF())
 		{
-			$errors[] = I18n::locale("error-wrong-token");
-			$result["action"] = "reload";
+			$errors[] = I18n::locale('error-wrong-token');
+			$result['action'] = 'reload';
 		}
 
 		if(Http::isLocalHost() && Http::fromPost('test_token_check', '') !== '')
@@ -77,23 +74,23 @@ if(isset($_POST["login"], $_POST["password"]))
 		{
 			if($id = $login -> loginUser($login_filled, $password_filled))
 			{
-				if(isset($_POST['remember']) && $_POST['remember'])
+				if(Http::fromPost('remember'))
 					$login -> rememberUser($id);
 			
-				unset($_SESSION['login'], $_SESSION['login_captcha']);
+				Session::destroy('adminpanel_login');
 			
 				$user = new User($id);
 				$user -> updateSetting('region', I18n::defineRegion());
 				
-				$result["action"] = "start";
+				$result['action'] = 'start';
 			}
 			else
-				$errors[] = I18n::locale("login-failed");
+				$errors[] = I18n::locale('login-failed');
 		}
 	}
 
 	if(count($errors))
-		$result["errors"] = $login -> displayLoginErrors($errors);
+		$result['errors'] = $login -> displayLoginErrors($errors);
 
 	Http::responseJson($result);
 }

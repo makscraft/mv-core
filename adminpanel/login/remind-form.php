@@ -13,7 +13,7 @@ else
    <?php include $registry -> getSetting('IncludeAdminPath')."login/captcha.php"; ?>
   <div class="submit">
      <input class="submit" type="submit" value="<?php echo I18n::locale('restore'); ?>" />
-     <input type="hidden" name="admin-login-csrf-token" value="<?php echo $login -> getTokenCSRF(); ?>" />
+     <input type="hidden" name="admin_login_csrf_token" value="<?php echo $login -> getTokenCSRF(); ?>" />
   </div>
   <div class="cancel">
      <a href="<?php echo $registry -> getSetting('AdminPanelPath'); ?>login/"><?php echo I18n::locale('cancel'); ?></a>

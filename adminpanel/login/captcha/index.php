@@ -1,7 +1,8 @@
 <?php
-session_start();
+include_once "../../../config/autoload.php";
+Session::start('adminpanel_login');
 
-$_SESSION["login"]["captcha"] = "";
+$captcha = '';
 $image = imagecreate(120, 30);   
 imagecolorallocate($image, 255, 255, 255);
 
@@ -12,7 +13,7 @@ $symbols = mt_rand(5, 7);
 for($i = 0; $i < $symbols; $i++) 
 {
     $number = mt_rand(0, 9);
-    $_SESSION["login"]["captcha"] .= $number;
+    $captcha .= $number;
     $angle = mt_rand(-25, 25);
     imagettftext($image, 19, $angle, 8 + 15 * $i, 23, $symbols_color, $font, $number);
 }
@@ -20,7 +21,7 @@ for($i = 0; $i < $symbols; $i++)
 $coordinates = ["x1" => 0, "y1" => mt_rand(0, 30), "x2" => 120, "y2" => mt_rand(0, 30)];
 imageline($image, $coordinates["x1"], $coordinates["y1"], $coordinates["x2"], $coordinates["y2"], $symbols_color);
 
-$_SESSION["login"]["captcha"] = md5($_SESSION["login"]["captcha"]);
+Session::set('captcha', $captcha);
 
 header("Expires: Wed, 1 Jan 1997 00:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");

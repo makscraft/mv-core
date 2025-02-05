@@ -188,6 +188,18 @@ class Http
     }
 
     /**
+     * Checks if the current request has passed keys.
+     */
+    static public function requestHas(...$keys): bool
+    {
+        foreach($keys as $key)
+            if(!array_key_exists($key, $_REQUEST))
+                return false;
+
+        return true;
+    }
+
+    /**
      * Reloads current URL with optional GET parameters passed.
      * Sends 302 status header before.
      */

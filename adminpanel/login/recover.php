@@ -51,10 +51,10 @@ if(!empty($_POST))
 	if(!isset($_SESSION['login']['ajax-token']) || $_SESSION['login']['ajax-token'] != Login::getAjaxInitialToken())
 		$errors[] = I18n::locale('error-wrong-token');
 
-	if(!isset($_POST['js-token']) || $_POST['js-token'] != Login::getJavaScriptToken())
+	if(!isset($_POST['js_token']) || $_POST['js_token'] != Login::getJavaScriptToken())
 		$errors[] = I18n::locale('error-wrong-token');
 
-	if(!isset($_POST['admin-login-csrf-token']) || $_POST['admin-login-csrf-token'] != Login::getTokenCSRF())
+	if(!isset($_POST['admin_login_csrf_token']) || $_POST['admin_login_csrf_token'] != Login::getTokenCSRF())
 		$errors[] = I18n::locale('error-wrong-token');
 	
 	if(!count($errors))
@@ -86,7 +86,7 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
                   </div>
                   <div class="submit">
                      <input class="submit" type="submit" value="<?php echo I18n::locale('restore'); ?>" />
-                     <input type="hidden" name="admin-login-csrf-token" value="<?php echo $login -> getTokenCSRF(); ?>" />
+                     <input type="hidden" name="admin_login_csrf_token" value="<?php echo $login -> getTokenCSRF(); ?>" />
                   </div>
                   <div class="cancel">
                      <a href="<?php echo $registry -> getSetting('AdminPanelPath'); ?>login/"><?php echo I18n::locale('cancel'); ?></a>

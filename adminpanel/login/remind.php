@@ -25,10 +25,10 @@ if(!empty($_POST))
 	if(!isset($_SESSION["login"]["ajax-token"]) || $_SESSION["login"]["ajax-token"] != Login::getAjaxInitialToken())
 		$errors[] = I18n::locale("error-wrong-token");
 
-	if(!isset($_POST["js-token"]) || $_POST["js-token"] != Login::getJavaScriptToken())
+	if(!isset($_POST["js_token"]) || $_POST["js_token"] != Login::getJavaScriptToken())
 		$errors[] = I18n::locale("error-wrong-token");
 
-	if(!isset($_POST["admin-login-csrf-token"]) || $_POST["admin-login-csrf-token"] != Login::getTokenCSRF())
+	if(!isset($_POST["admin_login_csrf_token"]) || $_POST["admin_login_csrf_token"] != Login::getTokenCSRF())
 		$errors[] = I18n::locale("error-wrong-token");
 	
 	if(!count($errors))
