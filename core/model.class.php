@@ -1583,7 +1583,7 @@ class Model extends ModelBase
 						$model_object = new $model_object();
 						$simple_model = (get_parent_class($model_object) == "ModelSimple");
 						
-						if(!$simple_model && $this -> countRecords(array("table->" => $row["module"], "id" => $row["row_id"])))
+						if(!$simple_model && $this -> countRecords(array("table->" => $model_object -> getTable(), "id" => $row["row_id"])))
 							$row[$name] = "<a href=\"?model=".$row["module"]."&action=update&id=".$row["row_id"]."\">".$row[$name]."</a>\n";
 						else if($simple_model)
 						    $row[$name] = "<a href=\"?model=".$row["module"]."&action=simple\">".$row[$name]."</a>\n";

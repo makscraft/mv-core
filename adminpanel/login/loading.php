@@ -4,9 +4,6 @@ $i18n = I18n::instance();
 $region = I18n::defineRegion();
 $i18n -> setRegion($region);
 
-if(!isset($_SESSION))
-	session_start();
-
 include $registry -> getSetting("IncludeAdminPath")."login/login-header.php";
 ?>
    <div id="container">

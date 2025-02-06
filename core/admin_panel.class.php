@@ -32,6 +32,8 @@ class AdminPanel
 
     public function __construct(User $user = null)
     {
+        ob_start();
+        
         Registry::set('AdminPanelEnvironment', true);
         
         if(!Service::sessionIsStarted())
@@ -345,5 +347,10 @@ class AdminPanel
             return false;
 
         return (new Login) -> autoLogin($cookie);
+    }
+
+    public function checkAnyAuthorization()
+    {
+        return $this -> checkSessionAuthorization() || $this -> checkCookieAuthorization();
     }
 }

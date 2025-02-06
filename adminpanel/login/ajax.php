@@ -4,6 +4,8 @@ include '../../config/autoload.php';
 Http::isAjaxRequest('post', true);
 $login = new Login();
 
+I18n::setRegion(I18n::defineRegion());
+
 if($token = Http::fromPost('data'))
 {
 	Session::set('ajax-token', preg_replace('/\W/', '', $token));

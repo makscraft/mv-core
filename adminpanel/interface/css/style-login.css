@@ -32,9 +32,9 @@ margin: 0 0 25px 0; font-size: 18px; display: flex; align-items: flex-end; line-
 .header-loading{margin: 17px 0 0 20px !important;}
 #header.error{margin-bottom: 17px;}
 
-div.errors, div.success{padding: 6px 12px 6px 12px; border-radius: 4px; margin-bottom: 12px; width: 280px;}
-div.errors{color: #ff1d1d; border: 1px solid #fbd689; background: #fdf4e1}
-div.success{background: #deee85;}
+div.errors, div.error, div.success{padding: 6px 12px 6px 12px; border-radius: 4px; margin-bottom: 12px; width: 280px;}
+div.errors, div.error{color: #ff1d1d; border: 1px solid #fbd689; background: #fdf4e1}
+div.success{background: #deee85; color: #333;}
 div.errors p{margin: 0 0 1px 0;}
 div.success p{margin: 0 0 1px 0; color: #333;}
 

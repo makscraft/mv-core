@@ -1,5 +1,8 @@
 <?php
-include_once "../../config/autoload.php";
+include_once '../../config/autoload.php';
+
+if(Http::fromGet('logout') === null && (new AdminPanel) -> checkAnyAuthorization())
+   Http::redirect(Registry::get('AdminPanelPath'));
 
 $registry = Registry::instance();
 $i18n = I18n::instance();
@@ -15,32 +18,24 @@ if($region = Http::fromGet('region'))
 else
 {
 	$region = I18n::defineRegion();
-	$i18n -> setRegion($region);	
+	I18n::setRegion($region);
 }
 
-//Debug::exit();
-//unset($_SESSION['login']['change-password']);
-//$login -> cancelRemember();
-/*
 if(Http::fromGet('logout') === Login::getLogoutToken())
 {	
+   $login -> logoutUser() -> cancelRemember();
+   
 	set_time_limit(300);
-	$session = new UserSession(0);
-	$session -> stopSession();
-		
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/");
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/admin/");
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/admin_multi/");
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/admin_record/");
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/redactor/");
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/filemanager/");
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/');
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/admin/');
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/admin_multi/');
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/admin_record/');
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/redactor/');
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/filemanager/');
 	Filemanager::makeModelsFilesCleanUp();
 
-	unset($_SESSION["login"]);
-   Session::destroy('admin_panel');
-	$login -> cancelRemember() -> reload("login/");
+   $login -> reload('login/');
 }
-*/
 
 include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
 ?>
@@ -49,7 +44,7 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
            <div id="login-middle">
 	           <div id="header"><?php echo I18n::locale('authorization'); ?></div>
 	           <form method="post" class="login-form">
-                   <?php echo FlashMessages::displayAndClear(); ?>              
+                  <?php echo FlashMessages::displayAndClear(); ?>
                   <div class="line">
                      <div class="name"><?php echo I18n::locale('login'); ?></div>
                      <input type="text" name="login" value="" autocomplete="off" />

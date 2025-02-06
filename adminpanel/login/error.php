@@ -13,7 +13,6 @@ else
 
 include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
 ?>
-
    <div id="container">
       <div id="login-area">
            <div id="login-middle">

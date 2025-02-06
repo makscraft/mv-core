@@ -53,9 +53,6 @@ class Login
 		
 		if(!Session::get('token'))
 			Session::set('token', Service::strongRandomString(50));
-
-		//Deletes old adminpanel session data
-		Session::destroy('admin_panel');
 	}
 
 	public function reload(string $path = '')
@@ -175,6 +172,18 @@ class Login
 		else
 			return false;
 	}
+
+	public function logoutUser()
+	{
+		Session::start('admin_panel');
+
+		if($user = Session::get('user'))
+			(new UserSession($user['id'])) -> stopSession();
+
+		Session::destroy('admin_panel');
+
+		return $this;
+	}
 	
 	public function sendUserPassword(array $user_data)
 	{		
@@ -195,6 +204,7 @@ class Login
    		//Message text
 		$message = "<p>".$user_data['name'].",<br />\n";
 		$message .= $this -> i18n -> locale("change-password")."</p>\n";
+		$message .= "<p>".$this -> i18n -> locale("login").": ".$user_data['login']."</p>\n";
 		$message .= "<p>".$this -> i18n -> locale("confirm-time", $arguments)."</p>\n";
    		$message .= "<p><a href=\"".$link."\">".$link."</a></p>\n";
    		
@@ -262,7 +272,10 @@ class Login
 				    $token = "$2y$10$".$token;
 				
 				if(Service::checkHash($string, $token))
-					$_SESSION['login']['change-password'] = $row['user_id'];
+				{
+					Session::start('admin_panel_login');
+					Session::set('change-password', $row['user_id']);
+				}
 			}			
 			
 			//Deletes data from list

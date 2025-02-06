@@ -21,7 +21,7 @@ $(document).ready(function()
                }
 
                let errors = $("form.login-form div.errors").length;
-               $("form.login-form").find("div.errors, div.success").remove();
+               $("form.login-form").find("div.errors, div.success, div.error").remove();
                
                if(data.errors)
                {

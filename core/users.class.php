@@ -111,7 +111,10 @@ class Users extends Model
 		if($this -> id == 1 || $this -> user -> getId() == $this -> id)
 			$this -> elements['active'] -> setValue(1);
 		
-		if($_SESSION['mv']['user']['id'] == $this -> id) //Puts new data into session to avoid the break of login
+		Session::start('admin_panel');
+
+		//Puts new data into session to avoid the break of login
+		if(Session::get('user')['id'] == $this -> id)
 			User::updateLoginData($this -> getValue('login'), $this -> getValue('password'));
 		
 		return parent::update(array("rights" => $this -> packRights($rights)));
