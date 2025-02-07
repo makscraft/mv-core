@@ -8,10 +8,6 @@ Require all denied
     Require all granted
 </FilesMatch>
 
-<FilesMatch "^model/.*$">
-    Require all granted
-</FilesMatch>
-
 <FilesMatch "^login/.*$">
     Require all granted
 </FilesMatch>

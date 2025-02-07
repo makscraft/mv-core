@@ -7,6 +7,7 @@ if(Http::fromGet('logout') === null && (new AdminPanel) -> checkAnyAuthorization
 $registry = Registry::instance();
 $i18n = I18n::instance();
 $login = new Login();
+Session::destroy('admin_panel');
 
 if($region = Http::fromGet('region'))
 {

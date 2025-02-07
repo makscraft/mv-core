@@ -1,9 +1,6 @@
 <?php
-
-use function PHPSTORM_META\elementType;
-
 /**
- * Class is under construction ...
+ * Main class in Admin Panel, manages authorized user and common settings.
  */
 class AdminPanel
 {
@@ -41,22 +38,14 @@ class AdminPanel
 
         Session::start('admin_panel');
         
-        $session_data = ['settings'];
-
-        foreach($session_data as $key)
-            if(Session::get($key) === null)
-                Session::set($key, []);
+        if(Session::get('settings') === null)
+            Session::set('settings', []);
 
         if($time_zone = Registry::get('TimeZone'))
             date_default_timezone_set($time_zone);                
 
         if(is_object($user))
-        {
             $this -> setUser($user);
-
-            if(Session::get('settings') == [])
-                Session::set('settings', $user -> loadSettings());
-        }
     }
 
     /**
@@ -76,6 +65,12 @@ class AdminPanel
     public function setUser(User $user)
 	{ 
 		$this -> user = $user;
+
+        Session::start('admin_panel');
+
+        if(Session::get('settings') == [])
+            Session::set('settings', $user -> loadSettings());
+
 		return $this;
 	}
 
@@ -143,9 +138,9 @@ class AdminPanel
     }
 
     /**
-     * 
+     * Generates regulat CSRF token to use in forms.
      */
-    public function createCSRFToken()
+    public function createCSRFToken(): string
 	{
 		$token = $_SERVER["REMOTE_ADDR"].$_SERVER["HTTP_USER_AGENT"];
 		$token .= $this -> user -> getField("login").$this -> user -> getField("password");

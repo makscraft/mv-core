@@ -81,7 +81,7 @@ class Model extends ModelBase
 				if(Registry::getInitialVersion() >= 3.0)
 					$object -> defineLinkingTable(get_class($this));
 			}
-			else if($type == 'many_to_one')
+			else if($type == 'many_to_one' || $type == 'one_to_many')
 			{	
 				$model_class = $object -> getProperty('related_model');
 			
@@ -246,6 +246,9 @@ class Model extends ModelBase
 	
 	public function instanceElement($field_data)
 	{
+		if($field_data[1] === 'one_to_many')
+			$field_data[1] = 'many_to_one';
+
 		self::checkElement($field_data, get_class($this));
 		$element = self::elementsFactory($field_data, get_class($this));
 
@@ -344,6 +347,7 @@ class Model extends ModelBase
 		}
 		
 		$sorter_data['id'] = 'int';
+		
 		$this -> sorter = new Sorter($sorter_data);
 		$this -> filter = new Filter($filters_data, '', $this);
 		

@@ -23,9 +23,9 @@ if($limit = Http::fromGet('pager-limit'))
 //Sorting tuning
 $model -> sorter -> addMoreUrlParams('action=index');
 
-if(Http::isGetRequest() && isset($_GET['sort-field'], $_GET['sort-order']))
+if(Http::isGetRequest() && Http::requestHas('sort-field', 'sort-order'))
 {
-    $model -> sorter -> setParams(Http::fromGet('sort-field'), Http::fromGet('sort-order'));
+    //$model -> sorter -> setParams(Http::fromGet('sort-field'), Http::fromGet('sort-order'));
 
     $admin_panel -> updateModelSessionSetting($model -> getModelClass(),
                                               'sorting',
