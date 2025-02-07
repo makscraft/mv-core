@@ -245,7 +245,7 @@ class Builder
 			return;
 
 		$custom = Registry::get('IncludePath').'views/under-maintenance.php';
-		$base = Registry::get('IncludeAdminPath').'views/under-maintenance.php';
+		$base = Registry::get('IncludeAdminPath').'controls/under-maintenance.php';
 
 		include_once is_file($custom) ? $custom : $base;
 		exit();

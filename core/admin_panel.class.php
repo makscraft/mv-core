@@ -94,13 +94,13 @@ class AdminPanel
         }
         else if($view = Http::fromGet('view', ''))
         {
-            $view = trim(str_replace(['..', '/', '\/'], '', $view));
+            $view = trim(str_replace(['.', '/', '\\'], '', $view));
             $this -> view = $view;
             $view = 'view-'.$view.'.php';
         }        
         else if($service = Http::fromGet('service', ''))
         {
-            $service = trim(str_replace(['..', '/', '\/'. '_'], '', $service));
+            $service = trim(str_replace(['..', '/', '\\'], '', $service));
             $this -> view = $service;
             $view = 'service/view-'.$service.'.php';
         }
@@ -117,12 +117,19 @@ class AdminPanel
         }
         else if($ajax = Http::fromGet('ajax', ''))
         {
-            $this -> view = $ajax = trim(str_replace(['..', '/', '\/'], '', $ajax));
+            $this -> view = $ajax = trim(str_replace(['.', '/', '\\', '_'], '', $ajax));
             $view = $ajax.'.php';
+        }
+        else if($custom = Http::fromGet('custom', ''))
+        {
+            $this -> view = $custom = trim(str_replace(['.', '/', '\\'], '', $custom));
+            $view = $custom.'.php';
         }
 
         if(Http::fromGet('ajax') && (Http::isAjaxRequest() || $ajax === 'upload-editor'))
             $file = Registry::get('IncludeAdminPath').'ajax/'.$view;
+        else if(isset($custom))
+            $file = Registry::get('IncludePath').'customs/adminpanel/'.$view;
         else
             $file = Registry::get('IncludeAdminPath').'views/'.$view;
 

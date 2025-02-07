@@ -496,11 +496,10 @@ div.date-time-set input{width: 250px;}
 #exposeMask{z-index: 1800 !important; opacity: 0.6 !important;}
 
 /* Buttons */
-.button-create, .button-list, .button-light, .button-dark, .modal-button{padding: 6px 20px 7px 20px; 
+.button-create, .button-list, .button-light, .button-dark, .modal-button, .button-clear{padding: 6px 20px 7px 20px; 
 text-decoration: none; color: #fff; font-weight: normal; background: #918b8b; border: none; cursor: pointer; outline: none;}
-.button-dark, .modal-button.cancel{background: none; color: #1464ba; padding: 6px 10px 7px 10px;}
+.button-dark, .modal-button.cancel, .button-clear{background: none; color: #1464ba; padding: 6px 10px 7px 10px;}
 .button-create{background: #f26061;}
-.button-create:active{top: 1px; right: -1px;}
 .button-list{background: #918b8b url("../images/arrow-down-white.svg") no-repeat center right 17px; min-width: 185px; 
 position: relative; float: left; outline: none; padding-right: 35px;}
 
@@ -528,8 +527,8 @@ div.image-input span.delete:active, .model-table td div span.top:active, .model-
 .model-table td div span.up:active, .model-table td div span.down:active, .images-wrapper .controls .left:active,
 .images-wrapper .controls .right:active, .images-wrapper .controls .first:active, .images-wrapper .controls .last:active,
 .images-wrapper .controls .delete:active, span.m2m-left:active, span.m2m-right:active, span.m2m-up:active,
-span.m2m-down:active, .images-wrapper .controls .comment:active, #hide-filters:active, input.modal-button:active{
-position: relative; top: 1px; left: 1px;}
+span.m2m-down:active, .images-wrapper .controls .comment:active, #hide-filters:active, input.modal-button:active,
+.button-create:active{position: relative; top: 1px; left: 1px;}
 
 a.single-action{width: 16px; height: 16px; display: inline-block; margin: 0 5px; cursor: pointer;}
 a.action-update{background: url("../images/icon-update.svg") no-repeat;}
@@ -567,8 +566,8 @@ ul.ui-autocomplete a.ui-state-hover{background: none;}
 form.model-elements-form span.required{padding-left: 3px;}
 
 /* Buttons styling */
-input.button-create, input.button-list, #filemanager-menu, #fields-list .apply, input.button-dark, input.button-light,
-input.modal-button{border-radius: 4px; -moz-border-radius: 4px; -webkit-border-radius: 4px;}
+.button-create, .button-list, #filemanager-menu, #fields-list .apply, .button-dark, .button-light,
+.modal-button{border-radius: 4px; -moz-border-radius: 4px; -webkit-border-radius: 4px;}
 #model-filters div.column-inner, #model-versions div.column-inner, div.images-wrapper div.controls, 
 button.button-light, button.button-dark{border-radius: 4px; -moz-border-radius: 4px; -webkit-border-radius: 4px;}
 #fields-list div.list, div.multi-actions-menu ul.first, .autocomplete-w1, #operations-menu{
@@ -610,9 +609,9 @@ p.csv-notice{margin-bottom: 10px;}
 /* Modal window */
 #overlay{display: none; width: 100%; height: 100%; position: fixed; background: #111; opacity: 0.4; z-index: 1000; 
 top: 0; left: 0;}
-#custom-modal-window{display: none; position: fixed; background: #fff; width: 350px;
+#custom-modal-window{display: none; position: fixed; background: #fff; width: 400px;
 z-index: 1001; top: 15%; left: 50%; transform: translateX(-50%); padding: 20px 25px 15px 25px; border-radius: 4px;
-box-shadow: 0px 2px 25px #333; -webkit-box-shadow: 0px 2px 25px #333;}
+box-shadow: 0px 2px 25px #333; -webkit-box-shadow: 0px 2px 25px #333; box-sizing: border-box;}
 #custom-modal-window span.close{background: url("../images/dialog-close.svg") no-repeat center; position: absolute;
 width: 12px; height: 12px; top: 15px; right: 15px; cursor: pointer;}
 #custom-modal-window div.message{margin:10px 0 15px 0; line-height: 20px;}

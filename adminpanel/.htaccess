@@ -1,1 +1,17 @@
-RewriteEngine off
+AddDefaultCharset UTF-8
+Options -Indexes
+RewriteEngine Off
+
+Require all denied
+
+<FilesMatch "^.*$">
+    Require all granted
+</FilesMatch>
+
+<FilesMatch "^model/.*$">
+    Require all granted
+</FilesMatch>
+
+<FilesMatch "^login/.*$">
+    Require all granted
+</FilesMatch>
