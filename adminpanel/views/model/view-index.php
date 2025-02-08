@@ -25,8 +25,6 @@ $model -> sorter -> addMoreUrlParams('action=index');
 
 if(Http::isGetRequest() && Http::requestHas('sort-field', 'sort-order'))
 {
-    //$model -> sorter -> setParams(Http::fromGet('sort-field'), Http::fromGet('sort-order'));
-
     $admin_panel -> updateModelSessionSetting($model -> getModelClass(),
                                               'sorting',
                                               [Http::fromGet('sort-field'), Http::fromGet('sort-order')]);
@@ -117,7 +115,13 @@ if(Http::isPostRequest() && Http::fromGet('multi_value') !== null && $multi_acti
 			else
 			{
 				$error = explode("=", $error);
-				FlashMessages::add('error', $error[1] ?? '');
+
+				if(isset($error[1]))
+					$error = I18n::locale('no-delete-model', ['module' => (new $error[1]) -> getName()]);
+				else
+					$error = $error = I18n::locale('not-deleted');
+				
+				FlashMessages::add('error', $error);
 			}
 		}
 
@@ -197,6 +201,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 	         	$model_class = $model -> getModelClass();
 	         	
 	         	if($model -> checkDisplayParam('mass_actions') && $model -> checkDisplayParam('update_actions') && 
+				   $admin_panel -> user -> checkModelRights($model -> getModelClass(), 'update') && 
 	         	   $model_class != 'users' && $model_class != 'garbage')
 	         	{
 	         		$quick_limit = "quick-limit-".$model -> getPagerLimitForQuickEdit();

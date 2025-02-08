@@ -7,7 +7,6 @@ if(Http::fromGet('logout') === null && (new AdminPanel) -> checkAnyAuthorization
 $registry = Registry::instance();
 $i18n = I18n::instance();
 $login = new Login();
-Session::destroy('admin_panel');
 
 if($region = Http::fromGet('region'))
 {
@@ -37,6 +36,8 @@ if(Http::fromGet('logout') === Login::getLogoutToken())
 
    $login -> reload('login/');
 }
+else
+   Session::destroy('admin_panel');
 
 include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
 ?>

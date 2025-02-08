@@ -272,7 +272,7 @@ div.stop-upload.small-loader{background-position: top 5px right 5px;}
 
 .images-wrapper{height: 115px; width: 140px; margin: 0 2.3% 20px 2.3%;}
 .images-wrapper .controls{background: #f6f5f5; padding: 2px 0 1px 2px; width: 122px; height: 24px; margin: 0 auto;
-border: 1px solid #918b8b;}
+border: 1px solid #ccc;}
 .images-wrapper .controls span{cursor: pointer; float: left; width: 15px; height: 24px; margin: 0 1px;}
 .images-wrapper .controls .left{background: url("../images/arrow-left.svg") no-repeat center;}
 .images-wrapper .controls .right{background: url("../images/arrow-right.svg") no-repeat center;}
@@ -646,6 +646,9 @@ padding-left: 23px}
 {
     #model-form.one-column.migrations-page{width: 80%;}
     #model-form .flash-message, #model-form .form-errors, #model-form .form-no-errors{width: auto;}
+    form div.images-area .uploaded-images{display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-row-gap: 30px; grid-column-gap: 10px; width: 100%;}
+    form div.images-area .uploaded-images > *{margin: 0; width: 100%;}
 }
 
 @media all and (max-width: 1300px)

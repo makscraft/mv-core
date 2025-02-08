@@ -399,7 +399,7 @@ abstract class ModelBase extends ModelInitial
 	public function getDataForActionsMenu()
 	{
 		if($this -> getModelClass() == 'garbage')
-			return array(array('name' => 'restore', 'type' => 'restore', 'caption' => I18n :: locale('restore')));
+			return array(array('name' => 'restore', 'type' => 'restore', 'caption' => I18n::locale('restore')));
 		
 		if(!$this -> checkDisplayParam('update_actions'))
 			return [];
@@ -450,7 +450,7 @@ abstract class ModelBase extends ModelInitial
 									   $this -> elements[$data['name']] -> getError(), 
 									   $data['name']);
 						
-						$error = Model :: processErrorText($error, $this -> elements[$data['name']]);
+						$error = Model::processErrorText($error, $this -> elements[$data['name']]);
 						return "<div class=\"datatype-error form-errors\"><p>".$error."</p></div>\n";
 					}
 				}
@@ -466,8 +466,8 @@ abstract class ModelBase extends ModelInitial
 					if(($data['type'] == 'bool' && ($value == 0 || $value == 1))
 						|| (in_array($data['type'], array('enum', 'parent', 'many_to_many', 'group')) 
 						    && $this -> elements[$data['name']] -> checkValue($value))
-						|| ($data['type'] == "date" && I18n :: checkDateFormat($value))
-						|| ($data['type'] == "date_time" && I18n :: checkDateFormat($value, "with-time"))
+						|| ($data['type'] == "date" && I18n::checkDateFormat($value))
+						|| ($data['type'] == "date_time" && I18n::checkDateFormat($value, "with-time"))
 						|| $data['type'] == "int" || $data['type'] == "float")
 					{
 						$current_action = $action;
@@ -475,7 +475,7 @@ abstract class ModelBase extends ModelInitial
 						$current_type = $data['type'];
 						
 						if($data['type'] == "date" || $data['type'] == "date_time")
-							$current_value = I18n :: dateForSQL($current_value);
+							$current_value = I18n::dateForSQL($current_value);
 						
 						if($data['type'] == 'enum' && $current_value == "0")
 							if(!$this -> elements[$data['name']] -> getProperty("foreign_key"))
@@ -570,7 +570,7 @@ abstract class ModelBase extends ModelInitial
 							if($changed_field && $changed_field -> getType() != "many_to_many" && 
 							   $changed_field -> getType() != "group")
 							{
-								$value = Service :: cleanHtmlSpecialChars(htmlspecialchars($value, ENT_QUOTES));
+								$value = Service::cleanHtmlSpecialChars(htmlspecialchars($value, ENT_QUOTES));
 								$version_dump[$name] = $updated_fields[$name] = $value;
 							}
 						}
@@ -642,8 +642,8 @@ abstract class ModelBase extends ModelInitial
 			//Add into log one record about all updated records
 			$arguments = array("ids_number" => count($selected_ids), "records" => "*ids_number");
 			
-			Log :: write($this -> getModelClass(), -1, I18n :: locale('affected-records', $arguments), $this -> user -> getId(), "update");
-			Cache :: cleanByModel($this -> getModelClass());
+			Log::write($this -> getModelClass(), -1, I18n::locale('affected-records', $arguments), $this -> user -> getId(), "update");
+			Cache::cleanByModel($this -> getModelClass());
 		}
 		
 		return $error;
@@ -676,9 +676,9 @@ abstract class ModelBase extends ModelInitial
 						$name .= $data[$content[$field]]." ";
 				}
 				else if($type == 'text' && $this -> elements[$field] -> getProperty("show_in_admin"))
-					$name = Service :: cutText($content[$field], $this -> elements[$field] -> getProperty("show_in_admin"), " ...")." ";
+					$name = Service::cutText($content[$field], $this -> elements[$field] -> getProperty("show_in_admin"), " ...")." ";
 				else if(($type == 'date' || $type == 'date_time') && preg_match("/^\d{4}-\d{2}-\d{2}/", $content[$field]))
-					$name .= I18n :: dateFromSQL($content[$field])." ";
+					$name .= I18n::dateFromSQL($content[$field])." ";
 				else if(!in_array($type, array("file", "image", "multi_images", "many_to_one", "many_to_many", "password")))
 					$name .= $content[$field]." ";
 			
@@ -701,7 +701,7 @@ abstract class ModelBase extends ModelInitial
 			if($object -> getType() == 'char' && isset($content[$name]) && $content[$name])
 				return $content[$name];
 				
-		return isset($content['id']) ? I18n :: locale('record')." ".$content['id'] : '-';
+		return isset($content['id']) ? I18n::locale('record')." ".$content['id'] : '-';
 	}
 	
 	public function findForeignParent()
@@ -739,7 +739,7 @@ abstract class ModelBase extends ModelInitial
 					echo "</script>\n</head>\n";
 					$message = "Wrong value of 'depend_on_enum' option in field '".$name."' of model '".get_class($this)."'. ";
 					$message .= "Use a name of enum field of current model.";
-					Debug :: displayError($message);
+					Debug::displayError($message);
 				}
 			}
 		
@@ -895,9 +895,9 @@ abstract class ModelBase extends ModelInitial
 		$field = $this -> getElement($field);
 		$types = ["file", "image", "multi_images"];
 		$file_name = basename($file);
-		$file_name = Service :: translateFileName($file_name).".".Service :: getExtension($file_name);
+		$file_name = Service::translateFileName($file_name).".".Service::getExtension($file_name);
 		
-		if(!is_file($file) || !Service :: getExtension($file) || !is_object($field) || !in_array($field -> getType(), $types))
+		if(!is_file($file) || !Service::getExtension($file) || !is_object($field) || !in_array($field -> getType(), $types))
 			return '';
 		
 		$folder = $this -> getModelClass()."-".($field -> getType() == "file" ? "files" : "images");
@@ -908,12 +908,12 @@ abstract class ModelBase extends ModelInitial
 		else
 		{
 			$counter = intval($this -> registry -> getDatabaseSetting('files_counter')) + 1;
-			$moved_file = $folder.Service :: removeExtension($file_name)."-f".$counter.".".Service :: getExtension($file_name);
+			$moved_file = $folder.Service::removeExtension($file_name)."-f".$counter.".".Service::getExtension($file_name);
 			$this -> registry -> setDatabaseSetting('files_counter', $counter);				
 		}
 		
 		if(!is_dir(dirname($moved_file)))
-			Filemanager :: createDirectory(dirname($moved_file));
+			Filemanager::createDirectory(dirname($moved_file));
 				
 		@copy($file, $moved_file);
 		

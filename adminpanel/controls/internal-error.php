@@ -1,4 +1,6 @@
 <?php
+global $admin_panel;
+
 $registry = Registry::instance();
 $path = Registry::get("AdminPanelPath");
 

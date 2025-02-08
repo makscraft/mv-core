@@ -1262,12 +1262,15 @@ class Model extends ModelBase
 		if($type == 'many_to_many') //If we need to count m2m values
 		{
 			$other_table = $this -> elements[$name] -> getProperty('linking_table');
-			$other_field = $this -> table."_id";
+			$other_field = $this -> table.'_id';
 		}
 		else if($type == 'many_to_one') //If we count m2o values
 		{
-			$other_table = strtolower($this -> elements[$name] -> getProperty('related_model'));
-			$other_field = (new $other_table) -> findElementByProperty('foreign_key', get_class($this));
+			$other_model = $this -> elements[$name] -> getProperty('related_model');
+			$other_model = new $other_model;
+			$other_table = $other_model -> getTable();
+
+			$other_field = $other_model -> findElementByProperty('foreign_key', get_class($this));
 			$other_field = $other_field -> getName();
 		}
 
@@ -1688,7 +1691,7 @@ class Model extends ModelBase
 						if($this -> elements[$name] -> getProperty("quick_change") && $this -> checkDisplayParam('update_actions'))
 						{
 							$bool_title = $row[$name] ? "switch-off" : "switch-on";
-							$row[$name] = "<span id=\"".$name."-".$row['id']."-".$this -> table."\" class=\"bool-field ";
+							$row[$name] = "<span id=\"".$name."-".$row['id']."-".$this -> getModelClass()."\" class=\"bool-field ";
 							$row[$name] .= $css_class."\" title=\"".I18n::locale($bool_title)."\"><span class=\"slider\"></span></span>";
 						}
 						else

@@ -67,7 +67,7 @@ class AdminPanel
 		$this -> user = $user;
 
         Session::start('admin_panel');
-
+        
         if(Session::get('settings') == [])
             Session::set('settings', $user -> loadSettings());
 
@@ -214,13 +214,14 @@ class AdminPanel
         $settings[$model][$key] = $value;
         
         Session::set('settings', $settings);
+        $this -> user -> saveSettings($settings);
 
         return $settings;
     }
 
     public function defineCurrentUserRegion()
     {
-        $region = $this -> getUserSessionSetting('region');
+        $region = $this -> getUserSessionSetting('user-region') ?? '';
 
         if(!I18n::checkRegion($region))
             $region = I18n::defineRegion();

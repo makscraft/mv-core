@@ -27,7 +27,7 @@ if(Http::isPostRequest() && Http::fromGet('action') === 'update')
 	{
 		if($model -> getValue('region'))
 		{
-            $admin_panel -> updateUserSessionSetting('region', $model -> getValue('region'));			
+            $admin_panel -> updateUserSessionSetting('user-region', $model -> getValue('region'));			
 			I18n::saveRegion($model -> getValue('region'));
 		}
 
@@ -64,7 +64,7 @@ $(document).ready(function()
 	          <table>
 		          <?php echo $model -> displayModelFormInAdminPanel(); ?>
                   <tr>
-                     <td class="field-name"><?php echo I18n::locale("admin_panel_skin"); ?></td>
+                     <td class="field-name"><?php echo I18n::locale("admin-panel-skin"); ?></td>
                      <td class="field-content">                        
                         <?php echo $admin_panel -> user -> displayUserSkinSelect(); ?>
                      </td>

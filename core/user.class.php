@@ -91,7 +91,9 @@ class User
 			$this -> session = new UserSession($this -> id);
 
 		Session::start('admin_panel');
-		Session::set('settings', $this -> loadSettings());
+		
+		if(Session::get('settings', []) === [])
+			Session::set('settings', $this -> loadSettings());
 	}
 	
 	public function getContent() { return $this -> content; }
@@ -170,7 +172,7 @@ class User
 	{
 		if(!$this -> checkModelRights($module, $right))
 		{
-			$this -> error = I18n::locale("error-no-rights");
+			$interal_error_text = I18n::locale("error-no-rights");
             include $this -> registry -> getSetting("IncludeAdminPath")."controls/internal-error.php";
 		}
 	}
@@ -189,11 +191,11 @@ class User
 		Session::start('admin_panel');
         $settings = Session::get('settings');
 		
-		if(isset($settings['skin']))
-			if($settings['skin'] == 'none')
+		if(isset($settings['user-skin']))
+			if($settings['user-skin'] == 'none')
 				return 'none';
-			else if(is_dir($path.$settings['skin']) && is_file($path.$settings['skin']."/skin.css"))
-				return $settings['skin'];
+			else if(is_dir($path.$settings['user-skin']) && is_file($path.$settings['user-skin']."/skin.css"))
+				return $settings['user-skin'];
 	}
 	
 	public function getAvailableSkins()
@@ -220,10 +222,10 @@ class User
 		{
 			Session::start('admin_panel');
 			$settings = Session::get('settings');
-			$settings['skin'] = $name;
+			$settings['user-skin'] = $name;
 			Session::set('settings', $settings);
 
-			$this -> updateSetting("skin", $name);
+			$this -> updateSetting('user-skin', $name);
 			
 			return 1;
 		}		
@@ -245,7 +247,7 @@ class User
 				
 				if(Http::fromPost('admin_panel_skin') == $folder)
 					$selected = ' selected="selected"';
-				else if(empty($_POST) && isset($settings['skin']) && $settings['skin'] == $folder)
+				else if(empty($_POST) && isset($settings['user-skin']) && $settings['user-skin'] == $folder)
 					$selected = ' selected="selected"';
 				
 				$html .= "<option".$selected." value=\"".$folder."\">".$folder."</option>\n";

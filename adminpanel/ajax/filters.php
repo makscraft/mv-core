@@ -3,7 +3,7 @@ Http::isAjaxRequest('post', true);
 $model = Http::fromPost('model');
 
 if(Registry::checkModel($model))
-{
+{	
 	$model = new $model();
 	$model -> loadRelatedData() -> runPagerFilterSorter() -> setUser($admin_panel -> user);
 

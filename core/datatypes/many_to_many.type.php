@@ -27,8 +27,8 @@ class ManyToManyModelElement extends ModelElement
 		if($this -> linking_table !== '')
 			return;
 
-		$first = strtolower($class_name);
-		$second = strtolower($this -> related_model);
+		$first = Registry::defineModelTableName($class_name);
+		$second = Registry::defineModelTableName($this -> related_model);
 
 		$this -> linking_table = $first > $second ? $first.'_'.$second : $second.'_'.$first;
 	}

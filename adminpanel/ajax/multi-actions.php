@@ -25,7 +25,7 @@ if(isset($_POST['empty-recycle-bin']))
 			if(intval($_POST['iterations-left']) == 1)
 			{
 				Filemanager::makeModelsFilesCleanUp();
-				FlashMessages::add('success', 'done-delete');
+				FlashMessages::add('success', I18n::locale('done-delete'));
 			}
 		}
 	
