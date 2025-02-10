@@ -62,6 +62,9 @@ class Filemanager
 
 	public function __construct()
 	{
+		if(Registry::get('BootFromCLI'))
+			return;
+		
 		Session::start('admin_panel');		
 		$data = Session::get('file_manager', []);
 		$data['path'] ??= Registry::get('FilesPath');
