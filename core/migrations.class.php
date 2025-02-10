@@ -254,7 +254,7 @@ class Migrations
 		$result = [];
 
 		foreach($this -> migrations_list as $sql)
-			$result[] = str_replace(["\n", "\r"], [' ', ''], $sql);
+			$result[] = str_replace(["\n", "\r"], [' ', ''], $sql).PHP_EOL;
 		
 		return $result;
 	}
