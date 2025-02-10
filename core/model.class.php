@@ -78,6 +78,8 @@ class Model extends ModelBase
 					Debug::displayError($message);
 				}
 
+				$object -> setSelfModel(get_class($this));
+
 				if(Registry::getInitialVersion() >= 3.0)
 					$object -> defineLinkingTable(get_class($this));
 			}
@@ -1888,7 +1890,7 @@ class Model extends ModelBase
 		
 		if($start_id != -1)
 		{
-			$html = "<a href=\"?model=".$this -> getModelClass()."&action=index&".$this -> parent_field."=-1\">";
+			$html = "<a href=\"?model=".$this -> getModelClass()."&action=index\">";
 			$html .= I18n::locale('root-catalog')."</a> ";
 			
 			$data = $this -> elements[$this -> parent_field] -> displayPath($start_id);

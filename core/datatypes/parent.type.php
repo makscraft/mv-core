@@ -31,7 +31,7 @@ class ParentModelElement extends EnumModelElement
 								
 		$html = "<input id=\"parent-".$this -> name."\" type=\"checkbox\"".$checked;
 		$html .= " name=\"".$this -> name."\" value=\"all\" />\n";
-		$html .= "<label for=\"parent-".$this -> name."\">".I18n :: locale("in-all-catalogs")."</label>\n";	
+		$html .= "<label for=\"parent-".$this -> name."\">".I18n::locale("in-all-catalogs")."</label>\n";	
 
 		return $html;
 	}
@@ -57,7 +57,7 @@ class ParentModelElement extends EnumModelElement
 	
 	public function getAvailbleParents(string $table)
 	{
-		$db = DataBase :: instance();
+		$db = DataBase::instance();
 		$arguments = func_get_args();
 		$for_frontend_filter = false;
 		$order_by = "`".$this -> name_field."` ASC";
@@ -117,7 +117,7 @@ class ParentModelElement extends EnumModelElement
 		}
 		
 		//Adds root directory
-		array_unshift($names, I18n :: locale('root-catalog'));
+		array_unshift($names, I18n::locale('root-catalog'));
 		array_unshift($ids, '-1');
 		
 		$this -> values_list = array_combine($ids, $names);
@@ -171,7 +171,7 @@ class ParentModelElement extends EnumModelElement
 				if($id == -1)
 					continue;
 				else if($parents[$id][$this -> name] == -1)
-					$this -> values_list[$id] .= " (".I18n :: locale('root-catalog').")";
+					$this -> values_list[$id] .= " (".I18n::locale('root-catalog').")";
 				else if(isset($parents_names[$parents[$id][$this -> name]][$this -> name_field]))
 					$this -> values_list[$id] .= " (".$parents_names[$parents[$id][$this -> name]][$this -> name_field].")";
 		}
@@ -210,9 +210,8 @@ class ParentModelElement extends EnumModelElement
 	
 	public function displayPath(int $start_id)
 	{
-		$db = DataBase :: instance();
-		$table = strtolower($this -> self_model);
-		
+		$db = DataBase::instance();
+		$table = Registry::defineModelTableName($this -> self_model);		
 		$names = $ids = [];
 		
 		do
@@ -280,7 +279,7 @@ class ParentModelElement extends EnumModelElement
 		if(!$in_recursion)
 			$this -> child_records = [];
 
-		$ids = DataBase :: instance() -> getColumn("SELECT `id` FROM `".$table."` 
+		$ids = DataBase::instance() -> getColumn("SELECT `id` FROM `".$table."` 
 													WHERE `".$this -> name."`='".$id."'");
 		
 		foreach($ids as $id)
@@ -312,7 +311,7 @@ class ParentModelElement extends EnumModelElement
 		if($this -> long_list)
 		{		
 			$value = intval($value);	
-			$db = Database :: instance();
+			$db = Database::instance();
 			return (bool) $db -> getCount($table, "`id`='".$value."'");
 		}
 		else
@@ -328,10 +327,10 @@ class ParentModelElement extends EnumModelElement
 		$key = intval($key);
 		
 		if($key == -1)
-			return I18n :: locale('root-catalog');
+			return I18n::locale('root-catalog');
 		else if($this -> long_list)
 		{
-			$db = Database :: instance();
+			$db = Database::instance();
 
 			$query = "SELECT `".$this -> name_field."` 
 					  FROM `".$table."` 
@@ -348,7 +347,7 @@ class ParentModelElement extends EnumModelElement
 		
 	public function getParentsForFilter(string $table)
 	{
-		$db = DataBase :: instance();
+		$db = DataBase::instance();
 		
 		//Takes all rows qhich have any child rows
 		$result = $db -> query("SELECT `id`,`".$this -> name_field."` 
@@ -365,7 +364,7 @@ class ParentModelElement extends EnumModelElement
 		}
 		
 		//Adds root directory
-		array_unshift($names, I18n :: locale('not-defined'), I18n :: locale('all-catalogs'), I18n :: locale('root-catalog'));
+		array_unshift($names, I18n::locale('not-defined'), I18n::locale('all-catalogs'), I18n::locale('root-catalog'));
 		array_unshift($ids, '', 'all', '-1');
 				
 		return array_combine($ids, $names);
@@ -373,7 +372,7 @@ class ParentModelElement extends EnumModelElement
 	
 	public function getParentsForOneRecord(string $table, int $id)
 	{
-		$db = DataBase :: instance();
+		$db = DataBase::instance();
 		$parents = [];
 		
 		do
@@ -393,7 +392,7 @@ class ParentModelElement extends EnumModelElement
 
 	public function getDataForAutocomplete(mixed $request, Database $db)
 	{
-		$request_re = Service :: prepareRegularExpression($request);
+		$request_re = Service::prepareRegularExpression($request);
 		$result_rows = [];
 
 		foreach($this -> values_list as $key => $value)
@@ -428,7 +427,7 @@ class ParentModelElement extends EnumModelElement
 		if(!is_array($params) || !count($params) || !count($this -> values_list))
 			return $this;
 		
-		$found_ids = Database :: instance() -> getColumn("SELECT `id` FROM `".$table."`".Model :: processSQLConditions($params));
+		$found_ids = Database::instance() -> getColumn("SELECT `id` FROM `".$table."`".Model::processSQLConditions($params));
 		
 		foreach($this -> values_list as $id => $name)
 			if(!in_array($id, $found_ids))
@@ -439,9 +438,9 @@ class ParentModelElement extends EnumModelElement
 	
 	public function getKeyUsingName(mixed $name)
 	{
-		$db = Database :: instance();
+		$db = Database::instance();
 		
-		if($name == I18n :: locale('root-catalog'))
+		if($name == I18n::locale('root-catalog'))
 			return -1;
 		else if($name)
 			return $db -> getCell("SELECT `id`

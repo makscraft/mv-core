@@ -5,6 +5,8 @@
 class ManyToManyModelElement extends ModelElement
 {
 	protected $related_model = '';
+
+	protected $self_model = '';
 	
 	protected $linking_table = '';
 	
@@ -21,6 +23,11 @@ class ManyToManyModelElement extends ModelElement
 	protected $long_list = false;
 
 	protected $empty_value = '';
+
+	public function setSelfModel(string $class_name)
+	{
+		$this -> self_model = $class_name;
+	}
 
 	public function defineLinkingTable(string $class_name)
 	{
@@ -97,7 +104,7 @@ class ManyToManyModelElement extends ModelElement
 			Debug :: displayError($message);
 		}
 		
-		return preg_replace("/_?".$this -> name."_?/", "", $this -> linking_table)."_id";
+		return strtolower($this -> self_model)."_id";
 	}
 	
 	public function getSelectedIds()
@@ -292,7 +299,7 @@ class ManyToManyModelElement extends ModelElement
 			
 			if($object -> getElement($field))
 			{
-				$params = "?model=".strtolower($this -> related_model)."&";
+				$params = "?model=".strtolower($this -> related_model)."&action=index&";
 				$params .= $field."=".$related_id;
 				$number = "<a class=\"to-children\" href=\"".$params."\">".$number."</a>\n";
 			}
