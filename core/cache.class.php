@@ -273,7 +273,7 @@ class Cache
 		$settings = Registry::getAllSettings();
 		$settings['ConfigFilesHash'] = Service::getFilesModificationTimesHash($config_files);
 		$settings['EnvFileTime'] = filemtime($env);
-		$settings['CheckConfigFilesUntil'] = time() + intval(Registry::get('CacheFilesCheckTime') ?? 300);
+		$settings['CheckConfigFilesUntil'] = time() + intval(Registry::get('CacheFilesCheckTime') ?? 600);
 
 		self::saveConfigCacheIntoFile($settings, 'env');
 	}
