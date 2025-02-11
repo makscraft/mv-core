@@ -133,7 +133,10 @@ class AdminPanel
         else
         {
             $this -> view = '404';
+
+            Http::sendStatusCodeHeader(404);
             return Registry::get('IncludeAdminPath').'views/view-404.php';
+            exit();
         }
     }
 
@@ -236,6 +239,7 @@ class AdminPanel
 		$error_key = $error_key === '' ? 'error-occurred' : $error_key;
 		$interal_error_text = I18n::locale($error_key);
 		
+        Http::sendStatusCodeHeader(404);
         include Registry::get('IncludeAdminPath').'controls/internal-error.php';
         exit();
     }

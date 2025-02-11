@@ -254,18 +254,8 @@ class Migrations
 		$result = [];
 
 		foreach($this -> migrations_list as $sql)
-		{
-			$sql = str_replace(["\n", "\r"], [' ', ''], $sql);
-
-			if(strpos($sql, 'CREATE TABLE ') !== false)
-			{				
-				$sql = substr($sql, 0, 50);
-				$sql = preg_replace('/\s+\S+$/', '', $sql).' ...';
-			}
-
-			$result[] = $sql;
-		}
-
+			$result[] = str_replace(["\n", "\r"], [' ', ''], $sql).PHP_EOL;
+		
 		return $result;
 	}
 }

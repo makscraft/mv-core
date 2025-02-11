@@ -90,6 +90,9 @@ class User
 		if($this -> id)  //Object to control the session for this user	
 			$this -> session = new UserSession($this -> id);
 
+		if(Registry::get('BootFromCLI'))
+			return;
+
 		Session::start('admin_panel');
 		
 		if(Session::get('settings', []) === [])

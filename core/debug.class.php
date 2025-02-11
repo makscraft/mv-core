@@ -62,8 +62,7 @@ class Debug
 		$var = is_null($var) ? 'null' : $var;
 		$var = is_bool($var) ? ($var ? 'true' : 'false') : $var;
 		$var = $var === '' ? "''" : $var;
-		$var = is_object($var) ? (array) $var : $var;
-
+		
 		if(is_array($var))
 		{
 			$var_ = [];
@@ -134,11 +133,13 @@ class Debug
 
 		self::pre($var);
 
-		echo "\n<style>
-				html, body{margin:0; padding: 0; background: #eee;}
-				pre{margin: 0;}
-				pre:nth-child(2n){background: #2d2d2d !important;}
-			  </style>\n";
+		if(!Registry::get('BootFromCLI'))
+			echo "\n<style>
+					html, body{margin:0; padding: 0; background: #eee;}
+					pre{margin: 0;}
+					pre:nth-child(2n){background: #2d2d2d !important;}
+				</style>\n";
+		
 		exit();
 	}
 
