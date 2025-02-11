@@ -567,7 +567,7 @@ form.model-elements-form span.required{padding-left: 3px;}
 
 /* Buttons styling */
 .button-create, .button-list, #filemanager-menu, #fields-list .apply, .button-dark, .button-light,
-.modal-button{border-radius: 4px; -moz-border-radius: 4px; -webkit-border-radius: 4px;}
+.modal-button{border-radius: 4px; -moz-border-radius: 4px; -webkit-border-radius: 4px; text-decoration: none !important;}
 #model-filters div.column-inner, #model-versions div.column-inner, div.images-wrapper div.controls, 
 button.button-light, button.button-dark{border-radius: 4px; -moz-border-radius: 4px; -webkit-border-radius: 4px;}
 #fields-list div.list, div.multi-actions-menu ul.first, .autocomplete-w1, #operations-menu{
