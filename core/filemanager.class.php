@@ -294,7 +294,7 @@ class Filemanager
 						{
 							$params = "<div>\n<a target=\"_blank\" href=\"".$href."\">".$params."</a>\n";
 							
-							if($dimentions = @getimagesize($file))
+							if(Service::checkImageFile($file) && $dimentions = @getimagesize($file))
 								$params .= "<div>".$dimentions[0].' x '.$dimentions[1]." px</div>\n";
 
 							$params .= "</div>\n";

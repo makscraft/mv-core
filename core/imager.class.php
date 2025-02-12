@@ -104,6 +104,9 @@ class Imager
    
    public function defineImageParams($image)
    {
+      if(!Service::checkImageFile($image))
+         return false;
+
       $type = $width = $height = false;
       $image_params = @getimagesize($image);
 

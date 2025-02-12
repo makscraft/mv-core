@@ -78,6 +78,15 @@ class Model extends ModelBase
 					Debug::displayError($message);
 				}
 
+				if(Registry::getInitialVersion() >= 3.3)
+					if(strtolower($model_class) !== $object -> getName())
+					{
+						$message = "Model element name for many_to_many datatype must have the value (third parameter): ".strtolower($model_class);
+						$message .= "<br>Model: ".get_class($this).", element: ".$object -> getCaption();
+
+						Debug::displayError($message);
+					}				
+
 				$object -> setSelfModel(get_class($this));
 
 				if(Registry::getInitialVersion() >= 3.0)

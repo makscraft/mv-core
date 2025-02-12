@@ -55,7 +55,7 @@ class MultiImagesModelElement extends CharModelElement
 		$checked = [];
 		
 		foreach($images as $image)
-			if(is_file($image['image']) && @getimagesize($image['image']))
+			if(Service::checkImageFile($image['image']) && @getimagesize($image['image']))
 				$checked[] = $image;
 
 		$this -> value = json_encode($checked);
@@ -168,7 +168,8 @@ class MultiImagesModelElement extends CharModelElement
 		
 		if(!in_array($extension, $this -> getOverriddenProperty("allowed_extensions")) || 
 		   !is_uploaded_file($file_data['tmp_name']) || 
-		   !in_array($file_data['type'], $this -> getOverriddenProperty("allowed_mime_types")))
+		   !in_array($file_data['type'], $this -> getOverriddenProperty("allowed_mime_types")) || 
+		   !Service::checkImageFile($file_data['tmp_name']))
 		{
 			$this -> error = "wrong-images-type";
 			return;
