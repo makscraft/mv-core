@@ -148,12 +148,14 @@ class CacheMedia
     }
 
     /**
-     * Returns cache drop mark, based on MV version.
+     * Returns media cache drop mark, based on MV version and current Build.
      * @return string
      */
     static public function getDropMark()
     {
-        return "?v".str_replace('.', '', (string) Registry :: getVersion());
+        $mark = str_replace('.', '', (string) Registry::getVersion());
+
+        return '?'.$mark.(Registry::get('Build') ?? 0);
     }
 
     /**
