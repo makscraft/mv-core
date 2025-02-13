@@ -9,7 +9,7 @@ if($search_text && mb_strlen($search_text) > 1)
 else
     $result = ['number' => 0, 'html' => []];
 
-$url_params = $search_text ? 'text='.$search_text : '';
+$url_params = $search_text ? 'view=search&text='.$search_text : '';
 $limit = $admin_panel -> getPaginationLimit();
 $paginator = new Paginator($result['number'], $limit);
 

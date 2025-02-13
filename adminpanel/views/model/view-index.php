@@ -111,7 +111,7 @@ if(Http::isPostRequest() && Http::fromGet('multi_value') !== null && $multi_acti
 			if($multi_action == 'restore' || ($multi_action == 'delete' && !preg_match('/^not-deleted/', $error)))
 				FlashMessages::add('error', $error);
 			else if(strpos($error, 'datatype-error form-errors'))
-				FlashMessages::add('error', $error);
+				FlashMessages::add('error', strip_tags($error));
 			else
 			{
 				$error = explode("=", $error);

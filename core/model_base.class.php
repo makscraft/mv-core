@@ -451,7 +451,7 @@ abstract class ModelBase extends ModelInitial
 									   $data['name']);
 						
 						$error = Model::processErrorText($error, $this -> elements[$data['name']]);
-						return "<div class=\"datatype-error form-errors\"><p>".$error."</p></div>\n";
+						return "<div class=\"datatype-error form-errors\">".$error."</div>\n";
 					}
 				}
 				

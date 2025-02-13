@@ -7,8 +7,7 @@ if(!$model -> checkDisplayParam('create_actions') ||
 	$admin_panel -> displayInternalError('error-no-rights');
 }
 
-$model -> loadRelatedData();
-$model -> setUser($admin_panel -> user);
+$model -> loadRelatedData() -> runPagerFilterSorter() -> setUser($admin_panel -> user);
 
 if($model -> getParentId())
 	$model -> setValue($model -> getParentField(), $model -> getParentId());

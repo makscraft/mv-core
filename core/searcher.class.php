@@ -62,24 +62,24 @@ class Searcher
 		{
 			$model = $result["models"][$row["model"]];
 			$html = "<div>\n";
-			$url = Registry::get("AdminPanelPath")."model/";
+			$url = Registry::get("AdminPanelPath")."?model=";
 			$name = "";
 			
 			if(isset($row["simple_model"])) //Name of result for simple nodel
 			{
-				$url .= "index-simple.php?model=".$row["model"];				
+				$url .= $row["model"]."&action=simple";				
 				$html .= "<p class=\"found-name\">".(++ $number).". ".I18n::locale("simple-module");
 				$html .= " <a class=\"name\" href=\"".$url."\">".$model -> getName()."</a></p>\n";
 			}
 			else //Name of result for regular model
 			{
 				$html .= "<p class=\"found-name\">".(++ $number).". <a class=\"name\" href=\"".$url;
-				$html .= "update.php?model=".$row["model"]."&id=".$row["id"]."\">\n";
+				$html .= $row["model"]."&action=update&id=".$row["id"]."\">\n";
 				
 				$name = $model -> tryToDefineName($row);
 				
 				$html .= preg_replace("/(".$request_re.")/ui", "<span>$1</span>", $name);				
-				$html .= "</a> ".I18n::locale("module").": <a href=\"".$url."?model=".$row["model"]."\">";
+				$html .= "</a> ".I18n::locale("module").": <a href=\"".$url.$row["model"]."&action=index\">";
 				$html .= $model -> getName()."</a></p>\n";
 			}
 				
@@ -138,7 +138,10 @@ class Searcher
 			$html_strings[] = $html;
 		}
 		
-		return array("number" => count($sorted_result), "html" => $html_strings);
+		return [
+			"number" => count($sorted_result),
+			"html" => $html_strings
+		];
 	}
 	
 	public function searchInAllModelsAjax(string $request, bool $full_search)

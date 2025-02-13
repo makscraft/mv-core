@@ -1878,7 +1878,7 @@ class Model extends ModelBase
 		{
 			$html = "<a title=\"".I18n::locale("edit")."\" href=\"";
 			$html .= $this -> registry -> getSetting('AdminPanelPath')."?model=".$this -> getModelClass();
-			$html .= "&action=update".$this -> getAllUrlParams(['parent','pager','filter']);
+			$html .= "&action=update&".$this -> getAllUrlParams(['parent','pager','filter']);
 			$html .= "&id=".$id."\" class=\"single-action action-".$action_type."\"></a>\n";
 		}
 		
