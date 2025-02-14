@@ -36,8 +36,6 @@ if(Http::fromGet('logout') === Login::getLogoutToken())
 
    $login -> reload('login/');
 }
-else
-   Session::destroy('admin_panel');
 
 include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
 ?>

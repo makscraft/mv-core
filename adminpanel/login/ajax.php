@@ -78,6 +78,8 @@ if(Http::requestHas('login', 'password'))
 			{
 				if(Http::fromPost('remember'))
 					$login -> rememberUser($id);
+
+				Session::start('admin_panel_login');
 			
 				if($back = Session::get('login-back-url'))
 				{

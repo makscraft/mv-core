@@ -1876,9 +1876,11 @@ class Model extends ModelBase
 		}
 		else if($action_type == 'update')
 		{
+			$url_params = $this -> getAllUrlParams(['parent','pager','filter']);
+
 			$html = "<a title=\"".I18n::locale("edit")."\" href=\"";
 			$html .= $this -> registry -> getSetting('AdminPanelPath')."?model=".$this -> getModelClass();
-			$html .= "&action=update&".$this -> getAllUrlParams(['parent','pager','filter']);
+			$html .= "&action=update".($url_params ? "&".$url_params : '');
 			$html .= "&id=".$id."\" class=\"single-action action-".$action_type."\"></a>\n";
 		}
 		
