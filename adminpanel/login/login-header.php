@@ -39,7 +39,7 @@ if(!$is_loading_page):
 	<script type="text/javascript" src="<?php echo Registry::get("AdminPanelPath"); ?>interface/js/jquery.js"></script>
 	<script type="text/javascript" src="<?php echo Registry::get("AdminPanelPath"); ?>interface/js/login.js<?php echo $cache_drop; ?>"></script>
 	<script type="text/javascript">
-		$(document).ready(function() { $("form div.submit").append("<input type=\"hidden\" name=\"js_token\" value=\"<?php echo Login::getJavaScriptToken(); ?>\" />"); });
+		$(document).ready(function() { $("form div.submit").append('<input type="hidden" name="js_token" value="<?php echo Login::getJavaScriptToken(); ?>" />'); });
 	</script>
 	<?php if(!Session::get('ajax-token')): ?>
 		<script type="text/javascript"> $(document).ready(function(){ $.post(adminPanelPath + "login/ajax.php", {"data": "<?php echo Login::getAjaxInitialToken(); ?>"}); }); </script>
