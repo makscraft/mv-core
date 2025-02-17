@@ -84,16 +84,17 @@ class Builder
 		$this -> registry = Registry::instance(); //Langs and settings
       	$this -> db = DataBase::instance(); //Manages database
       
+		//Starts the session if needed
       	if($this -> registry -> get('SessionSupport') && !Service::sessionIsStarted())
-        	session_start(); //Starts the session if needed
+        	Session::start();
       
       	$this -> router = new Router(); //Object to analyze the requested page
       	
       	if(count($this -> router -> getUrlParts()) == 1) //Redirect to index page in some cases
       		if($this -> router -> getUrlPart(0) == 'index' || $this -> router -> getUrlPart(0) == 'index.php')
       		{
-      			header($_SERVER['SERVER_PROTOCOL'].' 301 Moved Permanently');
-      			header('Location: '.$this -> registry -> get('MainPath'));
+      			Http::sendStatusCodeHeader(301);
+      			header('Location: '.Registry::get('MainPath'));
       			exit(); 
       		}
       
