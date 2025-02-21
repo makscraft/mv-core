@@ -270,15 +270,16 @@ class Debug
 
 		if(Registry::get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
 		{
+			Http::sendStatusCodeHeader(500);
 			Installation::displayErrorMessage($error);
 			exit();
 		}
-
+		
 		if(Registry::get('Mode') !== 'production')
 		{
 			if(Http::isAjaxRequest())
 			{
-				header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
+				Http::sendStatusCodeHeader(500);
 				Http::responseJson(['error' => $error, 'http_code' => 500, 'file' => $file, 'line' => $line]);
 			}
 			
@@ -290,7 +291,7 @@ class Debug
 			$screen = Registry::get('IncludeAdminPath').'controls/debug-error.php';
 			
 			if(!headers_sent())
-				header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
+				Http::sendStatusCodeHeader(500);
 
 			if(file_exists($screen))
 				include($screen);
@@ -315,8 +316,8 @@ class Debug
 		
 		Registry::set('ErrorAlreadyLogged', true);
 		
-		if(Registry :: get('DebugPanel') && Registry :: onDevelopment() && !Http :: isAjaxRequest())
-			include_once Registry :: get('IncludeAdminPath').'controls/debug-panel.php';
+		if(Registry::get('DebugPanel') && Registry::onDevelopment() && !Http::isAjaxRequest())
+			include_once Registry::get('IncludeAdminPath').'controls/debug-panel.php';
 
 		if($exit)
 			exit();

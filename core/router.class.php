@@ -25,6 +25,12 @@ class Router
    	private $route;
 
 	/**
+	 * Matched url pattern according to config/routes.php file.
+	 * @var string
+	 */	
+	private $pattern;
+
+	/**
 	 * Route to 404 error page from config/routes.php file.
 	 * @var string
 	 */	
@@ -87,6 +93,7 @@ class Router
 	 */
 	public function setRoute404()
 	{
+		$this -> pattern = 'e404';
 		$this -> route = $this -> route_404;
 
 		return $this;
@@ -166,20 +173,41 @@ class Router
 
 		//Typical, most popular routes are being searched faster with higher priority
 		if($this -> url === '/' || $count === 0)
+		{
+			$this -> pattern = '/';
 			$this -> route = $map['Map']['/'];
+		}
 		else if(array_key_exists($exact, $map['Map']))
+		{
+			$this -> pattern = '/'.$exact;
 			$this -> route = $map['Map'][$exact];
+		}
 		else if(array_key_exists($exact.'/?', $map['Map']))
+		{
+			$this -> pattern = '/'.$exact.'/?';
 			$this -> route = $map['Map'][$exact.'/?'];
+		}
 		else if($count === 2)
 		{
 			$key = $this -> url_parts[0].'/*';
+			$key_optioanal = $this -> url_parts[0].'/?';
 			$key_extra = $this -> url_parts[0].'/*/?';
 			
 			if(array_key_exists($key, $map['Map']))
+			{
+				$this -> pattern = '/'.$key;
 				$this -> route = $map['Map'][$key];
+			}
+			else if(array_key_exists($key_optioanal, $map['Map']))
+			{
+				$this -> pattern = '/'.$key_optioanal;
+				$this -> route = $map['Map'][$key_optioanal];
+			}			
 			else if(array_key_exists($key_extra, $map['Map']))
+			{
+				$this -> pattern = '/'.$key_extra;
 				$this -> route = $map['Map'][$key_extra];
+			}
 		}
 		else //More complex routes with longer search time
 		{
@@ -193,11 +221,13 @@ class Router
 
 				if(array_key_exists($key, $map['Map']))
 				{
+					$this -> pattern = '/'.$key;
 					$this -> route = $map['Map'][$key];
 					break;
 				}
 				else if(array_key_exists($key_extra, $map['Map']))
 				{
+					$this -> pattern = '/'.$key_extra;
 					$this -> route = $map['Map'][$key_extra];
 					break;
 				}
@@ -206,7 +236,10 @@ class Router
 		
 		//Fallbak route of no matches found
 		if(!$this -> route)
+		{
+			$this -> pattern = 'fallback';
 			$this -> route = $map['Map']['fallback'];
+		}
 
 		//Name of needed file (view) to include in ~/index.php
 		$file = Registry::get('IncludePath').'views/'.$this -> route;
@@ -359,6 +392,19 @@ class Router
    	{
    		return (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] != "off");
    	}
+
+	/**
+	 * Return array all current router params.
+	 */
+	public function getState(): array
+	{
+		return [
+			'url' => $this -> url,
+			'pattern' => $this -> pattern,
+			'route' => $this -> route,
+			'url_parts' => $this -> url_parts
+		];
+	}
    	
 	/**
 	 * Determines if the site is not in the root folder of domain.
