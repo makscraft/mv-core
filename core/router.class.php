@@ -190,7 +190,7 @@ class Router
 		else if($count === 2)
 		{
 			$key = $this -> url_parts[0].'/*';
-			$key_optioanal = $this -> url_parts[0].'/?';
+			$key_optional = $this -> url_parts[0].'/?';
 			$key_extra = $this -> url_parts[0].'/*/?';
 			
 			if(array_key_exists($key, $map['Map']))
@@ -198,10 +198,10 @@ class Router
 				$this -> pattern = '/'.$key;
 				$this -> route = $map['Map'][$key];
 			}
-			else if(array_key_exists($key_optioanal, $map['Map']))
+			else if(array_key_exists($key_optional, $map['Map']))
 			{
-				$this -> pattern = '/'.$key_optioanal;
-				$this -> route = $map['Map'][$key_optioanal];
+				$this -> pattern = '/'.$key_optional;
+				$this -> route = $map['Map'][$key_optional];
 			}			
 			else if(array_key_exists($key_extra, $map['Map']))
 			{
@@ -215,6 +215,8 @@ class Router
 
 			for($i = $count - 1; $i > 0; $i --)
 			{
+				$parts[$i] = '?';
+				$key_optional = implode('/', $parts);
 				$parts[$i] = '*';
 				$key = implode('/', $parts);
 				$key_extra = $key.'/?';
@@ -225,11 +227,31 @@ class Router
 					$this -> route = $map['Map'][$key];
 					break;
 				}
+				else if(array_key_exists($key_optional, $map['Map']))
+				{
+					$this -> pattern = '/'.$key_optional;
+					$this -> route = $map['Map'][$key_optional];
+				}				
 				else if(array_key_exists($key_extra, $map['Map']))
 				{
 					$this -> pattern = '/'.$key_extra;
 					$this -> route = $map['Map'][$key_extra];
 					break;
+				}
+
+				if($i < $count - 1)
+				{
+					$parts[$count - 1] = '?';
+					$key = implode('/', $parts);
+
+					if(array_key_exists($key, $map['Map']))
+					{
+						$this -> pattern = '/'.$key;
+						$this -> route = $map['Map'][$key];
+						break;
+					}
+
+					$parts[$count - 1] = '*';
 				}
 			}
 		}
