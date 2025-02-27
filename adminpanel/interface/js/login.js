@@ -11,7 +11,7 @@ $(document).ready(function()
            type: "POST",
            dataType: "json",
            data: $("form.login-form").serialize(),
-           url: adminPanelPath + "ajax/login.php",
+           url: adminPanelPath + "login/ajax.php",
            success: function(data)
            {
                if(data.action == "start" && !data.errors)
@@ -21,7 +21,7 @@ $(document).ready(function()
                }
 
                let errors = $("form.login-form div.errors").length;
-               $("form.login-form").find("div.errors, div.success").remove();
+               $("form.login-form").find("div.errors, div.success, div.error").remove();
                
                if(data.errors)
                {
@@ -47,7 +47,7 @@ $(document).ready(function()
                   $(new_captcha).load(function()
                   {
                       $("form.login-form div.captcha > img").replaceWith(new_captcha);
-                      $("form.login-form div.captcha input").val("");
+                      $("form.login-form div.captcha input").val('');
 
                       $("form.login-form div.captcha").parent().removeClass("hidden");
                   });

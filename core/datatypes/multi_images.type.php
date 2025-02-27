@@ -55,7 +55,7 @@ class MultiImagesModelElement extends CharModelElement
 		$checked = [];
 		
 		foreach($images as $image)
-			if(is_file($image['image']) && @getimagesize($image['image']))
+			if(Service::checkImageFile($image['image']) && @getimagesize($image['image']))
 				$checked[] = $image;
 
 		$this -> value = json_encode($checked);
@@ -109,8 +109,10 @@ class MultiImagesModelElement extends CharModelElement
 		}
 		
 		$html .= "</div>\n";
-		$maximum = ini_get("max_file_uploads");
+
+		$maximum = ini_get('max_file_uploads');
 		$maximum = $maximum <= 20 ? $maximum : 20;
+		$value = $this -> value && $this -> value != '[]' ? base64_encode(strval($this -> value)) : '';
 		
 		$html .= "<div class=\"upload-buttons\">\n<div class=\"upload-one\" ";
 		$html .= "id=\"max-quantity-".$maximum."\">\n";
@@ -118,7 +120,7 @@ class MultiImagesModelElement extends CharModelElement
 		$html .= "<input type=\"file\" multiple id=\"multi-images-".$this -> name."\" ";
 		$html .= "name=\"multi-images-".$this -> name."[]\" />\n";
 		$html .= "<div class=\"loading\"></div>\n";
-		$html .= "<input type=\"hidden\" name=\"".$this -> name."\" value=\"".base64_encode(strval($this -> value))."\" /></div>\n";
+		$html .= "<input type=\"hidden\" name=\"".$this -> name."\" value=\"".$value."\" /></div>\n";
 		$html .= "</div></div>\n".$this -> addHelpText();
 		
 		return $html;
@@ -166,7 +168,8 @@ class MultiImagesModelElement extends CharModelElement
 		
 		if(!in_array($extension, $this -> getOverriddenProperty("allowed_extensions")) || 
 		   !is_uploaded_file($file_data['tmp_name']) || 
-		   !in_array($file_data['type'], $this -> getOverriddenProperty("allowed_mime_types")))
+		   !in_array($file_data['type'], $this -> getOverriddenProperty("allowed_mime_types")) || 
+		   !Service::checkImageFile($file_data['tmp_name']))
 		{
 			$this -> error = "wrong-images-type";
 			return;

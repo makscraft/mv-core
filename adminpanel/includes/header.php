@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
 <title><?php echo I18n::locale('mv'); ?></title>
 <?php 
-$admin_panel_path = $registry -> getSetting('AdminPanelPath');
+$admin_panel_path = Registry::get('AdminPanelPath');
 $admin_media_path = Registry::get('AdminFolder').'/interface/';
 $cache_drop = CacheMedia::instance()::getDropMark();
 
@@ -21,44 +21,45 @@ else
 ?>
 <script type="text/javascript" src="<?php echo $admin_panel_path; ?>interface/js/mv.js<?php echo $cache_drop; ?>"></script>
 <script type="text/javascript">
-mVobject.mainPath = '<?php echo $registry -> getSetting('MainPath'); ?>';
-mVobject.adminPanelPath = '<?php echo $admin_panel_path; ?>';
-mVobject.urlParams = '<?php if(isset($system -> model)) echo $system -> model -> getAllUrlParams(array('pager','filter','model','parent','id')); ?>';
+MVobject.mainPath = '<?php echo $registry -> getSetting('MainPath'); ?>';
+MVobject.adminPanelPath = '<?php echo $admin_panel_path; ?>';
+MVobject.currentView = '<? echo isset($admin_panel) ? $admin_panel -> getCurrentView() : '' ?>';
+MVobject.urlParams = '<?php if(isset($model)) echo $model -> getAllUrlParams(array('pager','filter','model','parent','id')); ?>';
 <?php
-if(isset($system -> model))
-   echo "mVobject.currentModel = '".$system -> model -> getModelClass()."';\n";
+if(isset($model))
+   echo "MVobject.currentModel = '".$model -> getModelClass()."';\n";
 
-if(isset($system -> model -> sorter))
-   echo "mVobject.sortField = '".$system -> model -> sorter -> getField()."';\n";
+if(isset($model -> sorter))
+   echo "MVobject.sortField = '".$model -> sorter -> getField()."';\n";
 
-if(isset($system -> model))
+if(isset($model))
 {
-	$parent = $system -> model -> findForeignParent();
-	$linked_order_fields = $system -> model -> findDependedOrderFilters();	
+	$parent = $model -> findForeignParent();
+	$linked_order_fields = $model -> findDependedOrderFilters();	
 }
 
-if(isset($parent) && is_array($parent) && isset($system -> model -> filter))
-	if(!$system -> model -> filter -> allowChangeOrderLinkedWithEnum($parent['name']))
-		echo "mVobject.relatedParentFilter = '".$parent['caption']."';\n";
+if(isset($parent) && is_array($parent) && isset($model -> filter))
+	if(!$model -> filter -> allowChangeOrderLinkedWithEnum($parent['name']))
+		echo "MVobject.relatedParentFilter = '".$parent['caption']."';\n";
 
 if(isset($linked_order_fields) && count($linked_order_fields))
 	foreach($linked_order_fields as $name => $data)
-		if(!$system -> model -> filter -> allowChangeOrderLinkedWithEnum($data[0]))
-			echo "mVobject.dependedOrderFields.".$name." = '".$data[1]."';\n";
+		if(!$model -> filter -> allowChangeOrderLinkedWithEnum($data[0]))
+			echo "MVobject.dependedOrderFields.".$name." = '".$data[1]."';\n";
 		
-$has_applied_filters = (int) (isset($system -> model -> filter) && $system -> model -> filter -> ifAnyFilterApplied());
-echo "mVobject.hasAppliedFilters = ".$has_applied_filters.";\n";      
+$has_applied_filters = (int) (isset($model -> filter) && $model -> filter -> ifAnyFilterApplied());
+echo "MVobject.hasAppliedFilters = ".$has_applied_filters.";\n";      
       
-if(isset($system -> model -> filter))
-   if($caption = $system -> model -> filter -> ifFilteredByAllParents())
-      echo "mVobject.allParentsFilter = '".$caption."';\n";
-   else if(isset($system -> model -> pager))
-      echo "mVobject.startOrder = ".($system -> model -> pager -> getStart() + 1).";\n";
-	  
+if(isset($model -> filter))
+   if($caption = $model -> filter -> ifFilteredByAllParents())
+      echo "MVobject.allParentsFilter = '".$caption."';\n";
+   else if(isset($model -> pager))
+      echo "MVobject.startOrder = ".($model -> pager -> getStart() + 1).";\n";
+
 $region = $registry -> getSetting('Region');
 ?>
-mVobject.region = '<?php echo $region; ?>';
-mVobject.dateFormat = '<?php echo I18n::getDateFormat(); ?>';
+MVobject.region = '<?php echo $region; ?>';
+MVobject.dateFormat = '<?php echo I18n::getDateFormat(); ?>';
 </script>
 <?php
 
@@ -80,10 +81,10 @@ if(Router::isLocalHost())
 else
 	echo CacheMedia::getJavaScriptCache();
 ?>
-<script type="text/javascript" src="<?php echo $admin_panel_path; ?>ajax/autocomplete.php?locale=<?php echo $region; ?>"></script>
+<script type="text/javascript" src="<?php echo $admin_panel_path; ?>?service=locale&region=<?php echo $region; ?>"></script>
 
 <?php
-$skin = $system -> user -> getUserSkin();
+$skin = $admin_panel -> user -> getUserSkin();
 
 if($skin)
 {
@@ -95,7 +96,7 @@ if($skin)
 }
 else
 {
-   $skins = $system -> user -> getAvailableSkins();
+   $skins = $admin_panel -> user -> getAvailableSkins();
    echo "<script type=\"text/javascript\">$(document).ready(function() { openSkinChooseDialog([\"".implode("\",\"", $skins)."\"]); });</script>\n";
 }
 ?>
@@ -108,42 +109,43 @@ else
 <div id="container">
    <div id="header">
 	      <div class="inner">
-	      <a id="logo" href="<?php echo $admin_panel_path; ?>">
-		     <img src="<?php echo $admin_panel_path; ?>interface/images/logo.svg<?php echo $cache_drop; ?>" alt="MV logo" />
-	      </a>
-	      <div id="models-buttons">
-	         <ul>
-	            <li>
-	                <span><?php echo I18n::locale("modules"); ?></span>
-					<div id="models-list">
-						<?php echo $system -> menu -> displayModelsMenu(); ?>
+			<a id="logo" href="<?php echo $admin_panel_path; ?>">
+				<img src="<?php echo $admin_panel_path; ?>interface/images/logo.svg<?php echo $cache_drop; ?>" alt="MV logo" />
+			</a>
+			<div id="models-buttons">
+				<ul>
+					<li>
+						<span><?php echo I18n::locale("modules"); ?></span>
+						<div id="models-list">
+							<?php echo (new Menu) -> displayModelsMenu(); ?>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div id="header-search">
+				<form action="<?php echo $admin_panel_path; ?>" method="get">
+					<div>
+						<?php
+							$header_search_value = "";
+							
+							if(isset($search_text) && Http::fromGet('view') == 'search')
+								$header_search_value = $search_text;
+						?>
+						<input class="string" type="text" name="text" placeholder="<?php echo I18n::locale('search-in-all-modules'); ?>" value="<?php echo $header_search_value; ?>" />
+						<input type="submit" class="search-button" value="<?php echo I18n::locale('find'); ?>" />
+						<input type="hidden" name="view" value="search" />
 					</div>
-	            </li>
-	         </ul>
-	      </div>
-	      <div id="header-search">
-				<form action="<?php echo $admin_panel_path; ?>controls/search.php" method="get">
-	   			   <div>
-                      <?php
-                      	  $header_search_value = "";
-                      	  
-                      	  if(isset($search_text) && preg_match("/\/search\.php$/", $_SERVER["SCRIPT_FILENAME"]))
-                      	  	$header_search_value = $search_text;
-                      ?>
-				      <input class="string" type="text" name="text" placeholder="<?php echo I18n::locale('search-in-all-modules'); ?>" value="<?php echo $header_search_value; ?>" />
-				      <input type="submit" class="search-button" value="<?php echo I18n::locale('find'); ?>" />
-				   </div>
 				</form>
-		    </div>      
-	      <div id="user-settings">
-	       <ul>
-	         <li id="user-name"><span class="skin-color"><?php echo $system -> user -> getField('name'); ?></span></li>
-	         <li><a href="<?php echo $admin_panel_path; ?>controls/user-settings.php"><?php echo I18n::locale("my-settings"); ?></a></li>
-	         <?php $logout_link = $admin_panel_path."login?logout=".Login::getLogoutToken(); ?>
-	         <li><a href="<?php echo $registry -> getSetting('MainPath') ?>" target="_blank"><?php echo I18n::locale("to-site"); ?></a></li>
-	         <li><a href="<?php echo $logout_link; ?>"><?php echo I18n::locale("exit"); ?></a></li>
-	       </ul>
-	      </div>
-      </div>
-   </div>
-   <?php echo $system -> displayWarningMessages(); ?>
+			</div>
+			<div id="user-settings">
+				<ul>
+					<li id="user-name"><span class="skin-color"><?php echo $admin_panel -> user -> getField('name'); ?></span></li>
+					<li><a href="<?php echo $admin_panel_path; ?>?view=user-settings"><?php echo I18n::locale("my-settings"); ?></a></li>
+					<?php $logout_link = $admin_panel_path."login?logout=".Login::getLogoutToken(); ?>
+					<li><a href="<?php echo $registry -> getSetting('MainPath') ?>" target="_blank"><?php echo I18n::locale("to-site"); ?></a></li>
+					<li><a href="<?php echo $logout_link; ?>"><?php echo I18n::locale("exit"); ?></a></li>
+				</ul>
+			</div>
+      	</div>
+   	</div>
+   	<?php echo $admin_panel -> displayWarningMessages(); ?>

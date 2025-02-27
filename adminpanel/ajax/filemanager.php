@@ -1,11 +1,7 @@
 <?php
-include '../../config/autoload.php';
-
 Http::isAjaxRequest('post', true);
-
-$system = new System('ajax');
 $filemanager = new Filemanager();
-$filemanager -> setUser($system -> user);
+$filemanager -> setUser($admin_panel -> user);
 
 if(isset($_POST['number_files']) && intval($_POST['number_files']))
 {

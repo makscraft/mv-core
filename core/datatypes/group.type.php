@@ -33,17 +33,22 @@ class GroupModelElement extends ModelElement
 			
 		return $this;
 	}
+
+	public function getValue() 
+	{
+		return strval($this -> value);
+	}
 	
 	public function displayAdminFilter(mixed $data)
 	{
-		return EnumModelElement :: createAdminFilterHtml($this -> name, $data);
+		return EnumModelElement::createAdminFilterHtml($this -> name, $data);
 	}
 
 	public function countGroupRecords($value)
 	{
 		if(!$value) return;
 		
-		$number = Database :: instance() -> getCount($this -> table, "`id` IN(".$value.")");
+		$number = Database::instance() -> getCount($this -> table, "`id` IN(".$value.")");
 		
 		return $number ? $number : "";
 	}
@@ -52,14 +57,14 @@ class GroupModelElement extends ModelElement
 	{
 		if(!$value) return;
 			
-		$ids = Database :: instance() -> getColumn("SELECT `id` FROM `".$this -> table."` WHERE `id` IN(".$value.")");
+		$ids = Database::instance() -> getColumn("SELECT `id` FROM `".$this -> table."` WHERE `id` IN(".$value.")");
 		
 		return count($ids) ? implode(",", $ids) : "";
 	}
 	
 	public function getTableRecords()
 	{
-		$db = Database :: instance();
+		$db = Database::instance();
 		
 		$result = $db -> query("SELECT `id`,`".$this -> name_field."` 
 					 		    FROM `".$this -> table."` 
@@ -89,7 +94,7 @@ class GroupModelElement extends ModelElement
 		$html .= "<div class=\"column\">\n";
 		
 		//Multi select tag with not selected elements
-		$html .= "<div class=\"header\">".I18n :: locale("not-selected");
+		$html .= "<div class=\"header\">".I18n::locale("not-selected");
 		
 		if($this -> long_list)
 			$html .= "\n<input type=\"text\" class=\"m2m-not-selected-search\" />\n";
@@ -113,7 +118,7 @@ class GroupModelElement extends ModelElement
 		$html .= "<div class=\"m2m-buttons\">\n<span class=\"m2m-right\"></span>\n";
 		$html .= "<span class=\"m2m-left\"></span></div>\n";
 		
-		$html .= "<div class=\"column\">\n<div class=\"header\">".I18n :: locale("selected");
+		$html .= "<div class=\"column\">\n<div class=\"header\">".I18n::locale("selected");
 		
 		if($this -> long_list)
 			$html .= "\n<input type=\"text\" class=\"m2m-selected-search\" />\n";
@@ -147,7 +152,7 @@ class GroupModelElement extends ModelElement
 		
 	public function getOptionsForSearch($request, $ids, $self_id)
 	{
-		$db = Database :: instance();
+		$db = Database::instance();
 		$html = "";
 		$request_like = str_replace("%", "[%]", $request);
 		
@@ -177,7 +182,7 @@ class GroupModelElement extends ModelElement
 	
 	public function getDataForAutocomplete($request)
 	{
-		$db = Database :: instance();
+		$db = Database::instance();
 		$result_rows = [];
 		$request_like = str_replace("%", "[%]", $request);
 		$request_like = $db -> secure("%".$request_like."%");
@@ -200,7 +205,7 @@ class GroupModelElement extends ModelElement
 	
 	public function checkValue($id)
 	{
-		$db = Database :: instance();
+		$db = Database::instance();
 		
 		return $db -> getCell("SELECT `".$this -> name_field."` 
 							   FROM `".$this -> table."` 
@@ -209,7 +214,7 @@ class GroupModelElement extends ModelElement
 	
 	public function getDataForMultiAction()
 	{
-		$options_xml = "<value id=\"\">".I18n :: locale("select-value")."</value>\n";
+		$options_xml = "<value id=\"\">".I18n::locale("select-value")."</value>\n";
 		$data_for_options = $this -> getTableRecords();
 			
 		if(is_array($data_for_options))

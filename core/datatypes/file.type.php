@@ -210,6 +210,8 @@ class FileModelElement extends CharModelElement
 				$this -> error = '{wrong-images-type}';					
 			else if(!count($this -> allowed_mime_types) && !in_array($file_data['type'], $default_images_mimes))
 				$this -> error = '{wrong-files-type}';
+			else if(!Service::checkImageFile($file_data['tmp_name']))
+				$this -> error = '{wrong-files-type}';
 			else if($file_data['size'] > $max_image_size)
 				$this -> error = $this -> chooseError("max_size", '{too-heavy-image}');
 			else if($extension != "svg")

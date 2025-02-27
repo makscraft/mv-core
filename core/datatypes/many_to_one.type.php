@@ -91,7 +91,7 @@ class ManyToOneModelElement extends ModelElement
 	{
 		$related_object = new $this -> related_model();
 		
-		$html = "<a class=\"to-children\" href=\"?model=".strtolower($this -> related_model)."&";
+		$html = "<a class=\"to-children\" href=\"?model=".strtolower($this -> related_model)."&action=index&";
 		$html .= $this -> related_field."=".$this -> related_id."\">";
 		
 		$number = (int) $related_object -> db -> getCell("SELECT COUNT(*) 

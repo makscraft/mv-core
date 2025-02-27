@@ -167,6 +167,17 @@ class Sorter
 	}
 
 	/**
+	 * Adds more url parameters for current sorting links.
+	 * @return self
+	 */
+	public function addMoreUrlParams(string $url_params)
+	{
+		$this -> url_params .= ($this -> url_params ? '&' : '?').$url_params;
+			
+		return $this;
+	}
+
+	/**
 	 * Generates string of sorting GET params according to current sort values.
 	 * @return string
 	 */

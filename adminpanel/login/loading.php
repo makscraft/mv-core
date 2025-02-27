@@ -1,11 +1,9 @@
 <?php 
-include_once "../../config/autoload.php";
+include_once '../../config/autoload.php';
+Session::start('admin_panel');
 $i18n = I18n::instance();
 $region = I18n::defineRegion();
 $i18n -> setRegion($region);
-
-if(!isset($_SESSION))
-	session_start();
 
 include $registry -> getSetting("IncludeAdminPath")."login/login-header.php";
 ?>

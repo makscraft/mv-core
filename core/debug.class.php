@@ -62,8 +62,7 @@ class Debug
 		$var = is_null($var) ? 'null' : $var;
 		$var = is_bool($var) ? ($var ? 'true' : 'false') : $var;
 		$var = $var === '' ? "''" : $var;
-		$var = is_object($var) ? (array) $var : $var;
-
+		
 		if(is_array($var))
 		{
 			$var_ = [];
@@ -107,9 +106,18 @@ class Debug
 			return;
 		}
 
-		echo "\n<pre style=\"white-space: pre-wrap; word-wrap: anywhere; font-size: 14px !important; background: #222; color: #def474; padding: 20px;\">";
-		print_r(is_string($var) ? htmlspecialchars($var, ENT_QUOTES) : $var);
-		echo "</pre>\n";
+		if(Http::isAjaxRequest())
+		{
+			echo "<pre>\n";
+			print_r(is_string($var) ? htmlspecialchars($var, ENT_QUOTES) : $var);
+			echo "</pre>\n";
+		}
+		else
+		{		
+			echo "\n<pre style=\"white-space: pre-wrap; word-wrap: anywhere; font-size: 14px !important; background: #222; color: #def474; padding: 20px;\">";
+			print_r(is_string($var) ? htmlspecialchars($var, ENT_QUOTES) : $var);
+			echo "</pre>\n";
+		}
 	}
 
 	/**
@@ -125,11 +133,13 @@ class Debug
 
 		self::pre($var);
 
-		echo "\n<style>
-				html, body{margin:0; padding: 0; background: #eee;}
-				pre{margin: 0;}
-				pre:nth-child(2n){background: #2d2d2d !important;}
-			  </style>\n";
+		if(!Registry::get('BootFromCLI'))
+			echo "\n<style>
+					html, body{margin:0; padding: 0; background: #eee;}
+					pre{margin: 0;}
+					pre:nth-child(2n){background: #2d2d2d !important;}
+				</style>\n";
+		
 		exit();
 	}
 
@@ -260,15 +270,16 @@ class Debug
 
 		if(Registry::get('BootFromCLI') || strval(getenv('MV_COMPOSER_TEST_ENVIRONMENT')) !== '')
 		{
+			Http::sendStatusCodeHeader(500);
 			Installation::displayErrorMessage($error);
 			exit();
 		}
-
+		
 		if(Registry::get('Mode') !== 'production')
 		{
 			if(Http::isAjaxRequest())
 			{
-				header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
+				Http::sendStatusCodeHeader(500);
 				Http::responseJson(['error' => $error, 'http_code' => 500, 'file' => $file, 'line' => $line]);
 			}
 			
@@ -280,7 +291,7 @@ class Debug
 			$screen = Registry::get('IncludeAdminPath').'controls/debug-error.php';
 			
 			if(!headers_sent())
-				header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
+				Http::sendStatusCodeHeader(500);
 
 			if(file_exists($screen))
 				include($screen);
@@ -305,8 +316,8 @@ class Debug
 		
 		Registry::set('ErrorAlreadyLogged', true);
 		
-		if(Registry :: get('DebugPanel') && Registry :: onDevelopment() && !Http :: isAjaxRequest())
-			include_once Registry :: get('IncludeAdminPath').'controls/debug-panel.php';
+		if(Registry::get('DebugPanel') && Registry::onDevelopment() && !Http::isAjaxRequest())
+			include_once Registry::get('IncludeAdminPath').'controls/debug-panel.php';
 
 		if($exit)
 			exit();

@@ -1,11 +1,11 @@
 
-<div class="manage-filters" id="model-<?php echo $system -> model -> getModelClass(); ?>">
+<div class="manage-filters" id="model-<?php echo $model -> getModelClass(); ?>">
 	<p><?php echo I18n::locale('manage-filters'); ?></p>
 	<select id="add-filter">
 	   <option value=""><?php echo I18n::locale('add'); ?></option>
        <?php 
-			$html_selects = $system -> model -> filter -> displayAdminFiltersFieldsSelects($default_filters, 
-																						   $show_empty_default_filters);
+			$html_selects = $model -> filter -> displayAdminFiltersFieldsSelects($default_filters, 
+																				 $show_empty_default_filters);
 			echo $html_selects['add'];
        ?>
 	</select>

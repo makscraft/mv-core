@@ -78,10 +78,21 @@ class Model extends ModelBase
 					Debug::displayError($message);
 				}
 
+				if(Registry::getInitialVersion() >= 3.3)
+					if(strtolower($model_class) !== $object -> getName())
+					{
+						$message = "Model element name for many_to_many datatype must have the value (third parameter): ".strtolower($model_class);
+						$message .= "<br>Model: ".get_class($this).", element: ".$object -> getCaption();
+
+						Debug::displayError($message);
+					}				
+
+				$object -> setSelfModel(get_class($this));
+
 				if(Registry::getInitialVersion() >= 3.0)
 					$object -> defineLinkingTable(get_class($this));
 			}
-			else if($type == 'many_to_one')
+			else if($type == 'many_to_one' || $type == 'one_to_many')
 			{	
 				$model_class = $object -> getProperty('related_model');
 			
@@ -246,6 +257,9 @@ class Model extends ModelBase
 	
 	public function instanceElement($field_data)
 	{
+		if($field_data[1] === 'one_to_many')
+			$field_data[1] = 'many_to_one';
+
 		self::checkElement($field_data, get_class($this));
 		$element = self::elementsFactory($field_data, get_class($this));
 
@@ -344,6 +358,7 @@ class Model extends ModelBase
 		}
 		
 		$sorter_data['id'] = 'int';
+		
 		$this -> sorter = new Sorter($sorter_data);
 		$this -> filter = new Filter($filters_data, '', $this);
 		
@@ -712,6 +727,11 @@ class Model extends ModelBase
 			}			
 		}
 		
+		$in_transaction = (method_exists(Database::$pdo, "inTransaction")) ? Database::$pdo -> inTransaction() : true;
+		
+		if(!$in_transaction)
+			$this -> db -> beginTransaction();
+
 		if(method_exists($this, "beforeCreate")) //Trigger before creating a record 
 		{
 			$result_values = $this -> beforeCreate($version_dump);
@@ -754,6 +774,9 @@ class Model extends ModelBase
 			$this -> afterCreate($this -> id, $version_dump);
 			
 		Cache::cleanByModel($this -> getModelClass());
+
+		if(!$in_transaction)
+			$this -> db -> commitTransaction();
 		
 		return $this -> id;
 	}
@@ -872,7 +895,12 @@ class Model extends ModelBase
 			}
 			else if($type != 'many_to_one')		
 				$version_dump[$name] = $value;
-		}		
+		}
+
+		$in_transaction = (method_exists(Database::$pdo, "inTransaction")) ? Database::$pdo -> inTransaction() : true;
+		
+		if(!$in_transaction)
+			$this -> db -> beginTransaction();
 		
 		if(method_exists($this, "beforeUpdate"))
 		{
@@ -886,7 +914,7 @@ class Model extends ModelBase
 						$version_dump[$name] = $fields_and_values[$name] = $value;
 					}				
 		}
-			
+		
 		foreach($fields_and_values as $name => $value) //Prepearing values for SQL query
 			$values[] = "`".$name."`=".$this -> db -> secure($value);
 
@@ -894,7 +922,7 @@ class Model extends ModelBase
 							  SET ".implode(",", $values)." 
 							  WHERE `id`='".$this -> id."'");
 		
-		$this -> versions = new Versions($this -> table, $this -> id);
+		$this -> versions = new Versions($this -> getModelClass(), $this -> id);
 		$versions_limit = $this -> getVersionsLimit();
 		
 		if(!$versions_limit)
@@ -920,6 +948,9 @@ class Model extends ModelBase
 			$this -> afterUpdate($this -> id, $version_dump);
 			
 		Cache::cleanByModel($this -> getModelClass());
+
+		if(!$in_transaction)
+			$this -> db -> commitTransaction();
 				
 		return $this;
 	}
@@ -936,7 +967,12 @@ class Model extends ModelBase
 		
 		if(isset($arguments[0]) && is_array($arguments[0]))
 			$content = array_merge($content, $arguments[0]);
-			
+		
+		$in_transaction = (method_exists(Database::$pdo, "inTransaction")) ? Database::$pdo -> inTransaction() : true;
+		
+		if(!$in_transaction)
+			$this -> db -> beginTransaction();
+
 		if(method_exists($this, "beforeDelete"))
 			if($this -> beforeDelete($this -> id, $content) === false)
 				return $this; //Stop operation and exit if false was returned by pre action
@@ -971,6 +1007,9 @@ class Model extends ModelBase
 		$this -> drop();
 		
 		Cache::cleanByModel($this -> getModelClass());
+
+		if(!$in_transaction)
+			$this -> db -> commitTransaction();
 		
 		return $this;
 	}
@@ -1234,12 +1273,15 @@ class Model extends ModelBase
 		if($type == 'many_to_many') //If we need to count m2m values
 		{
 			$other_table = $this -> elements[$name] -> getProperty('linking_table');
-			$other_field = $this -> table."_id";
+			$other_field = $this -> table.'_id';
 		}
 		else if($type == 'many_to_one') //If we count m2o values
 		{
-			$other_table = strtolower($this -> elements[$name] -> getProperty('related_model'));
-			$other_field = (new $other_table) -> findElementByProperty('foreign_key', get_class($this));
+			$other_model = $this -> elements[$name] -> getProperty('related_model');
+			$other_model = new $other_model;
+			$other_table = $other_model -> getTable();
+
+			$other_field = $other_model -> findElementByProperty('foreign_key', get_class($this));
 			$other_field = $other_field -> getName();
 		}
 
@@ -1544,12 +1586,12 @@ class Model extends ModelBase
 					
 					if($name == 'name' && $this -> parent_field)
 						if($model_redirect = $this -> checkModelRedirect($row)) //If redirect to other model
-							$row[$name] = "<a class=\"to-children\" href=\"?model=".$model_redirect."\">".$row[$name]."</a>\n";
+							$row[$name] = "<a class=\"to-children\" href=\"?model=".$model_redirect."&action=index\">".$row[$name]."</a>\n";
 						else if($this -> elements[$this -> parent_field] -> checkAllowedDepth($row['id'], get_class($this)))
 						{
 							//Adds link for the parent type name if depth allowes it
 							$clear_name = $row[$name];
-							$row[$name] = "<a href=\"?model=".$this -> getModelClass()."&".$this -> parent_field."=";
+							$row[$name] = "<a href=\"?model=".$this -> getModelClass()."&action=index&".$this -> parent_field."=";
 							$row[$name] .= $row['id']."\">".$clear_name."</a>\n";
 						}
 					
@@ -1559,10 +1601,10 @@ class Model extends ModelBase
 						$model_object = new $model_object();
 						$simple_model = (get_parent_class($model_object) == "ModelSimple");
 						
-						if(!$simple_model && $this -> countRecords(array("table->" => $row["module"], "id" => $row["row_id"])))
-							$row[$name] = "<a href=\"update.php?model=".$row["module"]."&id=".$row["row_id"]."\">".$row[$name]."</a>\n";
+						if(!$simple_model && $this -> countRecords(array("table->" => $model_object -> getTable(), "id" => $row["row_id"])))
+							$row[$name] = "<a href=\"?model=".$row["module"]."&action=update&id=".$row["row_id"]."\">".$row[$name]."</a>\n";
 						else if($simple_model)
-						    $row[$name] = "<a href=\"index-simple.php?model=".$row["module"]."\">".$row[$name]."</a>\n";
+						    $row[$name] = "<a href=\"?model=".$row["module"]."&action=simple\">".$row[$name]."</a>\n";
 					}
 				
 					if(isset($foreign_keys[$name])) //If we need to show the value of foreign key
@@ -1571,7 +1613,7 @@ class Model extends ModelBase
 						{
 							if($this -> display_params['foreign_keys_admin_links']) //Link to foreign key model record
 							{
-								$href = "update.php?model=".strtolower($this -> elements[$name] -> getProperty('foreign_key'));
+								$href = "?action=update&model=".strtolower($this -> elements[$name] -> getProperty('foreign_key'));
 					   			$row[$name] = "<a href=\"".$href."&id=".$row[$name]."\">".$foreign_keys[$name][$row[$name]]."</a>\n";
 							}
 					   		else
@@ -1608,8 +1650,8 @@ class Model extends ModelBase
 						if($row[$name] && $this -> elements[$name] -> getProperty('foreign_key') && 
 						   $this -> display_params['foreign_keys_admin_links'])
 						   {
-								$href = "update.php?model=".strtolower($this -> elements[$name] -> getProperty('foreign_key'));
-					   			$row[$name] = "<a href=\"".$href."&id=".$save_value."\">".$row[$name]."</a>\n";
+								$href = "?model=".strtolower($this -> elements[$name] -> getProperty('foreign_key'));
+					   			$row[$name] = "<a href=\"".$href."&action=update&id=".$save_value."\">".$row[$name]."</a>\n";
 						   }
 					}
 					else if($type == 'int')
@@ -1660,7 +1702,7 @@ class Model extends ModelBase
 						if($this -> elements[$name] -> getProperty("quick_change") && $this -> checkDisplayParam('update_actions'))
 						{
 							$bool_title = $row[$name] ? "switch-off" : "switch-on";
-							$row[$name] = "<span id=\"".$name."-".$row['id']."-".$this -> table."\" class=\"bool-field ";
+							$row[$name] = "<span id=\"".$name."-".$row['id']."-".$this -> getModelClass()."\" class=\"bool-field ";
 							$row[$name] .= $css_class."\" title=\"".I18n::locale($bool_title)."\"><span class=\"slider\"></span></span>";
 						}
 						else
@@ -1675,17 +1717,20 @@ class Model extends ModelBase
 					}
 					
 					if(trim(strval($row[$name])) == '' && $type != 'bool')
-						$row[$name] = "-";
+						$row[$name] = '-';
+
+					$allow_quick_edit = true;
 						
 					if(method_exists($this, "processAdminModelTableFields"))
 					{
 						$processed_value = $this -> processAdminModelTableFields($name, $row_initial);
 						$row[$name] = !is_null($processed_value) ? $processed_value : $row[$name];
-					}						
+						$allow_quick_edit = is_null($processed_value);
+					}
 						
 					$css_quick_change = '';
 					
-					if($this -> checkIfFieldEditable($name))
+					if($this -> checkIfFieldEditable($name) && $allow_quick_edit)
 						if(in_array($type, array("char", "url", "redirect", "email", "phone")))
 							$css_quick_change = ' id="quick-edit-'.$name.'-'.$row['id'].'" class="edit-string"';
 						else if($type == "int" || $type == "float")
@@ -1831,9 +1876,11 @@ class Model extends ModelBase
 		}
 		else if($action_type == 'update')
 		{
+			$url_params = $this -> getAllUrlParams(['parent','pager','filter']);
+
 			$html = "<a title=\"".I18n::locale("edit")."\" href=\"";
-			$html .= $this -> registry -> getSetting('AdminPanelPath')."model/";
-			$html .= "update.php?".$this -> getAllUrlParams(array('parent','model','pager','filter'));
+			$html .= $this -> registry -> getSetting('AdminPanelPath')."?model=".$this -> getModelClass();
+			$html .= "&action=update".($url_params ? "&".$url_params : '');
 			$html .= "&id=".$id."\" class=\"single-action action-".$action_type."\"></a>\n";
 		}
 		
@@ -1854,7 +1901,7 @@ class Model extends ModelBase
 		
 		if($start_id != -1)
 		{
-			$html = "<a href=\"?model=".$this -> getModelClass()."&".$this -> parent_field."=-1\">";
+			$html = "<a href=\"?model=".$this -> getModelClass()."&action=index\">";
 			$html .= I18n::locale('root-catalog')."</a> ";
 			
 			$data = $this -> elements[$this -> parent_field] -> displayPath($start_id);
@@ -1865,7 +1912,7 @@ class Model extends ModelBase
 			if($length)
 				foreach($data as $id => $name)
 					if($i ++ < $length)
-						$html .= "/ <a href=\"?model=".$this -> getModelClass()."&".$this -> parent_field."=".$id."\">".$name."</a> ";
+						$html .= "/ <a href=\"?model=".$this -> getModelClass()."&action=index&".$this -> parent_field."=".$id."\">".$name."</a> ";
 					else
 						$html .= " / <span>".$name."</span>";			
 		}
@@ -2147,7 +2194,7 @@ class Model extends ModelBase
 				$this -> db -> query("DELETE FROM `".$object -> getProperty("linking_table")."` 
 						  		      WHERE `".$object -> getOppositeId()."`='".$id."'");
 		
-		$versions = new Versions($this -> table, $id);
+		$versions = new Versions($this -> getModelClass(), $id);
 		$versions -> clean() -> cleanFiles($content, $this -> defineFilesTypesFields());
 
 		if(!$in_transaction)

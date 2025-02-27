@@ -30,8 +30,8 @@ class Migrations
 	
 	public function __construct($in_console = false)
 	{
-		$this -> registry = Registry :: instance();
-		$this -> db = Database :: instance();
+		$this -> registry = Registry::instance();
+		$this -> db = Database::instance();
 		$this -> in_console = $in_console;
 	}
 
@@ -48,9 +48,9 @@ class Migrations
 	public function scanModels()
 	{
 		if($this -> in_console)
-			$models = Registry :: get('Models');
+			$models = Registry::get('Models');
 		else
-			$models = array_keys(Registry :: get('ModelsLower'));
+			$models = array_keys(Registry::get('ModelsLower'));
 
 		$sql = [];
 		
@@ -62,11 +62,11 @@ class Migrations
 			$model_object = new $model_name();
 
 			$table = $model_object -> getTable();
-			$table_exists = Database :: $adapter -> ifTableExists($table);
+			$table_exists = Database::$adapter -> ifTableExists($table);
 			
 			if(!$table_exists)
 			{				
-				$data = Database :: $adapter -> addTable($model_object, $table);
+				$data = Database::$adapter -> addTable($model_object, $table);
 				$sql = array_merge($sql, $data);
 			}
 			else if(!$model_object -> isSimpleModel())
@@ -81,20 +81,20 @@ class Migrations
 					
 					if($type == "many_to_many")
 					{
-						$sql = Database :: $adapter -> addManyToManyTable($element, $sql);
+						$sql = Database::$adapter -> addManyToManyTable($element, $sql);
 						continue;
 					}
 					
 					if($type == "many_to_one")
 					{
-						$sql = Database :: $adapter -> addManyToOneField($model_object, $element, $sql);
+						$sql = Database::$adapter -> addManyToOneField($model_object, $element, $sql);
 						continue;
 					}
 					
-					if(!Database :: $adapter -> ifTableColumnExists($table, $column))
+					if(!Database::$adapter -> ifTableColumnExists($table, $column))
 					{
 						$key = "add-column-".$table."-".$column;
-						$data = Database :: $adapter -> addTableColumn($model_object, $column);
+						$data = Database::$adapter -> addTableColumn($model_object, $column);
 						$sql[$key] = $data;
 					}
 				}
@@ -126,22 +126,22 @@ class Migrations
 							}
 							
 							if($table_exists && !$to_drop)
-								if(Database :: $adapter -> ifTableIndexExists($table, $index_name, $columns))
+								if(Database::$adapter -> ifTableIndexExists($table, $index_name, $columns))
 									continue;
 								
 							if($table_exists && $to_drop)
-								if(!Database :: $adapter -> ifTableIndexExists($table, $index_name, $columns))
+								if(!Database::$adapter -> ifTableIndexExists($table, $index_name, $columns))
 									continue;
 							
 							if($to_drop)
 							{
 								$key = "drop-index-".$table."-".$field;
-								$sql[$key] = Database :: $adapter -> dropTableColumnIndex($model_object, $field);
+								$sql[$key] = Database::$adapter -> dropTableColumnIndex($model_object, $field);
 							}
 							else
 							{
 								$key = "add-index-".$table."-".$field;
-								$sql[$key] = Database :: $adapter -> addTableColumnIndex($model_object, $field);
+								$sql[$key] = Database::$adapter -> addTableColumnIndex($model_object, $field);
 							}
 						}
 					}
@@ -149,21 +149,21 @@ class Migrations
 					{
 						foreach($data as $field)
 						{
-							if(!$table_exists || !Database :: $adapter -> ifTableColumnExists($table, $field))
+							if(!$table_exists || !Database::$adapter -> ifTableColumnExists($table, $field))
 								continue;
 							
 							$key = "drop-column-".$table."-".$field;
-							$sql[$key] = Database :: $adapter -> dropTableColumn($model_object, $field);
+							$sql[$key] = Database::$adapter -> dropTableColumn($model_object, $field);
 						}
 					}
 					else if($key == "rename_column")
 						foreach($data as $old_name => $new_name)
 						{
-							if(!$table_exists || !Database :: $adapter -> ifTableColumnExists($table, $old_name))
+							if(!$table_exists || !Database::$adapter -> ifTableColumnExists($table, $old_name))
 								continue;
 							
 							$key = "rename-column-".$table."-".$old_name;
-							$sql[$key] = Database :: $adapter -> renameTableColumn($model_object, $old_name, $new_name);
+							$sql[$key] = Database::$adapter -> renameTableColumn($model_object, $old_name, $new_name);
 							
 							if(isset($sql["add-column-".$table."-".$new_name]))
 								unset($sql["add-column-".$table."-".$new_name]);
@@ -190,7 +190,7 @@ class Migrations
 	public function displayMigrationsList()
 	{
 		if(!count($this -> migrations_list))
-			return "<p>Migrations not found.</p>\n";
+			return "<div class=\"flash-message info\"><div>New migrations not found.</div></div>\n";
 		
 		$html = "";
 		
@@ -202,7 +202,7 @@ class Migrations
 			{
 				$parts = explode("-", $key);
 				
-				if(!Database :: $adapter -> ifTableExists($parts[2]))
+				if(!Database::$adapter -> ifTableExists($parts[2]))
 					$can_run = false;
 			}
 			

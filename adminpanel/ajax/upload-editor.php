@@ -1,7 +1,4 @@
 <?php
-include_once "../../config/autoload.php";
-$system = new System("ajax");
-
 $result = [];
 
 if(!isset($_GET['ck-image'], $_FILES['upload']))

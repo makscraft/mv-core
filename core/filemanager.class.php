@@ -62,35 +62,39 @@ class Filemanager
 
 	public function __construct()
 	{
-		$_SESSION['mv']['file_manager'] ??= [];
-		$_SESSION['mv']['file_manager']['path'] ??= Registry :: get('FilesPath');
+		if(Registry::get('BootFromCLI'))
+			return;
+		
+		Session::start('admin_panel');		
+		$data = Session::get('file_manager', []);
+		$data['path'] ??= Registry::get('FilesPath');
 
-		$regexp = Service :: prepareRegularExpression(Registry :: get('FilesPath'));
-		$path = $_SESSION['mv']['file_manager']['path'];
+		$regexp = Service::prepareRegularExpression(Registry::get('FilesPath'));
+		$path = $data['path'];
 		$match = preg_match('/^'.$regexp.'/ui', $path);
 
 		if(!$match || $path === '/' || strpos($path, '..') !== false || !is_dir($path))
-			$path = $_SESSION['mv']['file_manager']['path'] = Registry :: get('FilesPath');
-
-		foreach(self :: FORBIDDEN_FILES as $forbidden)
-			if(realpath($path) == realpath(Registry :: get('FilesPath').$forbidden))
+			$path = $data['path'] = Registry::get('FilesPath');
+		
+		foreach(self::FORBIDDEN_FILES as $forbidden)
+			if(realpath($path) == realpath(Registry::get('FilesPath').$forbidden))
 			{
-				$path = $_SESSION['mv']['file_manager']['path'] = Registry :: get('FilesPath');
+				$path = $data['path'] = Registry::get('FilesPath');
 				break;
 			}
 
-		$this -> in_root = realpath(Registry :: get('FilesPath')) === realpath($path);
+		$this -> in_root = realpath(Registry::get('FilesPath')) === realpath($path);
 
-		$this -> path = preg_replace('/\/$/', '', $path);
-		$_SESSION['mv']['file_manager']['path'] = $this -> path;
-
-		$limit = AdminPanel :: getPaginationLimit();
+		$data['path'] = $this -> path = preg_replace('/\/$/', '', $path);
+		$limit = AdminPanel::getPaginationLimit();
 		$this -> total = $this -> countFilesInDirectory($this -> path);
 
 		if($this -> in_root && $this -> total > 0)
 			$this -> total --;
 
 		$this -> pagination = new Paginator($this -> total, $limit);
+		
+		Session::set('file_manager', $data);
 	}
 
 	public function setUser(User $user)
@@ -107,17 +111,17 @@ class Filemanager
 
 	static public function setCleanupLimit(int $limit)
 	{
-		self :: $cleanup_limit = $limit;
+		self::$cleanup_limit = $limit;
 	}
 
 	static public function getCleanupLimit(): int
 	{
-		return self :: $cleanup_limit;
+		return self::$cleanup_limit;
 	}
 
 	public function displayCurrentPath()
 	{ 
-		$html = Service :: removeFileRoot($this -> path);
+		$html = Service::removeFileRoot($this -> path);
 		$html = str_replace('/', ' / ', $html);
 
 		return '/ '.$html;
@@ -133,17 +137,21 @@ class Filemanager
 	public function navigate(string $path): bool
 	{
 		$path = trim($path);
+		$data = Session::get('file_manager');
+		$current_path = $data['path'];
 
 		if($path === 'back')
 		{
 			if($this -> in_root)
 				return false;
 			
-			$back = realpath($_SESSION['mv']['file_manager']['path'].'/..');
+			
+			$back = realpath($current_path.'/..');
 
 			if($back !== false)
-			{
-				$_SESSION['mv']['file_manager']['path'] = str_replace('\\', '/', $back);
+			{				
+				$data['path'] = str_replace('\\', '/', $back);
+				Session::set('file_manager', $data);
 
 				return true;
 			}
@@ -155,7 +163,8 @@ class Filemanager
 			if($folder == '' || preg_match('/[\.`\/\\\]+/', $folder) || !is_dir($this -> path.'/'.$folder))
 				return false;
 
-			$_SESSION['mv']['file_manager']['path'] .= '/'.$folder;
+			$data['path'] .= '/'.$folder;
+			Session::set('file_manager', $data);
 
 			return true;
 		}
@@ -219,16 +228,16 @@ class Filemanager
 	public function display(array $files): string
 	{
 		clearstatcache();
-		self :: cleanTmpFiles();
+		self::cleanTmpFiles();
 
 		$html = '';
-		$images_types = Registry :: get('AllowedImages');
-		$all_types = Registry :: get('AllowedFiles');
-		$tmp = Registry :: get('FilesPath').'tmp';
+		$images_types = Registry::get('AllowedImages');
+		$all_types = Registry::get('AllowedFiles');
+		$tmp = Registry::get('FilesPath').'tmp';
 		$imager = new Imager();
 		$img_max_weight = 1024 * 1024 * 3;
-		$secret = Registry :: get('SecretCode');
-		$highlight = AdminPanel :: getFlashParameter('highlight') ?? '';
+		$secret = Registry::get('SecretCode');
+		$highlight = Session::get('highlight', '');
 		$can_delete = $this -> user -> checkModelRights('filemanager', 'delete');
 
 		foreach($files as $file)
@@ -240,24 +249,24 @@ class Filemanager
 
 			$params = '-';
 			$disable = false;
-			$href = Service :: removeDocumentRoot($file);
+			$href = Service::removeDocumentRoot($file);
 			$identity = ['type' => '', 'path' => $file, 'token' => md5(filemtime($file).$file.$secret)];
 
 			if(is_dir($file) && $file !== '..')
 			{
-				if(in_array(basename($file), self :: FORBIDDEN_FILES))
+				if(in_array(basename($file), self::FORBIDDEN_FILES))
 					$disable = true;
 
 				$total_in = $this -> countFilesInDirectory($file) - 1;
 				
 				if($total_in > 0)
-					$params = I18n :: locale('number-files', ['number' => $total_in, 'files' => '*number']);
+					$params = I18n::locale('number-files', ['number' => $total_in, 'files' => '*number']);
 
 				$identity['type'] = 'directory';
 			}
 			else if(is_file($file))
 			{
-				$extension = Service :: getExtension($file);
+				$extension = Service::getExtension($file);
 
 				if(!in_array($extension, $all_types) || preg_match('/^\.[^\.]+/', $file))
 					$disable = true;
@@ -267,7 +276,7 @@ class Filemanager
 					{
 						if($extension === 'svg')
 						{
-							$thumb = Service :: removeDocumentRoot($file);
+							$thumb = Service::removeDocumentRoot($file);
 							$params = "<img class=\"svg-image\" src=\"".$thumb."\" alt=\"".basename($file)."\" />\n";
 						}
 						else if(filesize($file) <= $img_max_weight)
@@ -285,7 +294,7 @@ class Filemanager
 						{
 							$params = "<div>\n<a target=\"_blank\" href=\"".$href."\">".$params."</a>\n";
 							
-							if($dimentions = @getimagesize($file))
+							if(Service::checkImageFile($file) && $dimentions = @getimagesize($file))
 								$params .= "<div>".$dimentions[0].' x '.$dimentions[1]." px</div>\n";
 
 							$params .= "</div>\n";
@@ -305,26 +314,26 @@ class Filemanager
 			$html .= "<td class=\"name\">";
 
 			if($file === '..')
-				$html .= "<a href=\"?navigation=back\"> .. ".mb_strtolower(I18n :: locale('back'))."</a>";
+				$html .= "<a href=\"?view=filemanager&navigation=back\"> .. ".mb_strtolower(I18n::locale('back'))."</a>";
 			else if($disable)
 				$html .= basename($file);
 			else if(is_dir($file))
-				$html .= "<a href=\"?navigation=folder-".urlencode(basename($href))."\">".basename($file)."</a>";
+				$html .= "<a href=\"?view=filemanager&navigation=folder-".urlencode(basename($href))."\">".basename($file)."</a>";
 			else
 				$html .= "<a target=\"_blank\" href=\"".$href."\">".basename($file)."</a>";
 
 			$html .= "</td>\n";				
 			
-			$html .= "<td>".(($file === '..' || !$size) ? '-' : I18n :: convertFileSize($size))."</td>\n";			
+			$html .= "<td>".(($file === '..' || !$size) ? '-' : I18n::convertFileSize($size))."</td>\n";			
 			$html .= "<td class=\"params\">".$params."</td>\n";
-			$html .= "<td>".I18n :: timestampToDate(filemtime($file))."</td>\n";
+			$html .= "<td>".I18n::timestampToDate(filemtime($file))."</td>\n";
 
 			if(is_dir($file) && count(scandir($file)) > 2 || !is_writable($file))
 				$disable = true;
 
 			if($file !== '..')
 			{
-				$identity = Service :: encodeBase64(json_encode($identity));
+				$identity = Service::encodeBase64(json_encode($identity));
 				$type = is_file($file) ? 'is-file' : 'is-folder';
 				$css = '';
 
@@ -343,7 +352,7 @@ class Filemanager
 			$html .= "</tr>\n";
 		}
 
-		AdminPanel :: clearFlashParameters();
+		Session::remove('highlight');
 
 		return $html;
 	}
@@ -356,7 +365,7 @@ class Filemanager
 	 */
 	public function uploadFile(string $name)
 	{
-		$folder = Service :: removeFileRoot($this -> path);
+		$folder = Service::removeFileRoot($this -> path);
 		$folder = preg_replace('/^\/?userfiles\/?/', '', $folder);
 		$object = new FileModelElement('File', 'file', $name, ['files_folder' => $folder]);
 		$object -> setValue($_FILES[$name] ?? []);
@@ -365,14 +374,14 @@ class Filemanager
 		if(is_null($object -> getValue()) || !is_file($object -> getValue()))
 		{
 			if($object -> getError())
-				$result['message'] = Model :: processErrorText(['File', $object -> getError()], $object);
+				$result['message'] = Model::processErrorText(['File', $object -> getError()], $object);
 
 			return $result;
 		}
 
 		if(file_exists($this -> path.'/'.$object -> getProperty('file_name')))
 		{
-			$result['message'] = I18n :: locale('file-exists');
+			$result['message'] = I18n::locale('file-exists');
 			return $result;
 		}
 
@@ -380,10 +389,10 @@ class Filemanager
 		{
 			$result = [
 				'success' => true,
-				'message' => I18n :: locale('file-uploaded')
+				'message' => I18n::locale('file-uploaded')
 			];
 
-			AdminPanel :: addFlashParameter('highlight', $this -> path.'/'.$object -> getProperty('file_name'));
+			Session::set('highlight', $this -> path.'/'.$object -> getProperty('file_name'));
 		}
 
 		return $result;
@@ -402,24 +411,24 @@ class Filemanager
 
 		if(preg_match("/[^\w\-\s]/ui", $name))
 		{
-			$result['message'] = I18n :: locale('bad-folder-name');
+			$result['message'] = I18n::locale('bad-folder-name');
 			return $result;
 		}
 		
 		if(file_exists($this -> path.'/'.$name))
 		{
-			$result['message'] = I18n :: locale('folder-exists');
+			$result['message'] = I18n::locale('folder-exists');
 			return $result;
 		}
 
-		if(self :: createDirectory($this -> path.'/'.$name))
+		if(self::createDirectory($this -> path.'/'.$name))
 		{
 			$result = [
 				'success' => true,
-				'message' => I18n :: locale('folder-created')
+				'message' => I18n::locale('folder-created')
 			];
 
-			AdminPanel :: addFlashParameter('highlight', $this -> path.'/'.$name);
+			Session::set('highlight', $this -> path.'/'.$name);
 		}
 
 		return $result;
@@ -432,19 +441,19 @@ class Filemanager
 	public function deleteAction(string $target)
 	{
 		$result = ['success' => false, 'message' => ''];
-		$target = json_decode(Service :: decodeBase64($target), true);
+		$target = json_decode(Service::decodeBase64($target), true);
 
 		if(!is_array($target) || !isset($target['path']))
 			return $result;
 
 		$in_path = $this -> path.'/'.basename($target['path']);
-		$token = md5(filemtime($target['path']).$target['path'].Registry :: get('SecretCode'));
+		$token = md5(filemtime($target['path']).$target['path'].Registry::get('SecretCode'));
 
 		if(!file_exists($target['path']) || $target['token'] !== $token || $in_path !== $target['path'])
 			return $result;
 
 		if(!is_writable($target['path']))
-			$result['message'] = I18n :: locale('no-rights');
+			$result['message'] = I18n::locale('no-rights');
 		else
 		{
 			if($target['type'] === 'file')
@@ -453,7 +462,7 @@ class Filemanager
 				$result['success'] = $this -> deleteFolder($target['path']);
 
 			$key = $result['success'] ? 'done-delete' : 'not-deleted';
-			$result['message'] = I18n :: locale($key);		
+			$result['message'] = I18n::locale($key);		
 		}
 
 		return $result;
@@ -488,7 +497,7 @@ class Filemanager
 	 */
 	public function cleanTmpFiles()
 	{
-		$tmp_folder = Registry :: get('FilesPath').'tmp/';
+		$tmp_folder = Registry::get('FilesPath').'tmp/';
 		$descriptor = $this -> openDirectory($tmp_folder);		
 
 		while(false !== ($file = readdir($descriptor)))
@@ -519,10 +528,10 @@ class Filemanager
 		$tmp_folders = $parents = []; //Folders with temporary images and array of deleted images in main folder
 		$dir = opendir($path);
 
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 		$step = (int) $registry -> getDatabaseSetting('admin_cleanup_step');
-		$start = $step * self :: $cleanup_limit;
-		$stop = $start + self :: $cleanup_limit;
+		$start = $step * self::$cleanup_limit;
+		$stop = $start + self::$cleanup_limit;
 		
 		while(false !== ($file = readdir($dir)))
 		{
@@ -534,21 +543,21 @@ class Filemanager
 			
 			if(filetype($path.$file) == "file") //Files (parents) of temporary copies
 			{
-				self :: $cleanup_count ++;
+				self::$cleanup_count ++;
 
-				if(self :: $cleanup_count < $start)
+				if(self::$cleanup_count < $start)
 					continue;
-				else if(self :: $cleanup_count > $stop)
+				else if(self::$cleanup_count > $stop)
 					break;
 
 				$parents[] = $file;
 			}
 		}
 
-		if(self :: $cleanup_count > $stop)
+		if(self::$cleanup_count > $stop)
 		{
 			$registry -> setDatabaseSetting("admin_cleanup_step", $step + 1);
-			self :: $cleanup_count = "stop";
+			self::$cleanup_count = "stop";
 		}
 
 		closedir($dir);
@@ -579,26 +588,26 @@ class Filemanager
 	
 	static public function makeModelsFilesCleanUp()
 	{
-		$models = array_keys(Registry :: get('ModelsLower'));
-		$path = Registry :: get("FilesPath")."models/";
+		$models = array_keys(Registry::get('ModelsLower'));
+		$path = Registry::get("FilesPath")."models/";
 		
 		foreach($models as $model)
 		{
 			if(is_dir($path.$model."-images/"))
-				Filemanager :: cleanModelImages($path.$model."-images/");
+				Filemanager::cleanModelImages($path.$model."-images/");
 
-			if(self :: $cleanup_count == "stop")
+			if(self::$cleanup_count == "stop")
 				return;
 
 			if(is_dir($path.$model."-files/"))
-				Filemanager :: cleanModelImages($path.$model."-files/");
+				Filemanager::cleanModelImages($path.$model."-files/");
 
-			if(self :: $cleanup_count == "stop")
+			if(self::$cleanup_count == "stop")
 				return;
 		}
 
-		if(self :: $cleanup_count != "stop")
-			Registry :: setDatabaseSetting("admin_cleanup_step", 0);
+		if(self::$cleanup_count != "stop")
+			Registry::setDatabaseSetting("admin_cleanup_step", 0);
 	}
 	
 	static public function deleteOldFiles($path)
@@ -675,7 +684,7 @@ class Filemanager
 		
 		if($descriptor === false)
 		{
-			Debug :: displayError('Unable to open the directory:'.$folder);
+			Debug::displayError('Unable to open the directory:'.$folder);
 			return false;
 		}
 		else 

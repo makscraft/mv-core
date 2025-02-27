@@ -57,11 +57,13 @@ class Paginator
 	 */
 	public function setLimit(int $limit)
 	{
-	   $this -> limit = intval($limit);
-	   $this -> intervals = (int) ceil($this -> total / $this -> limit);
+		$this -> limit = intval($limit);
+		$this -> intervals = (int) ceil($this -> total / $this -> limit);
 
-	   if(!empty($_GET) && isset($_GET['page'])) //If we have current page number in GET we take it
-		  $this -> definePage(intval($_GET['page'])); //and determine the current elements to show on the page
+		if(!empty($_GET) && isset($_GET['page'])) //If we have current page number in GET we take it
+			$this -> definePage(intval($_GET['page'])); //and determine the current elements to show on the page
+
+		return $this;
 	}
  
 	/**
@@ -69,8 +71,10 @@ class Paginator
 	 */
 	public function setTotal(int $total) 
 	{
-	   $this -> total = $total;
-	   $this -> setLimit($this -> limit); //Recount the params
+		$this -> total = $total;
+		$this -> setLimit($this -> limit); //Recount the params
+
+		return $this;
 	}
 
 	/**
@@ -78,7 +82,7 @@ class Paginator
 	 */
 	public function setPage(int $page) 
 	{
-		$this -> definePage($page);
+		return $this -> definePage($page);
 	}
    
 	/**
@@ -148,6 +152,8 @@ class Paginator
          	$this -> page = $page;
          
      	$this -> start = ($this -> page - 1) * $this -> limit;
+
+		 return $this;
    	}   
 
 	/**
@@ -184,7 +190,7 @@ class Paginator
 	public function getState(): array
 	{
 		if($this -> intervals <= 1)
-			$last = $this -> total - 1;
+			$last = $this -> total ? $this -> total - 1 : 0;
 		else if($this -> page < $this -> intervals)
 			$last = ($this -> page * $this -> limit) - 1;
 		else
@@ -192,7 +198,7 @@ class Paginator
 
 		$items_left = ($this -> page - 1) * $this -> limit;
 
-		if($this -> page == $this -> intervals)
+		if($this -> page == $this -> intervals || !$this -> intervals)
 			$items_right = 0;
 		else
 			$items_right = $this -> total - $items_left - $this -> limit;
@@ -203,7 +209,7 @@ class Paginator
 			'page' => $this -> page,
 			'pages_total' => $this -> intervals,
 			'pages_left' => $this -> page - 1,
-			'pages_right' => $this -> intervals - $this -> page,
+			'pages_right' => $this -> intervals ? $this -> intervals - $this -> page : 0,
 			'item_from' => $this -> start,
 			'item_to' => $last,
 			'items_left' => $items_left,
@@ -230,8 +236,18 @@ class Paginator
 			
 		return $this;
 	}
-	
 
+	/**
+	 * Adds more url parameters for current pagination.
+	 * @return self
+	 */
+	public function addMoreUrlParams(string $url_params)
+	{
+		$this -> url_params .= ($this -> url_params ? '&' : '?').$url_params;
+			
+		return $this;
+	}
+	
 	/**
 	 * Returns string of url GET params.
 	 * @return string like page=23

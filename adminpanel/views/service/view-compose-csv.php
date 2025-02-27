@@ -1,20 +1,13 @@
 <?php
-include "../../config/autoload.php";
-
 if(!Http::isGetRequest())
 	exit();
 
 $registry = Registry::instance();
-$system = new System('ajax');
-
-if(!$system -> user -> checkUserLogin())
-	exit();
-
 $csv = new Csv();
 
 if(isset($_GET["model"], $_GET["csv_fields"], $_GET["csv_separator"], $_GET["csv_encoding"]))
-	if($system -> registry -> checkModel($_GET["model"]) && $_GET["csv_fields"])
-		if($system -> user -> checkModelRights($_GET["model"], "update"))
+	if($registry -> checkModel($_GET["model"]) && $_GET["csv_fields"])
+		if($admin_panel -> user -> checkModelRights($_GET["model"], "update"))
 			if(array_key_exists($_GET["csv_separator"], $csv -> getSeparators()) && 
 			   in_array($_GET["csv_encoding"], $csv -> getEncodings()))
 			{

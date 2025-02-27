@@ -47,10 +47,10 @@ class Log extends Model
 		
 		foreach($values as $model_class)
 			if($registry -> checkModel($model_class))
-				{	
-					$object = new $model_class();
-					$values_list[$model_class] = $object -> getName();
-				}
+			{	
+				$object = new $model_class();
+				$values_list[$model_class] = $object -> getName();
+			}
 		
 		natcasesort($values_list);
 		

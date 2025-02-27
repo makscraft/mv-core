@@ -1,47 +1,47 @@
 <?php 
-include "../../config/autoload.php";
-
 Http::isAjaxRequest('post', true);
-$system = new System('ajax');
+$token = Http::fromPost('adminpanel_csrf_token');
+$data = Http::fromPost('id');
 
-if(isset($_POST["id"], $_POST["admin-panel-csrf-token"]) && $_POST["admin-panel-csrf-token"] == $system -> getToken())
-{
-	$id = intval(preg_replace("/.*-(\d+)-.*/", "$1", $_POST['id']));
-	$model = preg_replace("/.*-\d+-(.*)$/", "$1", $_POST['id']);
-	$field = preg_replace("/^(.*)-\d+-.*$/", "$1", $_POST['id']);
-	
-	if($registry -> checkModel($model))
-	{
-		$system -> runModel($model);
+if($admin_panel -> createCSRFToken() !== $token)
+	exit();
+
+$id = intval(preg_replace('/.*-(\d+)-.*/', '$1', $data));
+$model = preg_replace('/.*-\d+-(.*)$/', '$1', $data);
+$field = preg_replace('/^(.*)-\d+-.*$/', '$1', $data);
+
+if(!Registry::checkModel($model))
+	exit();
+
+$model = new $model();
+$model -> loadRelatedData() -> setUser($admin_panel -> user);
 		
-		if($system -> model -> checkRecordById($id) && $system -> model -> checkIfFieldEditable($field) && 
-		   $system -> model -> checkIfFieldVisible($field) && 
-		   $system -> model -> checkDisplayParam('update_actions') && 
-		   $system -> user -> checkModelRights($system -> model -> getModelClass(), "update"))
-		{
-			$system -> model -> setId($id) -> read();
-			$element = $system -> model -> getElement($field);
-			
-			if($element -> getType() != "bool" || 
-			   ($model == "users" && ($id == 1 || $id == $system -> user -> getId())) || 
-			   !$element -> getProperty("quick_change"))
-				exit();
-								
-			$value = $element -> getValue() ? 0 : 1;
-			$argument = ($model == "users") ? 'self-update' : null;
+if($model -> checkRecordById($id) && $model -> checkIfFieldEditable($field) && 
+	$model -> checkIfFieldVisible($field) && 
+	$model -> checkDisplayParam('update_actions') && 
+	$admin_panel -> user -> checkModelRights($model -> getModelClass(), 'update'))
+{
+	$model -> setId($id) -> read();
+	$element = $model -> getElement($field);
+	
+	if($element -> getType() != 'bool' || 
+		($model == 'users' && ($id == 1 || $id == $admin_panel -> user -> getId())) || 
+		!$element -> getProperty('quick_change'))
+		exit();
+						
+	$value = $element -> getValue() ? 0 : 1;
+	$argument = ($model == 'users') ? 'self-update' : null;
 
-			$system -> model -> setValue($field, $value) -> update($argument) -> read();
-			
-			if($system -> model -> getValue($field) != $value)
-				exit();
-			
-			$css_class = $value ? "bool-true" : "bool-false";
-			$bool_title = $value ? "switch-off" : "switch-on";
-			
-			Http::responseJson([
-				'css_class' => $css_class,
-				'title' => I18n::locale($bool_title)
-			]);
-		}
-	}
+	$model -> setValue($field, $value) -> update($argument) -> read();
+	
+	if($model -> getValue($field) != $value)
+		exit();
+	
+	$css_class = $value ? 'bool-true' : 'bool-false';
+	$bool_title = $value ? 'switch-off' : 'switch-on';
+	
+	Http::responseJson([
+		'css_class' => $css_class,
+		'title' => I18n::locale($bool_title)
+	]);
 }

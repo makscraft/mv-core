@@ -24,8 +24,8 @@ class Garbage extends Model
 	public function __construct()
 	{
 		$values_list = [];
-		$db = Database :: instance();
-		$registry = Registry :: instance();
+		$db = Database::instance();
+		$registry = Registry::instance();
 		$values = $db -> getColumn("SELECT DISTINCT `module` FROM `garbage`");
 		
 		foreach($values as $model_class)
@@ -38,17 +38,17 @@ class Garbage extends Model
 		natcasesort($values_list);		
 		$this -> model_elements[0][] = ['values_list' => $values_list];
 		
-		parent :: __construct();
+		parent::__construct();
 	}
 	
 	public function displaySortableTable()
 	{
-		return parent :: displaySortableTable('garbage');
+		return parent::displaySortableTable('garbage');
 	}
 	
 	public function save($model, $row_id, $name, $content)
 	{
-		$content = Service :: serializeArray($content);
+		$content = Service::serializeArray($content);
 		
 		$this -> db -> query("INSERT INTO `".$this -> table."`(`module`,`row_id`,`name`,`content`,`date`)
 							  VALUES(".$this -> db -> secure($model).",'".$row_id."',".$this -> db -> secure($name).",
@@ -61,7 +61,7 @@ class Garbage extends Model
 		$model_object = $this -> registry -> checkModel($content['module']) ? new $content['module']() : null;
 		
 		if($model_object && method_exists($model_object, "beforeFinalDelete"))
-			$model_object -> beforeFinalDelete($content['row_id'], Service :: unserializeArray($content['content']));
+			$model_object -> beforeFinalDelete($content['row_id'], Service::unserializeArray($content['content']));
 		
 		//Final delete sql query
 		$this -> db -> query("DELETE FROM `".$this -> table."` WHERE `id`='".$this -> id."'");
@@ -70,7 +70,7 @@ class Garbage extends Model
 		
 		if($model_object) //Deletes old versions of just deleted record 
 		{
-			$versions -> cleanFiles(Service :: unserializeArray($content['content']), $model_object -> defineFilesTypesFields());
+			$versions -> cleanFiles(Service::unserializeArray($content['content']), $model_object -> defineFilesTypesFields());
 			$versions -> clean();
 		}
 		else
@@ -79,18 +79,18 @@ class Garbage extends Model
 		$name = $this -> tryToDefineName($content);
 		
 		if($this -> user)
-			Log :: write($this -> getModelClass(), $this -> id, $name, $this -> user -> getId(), "delete");		
+			Log::write($this -> getModelClass(), $this -> id, $name, $this -> user -> getId(), "delete");		
 		
 		$this -> updateManyToManyTables();
 		
 		if($model_object && method_exists($model_object, "afterFinalDelete"))
-			$model_object -> afterFinalDelete($content['row_id'], Service :: unserializeArray($content['content']));		
+			$model_object -> afterFinalDelete($content['row_id'], Service::unserializeArray($content['content']));		
 	}
 	
 	public function restore()
 	{
 		$content = $this -> getById();
-		$content['content'] = Service :: unserializeArray($content['content']);
+		$content['content'] = Service::unserializeArray($content['content']);
 		$model = new $content['module']();
 		
 		if($error = $model -> checkUniqueFields($content['content']))
@@ -114,11 +114,16 @@ class Garbage extends Model
 			}
 		}
 		
+		$in_transaction = (method_exists(Database::$pdo, "inTransaction")) ? Database::$pdo -> inTransaction() : true;
+		
+		if(!$in_transaction)
+			$this -> db -> beginTransaction();
+
 		//SQL to get record back to model table
-		$query = "INSERT INTO `".$content['module']."`(".implode(',', $names).") VALUES(".implode(',', $values).")";
+		$query = "INSERT INTO `".$model -> getTable()."`(".implode(',', $names).") VALUES(".implode(',', $values).")";
 
 		if(is_array($content['content']) && count($content['content']) && isset($content['content']['id']) && 
-		   $content['content']['id'] && !$this -> db -> getCount($content['module'], "`id`='".$content['content']['id']."'"))
+		   $content['content']['id'] && !$this -> db -> getCount($model -> getTable(), "`id`='".$content['content']['id']."'"))
 		{
 			if(method_exists($model, "beforeRestore"))
 				if($model -> beforeRestore($content['content']['id'], $content['content']) === false)
@@ -134,16 +139,19 @@ class Garbage extends Model
 			$name = $this -> tryToDefineName($content);
 			
 			if($this -> user)
-				Log :: write($this -> getModelClass(), $this -> id, $name, $this -> user -> getId(), "restore");
+				Log::write($this -> getModelClass(), $this -> id, $name, $this -> user -> getId(), "restore");
 			
 			if(method_exists($model, "afterRestore"))
 				$model -> afterRestore($content['content']['id'], $content['content']);
 				
-			Cache :: cleanByModel($content['module']);
+			Cache::cleanByModel($content['module']);
+
+			if(!$in_transaction)
+				$this -> db -> commitTransaction();
 		}
 		else
 		{
-			$this -> addError(I18n :: locale("error-unique-restore", array("field" => "id")));
+			$this -> addError(I18n::locale("error-unique-restore", array("field" => "id")));
 
 			return false;
 		}

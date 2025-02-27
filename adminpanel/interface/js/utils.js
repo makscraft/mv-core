@@ -6,7 +6,7 @@ $(document).ready(function()
 		$.ajax({
 			type: "POST",
 			data: "continue=1",
-			url: mVobject.adminPanelPath + "ajax/session.php"
+			url: MVobject.adminPanelPath + "?ajax=session"
 		});
 	}
 	
@@ -26,7 +26,7 @@ $(document).ready(function()
 		let selected = false;
 
 		if($(item).val())
-			if(selected = mVobject.convertDateIntoInternational($.trim($(item).val())))
+			if(selected = MVobject.convertDateIntoInternational($.trim($(item).val())))
 				selected = [selected];
 
 		let airDatepickerCalendar = new AirDatepicker(item, {
@@ -45,8 +45,8 @@ $(document).ready(function()
 
 		if(typeof airDatepickerLocale !== 'undefined')
 		{
-			if(mVobject.dateFormat)
-				airDatepickerLocale.dateFormat = mVobject.dateFormat.replace('mm', 'MM');
+			if(MVobject.dateFormat)
+				airDatepickerLocale.dateFormat = MVobject.dateFormat.replace('mm', 'MM');
 
 			airDatepickerCalendar.update({locale: airDatepickerLocale});
 		}
@@ -118,7 +118,8 @@ $(document).ready(function()
 			});
 		}
 		
-		$(this).parents("div.m2m-wrapper").find("input[type='hidden']").val(values.join(","));
+		if(typeof values != 'undefined')
+			$(this).parents("div.m2m-wrapper").find("input[type='hidden']").val(values.join(","));
 	});
 	
 	//Deletes the file and shows back the file input
@@ -161,12 +162,12 @@ $(document).ready(function()
 	function addUploadedMultiImage(element_area_id, data)
 	{
 		let image = "<div class=\"images-wrapper\"><div class=\"controls\" id=\"" + data.image + "\">"; 
-		image += "<span class=\"first\" title=\"" + mVobject.locale("move_first") + "\"></span> ";
-		image += "<span class=\"left\" title=\"" + mVobject.locale("move_left") + "\"></span>";
-		image += "<span class=\"right\" title=\"" + mVobject.locale("move_right") + "\"></span> ";
-		image += "<span class=\"last\" title=\"" + mVobject.locale("move_last") + "\"></span>";
-		image += "<span class=\"comment\" title=\"" + mVobject.locale("add_edit_comment") + "\"></span>";
-		image += "<span class=\"delete\" title=\"" + mVobject.locale("delete") + "\"></span></div>";
+		image += "<span class=\"first\" title=\"" + MVobject.locale("move_first") + "\"></span> ";
+		image += "<span class=\"left\" title=\"" + MVobject.locale("move_left") + "\"></span>";
+		image += "<span class=\"right\" title=\"" + MVobject.locale("move_right") + "\"></span> ";
+		image += "<span class=\"last\" title=\"" + MVobject.locale("move_last") + "\"></span>";
+		image += "<span class=\"comment\" title=\"" + MVobject.locale("add_edit_comment") + "\"></span>";
+		image += "<span class=\"delete\" title=\"" + MVobject.locale("delete") + "\"></span></div>";
 		
 		let big_image = data.small_image.replace("admin/", "");
 		
@@ -194,7 +195,7 @@ $(document).ready(function()
 			return;
 		}
 		
-		$('form.model-elements-form').attr("action", mVobject.adminPanelPath + "ajax/upload-images.php");		
+		$('form.model-elements-form').attr("action", MVobject.adminPanelPath + "?ajax=upload-images");		
 		$(this).parents(element_area_id).find("div.upload-one div.loading").addClass("small-loader");
 		$("#sku-products-combinations input[type='text']").prop("disabled", true);
 		
@@ -207,7 +208,7 @@ $(document).ready(function()
 				$(element_area_id + " div.images-error").remove();
 				$("form div.upload-one div.loading").removeClass("small-loader");
 
-				let errors_message = "<p>" + mVobject.locale("error_data_transfer") + "</p>";
+				let errors_message = "<p>" + MVobject.locale("error_data_transfer") + "</p>";
 				$(element_area_id).prepend("<div class=\"images-error\">" + errors_message + "</div>");
 			}, 
 			success: function(data)
@@ -227,7 +228,7 @@ $(document).ready(function()
         			
        				if(data.wrong_files)
 				    {
-       					errors_message += "<p>" + mVobject.locale("not_uploaded_files");
+       					errors_message += "<p>" + MVobject.locale("not_uploaded_files");
        					errors_message += ": " + data.wrong_files + ".</p>";
 				    }
        				
@@ -267,7 +268,7 @@ $(document).ready(function()
 			if(!number)
 			{
 				area.find("input[type='hidden']").val('');
-				area.prepend("<p class=\"no-images\">" + mVobject.locale("no_images") + "</p>");
+				area.prepend("<p class=\"no-images\">" + MVobject.locale("no_images") + "</p>");
 
 				return;
 			}
@@ -404,8 +405,8 @@ $(document).ready(function()
 	//Filters form processing
 	$("#filters-submit").click(function()
 	{		
-		var values = $("#admin-filters").find(":input, select, :checkbox:checked").serializeArray();
-		var filled_values = [];
+		let values = $("#admin-filters").find(":input, select, :checkbox:checked").serializeArray();
+		let filled_values = [];
 		
 		$.each(values, function(key, val) //Collects only filled fields of form
 		{
@@ -420,8 +421,9 @@ $(document).ready(function()
 		
 		filled_values = filled_values.join("&").replace("initial-form-params=", "");
 		filled_values = filled_values.replace("+", "%2B");
-		var path = document.location.href.replace(/\?.*$/, "");
-		document.location = path + "?" + filled_values;
+
+		let path = document.location.href.replace(/\?.*$/, "");
+		document.location = path + "?" + filled_values + '&action=index';
 		
 		return false;
 	});
@@ -432,9 +434,10 @@ $(document).ready(function()
 		$("#admin-filters input:text").val("");
 		$("#admin-filters select option").removeAttr("selected");
 		
-		var params = $("input[name='initial-form-params']").val();
-		var path = document.location.href.replace(/\?.*$/, "");
-		document.location = path + "?" + params;
+		let params = $("input[name='initial-form-params']").val();
+		let path = document.location.href.replace(/\?.*$/, "");
+
+		document.location = path + "?" + params + '&action=index';
 	});
 	
 	//Submits the search form when press 'enter' in the text field
@@ -478,7 +481,7 @@ $(document).ready(function()
 			$.ajax({
 				type: "POST",
 				dataType: "html",
-				url: mVobject.adminPanelPath + "ajax/filters.php",
+				url: MVobject.adminPanelPath + "?ajax=filters",
 				data: "model=" + model.replace(/^model-/, "") + "&add-filter=" + name,
 				success: function(data)
 				{
@@ -526,12 +529,12 @@ $(document).ready(function()
 	//Change the visibility of model filters in session
 	function changeFilterVisibility(value)
 	{
-		var params = "model=" + mVobject.currentModel + "&show-filters=" + (value ? "1" : "0");
+		let params = "model=" + MVobject.currentModel + "&show-filters=" + (value ? "1" : "0");
 				
 		$.ajax({
 			type: "POST",
 			dataType: "text",
-			url: mVobject.adminPanelPath + "ajax/filters.php",
+			url: MVobject.adminPanelPath + "?ajax=filters",
 			data: params
 		});		
 	}
@@ -559,15 +562,16 @@ $(document).ready(function()
 	//Changes the limit of records per page
 	$("div.pager-limit select").live("change", function()
 	{
-		var params = $(this).parent().find("input").val();
-		var href = mVobject.adminPanelPath;
+		let name = $(this).parent().find("input").attr("name");
+		let params = $(this).parent().find("input").val();
+		let href = MVobject.adminPanelPath;
 		
 		if(params == 'filemanager')
-			href += "controls/filemanager.php?pager-limit=" + this.value;
-		else if(params.match(/search\.php/))
-			href += params + "&pager-limit=" + this.value;
+			href += "?view=filemanager&pager-limit=" + this.value;
+		else if(MVobject.currentView == "search")
+			href += "?view=search&" + name + "=" + params + "&pager-limit=" + this.value;
 		else
-			href += "model/?" + params + "&pager-limit=" + this.value;
+			href += "?" + params + "&action=index&pager-limit=" + this.value;
 		
 		location.href = href;
 	});
@@ -597,16 +601,16 @@ $(document).ready(function()
 	//Starts multi action dialog
 	$("div.multi-actions-menu ul li").click(function()
 	{
-		var css_class = $(this).attr("class");
+		let css_class = $(this).attr("class");
 		
 		if(css_class == "has-no-rights" || css_class == "has-no-rights-0" || css_class == "has-no-rights-1")
 		{
-			$.modalWindow.open(mVobject.locale("no_rights"), {css_class: "alert"});
+			$.modalWindow.open(MVobject.locale("no_rights"), {css_class: "alert"});
 			return;
 		}
 		
-		var multi_action = css_class.replace("multi-", "");
-		var multi_value = "";
+		let multi_action = css_class.replace("multi-", "");
+		let multi_value = "";
 		
 		if(multi_action.match(/-(0|1)$/))
 		{
@@ -634,7 +638,7 @@ $(document).ready(function()
 			$.ajax({
 				type: "POST",
 				data: "check=1",
-				url: mVobject.adminPanelPath + "ajax/session.php",
+				url: MVobject.adminPanelPath + "?ajax=session",
 				success: function(data)
 				{	
 					if(!data)
@@ -642,11 +646,11 @@ $(document).ready(function()
 				}
 			});
 			
-			var pager_limit = parseInt($(this).attr("id").replace("quick-limit-", ""));
+			let pager_limit = parseInt($(this).attr("id").replace("quick-limit-", ""));
 			
 			if(pager_limit > 0)
 			{
-				$.modalWindow.open(mVobject.locale("quick_edit_limit", {number: pager_limit}), {css_class: "alert"});
+				$.modalWindow.open(MVobject.locale("quick_edit_limit", {number: pager_limit}), {css_class: "alert"});
 				return;
 			}
 			
@@ -655,7 +659,7 @@ $(document).ready(function()
 			//Wraps table values into inputs in order to edit them
 			$("#model-table-form td.edit-string, #model-table-form td.edit-number").each(function()
 			{
-				var value = $.trim($(this).html());
+				let value = $.trim($(this).html());
 				
 				if($(this).hasClass("edit-number"))
 					value = value.replace(",", ".").replace(/\s/gi, "");
@@ -678,7 +682,7 @@ $(document).ready(function()
 			//Extra buttons if we have long list of records on our page
 			if($("table.model-table tr").size() > 11)
 			{
-				var extra_buttons = $("input.cancel-quick-edit, input.save-quick-edit").clone();
+				let extra_buttons = $("input.cancel-quick-edit, input.save-quick-edit").clone();
 				extra_buttons.appendTo($("#bottom-actions-menu"));
 			}
 			
@@ -686,23 +690,23 @@ $(document).ready(function()
 			
 			$("input.save-quick-edit").click(function() //Save all values
 			{
-				var params = "model=" + mVobject.currentModel + "&" + $("#model-table-form").serialize();
+				let params = "model=" + MVobject.currentModel + "&" + $("#model-table-form").serialize();
 				
 				$.ajax({
 					type: "POST",
 					dataType: "json",
-					url: mVobject.adminPanelPath + "ajax/quick-edit.php",
+					url: MVobject.adminPanelPath + "?ajax=quick-edit",
 					data: params,
 					success: function(data)
-					{	
+					{
 						if(!data || (data.updated && !data.general_errors && !data.wrong_fields))
 							location.reload();
 						
 						if(data.general_errors) //Top error message
 						{
 							$("div.form-errors").remove();
-							var message = '<div class="form-errors">' + data.general_errors + '</div>';
-							$(message).insertAfter("#model-table h3.column-header").hide().fadeIn(400);
+							let message = '<div class="form-errors">' + data.general_errors + '</div>';
+							$(message).insertAfter("#model-table h3.column-header").hide().fadeIn(500);
 						}
 						
 						$("#model-table-form td").removeClass("quick-error-value");
@@ -719,14 +723,14 @@ $(document).ready(function()
 	{
 		if($(this).hasClass("has-no-rights"))
 		{
-			$.modalWindow.open(mVobject.locale("no_rights"), {css_class: "alert"});
+			$.modalWindow.open(MVobject.locale("no_rights"), {css_class: "alert"});
 			return;
 		}
 		
 		$.ajax({
 			type: "POST",
 			dataType: "text",
-			url: mVobject.adminPanelPath + "ajax/multi-actions.php",
+			url: MVobject.adminPanelPath + "?ajax=multi-actions",
 			data: "empty-recycle-bin=count",
 			success: function(data)
 			{	
@@ -738,10 +742,10 @@ $(document).ready(function()
 					return;
 				}
 				
-				var message = mVobject.locale("delete_many", {number_records: data});
+				var message = MVobject.locale("delete_many", {number_records: data});
 				recycleBinRecordsCount = parseInt(data);
 				$("#message-confirm-delete div.message").removeClass("update").addClass("delete").html(message);
-				$("#message-confirm-delete").overlay(mVobject.paramsForDialogs).load();
+				$("#message-confirm-delete").overlay(MVobject.paramsForDialogs).load();
 				$("#message-confirm-delete #butt-ok").attr("name", "method->emptyRecycleBin");
 			}
 		});
@@ -809,8 +813,8 @@ $(document).ready(function()
 		$.ajax({
 			type: "POST",
 			dataType: "json",
-			url: mVobject.adminPanelPath + "ajax/bool-change.php",
-			data: "id=" + this.id + "&admin-panel-csrf-token=" + $("input[name='admin-panel-csrf-token']").val(),
+			url: MVobject.adminPanelPath + "?ajax=bool-change",
+			data: "id=" + this.id + "&adminpanel_csrf_token=" + $("input[name='adminpanel_csrf_token']").val(),
 			success: function(data)
 			{
 				if(data && data.title && data.css_class)
@@ -872,11 +876,14 @@ $(document).ready(function()
 		
 		$.ajax({ //Writes params into session on the server
 			type: "POST",
-			url: mVobject.adminPanelPath + "ajax/display-fields.php",
-			data: mVobject.urlParams + "&model_display_fields=" + params.join(","),
+			url: MVobject.adminPanelPath + "?ajax=display-fields",
+			data: MVobject.urlParams + "&model_display_fields=" + params.join(","),
 			success: function(data)
 			{
-				location.href = mVobject.adminPanelPath + "model/?" + mVobject.urlParams;
+				let path = MVobject.adminPanelPath + '?'+ MVobject.urlParams;
+				path += '&action=' + MVobject.currentView;
+				
+				location.href = path;
 			}
 		});
 	});
@@ -944,28 +951,28 @@ $(document).ready(function()
   		let field = $(this).parents('div').attr('class').replace(' ordering-area', '');
   		model_field = field.replace(/^move_position_/, '');
   		
-  		if(model_field != mVobject.sortField)
+  		if(model_field != MVobject.sortField)
   		{
-			$.modalWindow.open(mVobject.locale("sort_by_column"), {css_class: "alert"});
+			$.modalWindow.open(MVobject.locale("sort_by_column"), {css_class: "alert"});
   			return;
   		}
-  		else if(mVobject.allParentsFilter)
+  		else if(MVobject.allParentsFilter)
   		{
-  			let data_ = {field: mVobject.allParentsFilter};
-			$.modalWindow.open(mVobject.locale("all_parents_filter", data_), {css_class: "alert"});
+  			let data_ = {field: MVobject.allParentsFilter};
+			$.modalWindow.open(MVobject.locale("all_parents_filter", data_), {css_class: "alert"});
   			return;
   		}
-  		else if(mVobject.relatedParentFilter)
+  		else if(MVobject.relatedParentFilter)
   		{
-  			let data_ = {field: mVobject.relatedParentFilter};
-			$.modalWindow.open(mVobject.locale("parent_filter_needed", data_), {css_class: "alert"});
+  			let data_ = {field: MVobject.relatedParentFilter};
+			$.modalWindow.open(MVobject.locale("parent_filter_needed", data_), {css_class: "alert"});
 
   			return;
   		}
-  		else if(typeof(mVobject.dependedOrderFields[model_field]) != "undefined")
+  		else if(typeof(MVobject.dependedOrderFields[model_field]) != "undefined")
   		{
-  			let data_ = {field: mVobject.dependedOrderFields[model_field]};
-			$.modalWindow.open(mVobject.locale("parent_filter_needed", data_), {css_class: "alert"});
+  			let data_ = {field: MVobject.dependedOrderFields[model_field]};
+			$.modalWindow.open(MVobject.locale("parent_filter_needed", data_), {css_class: "alert"});
 
   			return;
   		}
@@ -984,7 +991,7 @@ $(document).ready(function()
   				break;
   		}
 		
-		let start_order = mVobject.startOrder;
+		let start_order = MVobject.startOrder;
 		let data_for_ajax = [];
 		
 		$("table.model-table tr:gt(0)").each(function()
@@ -996,13 +1003,13 @@ $(document).ready(function()
 			data_for_ajax.push(id.replace(/.*_(\d+)$/, "$1") + "-" + start_order ++);
 		});
 		
-		data_for_ajax = "orders_update_data=" + data_for_ajax.join("_") + "&" + mVobject.urlParams;
+		data_for_ajax = "orders_update_data=" + data_for_ajax.join("_") + "&" + MVobject.urlParams;
 		data_for_ajax += "&model_field=" + model_field;
-		data_for_ajax += "&admin-panel-csrf-token=" + $("input[name='admin-panel-csrf-token']").val();
+		data_for_ajax += "&adminpanel_csrf_token=" + $("input[name='adminpanel_csrf_token']").val();
 		
 		$.ajax({
 			type: "POST",
-			url: mVobject.adminPanelPath + "ajax/orders.php",
+			url: MVobject.adminPanelPath + "?ajax=orders",
 			data: data_for_ajax
 		});
 		
@@ -1013,10 +1020,10 @@ $(document).ready(function()
   	    $("table.model-table tr:eq(" + row.index() + ")").addClass("moved-line");	  
   	});
   	
-  	//Reload the list of versions after pager action
+  	//Reload the list of versions after the paginator action
   	function updateVersionsList(params)
   	{
-  		var version = get_params = "";
+  		let version = get_params = '';
   		
   		if(location.href.match(/\?.*version=\d+/))
   		{
@@ -1025,13 +1032,13 @@ $(document).ready(function()
   		}
   		  		
   		if($("form.model-elements-form").attr("action").match(/current-tab=\d+/))
-  			get_params = "?" + $("form.model-elements-form").attr("action").replace(/.*(current-tab=\d+).*/, "$1");
+  			get_params = "&" + $("form.model-elements-form").attr("action").replace(/.*(current-tab=\d+).*/, "$1");
   		
 		$.ajax({
 			type: "POST",
-			url: mVobject.adminPanelPath + "ajax/versions.php" + get_params,
+			url: MVobject.adminPanelPath + "?ajax=versions" + get_params,
 			dataType: "html",
-			data: mVobject.urlParams + params + version,
+			data: MVobject.urlParams + params + version,
 			success: function(data)
 			{
 				if(!data)
@@ -1050,7 +1057,7 @@ $(document).ready(function()
   	//Vesions pager actions
   	$("#versions-pager div.pager a").live("click", function()
   	{
-  		var versions_page = $(this).attr("href");
+		let versions_page = $(this).attr("href");
   		versions_page = "&versions-page=" + parseInt(versions_page.replace(/.*versions-page=(\d+).*/, "$1"));
   		updateVersionsList(versions_page);
   		
@@ -1060,7 +1067,7 @@ $(document).ready(function()
   	//Sets new limit for versions pager
   	$("#versions-pager div.limit select").live("change", function() 
   	{
-  		var pager_limit = "&versions-pager-limit=" + parseInt($(this).val());
+  		let pager_limit = "&versions-pager-limit=" + parseInt($(this).val());
   		updateVersionsList(pager_limit);
   	});
   	  	
@@ -1091,7 +1098,7 @@ $(document).ready(function()
   		let field = $(this).parents(".m2m-wrapper").find("input[type='hidden']").attr("name");
   		let ids = $(this).parents(".m2m-wrapper").find("input[type='hidden']").val();
   		let this_ = this;
-  		let params = mVobject.urlParams + "&query=" + request + "&field=" + field + "&ids=" + ids;
+  		let params = MVobject.urlParams + "&query=" + request + "&field=" + field + "&ids=" + ids;
 		
   		if(!request)
   		{
@@ -1103,8 +1110,8 @@ $(document).ready(function()
   			params += "&self_id=" + $(this).parents("div.m2m-wrapper").attr("id").replace("group-self-id-", "");
   		
 		$.ajax({
-			type: "GET",
-			url: mVobject.adminPanelPath + "ajax/m2m-search.php",
+			type: "POST",
+			url: MVobject.adminPanelPath + "?ajax=m2m-search",
 			dataType: "html",
 			data: params,
 			success: function(data)
@@ -1153,8 +1160,8 @@ $(document).ready(function()
 		$("#model-form-tabs ul li").removeClass("active");
 		$(this).addClass("active");
 		
-		var group = $(this).attr("id").replace("tab-group-", "");
-		var action = $("form.model-elements-form").attr("action").replace(/&current-tab=\d+/, "");
+		let group = $(this).attr("id").replace("tab-group-", "");
+		let action = $("form.model-elements-form").attr("action").replace(/&current-tab=\d+/, "");
 		action += "&current-tab=" + $(this).attr("id").replace("tab-group-", "");
 		
 		$("form.model-elements-form").attr("action", action);
@@ -1176,8 +1183,8 @@ $(document).ready(function()
 	});
 	
 	//Main global search in admin panel
-    var options = { 
-		serviceUrl: mVobject.adminPanelPath + "ajax/search.php", 
+    let global_search_options = { 
+		serviceUrl: MVobject.adminPanelPath + "?ajax=search", 
 		deferRequestBy: 200,
 		noCache: true,
 		onSelect: function(data, value, elem)
@@ -1186,15 +1193,15 @@ $(document).ready(function()
 		}
     };
 
-    $("#header-search input.string").autocomplete(options);
+    $("#header-search input.string").autocomplete(global_search_options);
     
     //Top alert message in admin panel
     $("#hide-system-warnings").on("click", function()
     {
 		$.ajax({
 			type: "POST",
-			url: mVobject.adminPanelPath + "ajax/switch.php",
-			dataType: "html",
+			url: MVobject.adminPanelPath + "?ajax=autocomplete",
+			dataType: "text",
 			data: "switch-off=warnings",
 			success: function(data)
 			{
@@ -1218,7 +1225,7 @@ $(document).ready(function()
 			
 			$.ajax({
 				type: "POST",
-				url: mVobject.adminPanelPath + "ajax/autocomplete.php",
+				url: MVobject.adminPanelPath + "?ajax=autocomplete",
 				dataType: "text",
 				data: "action=translit&string=" + encodeURIComponent(value),
 				success: function(data)
@@ -1258,14 +1265,14 @@ $(document).ready(function()
 		let params = $(this).attr("id").split("-");
 		
 		if(params[2] == "deny")
-			$.modalWindow.open(mVobject.locale("no_rights"), {css_class: "alert"});
+			$.modalWindow.open(MVobject.locale("no_rights"), {css_class: "alert"});
 		else
 		{
 			let action_key = params[1] + "_one";
-			let message = mVobject.locale(action_key, {name: name});
+			let message = MVobject.locale(action_key, {name: name});
 			
-			var href = "id=" + params[2] + "&admin-model-action-token=" + params[3] + "&action=" + params[1]; 
-			href = mVobject.adminPanelPath + "model/?" + mVobject.urlParams + "&" + href;
+			let href = "id=" + params[2] + "&admin-model-action-token=" + params[3] + "&operation=" + params[1]; 
+			href = MVobject.adminPanelPath + "?" + MVobject.urlParams + "&action=index&" + href;
 			
 			$.modalWindow.open(message, {css_class: params[1], url: href});
 		}
@@ -1294,7 +1301,7 @@ function removeDeletedRecords()
 	$.ajax({
 		type: "POST",
 		dataType: "text",
-		url: mVobject.adminPanelPath + "ajax/multi-actions.php",
+		url: MVobject.adminPanelPath + "?ajax=multi-actions",
 		data: "empty-recycle-bin=process&iterations-left=" + recycleBinDeleteIterations,
 		success: function(data)
 		{
@@ -1323,7 +1330,7 @@ var keepAutocompleteData = {text: "", id: false, field: false};
 //Runs autocomplete for ling lists
 function runAutocomplete(element)
 {
-	var data = mVobject.urlParams.split("&");
+	var data = MVobject.urlParams.split("&");
 	var input_params = {};
 	
 	$("input.autocomplete-input, input.autocomplete-multi").live("keyup", function()
@@ -1344,7 +1351,7 @@ function runAutocomplete(element)
 		input_params.ids = $(element).next().attr("id");
 	
     var options = { 
-	serviceUrl: mVobject.adminPanelPath + "ajax/autocomplete.php", 
+	serviceUrl: MVobject.adminPanelPath + "?service=autocomplete",
 	deferRequestBy: 200,
 	noCache: true,
 	params: input_params,
@@ -1396,11 +1403,11 @@ function exportIntoCSV()
 {
 	if(!$.trim($("input[name='csv_fields']").val()))
 	{
-		$.modalWindow.open(mVobject.locale("select_fields"), {css_class: "alert"});
+		$.modalWindow.open(MVobject.locale("select_fields"), {css_class: "alert"});
 		return;
 	}
 
-	location.href = mVobject.adminPanelPath + "ajax/compose-csv.php?" + $("#csv-settings").serialize();
+	location.href = MVobject.adminPanelPath + "?service=compose-csv&" + $("#csv-settings").serialize();
 }
 
 //Action of import daa from csv file into model's table
@@ -1411,12 +1418,12 @@ function importFromCSV()
 	
 	if(!$.trim($("input[name='csv_fields']").val()))
 	{
-		$.modalWindow.open(mVobject.locale("select_fields"), {css_class: "alert"});
+		$.modalWindow.open(MVobject.locale("select_fields"), {css_class: "alert"});
 		return;
 	}
 	else if(!$("#csv_file").val())
 	{
-		$.modalWindow.open(mVobject.locale("select_csv_file"), {css_class: "alert"});
+		$.modalWindow.open(MVobject.locale("select_csv_file"), {css_class: "alert"});
 		return;
 	}
 	
@@ -1430,7 +1437,7 @@ function importFromCSV()
 			$("div.form-no-errors, div.form-errors").remove();
 			$("#csv-upload-loader").removeClass("small-loader");
 			
-			var message = '<div class="form-errors"><p>' + mVobject.locale("error_data_transfer");
+			var message = '<div class="form-errors"><p>' + MVobject.locale("error_data_transfer");
 			message += request.responseText ? "<br />" + request.responseText : ""; 
 			message += '</p></div>';
 
@@ -1458,7 +1465,7 @@ function importFromCSV()
 //Immediate showing of skin when we change select value by adding of css file
 function applySelectedSkin(select)
 {
-	var path = mVobject.adminPanelPath + "interface/skins/" + $(select).val() + "/skin.css";
+	var path = MVobject.adminPanelPath + "interface/skins/" + $(select).val() + "/skin.css";
 	var css_file = '<link id="skin-css" rel="stylesheet" type="text/css" href="' + path +'" />';
 	
 	$("#skin-css").remove();
@@ -1492,7 +1499,7 @@ function openSkinChooseDialog(skins)
 		$.ajax({
 			type: "POST",
 			dataType: "text",
-			url: mVobject.adminPanelPath + "ajax/display-fields.php",
+			url: MVobject.adminPanelPath + "?ajax=display-fields",
 			data: "set-user-skin=" + $("#choose-skin-select").val(),
 			success: function(data)
 			{

@@ -516,4 +516,15 @@ class Service
 
 		return str_replace('*', '', implode('', $signs)).implode('', $number);
 	}
+
+	/**
+	 * Checks if the image file is readable and has size.
+	 */
+	static public function checkImageFile(string $image): bool
+	{
+		if(!is_file($image))
+			return false;
+
+		return is_readable($image) && filesize($image) > 0;
+	}
 }

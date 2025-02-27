@@ -175,7 +175,7 @@ class Cache
 			return;
 		
 		$keys = Database::instance() -> getColumn("SELECT `key` FROM `".self::CLEANUP_TABLE."` 
-								 					 WHERE `model`='*' OR `model`='".$model."'");
+								 				   WHERE `model`='*' OR `model`='".$model."'");
 
 		foreach($keys as $key)
 			self::cleanByKey($key);

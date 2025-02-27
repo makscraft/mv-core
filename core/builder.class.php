@@ -81,19 +81,20 @@ class Builder
 
 		ob_start();
 		
-		$this -> registry = Registry :: instance(); //Langs and settings
-      	$this -> db = DataBase :: instance(); //Manages database
+		$this -> registry = Registry::instance(); //Langs and settings
+      	$this -> db = DataBase::instance(); //Manages database
       
-      	if($this -> registry -> get('SessionSupport') && !Service :: sessionIsStarted())
-        	session_start(); //Starts the session if needed
+		//Starts the session if needed
+      	if($this -> registry -> get('SessionSupport') && !Service::sessionIsStarted())
+        	Session::start();
       
       	$this -> router = new Router(); //Object to analyze the requested page
       	
       	if(count($this -> router -> getUrlParts()) == 1) //Redirect to index page in some cases
       		if($this -> router -> getUrlPart(0) == 'index' || $this -> router -> getUrlPart(0) == 'index.php')
       		{
-      			header($_SERVER['SERVER_PROTOCOL'].' 301 Moved Permanently');
-      			header('Location: '.$this -> registry -> get('MainPath'));
+      			Http::sendStatusCodeHeader(301);
+      			header('Location: '.Registry::get('MainPath'));
       			exit(); 
       		}
       
@@ -131,9 +132,9 @@ class Builder
 			return $this -> plugins[$name];
 
 		//Automatic models objects lazy creating
-		if(Registry :: checkModel($name))
+		if(Registry::checkModel($name))
 		{
-			$models = Registry :: get('ModelsLower');
+			$models = Registry::get('ModelsLower');
 
 			if(isset($models[$name]))
 				return $this -> models[$models[$name]] = new $name();
@@ -145,7 +146,7 @@ class Builder
 			}
 		}
 
-		$plugins = Registry :: get('PluginsLower');
+		$plugins = Registry::get('PluginsLower');
 
 		if(isset($plugins[$name]))
 			return $this -> plugins[$plugins[$name]];
@@ -226,15 +227,10 @@ class Builder
 	 */
 	public function displayDebugPanel()
 	{
-		if(Registry :: get('DebugPanel') && !Http :: isAjaxRequest())
+		if(Registry::get('DebugPanel') && !Http::isAjaxRequest())
 		{
-			if(Registry :: onDevelopment())
-				include_once Registry :: get('IncludeAdminPath').'controls/debug-panel.php';
-			else if(isset($_SESSION['mv']['user']['id']))
-			{
-				if((new User($_SESSION['mv']['user']['id'])) -> checkUserLogin())
-					include_once Registry :: get('IncludeAdminPath').'controls/debug-panel.php';
-			}
+			if(Registry::onDevelopment())
+				include_once Registry::get('IncludeAdminPath').'controls/debug-panel.php';
 		}
 	}
 
@@ -250,7 +246,7 @@ class Builder
 			return;
 
 		$custom = Registry::get('IncludePath').'views/under-maintenance.php';
-		$base = Registry::get('IncludeAdminPath').'views/under-maintenance.php';
+		$base = Registry::get('IncludeAdminPath').'controls/under-maintenance.php';
 
 		include_once is_file($custom) ? $custom : $base;
 		exit();

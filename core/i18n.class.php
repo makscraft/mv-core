@@ -572,9 +572,8 @@ class I18n
 	 */
 	static public function checkRegion(string $region)
 	{
-		$registry = Registry::instance();
-		$regions = $registry -> getSetting('SupportedRegions');
-		$regions = (is_array($regions) && count($regions)) ? $regions : array($registry -> getSetting('Region'));
+		$regions = Registry::get('SupportedRegions');
+		$regions = (is_array($regions) && count($regions)) ? $regions : [Registry::get('Region')];
 		
 		return in_array($region, $regions);
 	}
@@ -598,13 +597,13 @@ class I18n
 	static public function defineRegion()
 	{
 		$key = self::createRegionCookieKey();
+		$cookie = Http::getCookie($key);
 
-		if(isset($_COOKIE[$key]) && self::checkRegion((string) $_COOKIE[$key]))
-			return (string) $_COOKIE[$key];
+		if($cookie && self::checkRegion($cookie))
+			return $cookie;
 		else
 		{
 			$region = Registry::get('Region');
-
 			return ($region == 'en' && Registry::get('AmericanFix')) ? 'us' : $region;
 		}
 	}

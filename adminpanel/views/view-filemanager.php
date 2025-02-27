@@ -1,52 +1,53 @@
 <?php
-include_once '../../config/autoload.php';
-
-$system = new System();
-$admin_panel = new AdminPanel($system -> user);
-$system -> user -> extraCheckModelRights('file_manager', 'read');
+$admin_panel -> user -> extraCheckModelRights('file_manager', 'read');
 
 $filemanager = new Filemanager();
-$filemanager -> setUser($system -> user) -> setToken($system -> getToken());
+$filemanager -> setUser($admin_panel -> user) -> setToken($admin_panel -> createCSRFToken());
+$filemanager -> pagination -> setUrlParams('view=filemanager');
 $url_params = $filemanager -> pagination -> getUrlParams();
 
 $action_complete = false;
 
-if(isset($_GET['navigation']) && $filemanager -> navigate(strval($_GET['navigation'])))
-	$action_complete = true;
-else if(isset($_GET['pager-limit']) && $admin_panel -> savePaginationLimit($_GET['pager-limit']))
-	$action_complete = true;
+if($navigation = Http::fromGet('navigation'))
+    if($filemanager -> navigate(strval($navigation)))
+	    $action_complete = true;
+
+if($limit = Http::fromGet('pager-limit'))
+    if($admin_panel -> savePaginationLimit($limit))
+        $action_complete = true;
 
 $allowed_actions = ['createFolder', 'uploadFile', 'deleteAction'];
 
 if(isset($_GET['action'], $_POST['csrf_token']) && in_array($_GET['action'], $allowed_actions))
-	if($_POST['csrf_token'] === $system -> getToken())
+	if(Http::fromPost('csrf_token') === $admin_panel -> createCSRFToken())
 	{
-		$action = trim($_GET['action']);
-		$parameter = $_POST['target'] ?? 'target';
+		$action = Http::fromGet('action');
+		$parameter = Http::fromPost('target', 'target');
 		$permission = ($action == 'createFolder' || $action == 'uploadFile') ? 'create' : 'delete';
 
-		$system -> user -> extraCheckModelRights('file_manager', $permission);
+		$admin_panel -> user -> extraCheckModelRights('file_manager', $permission);
 		$result = $filemanager -> $action($parameter);
 
 		if($result['message'] !== '')
-			$admin_panel -> addFlashMessage($result['success'] ? 'success' : 'error', $result['message']);
+			FlashMessages::add($result['success'] ? 'success' : 'error', $result['message']);
 
 		$action_complete = true;
 	}
 
 if($action_complete)
-	$system -> reload('controls/filemanager.php'.($url_params ? '?'.$url_params : ''));
+    Http::reload('view=filemanager'.($url_params ? '&'.$url_params : ''));
 
 CacheMedia::addJavaScriptFile(Registry::get('AdminFolder').'/interface/js/file-manager.js');
 CacheMedia::addCssFile(Registry::get('AdminFolder').'/interface/css/style-filemanager.css');
 $to_display = $filemanager -> prepareFilesForDisplay();
 
-include $registry -> getSetting('IncludeAdminPath').'includes/header.php';
+
+include Registry::get('IncludeAdminPath').'includes/header.php';
 ?>
 <div id="columns-wrapper">
     <div id="filemanager-area">
 		<h3 class="column-header"><?php echo I18n::locale('file-manager'); ?></h3>
-		<?php echo $admin_panel -> displayAndClearFlashMessages(); ?>
+		<?php echo FlashMessages::displayAndClear(); ?>
 		<div id="filemanager-path">
 			<?php echo $filemanager -> displayCurrentPath();  ?>
 		</div>
@@ -64,38 +65,38 @@ include $registry -> getSetting('IncludeAdminPath').'includes/header.php';
 		</form>
 
 		<?php 
-			if($system -> user -> checkModelRights('file_manager', 'create'))
+			if($admin_panel -> user -> checkModelRights('file_manager', 'create'))
 				$submit_button = "type=\"submit\"";
 			else
-				$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(mVobject.locale('no_rights'), {css_class: 'alert'});\"";
+				$submit_button = "type=\"button\" onclick=\"$.modalWindow.open(MVobject.locale('no_rights'), {css_class: 'alert'});\"";
 		?>
 
 		<div id="filemanager-navigation">
-			<div class="buttons">
+			<div class="forms">
 				<section>
 					<h3><?php echo I18n::locale('upload-file'); ?></h3>
-					<form action="?action=uploadFile&<?php echo $url_params; ?>" method="post" enctype="multipart/form-data">
+					<form action="?view=filemanager&action=uploadFile&<?php echo $url_params; ?>" method="post" enctype="multipart/form-data">
 						<input type="file" name="target" />
-						<input type="hidden" name="csrf_token" value="<?php echo $system -> getToken(); ?>" />
+						<input type="hidden" name="csrf_token" value="<?php echo $admin_panel -> createCSRFToken(); ?>" />
 						<input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n::locale('upload'); ?>" />
 					</form>						
 				</section>
 				<section>
 					<h3><?php echo I18n::locale('create-folder'); ?></h3>
-					<form action="?action=createFolder&<?php echo $url_params; ?>" method="post">
+					<form action="?view=filemanager&action=createFolder&<?php echo $url_params; ?>" method="post">
 						<input type="text" class="borderd" name="target" />
-						<input type="hidden" name="csrf_token" value="<?php echo $system -> getToken(); ?>" />
+						<input type="hidden" name="csrf_token" value="<?php echo $admin_panel -> createCSRFToken(); ?>" />
 						<input class="button-light" <?php echo $submit_button; ?> value="<?php echo I18n::locale('create'); ?>" />
 					</form>
 				</section>
 				<section>
-					<form action="?action=deleteAction&<?php echo $url_params; ?>" method="post" id="filemanager-delete-any">
+					<form action="?view=filemanager&action=deleteAction&<?php echo $url_params; ?>" method="post" id="filemanager-delete-any">
 						<input type="hidden" name="target" value="" />
-						<input type="hidden" name="csrf_token" value="<?php echo $system -> getToken(); ?>" />
+						<input type="hidden" name="csrf_token" value="<?php echo $admin_panel -> createCSRFToken(); ?>" />
 					</form>
 				</section>
 			</div>
-			<div>
+			<div class="pagination">
 				<div class="pager-limit">
 					<span><?php echo I18n::locale('pager-limit'); ?></span>
 					<select>
@@ -109,5 +110,5 @@ include $registry -> getSetting('IncludeAdminPath').'includes/header.php';
 	</div>
 </div>
 <?php
-include $registry -> getSetting('IncludeAdminPath').'includes/footer.php';
+include Registry::get('IncludeAdminPath').'includes/footer.php';
 ?>

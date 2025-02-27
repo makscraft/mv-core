@@ -18,7 +18,7 @@ class ImageModelElement extends FileModelElement
 		$preview_height = ($form_frontend && $this -> form_preview_height) ? $this -> form_preview_height : 150;
 		$preview_folder = $form_frontend ? 'filemanager' : 'admin';
 				
-		if($this -> value && file_exists($this -> value))
+		if($this -> value && Service::checkImageFile($this -> value))
 		{
 			$imager = new Imager();
 			$src = $imager -> compress($this -> value, $preview_folder, $preview_width, $preview_height);

@@ -1,6 +1,6 @@
 <?php 
 /**
- * Displays the menus in admin panel, loading language parts via I18n class.
+ * Displays different menus in admin panel, loading language parts via I18n class.
  */
 class Menu 
 {
@@ -13,11 +13,10 @@ class Menu
 
 	public function displayModelsMenu()
 	{
-		if(!count(Registry :: get('ModelsLower')))
+		if(!count(Registry::get('ModelsLower')))
 			return '';
 		
 		$models = $this -> active_models;
-		
 		$columns_number = count($models) < 7 ? 3 : 5;
 		$rows_number = ceil(count($models) / $columns_number);
 		$current_row = $current_column = 1;
@@ -62,7 +61,7 @@ class Menu
 			return "";
 		
 		$html = "<div class=\"multi-actions-menu\">\n";
-		$html .= "<input class=\"button-list\" type=\"button\" value=\"".I18n :: locale('with-selected')."\" />\n";
+		$html .= "<input class=\"button-list\" type=\"button\" value=\"".I18n::locale('with-selected')."\" />\n";
 		$html .= "<ul>\n";
 		
 		$can_update = $user_object -> checkModelRights($model_object -> getModelClass(), "update");
@@ -74,24 +73,24 @@ class Menu
 			
 			if($data['type'] == 'bool')
 			{
-				$html .= "<li class=\"".$css_class."-1\">".$data['caption']." &laquo;".I18n :: locale('yes')."&raquo;</li>\n";
-				$html .= "<li class=\"".$css_class."-0\">".$data['caption']." &laquo;".I18n :: locale('no')."&raquo;</li>\n";
+				$html .= "<li class=\"".$css_class."-1\">".$data['caption']." &laquo;".I18n::locale('yes')."&raquo;</li>\n";
+				$html .= "<li class=\"".$css_class."-0\">".$data['caption']." &laquo;".I18n::locale('no')."&raquo;</li>\n";
 			}
 			else if($data['type'] == 'restore')
 				$html .= "<li class=\"".$css_class."\">".$data['caption']."</li>\n";
 			else if(in_array($data['type'], $types_list))
-				$html .= "<li class=\"".$css_class."\">".I18n :: locale('change-param')." &laquo;".$data['caption']."&raquo;</li>\n";
+				$html .= "<li class=\"".$css_class."\">".I18n::locale('change-param')." &laquo;".$data['caption']."&raquo;</li>\n";
 			else if($data['type'] == 'many_to_many' || $data['type'] == 'group')
 			{
-				$html .= "<li class=\"".$css_class."-add\">".I18n :: locale('add-param')." &laquo;".$data['caption']."&raquo;</li>\n";
-				$html .= "<li class=\"".$css_class."-remove\">".I18n :: locale('remove-param')." &laquo;".$data['caption']."&raquo;</li>\n";
+				$html .= "<li class=\"".$css_class."-add\">".I18n::locale('add-param')." &laquo;".$data['caption']."&raquo;</li>\n";
+				$html .= "<li class=\"".$css_class."-remove\">".I18n::locale('remove-param')." &laquo;".$data['caption']."&raquo;</li>\n";
 			}
 		}
 		
 		$css_class = $user_object -> checkModelRights($model_object -> getModelClass(), "delete") ? "multi-delete" : "has-no-rights";
 		
 		if($model_object -> checkDisplayParam('delete_actions'))
-			$html .= "<li class=\"".$css_class."\">".I18n :: locale('delete')."</li>\n";
+			$html .= "<li class=\"".$css_class."\">".I18n::locale('delete')."</li>\n";
 		
 		return $html."</ul>\n</div>\n";
 	}
@@ -108,7 +107,7 @@ class Menu
 					$caption = ($name != 'id') ? $object -> getCaption() : 'Id';
 					
 					if($object && $object -> getType() == 'parent')
-						$caption = I18n :: locale('child-records');					
+						$caption = I18n::locale('child-records');					
 					
 					$html['selected'] .= "<option value=\"".$name."\">".$caption."</option>\n";
 				}
@@ -120,7 +119,7 @@ class Menu
 					if($object -> getType() == 'text' && !$object -> getProperty('show_in_admin'))
 						continue;
 					
-					$caption = ($object -> getType() == 'parent') ? I18n :: locale('child-records') : $object -> getCaption();
+					$caption = ($object -> getType() == 'parent') ? I18n::locale('child-records') : $object -> getCaption();
 					$html['not-selected'][$caption] = "<option value=\"".$name."\">".$caption."</option>\n";				
 				}
 
@@ -137,18 +136,18 @@ class Menu
 	public function getActiveModels()
 	{
 		$models = [];
-		$list = array_keys(Registry :: get('ModelsLower'));
+		$list = array_keys(Registry::get('ModelsLower'));
 
 		foreach($list as $model)
 		{
 			$object = new $model();
 			
-			$href = Registry :: get('AdminPanelPath').'model/';
+			$href = Registry::get('AdminPanelPath').'?model='.$model;
 
 			if(get_parent_class($object) == 'ModelSimple')
-				$href .= 'index-simple.php';
-			
-			$href .= '?model='.$model;		
+				$href .= '&action=simple';
+			else			
+				$href .= '&action=index';
 			
 			$models[$object -> getName()] = $href;
 		}

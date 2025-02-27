@@ -1,40 +1,40 @@
 <?php
-include_once "../../config/autoload.php";
+include_once '../../config/autoload.php';
+
+if(Http::fromGet('logout') === null && (new AdminPanel) -> checkAnyAuthorization())
+   Http::redirect(Registry::get('AdminPanelPath'));
 
 $registry = Registry::instance();
+$i18n = I18n::instance();
 $login = new Login();
 
-if(isset($_GET["region"]))
+if($region = Http::fromGet('region'))
 {
-	I18n::saveRegion($_GET["region"]);
-	$login -> reload("login/");
+   if(I18n::checkRegion($region))
+	   I18n::saveRegion($region);
+
+	$login -> reload('login/');
 }
 else
 {
-	$i18n = I18n::instance();
 	$region = I18n::defineRegion();
-	$i18n -> setRegion($region);	
+	I18n::setRegion($region);
 }
 
-unset($_SESSION['login']['change-password']);
-$login -> cancelRemember();
-
-if(isset($_GET['logout']) && $_GET['logout'] == Login::getLogoutToken())
+if(Http::fromGet('logout') === Login::getLogoutToken())
 {	
+   $login -> logoutUser() -> cancelRemember();
+   
 	set_time_limit(300);
-	$session = new UserSession(0);
-	$session -> stopSession();
-		
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/");
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/admin/");
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/admin_multi/");
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/admin_record/");
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/redactor/");
-	Filemanager::deleteOldFiles($registry -> getSetting("FilesPath")."tmp/filemanager/");
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/');
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/admin/');
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/admin_multi/');
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/admin_record/');
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/redactor/');
+	Filemanager::deleteOldFiles($registry -> getSetting('FilesPath').'tmp/filemanager/');
 	Filemanager::makeModelsFilesCleanUp();
 
-	unset($_SESSION["login"]);
-	$login -> cancelRemember() -> reload("login/");
+   $login -> reload('login/');
 }
 
 include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
@@ -44,15 +44,7 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
            <div id="login-middle">
 	           <div id="header"><?php echo I18n::locale('authorization'); ?></div>
 	           <form method="post" class="login-form">
-                   <?php
-                       if(isset($_SESSION['login']['message']) && $_SESSION['login']['message'])
-                       {
-                           echo "<div class=\"".$_SESSION['login']['message-css']."\">\n";
-                           echo "<p>".$_SESSION['login']['message']."</p></div>\n";
-                       }
-                       
-                       unset($_SESSION['login']['message'], $_SESSION['login']['message-css']);
-                   ?>              
+                  <?php echo FlashMessages::displayAndClear(); ?>
                   <div class="line">
                      <div class="name"><?php echo I18n::locale('login'); ?></div>
                      <input type="text" name="login" value="" autocomplete="off" />
@@ -72,7 +64,7 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
                   </div>
                   <div class="submit">
                      <input class="submit" type="button" value="<?php echo I18n::locale('login-action'); ?>" />
-                     <input type="hidden" name="admin-login-csrf-token" value="<?php echo Login::getTokenCSRF(); ?>" />
+                     <input type="hidden" name="admin_login_csrf_token" value="<?php echo Login::getTokenCSRF(); ?>" />
                   </div>
                   <div class="remind">
                      <a href="<?php echo $registry -> getSetting('AdminPanelPath'); ?>login/remind.php" class="forgot-password"><?php echo I18n::locale('forgot-password'); ?></a>

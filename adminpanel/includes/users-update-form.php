@@ -1,5 +1,5 @@
 <?php
-if($system -> model -> getId() != 1)
+if($model -> getId() != 1)
 	include_once $registry -> getSetting("IncludeAdminPath")."includes/users-create-form.php";
 else
 {

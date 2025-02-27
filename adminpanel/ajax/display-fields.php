@@ -1,24 +1,26 @@
 <?php
-include "../../config/autoload.php";
-
 Http::isAjaxRequest('post', true);
-$system = new System('ajax');
 
-if(isset($_POST['model'], $_POST['model_display_fields']) && $system -> registry -> checkModel($_POST['model']))
+if(isset($_POST['model'], $_POST['model_display_fields']) && Registry::checkModel($_POST['model']))
 {
-	$system -> runModel($_POST['model']);
+	$model = new $_POST['model']();
 	$passed_fields = explode(',', $_POST['model_display_fields']);
-	$checked_fields = array();
+	$checked_fields = [];
 	
 	foreach($passed_fields as $name)
-		if($system -> model -> getElement($name) || $name == 'id')
+		if($model -> getElement($name) || $name == 'id')
 			$checked_fields[] = $name;
 
+	
 	if(count($checked_fields))
 	{
-		$_SESSION['mv']['settings'][$system -> model -> getModelClass()]['display-fields'] = implode(',', $checked_fields);
-		$system -> user -> saveSettings($_SESSION['mv']['settings']); 
+		$settings = $admin_panel -> updateModelSessionSetting(
+			$model -> getModelClass(),
+			'display-fields',
+			implode(',', $checked_fields));
+
+		$admin_panel -> user -> saveSettings($settings); 
 	}
 }
-else if(isset($_POST['set-user-skin']) && $_POST['set-user-skin'])
-	echo $system -> user -> setUserSkin($_POST['set-user-skin']);
+else if($skin = Http::fromPost('set-user-skin'))
+	Http::responseText($admin_panel -> user -> setUserSkin($skin));
