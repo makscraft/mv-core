@@ -1,11 +1,10 @@
 @font-face {
-    font-family: 'PantonSemiBold';
-    src: url('../fonts/PantonSemiBold.ttf') format('truetype');
-    font-weight: normal;
+    font-family: 'RobotoFlex';
+    src: url('../fonts/RobotoFlex.ttf') format('truetype');
     font-style: normal;
-}			
+  }		
 
-body.debug-page{font: 14px/140% 'PantonSemiBold'; background: #eee;}
+body.debug-page{font: 15px/140% 'RobotoFlex', sans-serif; background: #eee;}
 body.debug-page, body.debug-page *, .mv-debug-panel, .mv-debug-panel *{margin: 0; padding: 0; box-sizing: border-box;}
 #debug-area .inner{width: 92%; margin: 0 auto;}
 #debug-area header{height: 70px; background: #333; margin-bottom: 30px; color: #fff;}
@@ -13,8 +12,8 @@ body.debug-page, body.debug-page *, .mv-debug-panel, .mv-debug-panel *{margin: 0
 #debug-area header div.inner div.version{margin-left: 5%;}
 #debug-area header div.inner div.version-initial{margin-left: auto;}
 
-#debug-area section.content h1{font-size: 30px; margin-bottom: 25px;}
-#debug-area section.content h3{font-size: 20px; margin-bottom: 20px; font-weight: normal; line-height: 27px; 
+#debug-area section.content h1{font-size: 30px; margin-bottom: 25px; font-weight: 500;}
+#debug-area section.content h3{font-size: 22px; margin-bottom: 20px; font-weight: normal; line-height: 27px; 
 max-width: 1300px; padding: 22px; background: #ddd; border-radius: 4px;}
 #debug-area section.content pre{margin-bottom: 30px;}
 #debug-area section.content pre.code{background: #333; color: #fff; padding: 20px; line-height: 22px; border-radius: 4px;}
@@ -25,7 +24,7 @@ max-width: 1300px; padding: 22px; background: #ddd; border-radius: 4px;}
 body .mv-debug-panel{padding: 10px 1%;}
 .mv-debug-panel{min-height: 50px; background: #333; color: #fff !important; position: fixed; width: 97%; bottom: 15px;
 display: flex; align-items: center; z-index: 100000000; left: 1.5%; border-radius: 4px; 
-font: 14px/140% 'PantonSemiBold'; overflow: visible; box-sizing: border-box; transition: all 0.7s ease;}
+font: 14px/140% 'RobotoFlex'; overflow: visible; box-sizing: border-box; transition: all 0.7s ease;}
 .mv-debug-panel > *{margin-right: 3% !important; color: #fff !important; width: auto;}
 .mv-debug-panel > img{width: 40px; cursor: pointer;}
 .mv-debug-panel > div.sql-section{white-space: nowrap;}

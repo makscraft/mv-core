@@ -1,7 +1,6 @@
 @font-face {
-  font-family: 'PantonSemiBold';
-  src: url('../fonts/PantonSemiBold.ttf') format('truetype');
-  font-weight: normal;
+  font-family: 'RobotoFlex';
+  src: url('../fonts/RobotoFlex.ttf') format('truetype');
   font-style: normal;
 }
 
@@ -19,7 +18,7 @@ li{list-style: none;}
 .hidden{display: none !important;}
 
 html{height: 100%;}
-body{margin: 0; color: #eee; font: 14px "PantonSemiBold"; position: relative; height: 100%;
+body{margin: 0; color: #eee; font: 15px/140% 'RobotoFlex', sans-serif; position: relative; height: 100%;
 background: #131313 url("../images/login-back.jpg?33") top center no-repeat; background-size: cover;}
 
 #container{min-width: 700px; margin: 0 auto; position: relative;}
@@ -40,7 +39,7 @@ div.success p{margin: 0 0 1px 0; color: #333;}
 
 form.login-form div.line{display: flex; align-items: center; margin-bottom: 10px;}
 form.login-form div.line div.name{width: 100px; margin-right: 10px}
-form.login-form div.line input[type='text'], form.login-form div.line input[type='password']{height: 26px; 
+form.login-form div.line input[type='text'], form.login-form div.line input[type='password']{height: 30px; 
 padding: 5px 10px; border-radius: 4px; width: 170px; background: #eee}
 form.login-form div.line div.captcha{display: flex; flex-direction: column; align-items: flex-start;}
 form.login-form div.line div.captcha img{border-radius: 4px; margin-bottom: 5px;}
