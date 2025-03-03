@@ -291,7 +291,8 @@ class Http
 
         if(array_key_exists($status, $headers))
         {
-            header($_SERVER['SERVER_PROTOCOL'].' '.$status.' '.$headers[$status]);
+            if(isset($_SERVER['SERVER_PROTOCOL']))
+                header($_SERVER['SERVER_PROTOCOL'].' '.$status.' '.$headers[$status]);
 
             if($exit)
                 exit();
