@@ -81,6 +81,6 @@ var MVobject = {
 			parts[currentFormat.indexOf('dd')],
 		];
 
-		return result.join('-') + ' ' + date.split(/\s+/)[1];
+		return result.join('-') + ' ' + (date.split(/\s+/)[1] ?? '');
 	}
 };

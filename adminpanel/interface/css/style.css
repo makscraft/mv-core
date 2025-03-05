@@ -72,7 +72,8 @@ table.models-list-table td a:hover{background: #eee;}
 #index-icons ul li{height: 160px; margin-right: 2px; background: #f7f6f6; width: 240px;}
 #index-icons ul li.filemanager{margin: 0;}
 #index-icons ul li a{display: block; height: 90px; padding: 75px 20px 0 20px; text-align: center;
-text-decoration: none; color: #666; background-repeat: no-repeat; background-position: center 15px;}
+text-decoration: none; color: #666; background-repeat: no-repeat; background-position: center 15px;
+font-size: 14px; line-height: 20px;}
 #index-icons ul li a span{display: block; margin: 0 0 8px 0; font-size: 18px; color: #333;
 font-weight: 500;}
 #index-icons ul li.users a{background-image: url("../images/index-admins.png");
@@ -490,7 +491,7 @@ div.date-time-set input{width: 250px;}
 #exposeMask{z-index: 1800 !important; opacity: 0.6 !important;}
 
 /* Buttons */
-.button-create, .button-list, .button-light, .button-dark, .modal-button, .button-clear{padding: 6px 20px 7px 20px; 
+.button-create, .button-list, .button-light, .button-dark, .modal-button, .button-clear{padding: 6px 16px 7px 16px; 
 text-decoration: none; color: #fff; font-weight: normal; background: #918b8b; border: none; cursor: pointer; outline: none;}
 .button-dark, .modal-button.cancel, .button-clear{background: none; color: #1464ba; padding: 6px 10px 7px 10px;}
 .button-create{background: #f26061;}
