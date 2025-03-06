@@ -1,7 +1,7 @@
 <?php
 $model = new (Http::fromGet('model'));
 
-if(!$model -> checkDisplayParam('create_actions') || 
+if(!$model -> checkDisplayParam('update_actions') || 
    !$admin_panel -> user -> checkModelRights($model -> getModelClass(), 'read'))
 {
 	$admin_panel -> displayInternalError('error-no-rights');
