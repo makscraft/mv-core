@@ -48,7 +48,7 @@ class Searcher
 			$found = false;
 			
 			foreach($row as $value)
-				if(preg_match("/".$request_re."/ui", strip_tags($value)))
+				if(preg_match("/".$request_re."/ui", strip_tags(strval($value))))
 				{
 					$found = true;		
 					break;

@@ -59,9 +59,9 @@ opacity: 0; display: none;}
 #models-list table{margin: 0 0 0 -17px;}
 #models-list table.models-list-table td a:hover{background: #fff;}
 
-div.index-models{padding: 18px 0 40px 0;}
+div.index-models{padding: 30px 0 26px 0;}
 table.models-list-table{margin: 0 auto;}
-table.models-list-table td{padding: 0 5px 4px 5px; min-width: 170px;}
+table.models-list-table td{padding: 0 6px 4px 6px; min-width: 170px;}
 table.models-list-table td a{color: #1464ba; text-decoration: none; display: inline-block; 
 padding: 3px 12px 4px 12px; border-radius: 2px;}
 table.models-list-table td a:hover{background: #eee;}
@@ -71,10 +71,10 @@ table.models-list-table td a:hover{background: #eee;}
 #index-icons ul{display: flex;}
 #index-icons ul li{height: 160px; margin-right: 2px; background: #f7f6f6; width: 240px;}
 #index-icons ul li.filemanager{margin: 0;}
-#index-icons ul li a{display: block; height: 90px; padding: 75px 20px 0 20px; text-align: center;
+#index-icons ul li a{display: block; padding: 78px 20px 0 20px; text-align: center;
 text-decoration: none; color: #666; background-repeat: no-repeat; background-position: center 15px;
-font-size: 14px; line-height: 20px;}
-#index-icons ul li a span{display: block; margin: 0 0 8px 0; font-size: 18px; color: #333;
+font-size: 14px; line-height: 18px;}
+#index-icons ul li a span{display: block; margin: 0 0 12px 0; font-size: 18px; color: #333;
 font-weight: 500;}
 #index-icons ul li.users a{background-image: url("../images/index-admins.png");
 background-position: center 18px;}
@@ -105,11 +105,11 @@ border-bottom-right-radius: 4px; box-sizing: border-box;  background-size: cover
 #search-results div p.found-text{margin: 0;}
 
 #search-pager{margin: 0 0 5px 0; padding: 5px 0 0 0;}
-#search-pager div.pager-limit{float: none; text-align: left; margin-bottom: 15px;}
+#search-pager div.pager-limit{float: none; text-align: left;}
 #search-pager div.pager{width: auto; float: left; text-align: left; margin-bottom: 0;}
 
 /* Page title */
-h3.column-header{font-size: 30px; font-weight: 500; margin: 0 0 20px 0; display: flex; height: 40px;
+h3.column-header{font-size: 30px; font-weight: 500; margin: 0 0 30px 0; display: flex; height: 40px;
 align-items: flex-end;}
 h3.arrow{background: url("../images/arrow.svg") left no-repeat; padding-left: 9px;}
 #header-navigation{margin-left: auto;}
@@ -130,9 +130,9 @@ align-items: flex-start; display: flex; justify-content: space-between;}
 
 /* Versions area */
 #model-versions{width: 350px; min-height: 50px; position: relative; background: #f1e8e8; border-radius: 4px;}
-#model-versions div.column-inner{padding: 15px 20px 20px 20px}
+#model-versions div.column-inner{padding: 18px 20px 20px 20px}
 #model-versions table{width: 100%;}
-#model-versions table td{font-size: 14px; padding: 6px 7px;}
+#model-versions table td{font-size: 14px; line-height: 18px; padding: 6px;}
 #model-versions table td.number{padding-left: 12px; width: 20px; padding-right: 10px; text-align: center;}
 #model-versions table td.date p.date{margin: 0;}
 #model-versions table td.date p.user{margin: 0;}
@@ -142,7 +142,7 @@ align-items: flex-start; display: flex; justify-content: space-between;}
 #model-versions table td span.arrow{padding-right: 10px; background: url("../images/arrow-right-grey.svg") right no-repeat;}
 #model-versions table tr.active td{background: #fff;}
 #model-versions h3, #model-versions p{margin: 0 0 5px 0;}
-#model-versions h3{font-size: 20px; font-weight: 500; margin: 0 0 15px 0;}
+#model-versions h3{font-size: 20px; font-weight: 500; margin: 0 0 16px 0;}
 
 #model-form-tabs{padding: 0; width: 100%; float: left; border-bottom: 1px solid #918b8b; margin: 0 0 20px 0;}
 #model-form-tabs ul{margin: 0 0 -1px -2px; list-style: none; float: left; padding: 0 0px; overflow: hidden;}
@@ -167,7 +167,7 @@ border-bottom: 1px solid #918b8b; cursor: pointer; background: #eeeded; text-dec
 
 #model-filters{min-height: 100px; width: 220px; background: #f1e8e8; border-radius: 4px; -moz-border-radius: 4px;
 -webkit-border-radius: 4px; padding: 13px 20px 20px 20px; position: relative; overflow: hidden;}
-#model-filters h3{font-weight: 500; font-size: 20px; margin: 0 0 15px 0;}
+#model-filters h3{font-weight: 500; font-size: 20px; margin: 0 0 16px 0;}
 #hide-filters{margin-left: 10px; border: none; background: none; color: #1464ba; font-size: 14px; cursor: pointer;}
 #show-filters{float: right; background: #918b8b url("../images/arrow-right-white.svg") right 17px center no-repeat;
 padding-right: 35px; margin-left: 8px;}
@@ -183,10 +183,11 @@ div.footer-title a:hover{text-decoration: underline;}
 /* Table with model's records */
 #model-table-form{clear: both; overflow: auto; margin: 0 0 20px 0; border-bottom: 1px solid #918b8b;}
 .model-table{width: 100%;}
-.model-table th{text-align: left; border-bottom: 1px solid #918b8b; padding-bottom: 7px; vertical-align: top;
+.model-table th{text-align: left; border-bottom: 1px solid #918b8b; padding-bottom: 10px; vertical-align: top;
 font-weight: normal; line-height: 14px;}
 .model-table th.middle{min-width: 90px; padding-left: 5px; padding-right: 5px;}
 .model-table th a{text-decoration: none; color: #333;}
+.model-table th a:hover{color: #1464ba;}
 .model-table td{padding: 7px 4px; border-bottom-width: 0 !important;}
 .model-table td:has(.single-action){white-space: nowrap;}
 .model-table input[type='checkbox']{position: relative; bottom: -1px; right: -1px;}
@@ -194,8 +195,8 @@ font-weight: normal; line-height: 14px;}
 .model-table td.centered{text-align: center;}
 .model-table th.check-all{padding-left: 4px; width: 40px;}
 .model-table th.actions{width: 85px;}
-.model-table th a.active-asc{padding-right: 17px; background: url("../images/arrow-up.svg") right no-repeat;}
-.model-table th a.active-desc{padding-right: 17px; background: url("../images/arrow-down.svg") right no-repeat;}
+.model-table th a.active-asc{padding-right: 17px; background: url("../images/arrow-up-blue.svg") right no-repeat; color: #1464ba;}
+.model-table th a.active-desc{padding-right: 17px; background: url("../images/arrow-down-blue.svg") right no-repeat; color: #1464ba;}
 .model-table td div{min-width: 120px;}
 .model-table td div.ordering-area{display: flex;}
 .model-table td div span{display: block; width: 12px; height: 17px; cursor: pointer; margin: 0 3px;}
@@ -349,8 +350,8 @@ height: 30px; width: 100%;}
 #admin-filters select[name$='-cond']{width: 118px !important;}
 #admin-filters select option{padding: 0 5px 1px 5px;}
 #admin-filters input[type='checkbox']{margin-right: 4px; position: relative; bottom: 0;}
-#admin-filters .filter-name{margin: 0 0 3px 0; position: relative; clear: both; font-size: 14px;}
-#admin-filters .filter-input{margin: 0 0 12px 0;}
+#admin-filters .filter-name{margin: 0 0 4px 0; position: relative; clear: both; font-size: 14px;}
+#admin-filters .filter-input{margin: 0 0 10px 0;}
 #admin-filters table.admin-date-time-filter{width: 100%; box-sizing: border-box;}
 #admin-filters table.admin-date-time-filter td:first-child{padding: 0 4px 3px 0;}
 #admin-filters table.admin-date-time-filter td:last-child{padding: 0 0 3px 0;}
@@ -420,7 +421,7 @@ padding-right: 0; width: 24px;}
 a.to-children{background: url("../images/arrow.svg") right no-repeat; padding-right: 14px;}
 
 /* Columns management in recods table */
-#top-navigation{width: 100%; float: left; margin: 0 0 20px 0;}
+#top-navigation{width: 100%; float: left; margin: 0 0 25px 0;}
 #fields-list{float: right; position: relative;}
 #fields-list div.list{position: absolute; z-index: 1000; display: none; right: 0px; top: 33px; width: 400px; 
 background: #fff; border: 1px solid #918b8b; box-shadow: 0 0 9px #999; -webkit-box-shadow: 0 0 9px #999; 
@@ -492,7 +493,8 @@ div.date-time-set input{width: 250px;}
 
 /* Buttons */
 .button-create, .button-list, .button-light, .button-dark, .modal-button, .button-clear{padding: 6px 16px 7px 16px; 
-text-decoration: none; color: #fff; font-weight: normal; background: #918b8b; border: none; cursor: pointer; outline: none;}
+text-decoration: none; color: #fff; font-weight: normal; background: #918b8b; border: none; cursor: pointer; 
+outline: none;}
 .button-dark, .modal-button.cancel, .button-clear{background: none; color: #1464ba; padding: 6px 10px 7px 10px;}
 .button-create{background: #f26061;}
 .button-list{background: #918b8b url("../images/arrow-down-white.svg") no-repeat center right 17px; min-width: 185px; 
@@ -541,8 +543,8 @@ width: 15%; color: #1464ba; cursor: pointer;}
 #rights-table span{margin-left: 10px;}
 #rights-table td.model-name{padding-left: 7px; cursor: pointer; color: #1464ba;}
 
-#model-table-form td.edit-string input{width: 95%; border: 1px solid #bbb; padding: 5px; border-radius: 4px;}
-#model-table-form td.edit-number input{width: 70px; border: 1px solid #bbb; padding: 5px; border-radius: 4px;}
+#model-table-form td.edit-string input{width: 95%; border: 1px solid #bbb; padding: 6px; border-radius: 4px;}
+#model-table-form td.edit-number input{width: 70px; border: 1px solid #bbb; padding: 6px; border-radius: 4px;}
 #model-table-form td.quick-error-value input{background-color: #fdf4e1; border: 1px solid #fbd689;
 color: #ff1d1d;}
 
