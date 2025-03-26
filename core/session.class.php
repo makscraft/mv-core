@@ -42,7 +42,7 @@ class Session
             $_SESSION[$key] = [
                 'key' => $key,
                 'ip_hash' => md5($_SERVER['REMOTE_ADDR']),
-                'browser_hash' => md5($_SERVER['HTTP_USER_AGENT']),
+                'browser_hash' => md5($_SERVER['HTTP_USER_AGENT'] ?? ''),
                 'start_time' => time(),
                 'data' => []            
             ];
