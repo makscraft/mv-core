@@ -64,7 +64,7 @@ if(Http::requestHas('login', 'password'))
 			$result['action'] = 'reload';
 		}
 
-		if(Http::isLocalHost() && Http::fromPost('test_token_check', '') !== '')
+		if(Http::isHttps() && Http::isAjaxRequest() && Http::fromPost('test_token_check', '') !== '')
 		{
 			$string = Registry::get('APP_FOLDER').Registry::get('APP_TOKEN');
 			
