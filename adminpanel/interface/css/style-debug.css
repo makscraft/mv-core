@@ -15,8 +15,9 @@ body.debug-page, body.debug-page *, .mv-debug-panel, .mv-debug-panel *{margin: 0
 #debug-area section.content h1{font-size: 30px; margin-bottom: 25px; font-weight: 500;}
 #debug-area section.content h3{font-size: 20px; margin-bottom: 15px; font-weight: normal; line-height: 27px; 
 max-width: 1300px; padding: 20px; background: #fdf4e1; border-radius: 4px; border: 1px solid #fbd689;}
-#debug-area section.content pre{margin-bottom: 30px;}
-#debug-area section.content pre.code{background: #333; color: #fff; padding: 20px; line-height: 22px; border-radius: 4px;}
+#debug-area section.content pre{margin-bottom: 15px;}
+#debug-area section.content pre.code{background: #333; color: #fff; padding: 20px; line-height: 22px; 
+border-radius: 4px; max-width: 1300px;}
 #debug-area section.content pre.code code{color: #f26061; display: block; background: #444;}
 #debug-area section.content pre.code span.line{margin-right: 10px; padding: 0 5px;}
 #debug-area section.content pre.backtrace{max-width: 1300px; white-space: pre-wrap; padding: 20px;
