@@ -98,7 +98,7 @@ class Form
 	/**
 	 * Creates form object from model class name or array of fields.
 	 */
-	public function __construct(mixed $form_source, int $record_id = null)
+	public function __construct(mixed $form_source, $record_id = null)
 	{
 		$this -> i18n = I18n::instance();
 		$this -> registry = Registry::instance();
@@ -237,6 +237,19 @@ class Form
 			}
 			
 		return $values;
+	}
+
+	/**
+	 * Sets the list of values according to form fields keys.
+	 * @return self
+	 */
+	public function setValues(array $source)
+	{
+		foreach($source as $name => $value)
+			if(isset($this -> fields[$name]))
+				$this -> fields[$name] -> setValue($value);
+
+		return $this;
 	}
 
 	/**
