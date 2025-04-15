@@ -1018,7 +1018,7 @@ class Form
 		$files_fields = ['file', 'image', 'multi_images'];
 		$this -> moveUploadedFiles();
 
-		if(!$this -> state['valid'])
+		if(!$this -> state['valid'] && Http::isPostRequest())
 			return '';
 
 		$message = "<ul>\n";
