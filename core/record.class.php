@@ -358,6 +358,9 @@ class Record extends Content
 				$ids = $this -> __get($field);
 				$table = strtolower($element -> getProperty('related_model'));
 
+				if(is_string($ids) && $ids !== '')
+					$ids = explode(',', $ids);
+
 				if(!is_array($ids) || !count($ids))
 					return [];
 
