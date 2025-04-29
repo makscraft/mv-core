@@ -2324,10 +2324,10 @@ class Model extends ModelBase
 		
 		$length = count($parents);
 		$url = $this -> root_path;
-		$html = $url_field = '';
+		$html = '';
 		
-		if($this -> getModelClass() == "pages" && $url_field === '')
-			$url_field = "url";
+		if($this -> getModelClass() == 'pages' && $url_field === '')
+			$url_field = 'url';
 
 		if($length) //If we have any parents we start composing html path
 		{
