@@ -90,6 +90,9 @@ class CharModelElement extends ModelElement
 
 		if($this -> placeholder !== '')
 			$css .= ' placeholder="'.$this -> placeholder.'"';
+
+		if($this -> captcha)
+			$css .= ' autocomplete="off"';
 		
 		$html = "<input type=\"".$type."\" name=\"".$this -> name."\"";
 		$html .= $css." value=\"".$value."\" />\n".$this -> addHelpText();
