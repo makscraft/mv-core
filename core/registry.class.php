@@ -155,9 +155,9 @@ class Registry
 	}
 
 	/**
-	 * Takes settings from .env file and combines them with other config files settings.
+	 * Determines the name of actual .env file.
 	 */
-	public function loadEnvironmentSettings()
+	public function defineEnvFileName(): string
 	{
 		$env = self::$settings['IncludePath'].'.env';
 		
@@ -171,10 +171,47 @@ class Registry
 					$env .= $variant;
 					break;
 				}
-
-			if(!is_file($env))
-				return $this;
 		}
+
+		return $env;
+	}
+
+	/**
+	 * Checks if the actual .env file is available via http request.
+	 */
+	public function checkEnvFileViaHttp(string $file)
+	{
+		if(!is_file($file))
+			return $this;
+
+		$file = Service::removeDocumentRoot($file);
+		$file_http = Service::getAbsoluteHttpPath($file);
+
+		if(strpos(get_headers($file_http)[0], '200 OK') !== false)
+		{
+			$path = dirname($file).'/'.Registry::get('AdminFolder').'/';
+			Registry::set('AdminPanelPath', $path);
+
+			$message = 'Env file "'.$file_http.'" is available via http protocol.';
+			$message .= '<br>It contains sensitive data, so you need to restrict the http access for this file.';
+			$message .= '<br>Usually it can be done in http server settings like .htaccess or nginx.conf files.';
+
+			Debug::displayError($message);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Takes settings from .env file and combines them with other config files settings.
+	 */
+	public function loadEnvironmentSettings()
+	{
+		$env = $this -> defineEnvFileName();
+		$this -> checkEnvFileViaHttp($env);
+
+		if(!is_file($env))
+			return $this;
 
 		$data = parse_ini_file($env, false, INI_SCANNER_TYPED);
 
