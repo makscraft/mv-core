@@ -184,15 +184,13 @@ class Registry
 		if(!is_file($file))
 			return $this;
 
-		$file = Service::removeDocumentRoot($file);
-		$file_http = Service::getAbsoluteHttpPath($file);
+		$file_http = Service::getAbsoluteHttpPath('/'.basename($file));
+		$context = stream_context_create(['http' => ['method' => 'HEAD']]);
+		$headers = get_headers($file_http, false, $context);
 
-		if(strpos(get_headers($file_http)[0], '200 OK') !== false)
+		if(strpos($headers[0], '200 OK') !== false)
 		{
-			$path = dirname($file).'/'.Registry::get('AdminFolder').'/';
-			Registry::set('AdminPanelPath', $path);
-
-			$message = 'Env file "'.$file_http.'" is available via http protocol.';
+			$message = 'The Env file "'.$file_http.'" is available via http protocol.';
 			$message .= '<br>It contains sensitive data, so you need to restrict the http access for this file.';
 			$message .= '<br>Usually it can be done in http server settings like .htaccess or nginx.conf files.';
 
@@ -208,8 +206,7 @@ class Registry
 	public function loadEnvironmentSettings()
 	{
 		$env = $this -> defineEnvFileName();
-		$this -> checkEnvFileViaHttp($env);
-
+		
 		if(!is_file($env))
 			return $this;
 
@@ -241,6 +238,8 @@ class Registry
 		self::$settings['HttpPath'] = self::$settings['DomainName'].self::$settings['MainPath'];
 		self::$settings['HttpAdminPanelPath'] = self::$settings['DomainName'].self::$settings['AdminPanelPath'];
 		self::$settings['EnvFile'] = basename($env);
+
+		$this -> checkEnvFileViaHttp($env);
 
 		return $this;
 	}
