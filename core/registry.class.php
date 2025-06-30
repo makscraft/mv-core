@@ -273,11 +273,16 @@ class Registry
 
 	/**
 	 * Returns one setting by it's key if such key exists.
+	 * @param string $key name of setting
+     * @param string $default value of setting if key not existed
 	 * @return mixed
 	 */
-	static public function get(string $key)
+	static public function get(string $key, mixed $default = null)
 	{
-		return self::getSetting($key);
+		if($key === 'SecretCode' || $key === 'APP_TOKEN')
+			return self::getSetting($key);
+
+		return isset(self::$settings[$key]) ? self::$settings[$key] : $default;
 	}
 	
 	/**
