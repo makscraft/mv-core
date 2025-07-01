@@ -28,7 +28,7 @@ else
 if(version_compare(phpversion(), '8.0', '<'))
 {
 	$message = 'Ensure the application runs on PHP version 8.0 or higher for full compatibility.';
-	include $mvCorePath.'../adminpanel/views/under-maintenance.php';
+	include $mvCorePath.'../adminpanel/controls/under-maintenance.php';
 	exit();
 }
 
