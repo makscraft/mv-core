@@ -737,11 +737,12 @@ class Form
 
 		$html = '';
 		
-		foreach($this -> fields as $key => $object)
+		foreach($allowed_fields as $key)
 		{
-			if(!in_array($key, $allowed_fields))
+			if(!isset($this -> fields[$key]) || $key == 'id')
 				continue;
 
+			$object = $this -> fields[$key];
 			$caption = $object -> getCaption();
 			$type = $object -> getType();
 			
