@@ -1366,6 +1366,10 @@ class Model extends ModelBase
 			
 			$query = "SELECT ".$this -> table.".* ";
 			$query .= "FROM `".$this -> table."` LEFT JOIN `".$object -> getTable()."` ";
+
+			if($this -> table == $object -> getTable())
+				$query .= "same_extra_table ";
+
 			$query .= "ON ".$this -> table.".`".$sort_field_name."`=".$object -> getTable().".`id`";
 		}
 		else //Normal sorting by regular simple fields
