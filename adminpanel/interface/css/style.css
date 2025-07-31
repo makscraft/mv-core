@@ -184,7 +184,7 @@ div.footer-title a:hover{text-decoration: underline;}
 #model-table-form{clear: both; overflow: auto; margin: 0 0 20px 0; border-bottom: 1px solid #918b8b;}
 .model-table{width: 100%;}
 .model-table th{text-align: left; border-bottom: 1px solid #918b8b; padding-bottom: 10px; vertical-align: top;
-font-weight: normal; line-height: 14px;}
+font-weight: normal; line-height: 110%;}
 .model-table th.middle{min-width: 90px; padding-left: 5px; padding-right: 5px;}
 .model-table th a{text-decoration: none; color: #333;}
 .model-table th a:hover{color: #1464ba;}
