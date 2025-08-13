@@ -55,7 +55,7 @@ class MultiImagesModelElement extends CharModelElement
 		$checked = [];
 		
 		foreach($images as $image)
-			if(Service::checkImageFile($image['image']) && @getimagesize($image['image']))
+			if(Service::checkImageFile($image['image']) && (Service::getExtension($image['image']) === 'svg' || @getimagesize($image['image'])))
 				$checked[] = $image;
 
 		$this -> value = json_encode($checked);
@@ -182,30 +182,31 @@ class MultiImagesModelElement extends CharModelElement
 			return;
 		}
 		
-		$size = @getimagesize($file_data['tmp_name']);
+		if($extension !== 'svg')
+		{
+			$size = @getimagesize($file_data['tmp_name']);
+			
+			//Takes size of image and checks for too big images
+			if(!$size || $size[0] > $this -> getOverriddenProperty("max_width") || 
+				$size[1] > $this -> getOverriddenProperty("max_height"))
+			{
+				$this -> error = "too-large-image";
+				return;
+			}
+		}
+
+		$initial_name = Service::translateFileName($file_data['name']);
+		$tmp_name = Service::randomString(30); //New name of file
 		
-		//Takes size of image and checks for too big images
-		if(!$size || $size[0] > $this -> getOverriddenProperty("max_width") || 
-			$size[1] > $this -> getOverriddenProperty("max_height"))
-		{
-			$this -> error = "too-large-image";
-			return;
-		}
-		else
-		{
-			$initial_name = Service::translateFileName($file_data['name']);
-			$tmp_name = Service::randomString(30); //New name of file
+		if($initial_name) //Add name of file in latin letters
+			$tmp_name = $initial_name."-".$tmp_name;
+		
+		$tmp_name = Registry::get('FilesPath')."tmp/".$tmp_name.".".$extension;
+		move_uploaded_file($file_data['tmp_name'], $tmp_name);
 			
-			if($initial_name) //Add name of file in latin letters
-				$tmp_name = $initial_name."-".$tmp_name;
-			
-			$tmp_name = Registry::get('FilesPath')."tmp/".$tmp_name.".".$extension;
-           	move_uploaded_file($file_data['tmp_name'], $tmp_name);
-           		
-			$input_value[] = ['image' => $tmp_name, 'comment' => ''];
-			
-           	return [$tmp_name, $input_value];
-		}
+		$input_value[] = ['image' => $tmp_name, 'comment' => ''];
+		
+		return [$tmp_name, $input_value];
 	}
 
 	public function defineTargetFolder(string $model_name = '')
