@@ -92,7 +92,7 @@ class Http
     }
 
     /**
-     * Sends http header and passed palin text data.
+     * Sends http header and passed plain text data.
      * @param string $text text string for output
      */
     static public function responseText(string $text): void
