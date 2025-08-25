@@ -20,7 +20,7 @@ class Service
 	 */
 	static public function removeFileRoot(string $path = '')
 	{
-		$root = str_replace(['\\', '/'], '\/', Registry::get('IncludePath'));
+		$root = str_replace(["\\\\", "/"], "(\\\\|\/)", Registry::get('IncludePath'));
 		return preg_replace("/^".$root."/", '', $path);
 	}
 	
@@ -31,7 +31,7 @@ class Service
 	 */
 	static public function removeDocumentRoot(string $path = '')
 	{
-		$root = str_replace(['\\', '/'], '\/', Registry::get('DocumentRoot'));
+		$root = str_replace(["\\\\", "/"], "(\\\\|\/)", Registry::get('DocumentRoot'));
 		return preg_replace("/^".$root."/", '', $path);
 	}
 	
