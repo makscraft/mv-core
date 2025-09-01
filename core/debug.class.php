@@ -343,4 +343,12 @@ class Debug
 
 		return implode('', $code);
 	}
+
+	/**
+	 * Checks if PHP was run from CLI.
+	 */
+	static public function isCommandLineInterface(): bool
+	{
+    	return php_sapi_name() === 'cli';
+	}
 }

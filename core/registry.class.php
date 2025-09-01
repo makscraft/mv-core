@@ -239,7 +239,8 @@ class Registry
 		self::$settings['HttpAdminPanelPath'] = self::$settings['DomainName'].self::$settings['AdminPanelPath'];
 		self::$settings['EnvFile'] = basename($env);
 
-		$this -> checkEnvFileViaHttp($env);
+		if(!Debug::isCommandLineInterface())
+			$this -> checkEnvFileViaHttp($env);
 
 		return $this;
 	}
