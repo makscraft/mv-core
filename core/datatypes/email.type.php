@@ -4,7 +4,7 @@
  */
  class EmailModelElement extends CharModelElement
 {
-	protected $format = "/^[-a-z0-9_\.]+@[-a-z0-9_\.]+\.[a-z]{2,5}$/i";
+	protected $format = "/^[-a-z0-9_\.]+@[-a-z0-9_\.]+\.[a-z]{2,8}$/i";
 	
 	public function validate()
 	{
