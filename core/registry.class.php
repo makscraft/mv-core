@@ -47,7 +47,7 @@ class Registry
 			$settings_list['MainPath'] = '/'.preg_replace('/^\/?(.+[^\/])\/?$/', '$1', $settings_list['MainPath']).'/';
 
 		//Some servers have trailing slash in DOCUMENT_ROOT, some not...
-		$settings_list['DocumentRoot'] = preg_replace('/\/$/', '', $_SERVER['DOCUMENT_ROOT']);
+		$settings_list['DocumentRoot'] = preg_replace('/(\\\\|\/)$/', '', $_SERVER['DOCUMENT_ROOT']);
 
 		//Absolute path to userfiles folder
 		$settings_list['FilesPath'] = $settings_list['IncludePath'].$settings_list['FilesPath'].'/';
