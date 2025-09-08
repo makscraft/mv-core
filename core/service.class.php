@@ -518,13 +518,13 @@ class Service
 	}
 
 	/**
-	 * Checks if the image file is readable and has size.
+	 * Checks if the image file is readable, not currupted and has size.
 	 */
 	static public function checkImageFile(string $image): bool
 	{
-		if(!is_file($image))
+		if(!is_file($image) || !is_readable($image) || intval(filesize($image)) <= 0)
 			return false;
 
-		return is_readable($image) && filesize($image) > 0;
+		return (bool) preg_match('/^image\/\w+/u', mime_content_type($image));
 	}
 }
