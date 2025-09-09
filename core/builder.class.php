@@ -211,13 +211,44 @@ class Builder
 	{
 		$url_parts = $this -> router -> getUrlParts();
 
-		if(!isset($url_parts[$index]) || !$url_parts[$index])
+		if(!isset($url_parts[$index]) || $url_parts[$index] == '')
 			$this -> display404();
 		
 		if($condition === 'numeric' && !is_numeric($url_parts[$index]))
 			$this -> display404();
 			
 		return $url_parts[$index];
+	}
+
+	/**
+	 * Searches the record in model according to URL parameters and extra conditions.
+	 * @param string name of model to search the record in
+	 * @param string name of url field in model if exists
+	 * @param array extra conditions in query builder format
+	 * @return object|null Record object of found
+	 */
+	public function defineRecordByParams(string $model, string $url_field = '', array $conditions = []): ?Record
+	{
+		$url_part = $this -> checkUrlPart(1);
+		
+		if(Registry::checkModel($model))
+		{
+			if(is_numeric($url_part))
+				$conditions['id'] = intval($url_part);
+			else if($url_field !== '')
+				$conditions[$url_field] = $url_part;
+			else
+				return null;
+
+			if(null !== $record = $this -> $model -> find($conditions))
+				return $record;
+
+			$this -> display404();
+		}
+		else
+			Debug::displayError('Undefined model name \''.$model.'\' passed as a parameter for defineRecordByParams() method.');
+
+		return null;
 	}
 
 	/**
