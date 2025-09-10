@@ -227,7 +227,7 @@ class Builder
 	 * @param array extra conditions in query builder format
 	 * @return object|null Record object of found
 	 */
-	public function defineRecordByParams(string $model, string $url_field = '', array $conditions = []): ?Record
+	public function findRecordByUrl(string $model, string $url_field = '', array $conditions = []): ?Record
 	{
 		$url_part = $this -> checkUrlPart(1);
 		
@@ -246,7 +246,7 @@ class Builder
 			$this -> display404();
 		}
 		else
-			Debug::displayError('Undefined model name \''.$model.'\' passed as a parameter for defineRecordByParams() method.');
+			Debug::displayError('Undefined model name \''.$model.'\' passed as a parameter for findRecordByUrl() method.');
 
 		return null;
 	}
