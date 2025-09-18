@@ -471,7 +471,7 @@ class Filemanager
 	/**
 	 * Deletes folder in current directory.
 	 */
-	public function deleteFolder(string $path)
+	static public function deleteFolder(string $path)
 	{
 		if(is_dir($path))
 			@rmdir($path);
@@ -482,7 +482,7 @@ class Filemanager
 	/**
 	 * Deletes the one file in current directory.	
 	 */
-	public function deleteFile(string $path)
+	static public function deleteFile(string $path)
 	{
 		if(is_file($path))
 			@unlink($path);
