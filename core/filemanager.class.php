@@ -638,7 +638,6 @@ class Filemanager
 
 		$path = dirname($image_path);
 		$image_name = basename($image_path);
-		$path = preg_replace("/\/$/", "", $path)."/";
 		$tmp_folders = [];
 		$dir = opendir($path);
 		
@@ -655,17 +654,17 @@ class Filemanager
 		
 		foreach($tmp_folders as $folder)
 		{
-			$sub_dir = $path.$folder."/";
+			$sub_dir = $path."/".$folder;
 			$dir = opendir($sub_dir);
 			
 			while(false !== ($file = readdir($dir)))
 			{
-				if($file == "." || $file == ".." || filetype($sub_dir.$file) != "file")
+				if($file == "." || $file == ".." || filetype($sub_dir."/".$file) != "file")
 					continue;
 								
 				if($file == $image_name)
 				{
-					@unlink($sub_dir.$image_name);
+					@unlink($sub_dir."/".$image_name);
 					break;
 				}
 			}
