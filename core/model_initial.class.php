@@ -529,4 +529,24 @@ abstract class ModelInitial
 			
 		return $result;
 	}
+	
+	/**
+	 * Generates html tag for given image file path.
+	 * @param string $path absolute or relative to project root image path
+	 * @param array $params extra parameters for img tag (keys: 'css-class', 'alt-text', 'title')
+	 * @return string html img tag
+	 */
+	static public function displayImage(string $path, array $params = [])
+	{
+		if(is_file($path))
+			$path = Service::removeFileRoot($path);
+		
+		$src = Registry::get('MainPath').$path;
+
+		$params['css-class'] = isset($params['css-class']) ? ' class="'.$params['css-class'].'"' : '';
+		$params['alt-text'] = isset($params['alt-text']) ? ' alt="'.$params['alt-text'].'"' : '';
+		$params['title'] = isset($params['title']) ? ' title="'.$params['title'].'"' : '';
+
+		return "<img".$params['css-class']." src=\"".$src."\"".$params["title"].$params["alt-text"]." />\n";
+	}
 }	
