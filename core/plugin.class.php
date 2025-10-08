@@ -60,5 +60,13 @@ abstract class Plugin extends ModelInitial
 	{		
 		if($method == 'runPager')
 			return $this -> runPaginator($arguments[0], $arguments[1], $arguments[2] ?? null);
+		else
+		{
+			$trace = debug_backtrace();
+			$message = "Call to undefiend method '".$method."' of plugin '".get_class($this)."'";
+			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
+
+			Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);
+		}		
 	}
 }
