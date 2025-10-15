@@ -432,7 +432,8 @@ class Registry
 					return $version;
 
 		//If MV was installed manually without composer
-		return number_format(self::$version, 1);
+		$decimals = self::$version * 10 - floor(self::$version * 10) > 0 ? 2 : 1;
+		return number_format(self::$version, $decimals);
 	}
 
 	/**
