@@ -75,10 +75,10 @@ class ManyToOneModelElement extends ModelElement
 					$result[] = $name;
 		
 		if(count($result))
-			if($this -> display_count) //If we ned to show just number of records
+			if($this -> display_count) //If we need to show just number of records
 			{
-				$href = $object -> registry -> getSetting("AdminPanelPath")."model/?model=";
-				$href .= $object -> getModelClass()."&".$this -> related_field."=".$this -> related_id;
+				$href = $object -> registry -> getSetting("AdminPanelPath")."?model=";
+				$href .= $object -> getModelClass()."&action=index&".$this -> related_field."=".$this -> related_id;
 				$html .= "<a class=\"to-children\" href=\"".$href."\">".I18n :: formatIntNumber(count($result))."</a>";
 			}
 			else

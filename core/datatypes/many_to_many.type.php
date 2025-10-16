@@ -299,8 +299,7 @@ class ManyToManyModelElement extends ModelElement
 			
 			if($object -> getElement($field))
 			{
-				$params = "?model=".strtolower($this -> related_model)."&action=index&";
-				$params .= $field."=".$related_id;
+				$params = "?model=".strtolower($this -> related_model)."&action=index&".$field."=".$related_id;
 				$number = "<a class=\"to-children\" href=\"".$params."\">".$number."</a>\n";
 			}
 			

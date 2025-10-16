@@ -266,7 +266,7 @@ class ParentModelElement extends EnumModelElement
 			
 			if($number) //If we found children of our parent we show the number of them and link to this model with filter
 			{
-				$html = "<a class=\"to-children\" href=\"?model=".strtolower($related_model)."&".$related_object_element -> getName();
+				$html = "<a class=\"to-children\" href=\"?model=".strtolower($related_model)."&action=index&".$related_object_element -> getName();
 				$html .= "=".$id."\">".$number." (".$related_object -> getName().")</a>";
 				 
 				return $html;
