@@ -207,4 +207,23 @@ class Session
 
         return false;
     }
+
+    /**
+     * Gets value right from passed container without switch of current session container.
+     */
+    static public function getFromContainer(string $container, string $key, mixed $default = null)
+    {
+        if($container === '')
+            Debug::displayError('Session container name has not been passed in first argument.');
+
+        if(!self::exists($container) || $key === '')
+            return $default;
+
+        $container_key = self::generateKey($container);
+
+        if(isset($_SESSION[$container_key]['data'][$key]))
+            return $_SESSION[$container_key]['data'][$key];
+        else
+            return $default;
+    }
 }
