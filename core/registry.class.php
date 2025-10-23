@@ -132,6 +132,28 @@ class Registry
 	}
 
 	/**
+	 * Transforms names of models and plugins to camel case.
+	 */
+	public function camelCaseModelsAndPlugins()
+	{
+		$names = [];
+
+		foreach(self::$settings['Models'] as $name)
+			$names[$name] = str_replace(' ', '', ucwords(str_replace('_', ' ', $name)));
+
+		self::$settings['ModelsCamelCase'] = $names;
+		
+		$names = [];
+
+		foreach(self::$settings['Plugins'] as $name)
+			$names[$name] = str_replace(' ', '', ucwords(str_replace('_', ' ', $name)));
+
+		self::$settings['PluginsCamelCase'] = $names;
+
+		return $this;
+	}
+
+	/**
 	 * Creates aliases between old and new names of core classes.
 	 */
 	public function createClassesAliases()
@@ -387,6 +409,24 @@ class Registry
 	}
 
 	/**
+	 * Checks in loaded configurations if the certain model is active.
+	 * @param string $name name of model (class name)
+	 * @return bool
+	 */
+	static public function checkPlugin(string $name)
+	{
+		$lower = strtolower($name);
+
+		if(array_key_exists($lower, self::$settings['PluginsLower']))
+			return true;
+
+		if(in_array($lower, self::$settings['PluginsLower']))
+			return true;
+		
+		return false;
+	}
+
+	/**
 	 * Returns lowercased class name of model by table name.
 	 * @return string
 	 */
@@ -433,6 +473,7 @@ class Registry
 
 		//If MV was installed manually without composer
 		$decimals = self::$version * 10 - floor(self::$version * 10) > 0 ? 2 : 1;
+
 		return number_format(self::$version, $decimals);
 	}
 
@@ -452,5 +493,39 @@ class Registry
 	static public function onProduction()
 	{
 		return self::$settings['Mode'] === 'production';
+	}
+
+	/**
+	 * Creates list of plugins to start automatically after creation of main MV object.
+	 */
+	public function findAutoStartingPlugins()
+	{
+		self::$settings['AutoStartingPlugins'] = [];
+		$old_version = self::getInitialVersion() < 3.2 ? true : false;
+
+		foreach(self::$settings['Plugins'] as $plugin)
+		{
+			$auto_start = $old_version;
+
+			if(class_exists($plugin))
+			{
+				$reflection = new ReflectionClass($plugin);
+
+				if($reflection -> hasProperty('auto_start'))
+				{
+					$property = $reflection -> getProperty('auto_start');
+    				$property -> setAccessible(true);
+					$value = $property -> getDefaultValue();
+
+					if(!$old_version)
+						$auto_start = (bool) $value;
+					else if($value !== null)
+						$auto_start = (bool) $value;
+				}
+			}
+
+			if($auto_start)
+				self::$settings['AutoStartingPlugins'][strtolower($plugin)] = $plugin;
+		}
 	}
 }

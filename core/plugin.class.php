@@ -7,7 +7,7 @@
 abstract class Plugin extends ModelInitial
 {
 	/**
-	 * Url from the domain root including the app folder (if actual)
+	 * Url from the domain root including the app folder (if actual).
 	 * @var string
 	 */
     public $root_path;
@@ -17,11 +17,17 @@ abstract class Plugin extends ModelInitial
 	 * @var object Paginator
 	 */
 	public $paginator;
+
+	/**
+	 * Says if we need to start the plugin right after main MV object (Builder class) is constructed.
+	 * @var bool
+	 */
+	protected $auto_start;
 	
 	public function __construct()
 	{
-		$this -> registry = Registry :: instance(); 
-		$this -> db = DataBase :: instance();
+		$this -> registry = Registry::instance(); 
+		$this -> db = DataBase::instance();
 		$this -> table = $this -> registry -> definePluginTableName(get_class($this));
 		$this -> root_path = $this -> registry -> get('MainPath');
 	}

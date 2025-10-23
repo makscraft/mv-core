@@ -110,8 +110,11 @@ class Builder
 			date_default_timezone_set($time_zone);
 			
 		//Starts all enabled plugins
+		$autostarting_plugins = Registry::get('AutoStartingPlugins');
+
 		foreach($this -> registry -> get('PluginsLower') as $plugin => $lower)
-			$this -> plugins[$lower] = new $plugin();
+			if(array_key_exists($plugin, $autostarting_plugins))
+				$this -> plugins[$lower] = new $plugin();
 		
 		//Creates cache manager if it's enabled
 		if($this -> registry -> get('EnableCache'))
@@ -124,6 +127,7 @@ class Builder
 	 */
 	public function __get($name)
 	{
+		$keep = $name;
 		$name = strtolower($name);
 
 		if(isset($this -> models[$name]))
@@ -146,10 +150,25 @@ class Builder
 			}
 		}
 
-		$plugins = Registry::get('PluginsLower');
+		if(Registry::checkPlugin($name))
+		{
+			$plugins = Registry::get('PluginsLower');
 
-		if(isset($plugins[$name]))
-			return $this -> plugins[$plugins[$name]];
+			if(isset($plugins[$name]))
+				return $this -> plugins[$plugins[$name]] = new $name();
+			else if(in_array($name, $plugins))
+			{
+				$key = array_search($name, $plugins);
+
+				return $this -> plugins[$name] = new $key();
+			}
+		}
+
+		$trace = debug_backtrace();
+		$message = "Attempt to access undefiend property '".$keep."' of main MV object";
+		$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
+
+		Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);
 	}
 	
 	/**

@@ -127,9 +127,6 @@ if(!isset($mvSetupSettings['LoadedFromCache']))
 	$registry -> loadSettings($mvMainSettings);
 	
 	$registry -> loadEnvironmentSettings() -> checkSettingsValues() -> lowerCaseConfigNames();
-	
-	//Saves cache confid file (if we have .env file in root folder)
-	Cache::createMainConfigFile($mvConfigFiles);
 }
 else
 	$registry -> loadSettings($mvSetupSettings);
@@ -215,6 +212,14 @@ register_shutdown_function('fatalErrorHandlerMV');
 //Final general settings
 error_reporting(0);
 ini_set('display_errors', 0);
+
+if(!isset($mvSetupSettings['LoadedFromCache']))
+{
+	$registry -> findAutoStartingPlugins();
+	
+	//Saves cache confid file (if we have .env file in root folder)
+	Cache::createMainConfigFile($mvConfigFiles);
+}
 
 if(isset($mvSetupSettings['HttpOnlyCookie']) && $mvSetupSettings['HttpOnlyCookie'])
 	ini_set('session.cookie_httponly', 1);
