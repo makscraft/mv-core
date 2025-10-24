@@ -226,4 +226,38 @@ class Session
         else
             return $default;
     }
+
+    /**
+     * Puts value right into passed container (if started) without switch of current session container.
+     */
+    static public function addToContainer(string $container, string $key, mixed $value)
+    {
+        if($container === '')
+            Debug::displayError('Session container name has not been passed in first argument.');
+        
+        if(!self::exists($container))
+            Debug::displayError("Session container is not started. You need to run Session::start('".$container."') before.");
+
+        $container_key = self::generateKey($container);
+
+        if($key)
+            $_SESSION[$container_key]['data'][$key] = $value;
+    }
+
+    /**
+     * Removes the value by key right from passed container without switch of current session container.
+     */
+    static public function removeFromContainer(string $container, string $key)
+    {
+        if($container === '')
+            Debug::displayError('Session container name has not been passed in first argument.');
+
+        if(!self::exists($container) || $key === '')
+            return;
+
+        $container_key = self::generateKey($container);
+
+        if(isset($_SESSION[$container_key]['data'][$key]))
+            unset($_SESSION[$container_key]['data'][$key]);
+    }
 }
