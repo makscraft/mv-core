@@ -561,7 +561,7 @@ class Auth
             return null;
 
         if(null === $element = self::$model -> findElementByProperty('type', 'email'))
-            return '';
+            return null;
 
         $email_field = $element -> getName();
         $base = self::getCryptoBase();
