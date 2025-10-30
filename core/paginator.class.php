@@ -150,6 +150,9 @@ class Paginator
          	$this -> page = $this -> intervals;
       	else
          	$this -> page = $page;
+
+		if($this -> page <= 0)
+			$this -> page = 1;
          
      	$this -> start = ($this -> page - 1) * $this -> limit;
 
