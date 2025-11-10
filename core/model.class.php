@@ -2302,7 +2302,7 @@ class Model extends ModelBase
 		return $records;
 	}
 	
-	public function displayBreadcrumbs(int $id, string $url_first, $url_field = '')
+	public function displayBreadcrumbs(int $id, string $url_first = '', $url_field = '')
 	{
 		$parents = [];
 		$linked_tree = false;
