@@ -135,7 +135,7 @@ class Debug
 
 		if(!Registry::get('BootFromCLI'))
 			echo "\n<style>
-					html, body{margin:0; padding: 0; background: #eee;}
+					html, body{margin:0; padding: 0; background: #222;}
 					pre{margin: 0;}
 					pre:nth-child(2n){background: #2d2d2d !important;}
 				</style>\n";
