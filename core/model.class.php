@@ -2352,12 +2352,12 @@ class Model extends ModelBase
 				if($url_data && array_key_exists($id, $url_data) && $url_data[$id][$url_field]) //If we have url field
 				{
 					if($this -> getModelClass() == "pages") //Pages model has no first url part
-						$href .= $url_data[$id][$url_field]."/";
+						$href .= $url_data[$id][$url_field];
 					else
-						$href .= $url_first."/".$url_data[$id][$url_field]."/";
+						$href .= $url_first."/".$url_data[$id][$url_field];
 				} 
 				else 
-					$href .= $url_first."/".$id."/"; //Simple url with just id
+					$href .= $url_first."/".$id; //Simple url with just id
 				
 				if(($length && !$linked_tree) || $linked_tree)
 					$html .= "<a href=\"".$href."\">".$name."</a>\n"; //Links path
