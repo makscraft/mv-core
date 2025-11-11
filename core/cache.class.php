@@ -78,6 +78,9 @@ class Cache
 			//If this cache is deleted by any action in admin panel
 			if(!count($checked_models))
 				$checked_models[] = '*';
+
+			if($lifetime > 0)
+				$content = serialize($content);
 		}
 		else //New version of code
 		{
@@ -85,17 +88,18 @@ class Cache
 				$checked_models[] = '*';
 
 			$content = serialize($content);
-			$lifetime = $lifetime > 0 ? time() + $lifetime : 0;
-
+			
 			if(random_int(1, 10) == 10)
 				self::cleanByLifetime();
 		}
+
+		$lifetime = $lifetime > 0 ? time() + $lifetime : 0;
 				
 		$this -> db -> beginTransaction();
 
 		$this -> cleanByKey($key); //Deletes old cache with such key
 
-		if(Registry::getInitialVersion() < 3.0)
+		if(Registry::getInitialVersion() < 3.0 && $lifetime === 0)
 			$query = "INSERT INTO `".self::CONTENT_TABLE."` (`key`,`content`)
 					  VALUES(".$this -> db -> secure($key).",".$this -> db -> secure($content).")";
 		else
@@ -135,7 +139,7 @@ class Cache
 									   	WHERE `key`=".$this -> db -> secure($key));
 
 		if(is_array($value))
-			if(Registry::getInitialVersion() < 3.0)
+			if(Registry::getInitialVersion() < 3.0 && !isset($value['until']))
 				return $value['content'];
 			else if(intval($value['until']) === 0 || time() < intval($value['until']))
 				return unserialize($value['content']);
