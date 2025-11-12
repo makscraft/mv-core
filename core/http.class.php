@@ -72,6 +72,7 @@ class Http
     {
         $json = json_encode($json, $flags);
 
+        header_remove('X-Powered-By');
         header('Content-Type: application/json');
         echo $json;
         exit();
@@ -86,6 +87,7 @@ class Http
         if(strpos($xml, '<?xml version=') === false)
             $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".$xml;
 
+        header_remove('X-Powered-By');
         header('Content-Type: application/xml');
         echo trim($xml);
         exit();
@@ -97,6 +99,7 @@ class Http
      */
     static public function responseText(string $text): void
     {
+        header_remove('X-Powered-By');
         header('Content-Type: text/plain');
         echo trim($text);
         exit();
@@ -302,5 +305,18 @@ class Http
             if($exit)
                 exit();
         }
+    }
+
+    /**
+     * Returns client IP address, including proxy and load balancer.
+     */
+    static public function getIpAddress(): string
+    {
+        if(!empty($_SERVER['HTTP_CLIENT_IP']))
+            return $_SERVER['HTTP_CLIENT_IP'];
+        else if(!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+        return $_SERVER['REMOTE_ADDR'];
     }
 }
