@@ -174,13 +174,22 @@ class Auth
     }
 
     /**
-     * Removes one authorized user from state data? usually after logout.
+     * Removes one authorized user from state data usually after logout.
      */
-    static protected function removeAuthorizedUser(string $model)
+    static protected function removeAuthorizedUser()
     {
-        if(!is_null(self::$current) && isset(self::$users[self::$current]))
+        if(self::hasAuthorizedUser())
             unset(self::$users[self::$current]);
     }
+
+    /**
+     * Checks if we have authorized user of current mdel state.
+     */
+    static public function hasAuthorizedUser(): bool
+    {
+        return !is_null(self::$current) && isset(self::$users[self::$current]);
+    }
+
 
     /* Login and logout */
 
@@ -253,6 +262,22 @@ class Auth
         }
         
         return null;
+    }
+
+    /**
+     * Creates token for url to check before logout.
+     */
+    static public function generateLogoutToken()
+    {
+        if(!self::hasAuthorizedUser())
+            return null;
+        
+        $session_key = self::$containers[self::$current]['session_key'];
+        $user = self::$users[self::$current]['id'];
+        $ip = Session::getParameter('ip_hash');
+        $browser = Session::getParameter('browser_hash');
+
+        return Service::createHash($session_key.self::$current.$user.$ip.$browser, 'random');
     }
 
     /**
