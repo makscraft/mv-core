@@ -397,6 +397,15 @@ class Form
 	{
 		return $this -> setValue($key, $value);	
 	}
+
+	/**
+	 * Checks if the form has certain field.
+	 * @return object|null
+	 */
+	public function hasField(string $field): bool
+	{
+		return array_key_exists($field, $this -> fields) && is_object($this -> fields[$field]);
+	}	
 	
 	/**
 	 * Returns form field object.
