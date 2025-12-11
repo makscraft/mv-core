@@ -535,13 +535,12 @@ class Filemanager
 		
 		while(false !== ($file = readdir($dir)))
 		{
-			if($file == "." || $file == "..")
+			if($file == '.' || $file == '..')
 				continue;
 			
-			if(filetype($path.$file) == "dir") //Collects all temporary directories
+			if(is_dir($path.$file))
 				$tmp_folders[] = $file;
-			
-			if(filetype($path.$file) == "file") //Files (parents) of temporary copies
+			else if(is_file($path.$file))
 			{
 				self::$cleanup_count ++;
 
@@ -556,15 +555,16 @@ class Filemanager
 
 		if(self::$cleanup_count > $stop)
 		{
-			$registry -> setDatabaseSetting("admin_cleanup_step", $step + 1);
-			self::$cleanup_count = "stop";
+			$registry -> setDatabaseSetting('admin_cleanup_step', $step + 1);
+			self::$cleanup_count = 'stop';
 		}
 
 		closedir($dir);
 		
-		foreach($tmp_folders as $folder) //Search the temporary copies of deleted file
+		//Search the temporary copies of deleted file
+		foreach($tmp_folders as $folder)
 		{
-			$sub_dir = $path.$folder."/"; //Directory to open
+			$sub_dir = $path.$folder.'/';
 
 			if(!is_dir($sub_dir))
 				continue;
@@ -573,10 +573,10 @@ class Filemanager
 			
 			while(false !== ($file = readdir($dir)))
 			{
-				if($file == "." || $file == ".." || filetype($sub_dir.$file) != "file")
+				if($file == '.' || $file == '..' || !is_file($sub_dir.$file))
 					continue;
 								
-				$real_name = str_replace($folder."_", "", $file); //Takes real name of file
+				$real_name = str_replace($folder.'_', '', $file); //Takes real name of file
 
 				if(!in_array($real_name, $parents)) //If the temp copy not related to any initial file we delete it
 					@unlink($sub_dir.$file);
@@ -624,7 +624,7 @@ class Filemanager
 				if($file == '.' || $file == '..' || preg_match('/^\./', $file))
 					continue;
 					
-				if(filetype($path.$file) == 'file' && (time() - filemtime($path.$file)) >= 10800)
+				if(is_file($path.$file) && (time() - filemtime($path.$file)) >= 10800)
 					@unlink($path.$file);
 			}
 	}
@@ -641,12 +641,12 @@ class Filemanager
 		$tmp_folders = [];
 		$dir = opendir($path);
 		
-		while(false !== ($file = readdir($dir)))
+		while(false !== $file = readdir($dir))
 		{
-			if($file == "." || $file == "..")
+			if($file == '.' || $file == '..')
 				continue;
 			
-			if(filetype($path."/".$file) == "dir")
+			if(is_dir($path.'/'.$file))
 				$tmp_folders[] = $file;			
 		}
 
@@ -654,17 +654,17 @@ class Filemanager
 		
 		foreach($tmp_folders as $folder)
 		{
-			$sub_dir = $path."/".$folder;
+			$sub_dir = $path.'/'.$folder;
 			$dir = opendir($sub_dir);
 			
-			while(false !== ($file = readdir($dir)))
+			while(false !== $file = readdir($dir))
 			{
-				if($file == "." || $file == ".." || filetype($sub_dir."/".$file) != "file")
+				if($file == '.' || $file == '..' || !is_file($sub_dir.'/'.$file))
 					continue;
 								
 				if($file == $image_name)
 				{
-					@unlink($sub_dir."/".$image_name);
+					@unlink($sub_dir.'/'.$image_name);
 					break;
 				}
 			}

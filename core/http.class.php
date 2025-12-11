@@ -224,12 +224,10 @@ class Http
      */
     static public function redirect(string $url = '', int $status = 302)
     {
-        if($url === '')
+        if($url === '' || $url === '/')
             $url = Registry::get('MainPath');
         else if(!preg_match('/^(\/|https?:)/', $url))
             $url = Registry::get('MainPath').$url;
-        else if(preg_match('/^\//', $url))
-            $url = Registry::get('MainPath').preg_replace('/^\//', '', $url);
 
         self::sendStatusCodeHeader($status);
         header('Location: '.$url);
