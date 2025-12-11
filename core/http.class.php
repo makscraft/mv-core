@@ -222,12 +222,14 @@ class Http
     /**
      * Executes redirect to passed url with status code.
      */
-    static public function redirect(string $url, int $status = 302)
+    static public function redirect(string $url = '', int $status = 302)
     {
-        if(!preg_match('/^(\/|https?:)/', $url))
-            $url = Registry::get('MainPath').$url;
-        else if($url === '/')
+        if($url === '')
             $url = Registry::get('MainPath');
+        else if(!preg_match('/^(\/|https?:)/', $url))
+            $url = Registry::get('MainPath').$url;
+        else if(preg_match('/^\//', $url))
+            $url = Registry::get('MainPath').preg_replace('/^\//', '', $url);
 
         self::sendStatusCodeHeader($status);
         header('Location: '.$url);
