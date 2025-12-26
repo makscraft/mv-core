@@ -331,12 +331,12 @@ class Registry
 	 * Gets one setting by it's key from common settings db table named 'settings'.
 	 * @return mixed
 	 */
-	static public function getDatabaseSetting(string $key)
+	static public function getDatabaseSetting(string $key, mixed $default)
 	{
 		$db = Database::instance();
+		$value =  $db -> getCell("SELECT `value` FROM `settings` WHERE `key`=".$db -> secure($key));
 
-		return $db -> getCell("SELECT `value` FROM `settings` 
-							   WHERE `key`=".$db -> secure($key));
+		return ($value === null || $value === false) ? $default : $value;
 	}
 	
 	/**
