@@ -1,4 +1,7 @@
 <?php
+/**
+ * Search manager to look for records in all active MV modeles accordin to passed text pattern.
+ */
 class Searcher
 {
     /**
@@ -7,10 +10,49 @@ class Searcher
 	 */
 	public $db;
 
+	/**
+	 * Models rows total numbers cache, to speed up the search.
+	 * @var array
+	 */
+	protected $totals = [];
+
+	/**
+	 * Max allowed records limit in model for search in it.
+	 */
+	public const MODEL_ROWS_LIMIT = 5000;
+
+	/**
+	 * Max allowed records limit in model for search in it (if ajax autocomplete).
+	 */
+	public const MODEL_ROWS_LIMIT_AJAX = 2000;
+
     public function __construct()
 	{
         $this -> db = Database::instance();
+		
+		if(null === $totals = AdminPanel::getAdminPanelSettingCacheValue('admin_search_models', 'totals'))
+		{
+			$totals = [];
+
+			foreach(array_keys(Registry::get('ModelsLower')) as $model)
+				$totals[$model] = (new $model) -> countRecords();
+
+			AdminPanel::saveAdminPanelSettingCacheValue('admin_search_models', 'totals', $totals, 60 * 10);
+		}
+
+		$this -> totals = $totals;
     }
+
+	public function allow($model, $is_ajax = false): bool
+	{
+		if(isset($this -> totals[$model]) && $this -> totals[$model] > 0)
+		{
+			$limit = $is_ajax ? self::MODEL_ROWS_LIMIT_AJAX : self::MODEL_ROWS_LIMIT;
+			return $this -> totals[$model] <= $limit;
+		}
+
+		return false;
+	}
 
     public function searchInAllModels(string $request)
 	{
@@ -28,7 +70,7 @@ class Searcher
 				$model = $result["models"][$row["model"]];
 				$name = $model -> tryToDefineName($row);
 			
-				if(preg_match("/^".$request_re."$/ui", $name)) //Exact un name matches go upper
+				if(preg_match("/^".$request_re."$/ui", $name)) //Exact name matches go upper
 				{
 					array_unshift($sorted_result, $row);
 					unset($result["rows"][$key]);
@@ -139,23 +181,24 @@ class Searcher
 		}
 		
 		return [
-			"number" => count($sorted_result),
-			"html" => $html_strings
+			'number' => count($sorted_result),
+			'html' => $html_strings
 		];
 	}
 	
 	public function searchInAllModelsAjax(string $request, bool $full_search)
 	{
-		$fields_types = array("char", "email", "redirect", "url");
+		$fields_types = ['char', 'email', 'redirect', 'url'];
 		$results = $model_objects = $full_results = [];
-		$request_sql = $this -> db -> secure("%".$request."%"); //Prepare search phrase
+		$request_sql = $this -> db -> secure('%'.$request.'%'); //Prepare search phrase
 		$limit = 10;
 		
-		if(mb_strlen($request, "utf-8") < 2) //Too short request
+		if(mb_strlen($request, 'utf-8') < 2) //Too short request
 			return $results;
-		
+
 		foreach(array_keys(Registry::get('ModelsLower')) as $model_name)
-			$model_objects[$model_name] = new $model_name(); //Creates models objects
+			if($this -> allow($model_name, !$full_search))
+				$model_objects[$model_name] = new $model_name(); //Creates models objects
 		
 		//Search in all allowed fields exept for text type
 		$search_data = $this -> searchData($model_objects, $request_sql, $fields_types);
@@ -168,20 +211,20 @@ class Searcher
 			foreach($row as $field => $value)
 				if(in_array($field, $search_data["fields"])) //If it's allowed field
 				{
-					$value = mb_strtolower(strip_tags(strval($value)), "utf-8");
+					$value = mb_strtolower(strip_tags(strval($value)), 'utf-8');
 					$value = htmlspecialchars_decode($value, ENT_QUOTES);
 								
 					if(preg_match("/".Service::prepareRegularExpression($request)."/ui", $value))
 						if(!in_array($value, $results))
 							$results[] = $value; //Adds new value for autocompllete
 										
-					if(count($results) >= $limit && !$full_search) //If its limit for autocomplete
+					if(count($results) >= $limit && !$full_search) //If its limit for ajax autocomplete
 						return $results;
 				}
 
 		if($full_search || count($results) < $limit) //Next step of search, goes throught text fields
 		{
-			$search_data = $this -> searchData($model_objects, $request_sql, array("text"));
+			$search_data = $this -> searchData($model_objects, $request_sql, ['text']);
 			
 			if($full_search) //Search results preparing for search page of admin panel
 			{
@@ -203,7 +246,10 @@ class Searcher
 				foreach($full_results as $key => $rows)
 					$final_full_results = array_merge($final_full_results, $rows);
 						
-				return array("models" => $model_objects, "rows" => $final_full_results);
+				return [
+					'models' => $model_objects,
+					'rows' => $final_full_results
+				];
 			}
 			
 			foreach($search_data["rows"] as $row) //Ajax autocomplete results process
@@ -234,19 +280,22 @@ class Searcher
 	private function searchData(array $models, string $request_sql, array $types)
 	{
 		$rows = $fields = [];
-		
+
 		foreach($models as $model) //Search in all passed models
 		{
-			$simple_model = (get_parent_class($model) == "ModelSimple");
+			$simple_model = (get_parent_class($model) === 'ModelSimple');
 			$query = [];
+			$fields_sql = ['id'];
 			
 			foreach($model -> getElements() as $object)
 				if(in_array($object -> getType(), $types))
 				{
-					if($object -> getType() == "text" && $object -> getProperty("display_method"))
-						continue;
+					if($object -> getType() == 'text')
+						if($object -> getProperty('display_method') || $object -> getProperty('virtual'))
+							continue;
 					
 					$fields[] = $object -> getName();
+					$fields_sql[] = $object -> getName();
 					
 					//SQL query preparing
 					if($simple_model)
@@ -255,16 +304,18 @@ class Searcher
 						$query[] = "`".$object -> getName()."` LIKE ".$request_sql;
 				}
 				
-			if(!count($query)) //If no fields for search
+			if(!count($query)) //If no fields for search in current model
 				continue;
-									
-			$query = "SELECT * FROM `".$model -> getTable()."` WHERE ".implode(" OR ", $query);
-			$found_rows = $this -> db -> getAll($query); //Search SQL query
+			
+			//Search SQL query executiom
+			$fields_sql = $simple_model ? '*' : '`'.implode('`, `', $fields_sql).'`';
+			$query = "SELECT ".$fields_sql." FROM `".$model -> getTable()."` WHERE ".implode(" OR ", $query);
+			$found_rows = $this -> db -> getAll($query);
 			
 			if(!count($found_rows))			
 				continue;
 			
-			if($simple_model) //Results from simple models process
+			if($simple_model) //Results from simple models search
 			{
 				$simple_row = [];
 				
@@ -273,15 +324,18 @@ class Searcher
 					
 				$simple_row["id"] = 0;
 				$simple_row["simple_model"] = true;
-				$found_rows = array($simple_row);
+				$found_rows = [$simple_row];
 			}
 			
 			foreach($found_rows as $key => $row)
 				$found_rows[$key]["model"] = $model -> getModelClass();
 				
-			$rows = array_merge($rows, $found_rows); //Result rows			
+			$rows = array_merge($rows, $found_rows);
 		}			
 		
-		return array("rows" => $rows, "fields" => $fields);
+		return [
+			'rows' => $rows,
+			'fields' => array_unique($fields)
+		];
 	}
 }

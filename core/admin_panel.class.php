@@ -360,4 +360,38 @@ class AdminPanel
     {
         return $this -> checkSessionAuthorization() || $this -> checkCookieAuthorization();
     }
+
+    static public function getAdminPanelSettingCacheValue(string $container, string $key): mixed
+    {
+        $cell = Registry::getDatabaseSetting($container);
+
+        if($cell === null || $cell === false)
+            return null;
+
+        $cell = @unserialize($cell);
+
+        if(is_array($cell) && isset($cell['until'], $cell['build'], $cell['data']) && is_array($cell['data']))
+            if(time() < $cell['until'] && $cell['build'] == Registry::get('Build'))
+                if(isset($cell['data'][$key]))
+                    return $cell['data'][$key];
+        
+        return null;
+    }
+
+    static public function saveAdminPanelSettingCacheValue(string $container, string $key, mixed $value, int $time): void
+    {
+        $cell = Registry::getDatabaseSetting($container);
+
+        if(!$cell)
+            $cell = ['data' => [], 'until' => time() + $time, 'build' => Registry::get('Build')];
+        else
+            $cell = @unserialize($cell);
+
+        if(!is_array($cell) || !isset($cell['until'], $cell['build']) || time() >= $cell['until'] || $cell['build'] != Registry::get('Build'))
+            $cell = ['data' => [], 'until' => time() + $time, 'build' => Registry::get('Build')];
+
+        $cell['data'][$key] = $value;
+
+        Registry::setDatabaseSetting($container, serialize($cell));
+    }
 }
