@@ -1185,7 +1185,7 @@ $(document).ready(function()
 	//Main global search in admin panel
     let global_search_options = { 
 		serviceUrl: MVobject.adminPanelPath + "?ajax=search", 
-		deferRequestBy: 200,
+		deferRequestBy: 500,
 		noCache: true,
 		onSelect: function(data, value, elem)
 		{
