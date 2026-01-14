@@ -331,7 +331,7 @@ class ModelSimple extends Model
 				if($object -> getType() == "email" && isset($this -> data[$name]) && $this -> data[$name])
 					$emails[] = $this -> data[$name];
 				
-		return implode(', ', $emails);
+		return implode(', ', array_unique($emails));
 	}
 	
 	public function __call($method, $arguments)
