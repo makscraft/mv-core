@@ -64,7 +64,12 @@ class MysqlAdapter extends DbAdapter
 		else if($type == "int" || $type == "order" || $type == "parent")
 			$result = "int(11)";
 		else if($type == "float")
-			$result = "float";
+		{
+			if($decimal = $element -> getProperty("decimal"))
+				$result = "decimal(".$decimal.")";
+			else
+				$result = "float";
+		}
 		else if($type == "date")
 			$result = "date";
 		else if($type == "date_time")

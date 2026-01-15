@@ -5,6 +5,8 @@
  class FloatModelElement extends IntModelElement
 {
 	protected $format = "/^-?(0\.|[1-9]\d*\.|[1-9])\d*$/";
+	
+	protected $decimal;
 
 	public function prepareValue()
 	{
