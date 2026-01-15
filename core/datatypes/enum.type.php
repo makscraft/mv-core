@@ -135,6 +135,8 @@ class EnumModelElement extends ModelElement
 			if($this -> is_parent && $this -> show_parent)
 				if($parent_name = $this -> getNameOfParentOfForeignKey($this -> value))
 					$value .= " (".$parent_name.")";
+
+			$value = $this -> cleanTextValueForInput($value);
 			
 			$html = "<input class=\"autocomplete-input\" type=\"text\" ";
 		    $html .= $this -> addHtmlParams()." value=\"".$value."\" />\n";
@@ -150,7 +152,7 @@ class EnumModelElement extends ModelElement
 		}
 		else if(!$form_frontend)
 			$options_html = "<option value=\"\">".I18n :: locale("select-value")."</option>\n";
-			
+		
 		if(is_array($data_for_options))
 			foreach($data_for_options as $id => $name)
 			{

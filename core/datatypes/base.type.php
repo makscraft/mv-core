@@ -112,7 +112,7 @@ abstract class ModelElement
 				{
 					$message = "Undefined extra parameter '".$property."' in field '".$name."' of model '";
 					$message .= ucfirst($extra_params['model'])."'.";
-					Debug :: displayError($message);
+					Debug::displayError($message);
 				}
 	}
 	
@@ -158,10 +158,23 @@ abstract class ModelElement
 	public function cleanValue()
 	{
 		if($this -> value)
-			$this -> value = Service :: cleanHtmlSpecialChars($this -> value);
+			$this -> value = Service::cleanHtmlSpecialChars($this -> value);
 		
 		return $this;
 	}
+
+	/**
+	 * Cleans value before displaying in html text input.
+	 */
+	public function cleanTextValueForInput($value)
+	{
+		if($value === null || $value === '')
+			return '';
+
+		$value = htmlspecialchars(trim($value), ENT_QUOTES);
+				
+		return Service::cleanHtmlSpecialChars($value);
+	}	
 	
 	public function setRequired($value) { $this -> required = $value; return $this; }
 	public function setHelpText($value) { $this -> help_text = $value; return $this; }
@@ -229,7 +242,7 @@ abstract class ModelElement
 			$message = "Undefined extra parameter '".$property."' in field '".$this -> name."' of model '";
 			$message .= ucfirst($this -> model)."'.";
 
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 		
 		return $this;
@@ -254,7 +267,7 @@ abstract class ModelElement
 		if($this -> help_text)
 		{
 			if(preg_match("/^\{.*\}$/", $this -> help_text))
-				$this -> help_text = I18n :: locale(preg_replace("/^\{(.*)\}$/", "$1", $this -> help_text));
+				$this -> help_text = I18n::locale(preg_replace("/^\{(.*)\}$/", "$1", $this -> help_text));
 			
 			return "<div class=\"help-text\">".$this -> help_text."</div>\n";
 		}

@@ -80,9 +80,7 @@ class CharModelElement extends ModelElement
 
 	public function displayHtml()
 	{
-		$value = $this -> value ? $this -> value : '';
-		$value = htmlspecialchars($value, ENT_QUOTES);
-		$value = Service :: cleanHtmlSpecialChars($value);
+		$value = $this -> cleanTextValueForInput($this -> value);
 		$value = $this -> captcha ? '' : $value;
 		
 		$type = $this -> hidden ? "hidden" : "text";
