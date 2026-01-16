@@ -78,6 +78,16 @@ class Paginator
 	}
 
 	/**
+	 * Sets position number of first entity in LIMIT query (see getParamsForSQL())
+	 */
+	public function setStart(int $start) 
+	{
+		$this -> start = $start;
+
+		return $this;
+	}
+
+	/**
 	 * Sets new current page number and recounts the params according to new value.
 	 */
 	public function setPage(int $page) 
