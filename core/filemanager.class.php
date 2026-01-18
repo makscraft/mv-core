@@ -724,7 +724,7 @@ class Filemanager
 	    $dir = scandir($path);
 	    
 	    foreach($dir as $file)
-	        if (($file !== '.') && ($file !== '..'))
+	        if($file !== '.' && $file !== '..')
 	            if(is_dir($path.'/'.$file))
 	                 $size += $this -> defineFolderSize($path.'/'.$file);
 	            else
@@ -747,5 +747,23 @@ class Filemanager
 			chmod($path, 0777);
 
 		return is_dir($path);
+	}
+
+	/**
+	 * Returns list of all files from passed directory.
+	 * @return array absolute files paths
+	 */
+	static public function getDirectoryFiles(string $path): array
+	{
+		if(!file_exists($path) || !is_dir($path) || false === $data = scandir($path))
+			return [];
+
+		$files = [];
+
+	    foreach($data as $file)
+	        if($file !== '.' && $file !== '..' && is_file($path.'/'.$file))
+				$files[] = $path.'/'.$file;
+
+		return $files;
 	}
 }
