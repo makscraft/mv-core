@@ -1661,13 +1661,7 @@ class Model extends ModelBase
 					else if($type == 'int')
 						$row[$name] = I18n::formatIntNumber(intval($row[$name]));
 					else if($type == 'float')
-					{
-						$float_number = explode(".", $row[$name]);
-						$row[$name] = I18n::formatIntNumber($float_number[0]);
-						
-						if(isset($float_number[1]) && $float_number[1])
-							$row[$name] .= I18n::getDecimalMark().$float_number[1];
-					}
+						$row[$name] = $this -> elements[$name] -> formatValue($row[$name]);
 					else if($type == 'many_to_many')
 						$row[$name] = $this -> elements[$name] -> displayAdminTableLink($row['id']);
 					else if($type == 'group' && $row[$name])

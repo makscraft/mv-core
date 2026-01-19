@@ -14,4 +14,11 @@
 		
 		return $this -> value;
 	}
+
+	public function formatValue($value)
+	{
+		$decimals = $this -> decimal ? intval(explode(',', $this -> decimal)[1]) : 2;
+		
+		return I18n::formatFloatNumber($value, $decimals);
+	}	
 } 
