@@ -198,8 +198,10 @@ class Filter
 			if($value == "*" || $value == "-")
 				$checked_value = $value;
 			else if(isset($arguments[2]['long_list'], $arguments[2]['foreign_key']) && $arguments[2]['long_list'])
-			{				
-				if($db -> getCount($arguments[2]['foreign_key'], "`id`='".intval($value)."'"))
+			{
+				$table_name = Registry::defineModelTableName($arguments[2]['foreign_key']);
+
+				if($db -> getCount($table_name, "`id`='".intval($value)."'"))
 					$checked_value = $value;
 			}
 			else if(isset($arguments[2]['table']) && $arguments[2]['table'])
@@ -1088,7 +1090,9 @@ class Filter
 					if($value && isset($this -> fields[$field]["foreign_key"], $this -> fields[$field]["long_list"]) && 
 					   $this -> fields[$field]["long_list"])
 					{
-						if($db -> getCount($this -> fields[$field]["foreign_key"], "`id`='".intval($value)."'"))
+						$table_name = Registry::defineModelTableName($this -> fields[$field]["foreign_key"]);
+
+						if($db -> getCount($table_name, "`id`='".intval($value)."'"))
 							$checked_values[] = intval($value);
 					}
 					else if($value && array_key_exists($value, $this -> fields[$field]["values_list"]))
