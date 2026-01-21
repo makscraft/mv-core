@@ -374,6 +374,29 @@ class Record extends Content
 
 		return [];
 	}
+
+	/**
+	 * Updates certain record's fields in database without whole record's data update.
+	 */
+	public function updateFields(array $fields)
+	{
+		if(count($fields) === 0 || !$this -> id)
+			return $this;
+
+		$sql = [];
+		$prepared_values = $this -> prepareContentValues();
+
+		foreach($prepared_values as $field => $value)
+			if(in_array($field, $fields) && $this -> model -> getElement($field))
+				$sql[] = "`".$field."`=".$this -> model -> db -> secure($value);
+		
+		if(count($sql))
+			$this -> model -> db -> query("UPDATE `".$this -> model -> getTable()."` 
+										   SET ".implode(', ', $sql)." 
+										   WHERE `id`='".$this -> id."'");
+
+		return $this;
+	}
 	
 	public function __call(string $method, $arguments)
 	{
@@ -387,7 +410,7 @@ class Record extends Content
 			$message = "Call to undefiend method '".$method."' of Record object of model '".get_class($this -> model)."'";
 			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
 
-			Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);			
+			Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);
 		}
 	}
 }
