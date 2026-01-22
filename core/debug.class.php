@@ -172,7 +172,7 @@ class Debug
 			return 'opera';			
 		if(strpos($agent, 'yabrowser') !== false)
 			return 'yandex';
-		if(strpos($_SERVER['HTTP_USER_AGENT'], 'Edge') !== false)
+		if(strpos($_SERVER['HTTP_USER_AGENT'], 'Edg') !== false)
 			return 'edge';
 		if(strpos($agent, 'chrome') !== false)
 			return 'chrome';
