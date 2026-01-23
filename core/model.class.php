@@ -2366,18 +2366,19 @@ class Model extends ModelBase
 		return $html;
 	}
 	
-	public function findActiveRecordByDefault(Router $router)
+	public function findActiveRecordByDefault(Router $router): ?Record
 	{
 		$url_parts = $router -> getUrlParts();
-		$record = false;
+
+		if(count($url_parts) !== 2)
+			return null;
 		
-		if(count($url_parts) == 2)
-			if(is_numeric($url_parts[1]))
-				$record = $this -> findRecord(array("id" => $url_parts[1], "active" => 1));
-			else
-				$record = $this -> findRecord(array("url" => $url_parts[1], "active" => 1));
+		if(is_numeric($url_parts[1]))
+			$record = $this -> find($url_parts[1]);
+		else
+			$record = $this -> find(['url' => $url_parts[1]]);
 					
-		return $record;
+		return is_object($record) && $record -> active ? $record : null;
 	}
 
 	public function getAuthorizationSessings()
