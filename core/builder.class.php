@@ -242,9 +242,9 @@ class Builder
 	/**
 	 * Searches the record in model according to URL parameters and extra conditions.
 	 * @param string name of model to search the record in
-	 * @param string name of url field in model if exists
+	 * @param string name of url field in model (if exists)
 	 * @param array extra conditions in query builder format
-	 * @return object|null Record object of found
+	 * @return object|null Record object if found, otherwise 404 error will be shown
 	 */
 	public function findRecordByUrl(string $model, string $url_field = '', array $conditions = []): ?Record
 	{
@@ -256,16 +256,15 @@ class Builder
 				$conditions['id'] = intval($url_part);
 			else if($url_field !== '')
 				$conditions[$url_field] = $url_part;
-			else
-				return null;
 
-			if(null !== $record = $this -> $model -> find($conditions))
-				return $record;
-
-			$this -> display404();
+			if(count($conditions))
+				if(null !== $record = $this -> $model -> find($conditions))
+					return $record;
 		}
 		else
 			Debug::displayError('Undefined model name \''.$model.'\' passed as a parameter for findRecordByUrl() method.');
+
+		$this -> display404();
 
 		return null;
 	}
