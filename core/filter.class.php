@@ -43,7 +43,7 @@ class Filter
 		'eq' => '=', 'neq' => '!=', 'gt' => '>', 'lt' => '<', 'gte' => '>=', 'lte' => '<='
 	];
 	
-	public function __construct(array $fields, string $source = '', object $model = null)
+	public function __construct(array $fields, string $source = '', mixed $model = '')
 	{
 		if(is_object($model) && Registry::checkModel($model -> getModelClass()))
 			$this -> model = $model;
@@ -52,7 +52,6 @@ class Filter
 		if($source === 'frontend')
 		{
 			$this -> fields = $fields;
-						
 			return;
 		}
 
@@ -110,56 +109,61 @@ class Filter
 				}
 			}
 	}
+
+	public function getFilter(string $field)
+	{
+		return array_key_exists($field, $this -> fields) && is_array($this -> fields[$field]) ? $this -> fields[$field] : null;
+	}
 	
 	public function addFilter(string $caption, string $type, string $name, array $params = [])
 	{
-		$types = array("bool", "char", "int", "float", "enum", "text");
+		$types = ['bool', 'char', 'int', 'float', 'enum', 'text'];
 
 		if(!in_array($type, $types))
 			return $this;
 		
-		$this -> fields[$name] = array("type" => $type, "caption" => $caption);
+		$this -> fields[$name] = ['type' => $type, 'caption' => $caption];
 		
-		if($type == "enum")
+		if($type == 'enum')
 		{
-			$this -> fields[$name]["values_list"] = [];
+			$this -> fields[$name]['values_list'] = [];
 			
-			if(isset($params["values_list"]) && is_array($params["values_list"]) && count($params["values_list"]))
-				$this -> fields[$name]["values_list"] = $params["values_list"];
-			else if(isset($params["foreign_key"]) && $params["foreign_key"])
+			if(isset($params['values_list']) && is_array($params['values_list']) && count($params['values_list']))
+				$this -> fields[$name]['values_list'] = $params['values_list'];
+			else if(isset($params['foreign_key']) && $params['foreign_key'])
 			{
 				$object = $this -> model -> getElement($name);
-				$this -> fields[$name]["long_list"] = $object -> getProperty("long_list");
+				$this -> fields[$name]['long_list'] = $object -> getProperty('long_list');
 				
-				if(!$this -> fields[$name]["long_list"])
+				if(!$this -> fields[$name]['long_list'])
 				{
 					$object -> defineValuesList(get_class($this -> model));
-					$this -> fields[$name]["values_list"] = $object -> getProperty("values_list");
+					$this -> fields[$name]['values_list'] = $object -> getProperty('values_list');
 				}
 			}
 			
-			if(isset($params["empty_value"]) && $params["empty_value"])
-				$this -> fields[$name]["empty_value"] = $params["empty_value"];
+			if(isset($params['empty_value']) && $params['empty_value'])
+				$this -> fields[$name]['empty_value'] = $params['empty_value'];
 			else
-				$this -> fields[$name]["empty_value"] = I18n::locale("not-defined");
+				$this -> fields[$name]['empty_value'] = I18n::locale('not-defined');
 		}		
 		
 		if(isset($_GET[$name]))
 		{
 			$value = self::checkFieldValue($type, trim($_GET[$name]), $this -> fields[$name]);
 		
-			if($value != "")
-				$this -> fields[$name]["value"] = $value;
+			if($value != '')
+				$this -> fields[$name]['value'] = $value;
 		}
 		else
 			foreach($_GET as $key => $value)
-				if($key == $name."-from" || $key == $name."-to")
+				if($key == $name.'-from' || $key == $name.'-to')
 				{
-					$condition = $key == $name."-from" ? "gte" : "lte";
+					$condition = $key == $name.'-from' ? 'gte' : 'lte';
 					$value = Filter::checkFieldValue($type, trim($value), $this -> fields[$name]);
 			
-					if($value != "")
-						$this -> fields[$name]["conditions"][$condition] = $value;
+					if($value != '')
+						$this -> fields[$name]['conditions'][$condition] = $value;
 				}
 		
 		return $this;
@@ -198,10 +202,8 @@ class Filter
 			if($value == "*" || $value == "-")
 				$checked_value = $value;
 			else if(isset($arguments[2]['long_list'], $arguments[2]['foreign_key']) && $arguments[2]['long_list'])
-			{
-				$table_name = Registry::defineModelTableName($arguments[2]['foreign_key']);
-
-				if($db -> getCount($table_name, "`id`='".intval($value)."'"))
+			{				
+				if($db -> getCount($arguments[2]['foreign_key'], "`id`='".intval($value)."'"))
 					$checked_value = $value;
 			}
 			else if(isset($arguments[2]['table']) && $arguments[2]['table'])
@@ -1059,9 +1061,7 @@ class Filter
    	}
 	
 	public function setDisplayEnumRadio(string $field, int $columns)
-   	{
-   		$html = "";
-   		
+   	{   		
    	   	if(isset($this -> fields[$field]))
    	   		$this -> fields[$field]["display_radio"] = $columns;
    		
@@ -1090,9 +1090,7 @@ class Filter
 					if($value && isset($this -> fields[$field]["foreign_key"], $this -> fields[$field]["long_list"]) && 
 					   $this -> fields[$field]["long_list"])
 					{
-						$table_name = Registry::defineModelTableName($this -> fields[$field]["foreign_key"]);
-
-						if($db -> getCount($table_name, "`id`='".intval($value)."'"))
+						if($db -> getCount($this -> fields[$field]["foreign_key"], "`id`='".intval($value)."'"))
 							$checked_values[] = intval($value);
 					}
 					else if($value && array_key_exists($value, $this -> fields[$field]["values_list"]))
