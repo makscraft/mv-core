@@ -28,8 +28,8 @@ class GroupModelElement extends ModelElement
 	
 	public function validate()
 	{
-		if($this -> required && !$this -> value) //If we check required value
-			$this -> error = $this -> chooseError("required", "{error-required-enum}");
+		if($this -> required && !$this -> value)
+			$this -> error = $this -> chooseError('required', '{error-required-enum}');
 			
 		return $this;
 	}
@@ -46,20 +46,24 @@ class GroupModelElement extends ModelElement
 
 	public function countGroupRecords($value)
 	{
-		if(!$value) return;
-		
-		$number = Database::instance() -> getCount($this -> table, "`id` IN(".$value.")");
-		
-		return $number ? $number : "";
+		return $value ? Database::instance() -> getCount($this -> table, "`id` IN(".$value.")") : 0;
 	}
 	
 	public function checkGroupRecords($value)
 	{
-		if(!$value) return;
-			
+		$ids = [];
+
+		foreach(explode(',', $value) as $id)
+			if(is_numeric(trim($id)))
+				$ids[] = intval(trim($id));
+
+		if(!count($ids))
+			return '';
+
+		$value = implode(',', $ids);
 		$ids = Database::instance() -> getColumn("SELECT `id` FROM `".$this -> table."` WHERE `id` IN(".$value.")");
 		
-		return count($ids) ? implode(",", $ids) : "";
+		return count($ids) ? implode(',', $ids) : '';
 	}
 	
 	public function getTableRecords()
@@ -72,7 +76,7 @@ class GroupModelElement extends ModelElement
 		
 		$ids = $names = []; //Collects names and ids of records
 		
-		while($row = $db -> fetch($result, "ASSOC"))
+		while($row = $db -> fetch($result, 'ASSOC'))
 		{
 			$ids[] = $row['id'];
 			$names[] = trim($row[$this -> name_field]) ? trim($row[$this -> name_field]) : '-';
@@ -87,10 +91,10 @@ class GroupModelElement extends ModelElement
 	public function displayHtml()
 	{
 		$all_records = $this -> getTableRecords();
-		$selected_ids = $this -> value ? array_unique(explode(",", $this -> value)) : [];
-		$current_id = $this -> id ? " id=\"group-self-id-".$this -> id."\"" : "";
+		$selected_ids = $this -> value ? array_unique(explode(',', $this -> value)) : [];
+		$current_id = $this -> id ? " id=\"group-self-id-".$this -> id."\"" : '';
 		
-		$html = "<div class=\"m2m-wrapper group-datatype".($this -> long_list ? " with-search" : "")."\"".$current_id.">\n";
+		$html = "<div class=\"m2m-wrapper group-datatype".($this -> long_list ? " with-search" : '')."\"".$current_id.">\n";
 		$html .= "<div class=\"column\">\n";
 		
 		//Multi select tag with not selected elements
@@ -106,10 +110,7 @@ class GroupModelElement extends ModelElement
 		if(!$this -> long_list)
 			foreach($all_records as $id => $name)
 				if(!in_array($id, $selected_ids) && (!$this -> id || $this -> id != $id))
-				{
-					$html .= "<option value=\"".$id."\" title=\"";
-					$html .= $name."\">".$name."</option>\n";
-				}
+					$html .= "<option value=\"".$id."\" title=\"".$name."\">".$name."</option>\n";
 				
 		$html .= "</select>\n";		
 		$html .= "</div>\n";
@@ -153,17 +154,17 @@ class GroupModelElement extends ModelElement
 	public function getOptionsForSearch($request, $ids, $self_id)
 	{
 		$db = Database::instance();
-		$html = "";
+		$html = '';
 		$request_like = str_replace("%", "[%]", $request);
 		
-		if($request_like == "")
-			return "";
+		if($request_like == '')
+			return '';
 		
 		$request_like = $db -> secure("%".$request_like."%");
 		
-		$where = ($ids && count($ids)) ? " WHERE `id` NOT IN(".implode(",", $ids).") " : "";		
+		$where = ($ids && count($ids)) ? " WHERE `id` NOT IN(".implode(",", $ids).") " : '';		
 		$where .= $where ? " AND " : " WHERE ";
-		$where .= $self_id ? "`id`!='".$self_id."' AND " : "";
+		$where .= $self_id ? "`id`!='".$self_id."' AND " : '';
 		$where .= "`".$this -> name_field."` LIKE ".$request_like;
 		
 		$result = $db -> query("SELECT `id`,`".$this -> name_field."` 
@@ -195,21 +196,22 @@ class GroupModelElement extends ModelElement
 								
 		$rows = $db -> getAll($query);
 			
-		foreach($rows as $row) //Collects suggestions
+		//Collects suggestions
+		foreach($rows as $row)
 			$result_rows[$row['id']] = htmlspecialchars_decode($row[$this -> name_field], ENT_QUOTES);
 		
-		return array('query' => $request,  
-					 'suggestions' => array_values($result_rows),
-					 'data' => array_keys($result_rows));
+		return [
+			'query' => $request,  
+			'suggestions' => array_values($result_rows),
+			'data' => array_keys($result_rows)
+		];
 	}
 	
 	public function checkValue($id)
 	{
-		$db = Database::instance();
-		
-		return $db -> getCell("SELECT `".$this -> name_field."` 
-							   FROM `".$this -> table."` 
-							   WHERE `id`='".intval($id)."'");
+		return Database::instance() -> getCell("SELECT `".$this -> name_field."` 
+												FROM `".$this -> table."` 
+												WHERE `id`='".intval($id)."'");
 	}
 	
 	public function getDataForMultiAction()
