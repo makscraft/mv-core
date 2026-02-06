@@ -11,53 +11,57 @@ sup{vertical-align: text-top;}
 sub{vertical-align: text-bottom;}
 input,textarea,select{font-family: inherit; font-size: inherit; font-weight: inherit; border: none; outline: navy;}
 a, img{outline: 0;}
-a{color: #eee; text-decoration: none;}
+a{color: #f9f9f9; text-decoration: none;}
 a:hover{text-decoration: underline;}
 label{cursor: pointer;}
 li{list-style: none;}
 .hidden{display: none !important;}
 
 html{height: 100%;}
-body{margin: 0; color: #eee; font: 15px/140% 'RobotoFlex', sans-serif; position: relative; height: 100%;
-background: #131313 url("../images/login-back.jpg?33") top center no-repeat; background-size: cover;}
+body{margin: 0; color: #f9f9f9; font: 16px/130% 'RobotoFlex', sans-serif; position: relative; height: 100%;
+background: #131313 url('../images/login-back.jpg?34') top center no-repeat; background-size: cover;}
 
 #container{min-width: 700px; margin: 0 auto; position: relative;}
-#login-area{width: 380px; padding: 130px 0 0 0; margin: 0 auto;}
-#login-middle{padding: 20px 20px 15px 20px;}
+#login-area{width: 410px; padding: 130px 0 0 0; margin: 0 auto;}
+#login-middle{padding: 30px 45px 20px 45px; background: #807f84ab; border-radius: 6px;}
 #login-middle p.done{margin: 0 0 12px 0;}
 
-#header{background: url("../images/logo.svg?v30") top left no-repeat; height: 23px; padding: 0 0 0 85px;
+#header{background: url('../images/logo.svg?v30') top left no-repeat; height: 23px; padding: 0 0 0 80px;
 margin: 0 0 25px 0; font-size: 18px; display: flex; align-items: flex-end; line-height: 60%;}
 .header-loading{margin: 17px 0 0 20px !important;}
 #header.error{margin-bottom: 17px;}
 
-div.errors, div.error, div.success{padding: 6px 12px 6px 12px; border-radius: 4px; margin-bottom: 12px; width: 280px;}
+div.errors, div.error, div.success{padding: 10px 16px; border-radius: 4px; margin-bottom: 14px;}
 div.errors, div.error{color: #ff1d1d; border: 1px solid #fbd689; background: #fdf4e1}
 div.success{background: #deee85; color: #333;}
 div.errors p{margin: 0 0 1px 0;}
 div.success p{margin: 0 0 1px 0; color: #333;}
 
-form.login-form div.line{display: flex; align-items: center; margin-bottom: 10px;}
-form.login-form div.line div.name{width: 100px; margin-right: 10px}
-form.login-form div.line input[type='text'], form.login-form div.line input[type='password']{height: 30px; 
-padding: 5px 10px; border-radius: 4px; width: 170px; background: #eee}
-form.login-form div.line div.captcha{display: flex; flex-direction: column; align-items: flex-start;}
-form.login-form div.line div.captcha img{border-radius: 4px; margin-bottom: 5px;}
-form.login-form input.submit, a.submit{background: #63b3f9; position: relative; cursor: pointer; border-radius: 4px; 
-color: #fff; width: auto; padding: 6px 30px; outline: none; transition: all 0.5s ease;}
+form.login-form div.line{display: flex; flex-direction: column; gap: 5px; align-items: flex-start; margin-bottom: 16px;}
+form.login-form div.line.last{margin-bottom: 24px;}
+form.login-form div.line input[type='text'], form.login-form div.line input[type='password']{height: 36px; 
+padding: 0 12px; border-radius: 4px; width: 100%;}
+form.login-form.remind-password div.line:has(div.captcha){margin-bottom: 25px;}
+form.login-form div.line div.captcha{display: flex; align-items: center; gap: 12px;}
+form.login-form div.line div.captcha img{border-radius: 4px;}
+form.login-form input.submit, a.submit{background: #3aa3ff; position: relative; cursor: pointer; border-radius: 4px; 
+color: #fff; width: 100%; outline: none; transition: all 0.5s ease; height: 36px; display: flex; align-items: center;
+justify-content: center;}
 a.submit{text-decoration: none;}
-form.login-form div.submit{width: 280px; display: flex; justify-content: flex-end; margin-bottom: 15px;}
-form.login-form input.submit:hover, a.submit:hover{background: #3aa3ff;}
+form.login-form div.submit{margin-bottom: 16px;}
+form.login-form input.submit:hover, a.submit:hover{background: #63b3f9;}
 form.login-form input.submit:active{position: relative; top: 1px; left: 1px;}
-form.login-form div.remind{margin: 0 0 12px 0;}
+form.login-form div.remind{margin: 0 0 16px 0;}
+form.login-form div.cancel{display: flex; justify-content: center;}
 
 a.error-link{display: inline-block; margin: 10px 0 0 0;}
 
-#remember{display: flex; align-items: center; margin-bottom: 20px; padding-top: 5px;}
+#remember{display: flex; align-items: center; margin-bottom: 20px;}
 #remember-login{outline: none; border: none; width: auto; bottom: 0; position: relative;}
-#remember label{cursor: pointer; margin: 0 0 0 8px; position: relative; bottom: -1px;}
+#remember label{cursor: pointer; margin: 0 0 0 6px; position: relative;}
 
-#select-login-region{border-radius: 4px; padding: 3px 5px;}
+form.login-form div.line.language{flex-direction: row; gap: 16px; align-items: center;}
+#select-login-region{border-radius: 4px; padding: 4px 8px;}
 #select-login-region option{padding-left: 5px; padding-right: 5px;}
 
 @media all and (max-width: 1400px)

@@ -69,7 +69,7 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
                   <div class="remind">
                      <a href="<?php echo $registry -> getSetting('AdminPanelPath'); ?>login/remind.php" class="forgot-password"><?php echo I18n::locale('forgot-password'); ?></a>
                   </div>
-                  <div class="line">
+                  <div class="line language">
                      <div class="name"><?php echo I18n::locale('language'); ?></div>
                      <select name="region" id="select-login-region">
                          <?php echo I18n::displayRegionsSelect($region); ?>

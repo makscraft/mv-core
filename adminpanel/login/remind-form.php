@@ -4,7 +4,7 @@ if(isset($_POST['email']) && trim($_POST['email']))
 else
 	$email = '';
 ?>
-<form method="post" class="login-form">
+<form method="post" class="login-form remind-password">
    <?php echo $login -> displayLoginErrors($errors); ?>
    <div class="line">
       <div class="name"><?php echo I18n::locale('email'); ?></div>

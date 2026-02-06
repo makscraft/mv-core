@@ -82,7 +82,7 @@ include $registry -> getSetting('IncludeAdminPath')."login/login-header.php";
                      <div class="name"><?php echo I18n::locale('new-password'); ?></div>
                      <input class="password" type="password" name="password" value="<?php echo $form -> password; ?>" autocomplete="off" />
                   </div>
-                  <div class="line">
+                  <div class="line last">
                      <div class="name"><?php echo I18n::locale('password-repeat'); ?></div>
                      <input class="password" type="password" name="password_repeat" value="<?php echo $form -> password_repeat; ?>" autocomplete="off" />
                   </div>
