@@ -10,6 +10,12 @@ class Editor
 	 */
    	private static $instance = false;
 
+	static public function createSecurityToken()
+	{
+		$token = $_SERVER['HTTP_USER_AGENT'].Registry::get('SecretCode').Http::getIpAddress();
+		return Service::createHash($token, 'random');
+	}
+
 	static public function run(string $id, int $height)
 	{
 		$html = '';
@@ -17,12 +23,14 @@ class Editor
 		$region = Registry::get('Region');
 		$region = ($region == 'en' || $region == 'am' || $region == 'us') ? 'en' : $region;
 		$region_path = Registry::get('AdminPanelPath').'i18n/'.$region.'/';
-		$upload_path = Registry::get('AdminPanelPath').'?ajax=upload-editor&ck-image';
+		$upload_path = Registry::get('AdminPanelPath').'?ajax=upload-editor&type=image&token='.Editor::createSecurityToken();
   
 		if(!self::$instance)
 		{
 			$path = Registry::get("AdminPanelPath")."interface/ckeditor/";
+			$html .= "<script type=\"text/javascript\"> const editorSecurityToken = '".Editor::createSecurityToken()."'; </script>\n";
 			$html .= "<script type=\"text/javascript\" src=\"".$path."ckeditor.js\"></script>\n";
+			$html .= "<script type=\"text/javascript\" src=\"".$path."uploaders.js\"></script>\n";
 			$html .= "<script type=\"text/javascript\" src=\"".$region_path."ckeditor.".$region.".js\"></script>\n";
 
 			self::$instance = true;
@@ -34,10 +42,11 @@ class Editor
 					.create(document.querySelector('#".$id."'), {
 
 						removePlugins: ['ImageInsert', 'MediaEmbedToolbar'],
+						extraPlugins: [MVframeworkFileUploadPlugin],
 						toolbar: {
 							items: ['sourceEditing', 'undo', 'redo', '|', 'heading', '|', 'bold', 'italic', 
 									'underline', 'bulletedList', 'numberedList', 'blockQuote', 'link', 
-									'fontColor', 'uploadImage', 'insertTable', 'mediaEmbed', 'code']
+									'fontColor', 'uploadImage', 'fileUploadButton', 'insertTable', 'mediaEmbed', 'code']
 						},
 						heading: {
 							options: [
@@ -69,88 +78,11 @@ class Editor
 					.then(editor => {
 						window.editor = editor;
 					})
-					.catch(err => {
-						console.error(err.stack);
+					.catch(error => {
+						console.error(error);
 					});
 				  </script>\n";   
 		
 		return $html;
 	}
-	
-	static public function createFilesJSON()
-	{
-		$registry = Registry::instance();
-		$path = $registry -> getSetting("FilesPath")."tmp/files.json";
-		$folder = $registry -> getSetting("FilesPath")."files/";
-		$url = $registry -> getSetting("MainPath")."userfiles/files/";
-		$json = [];
-   	   
-  		clearstatcache();
-		
-		$directory = @opendir($folder);
-		
-		if($directory)
-			while(false !== ($file = readdir($directory)))
-			{
-				if($file == "." || $file == "..")
-					continue;
-				
-				if(is_file($folder.$file))
-				{
-					$json[] = array("name" => "",
-									"title" => $file,
-									"link" => $url.$file, 
-									"size" => I18n::convertFileSize(filesize($folder.$file)));	
-				}
-			}
-				
-		file_put_contents($path, json_encode($json));
-  	}
-   
-	static public function createImagesJSON()
-	{
-		$registry = Registry::instance();
-		$path = $registry -> getSetting("FilesPath")."tmp/images.json";
-		$folder = $registry -> getSetting("FilesPath")."images/";
-		$url = $registry -> getSetting("MainPath")."userfiles/images/";
-		$json = [];
-		
-		clearstatcache();
-		
-		$directory = @opendir($folder);
-		$imager = new Imager();
-		
-		if($directory)
-			while(false !== ($file = readdir($directory)))
-			{
-				if($file == "." || $file == "..")
-					continue;
-				
-				if(is_file($folder.$file))
-				{
-					$extension = Service::getExtension($file);
-					
-					if(!in_array($extension, $registry -> getSetting("AllowedImages")))
-						continue;
-					
-					$tmp_name = $registry -> getSetting("FilesPath")."tmp/".$file;
-					$thumb_name = $registry -> getSetting("FilesPath")."tmp/redactor/".$file;
-					
-					if(!is_file($thumb_name))
-					{
-						$imager -> setImage($folder.$file);
-						@copy($folder.$file, $tmp_name);
-						$thumb_name = $imager -> compress($tmp_name, "redactor", 100, 75);
-						@unlink($tmp_name);
-					}
-					
-					$json[] = array("thumb" => Service::removeDocumentRoot($thumb_name),
-										 "image" => $url.$file,
-										 "title" => $file);
-				}
-				
-			}
-				
-		file_put_contents($path, json_encode($json));
-   }
 }
