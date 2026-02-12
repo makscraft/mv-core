@@ -377,9 +377,7 @@ height: 30px; width: 100%;}
 background: #fff url("../images/icon-search.svg") center right 7px no-repeat;}
 .autocomplete-multi{padding-right: 28px !important;}
 
-/* External plugins */
-.ck.ck-editor{z-index: 100;}
-
+/* Air datepicker */
 .air-datepicker{z-index: 3000 !important;}
 .air-datepicker, .air-datepicker-time--current-hours, .air-datepicker-time--current-minutes{
 font-family: 'RobotoFlex' !important;}
@@ -624,6 +622,7 @@ padding-left: 23px}
 padding-left: 23px}
 
 /* CKEditor content */
+.ck.ck-editor{z-index: 100;}
 .ck.ck-content{padding: 20px 1.4% !important;}
 .ck.ck-content p{margin: 0 0 15px 0 !important;}
 .ck.ck-content h1{font-size: 30px; line-height: 40px; margin: 0 0 15px 0 !important;}
@@ -638,6 +637,8 @@ padding-left: 23px}
 .ck.ck-content i{font-style: italic;}
 .ck.ck-content u{text-decoration: underline;}
 .ck.ck-content pre{margin-bottom: 20px;}
+.ck.ck-content a{color: #1464ba;}
+.ck.ck-link-actions .ck-button.ck-link-actions__preview .ck-button__label{color: #1464ba !important;}
 
 @media all and (max-width: 1550px)
 {

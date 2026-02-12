@@ -120,11 +120,38 @@ class Filemanager
 	}
 
 	public function displayCurrentPath()
-	{ 
-		$html = Service::removeFileRoot($this -> path);
-		$html = str_replace('/', ' / ', $html);
+	{
+		$path = Service::removeFileRoot($this -> path);
+		$parts = explode('/', $path);
+		$data = [];
 
-		return '/ '.$html;
+		if(count($parts) > 1)
+		{
+			$next = [];
+
+			foreach($parts as $part)
+			{
+				$next[] = $part;
+				$data[$part] = implode('/', $next);
+			}
+		}
+		else
+			return '<span class="slash">/</span><span>'.$parts[0].'</span>';
+
+		$html = [];
+
+		foreach($data as $name => $folder)
+		{
+			if((count($html) + 1) == count($parts))
+			{
+				$html[] = '<span>'.$name.'</span>';
+				break;
+			}
+
+			$html[] = "<a href=\"?view=filemanager&navigation=".urlencode($folder)."\">".$name."</a>";
+		}
+
+		return '<span class="slash">/</span>'.implode('<span class="slash">/</span>', $html);
 	}
 
 	/* Navigation */
@@ -144,8 +171,7 @@ class Filemanager
 		{
 			if($this -> in_root)
 				return false;
-			
-			
+						
 			$back = realpath($current_path.'/..');
 
 			if($back !== false)
@@ -167,6 +193,21 @@ class Filemanager
 			Session::set('file_manager', $data);
 
 			return true;
+		}
+		else if(preg_match('/^userfiles/', $path))
+		{
+			if($this -> in_root || preg_match('/[\.`]+/', $path))
+				return false;
+			
+			$path = Registry::get('FilesPath').preg_replace('/^userfiles\/?/', '', urldecode($path));
+			
+			if(realpath($path) !== false && is_dir($path))
+			{
+				$data['path'] = str_replace('\\', '/', $path);
+				Session::set('file_manager', $data);
+
+				return true;
+			}
 		}
 
 		return false;

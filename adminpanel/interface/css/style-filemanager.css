@@ -1,6 +1,7 @@
 
 #filemanager-area{width: 100%;}
 #filemanager-path{margin-bottom: 25px;}
+#filemanager-path > span.slash{margin: 0 3px;}
 #filemanager-form{margin-bottom: 30px; border-bottom: 1px solid #918b8b;}
 #filemanager-form tr.back td.name{background-image: url('../images/icon-folder-up.svg');}
 #filemanager-form tr.folder td.name{background-image: url('../images/icon-folder.svg');}
