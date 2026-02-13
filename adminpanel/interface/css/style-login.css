@@ -26,7 +26,7 @@ background: #131313 url('../images/login-back.jpg?34') top center no-repeat; bac
 #login-middle{padding: 30px 45px 20px 45px; background: #807f84ab; border-radius: 6px;}
 #login-middle p.done{margin: 0 0 12px 0;}
 
-#header{background: url('../images/logo.svg?v30') top left no-repeat; height: 23px; padding: 0 0 0 80px;
+#header{background: url('../images/logo-login.svg?v34') top left no-repeat; height: 23px; padding: 0 0 0 80px;
 margin: 0 0 25px 0; font-size: 18px; display: flex; align-items: flex-end; line-height: 60%;}
 .header-loading{margin: 17px 0 0 20px !important;}
 #header.error{margin-bottom: 17px;}
