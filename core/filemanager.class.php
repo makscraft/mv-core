@@ -68,6 +68,7 @@ class Filemanager
 		Session::start('admin_panel');		
 		$data = Session::get('file_manager', []);
 		$data['path'] ??= Registry::get('FilesPath');
+		$data['cache'] ??= [];
 
 		$regexp = Service::prepareRegularExpression(Registry::get('FilesPath'));
 		$path = $data['path'];
@@ -117,6 +118,28 @@ class Filemanager
 	static public function getCleanupLimit(): int
 	{
 		return self::$cleanup_limit;
+	}
+
+	private function getCacheDataForDirectory($directory)
+	{
+		if(!is_dir($directory))
+			return null;
+
+		$data = Session::get('file_manager');
+		$key = md5(realpath($directory));
+
+		if(isset($data['cache'][$key]) && time() <= $data['cache'][$key]['until'])
+			return $data['cache'][$key];
+
+		$data['cache'][$key] = [
+			'count_files' => $this -> countFilesInDirectory($directory) - 1,
+			'total_size' => $this -> defineFolderSize($directory),
+			'until' => time() + 600
+		];
+
+		Session::set('file_manager', $data);
+
+		return $data['cache'][$key];
 	}
 
 	public function displayCurrentPath()
@@ -280,13 +303,13 @@ class Filemanager
 		$secret = Registry::get('SecretCode');
 		$highlight = Session::get('highlight', '');
 		$can_delete = $this -> user -> checkModelRights('filemanager', 'delete');
-
+		
 		foreach($files as $file)
 		{
 			if($file === '..')
 				$size = 0;
 			else
-				$size = is_dir($file) ? $this -> defineFolderSize($file) : filesize($file);
+				$size = is_dir($file) ? $this -> getCacheDataForDirectory($file)['total_size'] : filesize($file);
 
 			$params = '-';
 			$disable = false;
@@ -298,7 +321,7 @@ class Filemanager
 				if(in_array(basename($file), self::FORBIDDEN_FILES))
 					$disable = true;
 
-				$total_in = $this -> countFilesInDirectory($file) - 1;
+				$total_in = $this -> getCacheDataForDirectory($file)['count_files'];
 				
 				if($total_in > 0)
 					$params = I18n::locale('number-files', ['number' => $total_in, 'files' => '*number']);
@@ -762,9 +785,9 @@ class Filemanager
 	public function defineFolderSize(string $path): int
 	{
 	    $size = 0;
-	    $dir = scandir($path);
+	    $directory = scandir($path);
 	    
-	    foreach($dir as $file)
+	    foreach($directory as $file)
 	        if($file !== '.' && $file !== '..')
 	            if(is_dir($path.'/'.$file))
 	                 $size += $this -> defineFolderSize($path.'/'.$file);
