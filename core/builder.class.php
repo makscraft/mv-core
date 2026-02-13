@@ -112,9 +112,9 @@ class Builder
 		//Starts all enabled plugins
 		$autostarting_plugins = Registry::get('AutoStartingPlugins');
 
-		foreach($this -> registry -> get('PluginsLower') as $plugin => $lower)
-			if(array_key_exists($plugin, $autostarting_plugins))
-				$this -> plugins[$lower] = new $plugin();
+		foreach(Registry::get('Plugins') as $plugin)
+			if(in_array($plugin, $autostarting_plugins))
+				$this -> plugins[$plugin] = new $plugin();
 		
 		//Creates cache manager if it's enabled
 		if($this -> registry -> get('EnableCache'))
@@ -128,8 +128,9 @@ class Builder
 	public function __get($name)
 	{
 		$keep = $name;
-		$name = strtolower($name);
+		$name = Registry::getQuickAccessKeyName($name);
 
+		//Fast model/plugin object providing
 		if(isset($this -> models[$name]))
 			return $this -> models[$name];
 		else if(isset($this -> plugins[$name]))
@@ -137,32 +138,10 @@ class Builder
 
 		//Automatic models objects lazy creating
 		if(Registry::checkModel($name))
-		{
-			$models = Registry::get('ModelsLower');
-
-			if(isset($models[$name]))
-				return $this -> models[$models[$name]] = new $name();
-			else if(in_array($name, $models))
-			{
-				$key = array_search($name, $models);
-
-				return $this -> models[$name] = new $key();
-			}
-		}
+			return $this -> models[$name] = new $name();
 
 		if(Registry::checkPlugin($name))
-		{
-			$plugins = Registry::get('PluginsLower');
-
-			if(isset($plugins[$name]))
-				return $this -> plugins[$plugins[$name]] = new $name();
-			else if(in_array($name, $plugins))
-			{
-				$key = array_search($name, $plugins);
-
-				return $this -> plugins[$name] = new $key();
-			}
-		}
+			return $this -> plugins[$name] = new $name();
 
 		$trace = debug_backtrace();
 		$message = "Attempt to access undefiend property '".$keep."' of main MV object";

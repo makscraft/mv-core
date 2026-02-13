@@ -134,23 +134,9 @@ class Registry
 	/**
 	 * Transforms names of models and plugins to camel case.
 	 */
-	public function camelCaseModelsAndPlugins()
+	static public function camelCaseClassName(string $name)
 	{
-		$names = [];
-
-		foreach(self::$settings['Models'] as $name)
-			$names[$name] = str_replace(' ', '', ucwords(str_replace('_', ' ', $name)));
-
-		self::$settings['ModelsCamelCase'] = $names;
-		
-		$names = [];
-
-		foreach(self::$settings['Plugins'] as $name)
-			$names[$name] = str_replace(' ', '', ucwords(str_replace('_', ' ', $name)));
-
-		self::$settings['PluginsCamelCase'] = $names;
-
-		return $this;
+		return str_replace(' ', '', ucwords(str_replace('_', ' ', $name)));
 	}
 
 	/**
@@ -424,6 +410,35 @@ class Registry
 			return true;
 		
 		return false;
+	}
+
+	/**
+	 * Identification of model or plugin cache name to use at frontend.
+	 * For use like $mv -> PagesSections or $mv -> catalog_products
+	 */
+	static public function getQuickAccessKeyName(string $name)
+	{
+		if(in_array($name, self::$settings['Models']) || in_array($name, self::$settings['Plugins']))
+			return $name;
+
+		$camel = Registry::camelCaseClassName($name);
+
+		if(in_array($camel, self::$settings['Models']) || in_array($camel, self::$settings['Plugins']))
+			return $camel;		
+
+		$lower = strtolower($name);
+
+		if(array_key_exists($lower, self::$settings['ModelsLower']))
+			return self::$settings['ModelsLower'][$lower];
+		else if(in_array($lower, self::$settings['ModelsLower']))
+			return $lower;
+
+		if(array_key_exists($lower, self::$settings['PluginsLower']))
+			return self::$settings['PluginsLower'][$lower];
+		else if(in_array($lower, self::$settings['PluginsLower']))
+			return $lower;
+
+		return null;
 	}
 
 	/**
