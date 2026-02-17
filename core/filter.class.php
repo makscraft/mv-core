@@ -202,8 +202,10 @@ class Filter
 			if($value == "*" || $value == "-")
 				$checked_value = $value;
 			else if(isset($arguments[2]['long_list'], $arguments[2]['foreign_key']) && $arguments[2]['long_list'])
-			{				
-				if($db -> getCount($arguments[2]['foreign_key'], "`id`='".intval($value)."'"))
+			{
+				$table = Registry::defineModelTableName($arguments[2]['foreign_key']);
+
+				if($db -> getCount($table, "`id`='".intval($value)."'"))
 					$checked_value = $value;
 			}
 			else if(isset($arguments[2]['table']) && $arguments[2]['table'])
@@ -778,9 +780,13 @@ class Filter
 						
 						if(isset($data["value"]) && $data["value"])
 						{
-							$foreign_key = (isset($data["foreign_key"]) && $data["foreign_key"]) ? $data["foreign_key"] : false;
-							$object_params = array("long_list" => true, "foreign_key" => $foreign_key);
-							$object_params["values_list"] = $data["values_list"];
+							$foreign_key = isset($data["foreign_key"]) && $data["foreign_key"] ? $data["foreign_key"] : false;
+
+							$object_params = [
+								'long_list' => true,
+								'foreign_key' => $foreign_key,
+								'values_list' => $data['values_list']
+							];
 							
 							if($data['type'] == 'enum')
 								$object = new EnumModelElement($data["caption"], "enum", $name, $object_params);
@@ -1090,7 +1096,9 @@ class Filter
 					if($value && isset($this -> fields[$field]["foreign_key"], $this -> fields[$field]["long_list"]) && 
 					   $this -> fields[$field]["long_list"])
 					{
-						if($db -> getCount($this -> fields[$field]["foreign_key"], "`id`='".intval($value)."'"))
+						$table = Registry::defineModelTableName($this -> fields[$field]["foreign_key"]);
+
+						if($db -> getCount($table, "`id`='".intval($value)."'"))
 							$checked_values[] = intval($value);
 					}
 					else if($value && array_key_exists($value, $this -> fields[$field]["values_list"]))
