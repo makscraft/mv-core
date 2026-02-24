@@ -256,17 +256,18 @@ abstract class ModelInitial
 				}
 				else //Old version of code
 				{
-					if(preg_match("/^[\d\s,']+$/", $value))
-						$value = str_replace("'", "", $value);
-					else
-					{
-						$values = explode(",", $value);
-							
-						foreach($values as $k => $v)
-							$values[$k] = "'".str_replace("'", "", trim($v))."'";
-							
-						$value = implode(",", $values);
-					}
+					if(is_string($value))
+						if(preg_match("/^[\d\s,']+$/", $value))
+							$value = str_replace("'", '', $value);
+						else
+						{
+							$values = explode(',', $value);
+								
+							foreach($values as $k => $v)
+								$values[$k] = "'".str_replace("'", "", trim($v))."'";
+								
+							$value = implode(',', $values);
+						}
 				}
 				
 				$where[] = $field." ".($condition_in ? "IN" : "NOT IN")."(".$value.")";

@@ -646,7 +646,7 @@ class Model extends ModelBase
 			{
 				//Update from admin panel with not editable m2m fields
 				if($fields === 'update' && (!$this -> checkIfFieldEditable($name) || !$this -> checkIfFieldVisible($name)))
-					continue; //TODO think about m2m hidden and visible fields
+					continue;
 
 				//If we update record from front we pass fields to update
 				if(is_array($fields) && !in_array($object -> getName(), $fields))
@@ -657,15 +657,22 @@ class Model extends ModelBase
 				$opposite_id = $object -> getOppositeId(); //Name of other field in M2M table
 				$selected_ids = $object -> getSelectedIds(); //Selected ids of M2M field by current element
 
+				$current_ids = $this -> db -> getColumn("SELECT `".$self_id."` 
+														 FROM `".$table."` 
+														 WHERE `".$opposite_id."`='".$this -> id."'");
+
+				//If current m2m field was not changed we skip the linking tables update
+				if(array_count_values($current_ids) == array_count_values($selected_ids))
+					continue;
+
 				//Deletes all links from table to rewrite them
-				$this -> db -> query("DELETE FROM `".$table."` 
-									  WHERE `".$opposite_id."`='".$this -> id."'");
+				$this -> db -> query("DELETE FROM `".$table."` WHERE `".$opposite_id."`='".$this -> id."'");
 				
 				//Adds links one by one
 				if(is_array($selected_ids) && count($selected_ids))
-					foreach($selected_ids as $value)
+					foreach($selected_ids as $id)
 						$this -> db -> query("INSERT INTO `".$table."`(`".$self_id."`,`".$opposite_id."`) 
-											  VALUES ('".$value."','".$this -> id."')");
+											  VALUES ('".$id."','".$this -> id."')");
 			}
 	}
 	
