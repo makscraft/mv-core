@@ -187,13 +187,12 @@ class Builder
 		
 		$mv = $this;
 			
-		header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+		Http::sendStatusCodeHeader(404);
 
 		if(file_exists($this -> views_path.'before-view.php'))
 			include $this -> views_path.'before-view.php';
 
-		$this -> router -> setRoute404();
-		include $this -> views_path.$mv -> router -> getRoute();
+		include $this -> views_path.$mv -> router -> setRoute404() -> getRoute();
 
 		$this -> displayDebugPanel();
 		exit();
