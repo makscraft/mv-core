@@ -158,7 +158,7 @@ class Builder
 	{
 		$path = preg_replace('/^\//', '', $path);
 
-		header("Location: ".$this -> registry -> get("MainPath").$path);
+		header('Location: '.$this -> registry -> get('MainPath').$path);
 		exit();
 	}
 	
@@ -168,7 +168,7 @@ class Builder
 	 */
 	public function reload($part = '')
 	{
-		$path = str_replace([$_SERVER["QUERY_STRING"], "?"], "", $_SERVER["REQUEST_URI"]);
+		$path = str_replace([$_SERVER['QUERY_STRING'], '?'], '', $_SERVER['REQUEST_URI']);
 		
 		header("Location: ".$path.$part);
 		exit();		
@@ -184,18 +184,38 @@ class Builder
 		//If any kind of not false or not null datatype param has being passed.
 		if(isset($arguments[0]) && $arguments[0])
 			return;
+
+		//In newer MV versions 404 error is being processed via exceptions
+		if(Registry::get('FrontHttpStatusException'))
+			throw new FrontHttpStatusException('', 404);
 		
+		//Old version of 404 error processing
 		$mv = $this;
-			
+		
 		Http::sendStatusCodeHeader(404);
 
 		if(file_exists($this -> views_path.'before-view.php'))
 			include $this -> views_path.'before-view.php';
 
-		include $this -> views_path.$mv -> router -> setRoute404() -> getRoute();
+		include $this -> views_path.$this -> router -> setRoute404() -> getRoute();
 
 		$this -> displayDebugPanel();
 		exit();
+	}
+
+	/**
+	 * Handles http status errors in main front index.php file.
+	 * @return string view file to include or throughts an exception
+	 */
+	public function handleFrontHttpStatusException(FrontHttpStatusException $exception)
+	{
+		if($exception -> getCode() === 404)
+		{
+			Http::sendStatusCodeHeader(404);
+			return $this -> views_path.$this -> router -> setRoute404() -> getRoute();
+		}
+
+		throw new Exception('Undefined error in main front http error handler. '.$exception -> getMessage());
 	}
 	
 	/**

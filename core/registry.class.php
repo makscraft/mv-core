@@ -99,6 +99,19 @@ class Registry
 			Debug::displayError($message);
 		}
 
+		self::$settings['FrontHttpStatusException'] = false;
+
+		if(class_exists('FrontHttpStatusException'))
+			if(self::getInitialVersion() > 3.42)
+				self::$settings['FrontHttpStatusException'] = true;
+			else
+			{
+				$file = file_get_contents(self::$settings['IncludePath'].'index.php');
+
+				if(strpos($file, 'catch(FrontHttpStatusException $exception)') !== false)
+					self::$settings['FrontHttpStatusException'] = true;
+			}
+
 		return $this;
 	}
 

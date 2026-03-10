@@ -32,6 +32,9 @@ if(version_compare(phpversion(), '8.0', '<'))
 	exit();
 }
 
+//Main front http exception class to catch 404 errors and others
+class FrontHttpStatusException extends Exception{}
+
 require_once $mvIncludePath.'config/setup.php';
 require_once $mvCorePath.'datatypes/base.type.php';
 require_once $mvCorePath.'datatypes/bool.type.php';
