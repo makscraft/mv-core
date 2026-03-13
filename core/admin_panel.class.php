@@ -337,7 +337,7 @@ class AdminPanel
 
         $row = Database::instance() -> getRow("SELECT * FROM `users` WHERE `id`='".intval($auth['id'])."'");
 
-        if(!$row['active'] && $row['id'] != 1)
+        if(!is_array($row) || (!$row['active'] && $row['id'] != 1))
             return false;
 
         if(md5($row['password']) != $auth['password'])
