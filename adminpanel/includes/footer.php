@@ -25,7 +25,7 @@
     <div id="footer">
         <div class="footer-title">
             <a href="https://mv-framework.<?php echo ($region == "ru") ? "ru" : "com"; ?>" target="_blank">
-                <?php echo I18n::locale("mv").', '.Registry::getCorePackageVersion(); ?>
+                <?php echo I18n::locale("mv").' '.Registry::getCorePackageVersion(); ?>
             </a>
         </div>
     </div>  
