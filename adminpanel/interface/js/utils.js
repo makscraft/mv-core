@@ -100,6 +100,7 @@ $(document).ready(function()
 	//Changes the order of table columns by moving the options in select
 	$("div.m2m-buttons span.m2m-up, div.m2m-buttons span.m2m-down").click(function()
 	{
+		let values = [];
 		let option = $(this).parent().prev().find("option:selected:first");
 		
 		if(this.className == "m2m-up")
@@ -110,16 +111,13 @@ $(document).ready(function()
 		if($(this).parents("div.m2m-wrapper").hasClass("group-datatype") || 
 		   $(this).parents("div.m2m-wrapper").hasClass("csv-fields"))
 		{
-			let values = [];
-			
 			$(this).parents("div.m2m-wrapper").find("select.m2m-selected option, div.search-buffer option").each(function()
 			{
 				values.push(this.value);
 			});
-		}
-		
-		if(typeof values != 'undefined')
+
 			$(this).parents("div.m2m-wrapper").find("input[type='hidden']").val(values.join(","));
+		}			
 	});
 	
 	//Deletes the file and shows back the file input
