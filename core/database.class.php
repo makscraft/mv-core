@@ -176,7 +176,7 @@ class Database
 	public function query(string $query)
 	{
 		if(Registry::get('DebugPanel'))
-			self::$total[] = Service::cutText(htmlspecialchars($query, ENT_QUOTES), 800, ' ...');
+			self::$total[] = Service::cutText(htmlspecialchars($query, ENT_QUOTES), 2000, ' ...');
 		
 		try
 		{
@@ -186,7 +186,7 @@ class Database
 		catch(PDOException $error)
 		{
 			if(Registry::onDevelopment())
-				Debug::displayError($error -> getMessage());
+				Debug::displayError($error -> getMessage().'. SQL query: '.str_replace(["\n", "\r", "\t"], '', $query));
 			else
 			{
 				Registry::set('ErrorAlreadyLogged', true);

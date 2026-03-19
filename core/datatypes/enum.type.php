@@ -456,6 +456,9 @@ class EnumModelElement extends ModelElement
 		//If we need to get the enum value by key at the frontend
 		if($this -> foreign_key)
 		{
+			if(!is_numeric($key))
+				return '';
+
 			$object = new $this -> foreign_key();
 
 			$row = $object -> db -> getRow("SELECT `".$this -> name_field."`".
@@ -465,9 +468,10 @@ class EnumModelElement extends ModelElement
 
 			return $this -> createNameFromNameFields($row, $object);
 		}
-		else
-			if(isset($this -> values_list[$key]))
-				return $this -> values_list[$key];
+		else if(array_key_exists($key, $this -> values_list))
+			return $this -> values_list[$key];
+
+		return '';
 	}
 	
 	public function getNameOfParentOfForeignKey($id)

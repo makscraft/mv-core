@@ -330,6 +330,9 @@ class ParentModelElement extends EnumModelElement
 			return I18n::locale('root-catalog');
 		else if($this -> long_list)
 		{
+			if(!is_numeric($key))
+				return '';
+
 			$db = Database::instance();
 
 			$query = "SELECT `".$this -> name_field."` 
@@ -340,9 +343,10 @@ class ParentModelElement extends EnumModelElement
 
 			return $db -> getCell($query);
 		}
-		else
-			if(isset($this -> values_list[$key]))
-				return $this -> values_list[$key];
+		else if(array_key_exists($key, $this -> values_list))
+			return $this -> values_list[$key];
+
+		return '';
 	}
 		
 	public function getParentsForFilter(string $table)
