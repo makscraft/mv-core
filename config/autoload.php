@@ -176,7 +176,7 @@ spl_autoload_register(function($class_name)
 });
 
 //Sets up current localization region of the application
-I18n::instance() -> setRegion($mvSetupSettings['Region']);
+I18n::instance() -> setRegion(Registry::get('Region'));
 
 //Start time for debug panel
 Registry::set('WorkTimeStart', gettimeofday());
