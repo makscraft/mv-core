@@ -97,20 +97,28 @@ class Menu
 	
 	public function displayTableFields($model_object)
 	{
-		$html = array("selected" => "", "not-selected" => []);
+		$html = [
+			'selected' => '',
+			'not-selected' => []
+		];
+
 		$selected_fields = $model_object -> getFieldsToDisplay();
 		
 		foreach($selected_fields as $name)
 			if($model_object -> checkIfFieldVisible($name))
-				if($name == 'id' || $object = $model_object -> getElement($name))
+			{
+				$object = $model_object -> getElement($name);
+
+				if($name == 'id' || is_object($object))
 				{
 					$caption = ($name != 'id') ? $object -> getCaption() : 'Id';
-					
-					if($object && $object -> getType() == 'parent')
+
+					if(is_object($object) && $object -> getType() == 'parent')
 						$caption = I18n::locale('child-records');					
 					
 					$html['selected'] .= "<option value=\"".$name."\">".$caption."</option>\n";
 				}
+			}
 				
 		foreach($model_object -> getElements() as $name => $object)
 			if($model_object -> checkIfFieldVisible($name))
