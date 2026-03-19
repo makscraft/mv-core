@@ -451,7 +451,7 @@ class Registry
 		else if(in_array($lower, self::$settings['PluginsLower']))
 			return $lower;
 
-		return null;
+		return '';
 	}
 
 	/**
