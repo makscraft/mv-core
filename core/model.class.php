@@ -206,17 +206,7 @@ class Model extends ModelBase
 	{
 		$this -> name = $name;
 	}
-	
-	public function checkModelName($name)
-	{
-		if($this -> registry -> getSetting('ForbiddenModelsNames'))
-			if(in_array($name, $this -> registry -> getSetting('ForbiddenModelsNames')))
-			{
-				$message = "The name of model '".$name."' is forbidden, please try different one.";
-				Debug::displayError($message);
-			}
-	}
-	
+		
 	public function isSimpleModel()
 	{
 		return (get_parent_class($this) === 'ModelSimple');

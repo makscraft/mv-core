@@ -129,7 +129,7 @@ if(!isset($mvSetupSettings['LoadedFromCache']))
 	$registry -> loadSettings($mvSetupSettings);
 	$registry -> loadSettings($mvMainSettings);
 	
-	$registry -> loadEnvironmentSettings() -> checkSettingsValues() -> lowerCaseConfigNames();
+	$registry -> loadEnvironmentSettings() -> lowerCaseConfigNames() -> checkSettingsValues();
 }
 else
 	$registry -> loadSettings($mvSetupSettings);

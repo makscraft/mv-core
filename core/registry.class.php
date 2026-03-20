@@ -112,6 +112,20 @@ class Registry
 					self::$settings['FrontHttpStatusException'] = true;
 			}
 
+		$forbidden = Registry::get('ForbiddenModelsNames', ['users', 'log', 'settings']);
+		
+		foreach(self::$settings['Models'] as $name)
+		{
+			$lower_camel = strtolower($name);
+			$lower_snake = self::$settings['ModelsLower'][$lower_camel];
+
+			if(in_array($lower_camel, $forbidden) || in_array($lower_snake, $forbidden))
+			{
+				$message = "The name of model '".$name."' is forbidden, please try different one.";
+				Debug::displayError($message);
+			}
+		}			
+
 		return $this;
 	}
 
