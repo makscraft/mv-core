@@ -8,10 +8,17 @@ $version_initial = Registry::getInitialVersion();
 $version_initial = ($version_initial != $version) ? $version_initial : null;
 
 $backtrace = debug_backtrace();
+$sql_query = '';
 unset($backtrace[0], $backtrace[1]);
 
 foreach($backtrace as $key => $data)
-	unset($backtrace[$key]['object'], $backtrace[$key]['type']);
+{
+	unset($backtrace[$key]['object']);
+
+	if($key == 2 && isset($data['class'], $data['function'], $data['args'][0]))
+		if($data['class'] === 'Database' && $data['function'] === 'query')
+			$sql_query = $backtrace[$key]['args'][0] = preg_replace('/[\\x00-\\x1F\\x7F]/', '', $data['args'][0]);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -30,7 +37,8 @@ foreach($backtrace as $key => $data)
 			<header>
 				<div class="inner">
 					<img src="<?php echo $admin_panel_path; ?>interface/images/logo.svg<?php echo $cache_drop; ?>" alt="MV logo" />
-					<div class="version">MV framework, version <?php echo $version_package.$engine; ?></div>
+					<div class="version">MV framework, version <?php echo $version_package.$engine; ?>, 
+					project build <?php echo Registry::get('Build', 0); ?></div>
 					<?php if($version_initial): ?>
 						<div class="version-initial">updated from version <?php echo number_format($version_initial, 1); ?></div>
 					<?php endif; ?>
@@ -40,7 +48,7 @@ foreach($backtrace as $key => $data)
 				<div class="inner">
 					<h1>Internal Script Error</h1>
 					<?php if(isset($debug_error) && $debug_error): ?>
-						<h3><?php echo $debug_error; ?></h3>
+						<h3><?php echo $debug_error.($sql_query ? '<small>'.$sql_query.'</small>' : ''); ?></h3>
 					<?php
 						endif;
 
