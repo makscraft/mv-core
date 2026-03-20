@@ -111,6 +111,7 @@ class Http
      */
     static public function responseHtml(string $html): void
     {
+        header_remove('X-Powered-By');
         header('Content-Type: text/html');
         echo trim($html);
         exit();
