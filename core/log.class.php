@@ -5,27 +5,31 @@
  */
 class Log extends Model
 {
-	protected $name = "{users-operations}";
+	protected $name = '{users-operations}';
 	
-	protected $model_elements = array(
-		array("{module}", "enum", "module"),
-		array("{row_id}", "int", "row_id"),
-		array("{date}", "date_time", "date"),
-		array("{record}", "char", "name"),
-		array("{user}", "enum", "user_id", array("foreign_key" => "Users")),
-		array("{operation}", "enum", "operation", array("values_list" => array(
-														"create" => "{creating}",
-														"update" => "{editing}",
-														"delete" => "{deleting}",
-														"restore" => "{restoring}")))				
-	);
+	protected $model_elements = [
+		['{module}', 'enum', 'module'],
+		['{row_id}', 'int', 'row_id'],
+		['{date}', 'date_time', 'date'],
+		['{record}', 'char', 'name'],
+		['{user}', 'enum', 'user_id', ['foreign_key' => 'Users']],
+		['{operation}', 'enum', 'operation', [
+				'values_list' => [
+					'create' => '{creating}',
+					'update' => '{editing}',
+					'delete' => '{deleting}',
+					'restore' => '{restoring}'
+				]
+			]
+		]				
+	];
 			
-	protected $model_display_params = array(
-		"hidden_fields" => array('row_id'),
-		"create_actions" => false,
-		"update_actions" => false,
-		"delete_actions" => false
-	);
+	protected $model_display_params = [
+		'hidden_fields' => ['row_id'],
+		'create_actions' => false,
+		'update_actions' => false,
+		'delete_actions' => false
+	];
 	
 	/**
 	 * Maximal allowed size of one log file.
@@ -41,8 +45,8 @@ class Log extends Model
 	
 	public function __construct()
 	{
-		$registry = Registry :: instance();
-		$values = Database :: instance()-> getColumn("SELECT DISTINCT `module` FROM `log`");
+		$registry = Registry::instance();
+		$values = Database::instance()-> getColumn("SELECT DISTINCT `module` FROM `log`");
 		$values_list = [];
 		
 		foreach($values as $model_class)
@@ -56,7 +60,7 @@ class Log extends Model
 		
 		$this -> model_elements[0][] = ['values_list' => $values_list];
 		
-		parent :: __construct();
+		parent::__construct();
 		
 		$this -> elements['operation'] -> defineValuesList();
 		$this -> elements['user_id'] -> defineValuesList();
@@ -67,7 +71,7 @@ class Log extends Model
 	 */
 	static public function write(string $model, int $row_id, string $name, int $user_id, string $operation)
 	{
-		$db = Database :: instance();
+		$db = Database::instance();
 
 		$db -> query("INSERT INTO `log`(`module`,`row_id`,`name`,`user_id`,`operation`,`date`) 
 					  VALUES(".$db -> secure($model).",'".$row_id."',".$db -> secure($name).",'".$user_id."',
@@ -80,7 +84,7 @@ class Log extends Model
 	 */
 	static public function clean(int $user_id)
 	{
-		Database :: instance() -> query("DELETE FROM `log` WHERE `user_id`='".$user_id."'");
+		Database::instance() -> query("DELETE FROM `log` WHERE `user_id`='".$user_id."'");
 	}
 	
 	/**
@@ -90,22 +94,22 @@ class Log extends Model
 	 */
 	static public function add(string $message, string $file_name = '')
 	{
-		$message = I18n :: getCurrentDateTime('SQL').' '.$message;
-		$folder = Registry :: get('IncludePath').'log/';
+		$message = I18n::getCurrentDateTime('SQL').' '.$message;
+		$folder = Registry::get('IncludePath').'log/';
 		
 		if(!is_dir($folder))
 			return;
 
 		if($file_name === '')
 		{
-			$file_name = Registry :: get('DomainName');
+			$file_name = Registry::get('DomainName');
 			$file_name = $file_name ? $file_name : 'runtime';
 			$file_name = preg_replace('/^https?:\/\/(www\.)?/', '', $file_name);
 		}
 		else
 			$file_name = str_replace(['.', '/', '\\'], '', $file_name);
 
-		$file_name = $folder.self :: defineLogFileName($file_name);
+		$file_name = $folder.self::defineLogFileName($file_name);
 
 		if(!file_exists($file_name))
 			file_put_contents($file_name, $message."\n");
@@ -124,10 +128,10 @@ class Log extends Model
 	 */
 	static public function defineLogFileName(string $template)
 	{
-		$folder = Registry :: get('IncludePath').'log/';
+		$folder = Registry::get('IncludePath').'log/';
 		$total = 0;
 		$oldest = $newest = ['file' => '', 'time' => 0];
-		$regexp = Service :: prepareRegularExpression($template);
+		$regexp = Service::prepareRegularExpression($template);
 
 		if(!is_dir($folder))
 			return '';
@@ -150,10 +154,10 @@ class Log extends Model
 		if($total === 0)
 			return $template.'.log';
 		
-		if(filesize($folder.$newest['file']) < self :: LOG_FILE_SIZE)
+		if(filesize($folder.$newest['file']) < self::LOG_FILE_SIZE)
 			return $newest['file'];
 
-		if($total >= self :: LOG_FILES_LIMIT)
+		if($total >= self::LOG_FILES_LIMIT)
 			unlink($folder.$oldest['file']);
 
 		$number = str_replace([$template, '.log'], '', $newest['file']);
