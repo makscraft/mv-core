@@ -167,7 +167,9 @@ class Debug
 			if(strpos($agent, 'safari') !== false && strpos($agent, 'version/') !== false)
 				return 'safari';
 		}
-		
+
+		if(isset($_SERVER['HTTP_SEC_CH_UA']) && strpos($_SERVER['HTTP_SEC_CH_UA'], 'Brave') !== false)
+			return 'brave';
 		if(preg_match('/opr\/\d+/', $agent) || preg_match('/opera/', $agent))
 			return 'opera';			
 		if(strpos($agent, 'yabrowser') !== false)
