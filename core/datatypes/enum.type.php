@@ -1,6 +1,6 @@
 <?php
 /**
- * Enum datatype class. Has a list of values and work with database.
+ * Enum datatype class. Has a list of values and can work with database.
  */
 class EnumModelElement extends ModelElement
 {
@@ -43,34 +43,36 @@ class EnumModelElement extends ModelElement
 	public function setLongList($value)
 	{
 		$this -> long_list = $value;
+
 		return $this;
 	}
 	
 	public function setDisplayRadio($display_radio) 
 	{ 
 		$this -> display_radio = $display_radio; 
+
 		return $this; 
 	}
 	
 	public function validate()
 	{
 		if($this -> required && !$this -> value)
-			$this -> error = $this -> chooseError("required", "{error-required-enum}");
+			$this -> error = $this -> chooseError('required', '{error-required-enum}');
 		else if($this -> value) 
 			if(!$this -> multiple_choice)
 			{
 				if(!$this -> checkValue($this -> value))
-					$this -> error = "{error-undefined-value}";
+					$this -> error = '{error-undefined-value}';
 			}
 			else
-				foreach(explode(",", $this -> value) as $key)
+				foreach(explode(',', $this -> value) as $key)
 					if(!array_key_exists($key, $this -> values_list))
-						$this -> error = "{error-undefined-value}";
+						$this -> error = '{error-undefined-value}';
 				
 		if($this -> unique && $this -> value && !$this -> error)
 		{
 			$arguments = func_get_args();
-			$class_name = (isset($arguments[0]) && $arguments[0]) ? $arguments[0] : "";
+			$class_name = (isset($arguments[0]) && $arguments[0]) ? $arguments[0] : '';
 			$id = (isset($arguments[1]) && $arguments[1]) ? intval($arguments[1]) : false;
 			
 			if(!$class_name)
@@ -78,14 +80,14 @@ class EnumModelElement extends ModelElement
 			
 			$object = new $class_name();
 			
-			if(get_parent_class($object) == "ModelSimple")
+			if(get_parent_class($object) == 'ModelSimple')
 				return $this;
 			
 			$query = "SELECT COUNT(*) FROM `".$object -> getTable()."` WHERE `".$this -> name."`='".$this -> value."'";
-			$query .= $id ? " AND `id`!='".$id."'" : "";
+			$query .= $id ? " AND `id`!='".$id."'" : '';
 			
 			if($object -> db -> getCell($query))
-				$this -> error = $this -> chooseError("unique" ,"{error-unique-value}");
+				$this -> error = $this -> chooseError('unique' ,'{error-unique-value}');
 		}
 		
 		return $this;
@@ -104,10 +106,10 @@ class EnumModelElement extends ModelElement
 			$object = new $this -> foreign_key();
 			
 			$this -> values_list = [];
-			$extra = $this -> name_field_extra ? ",`".$this -> name_field_extra."`" : "";
+			$extra = $this -> name_field_extra ? ",`".$this -> name_field_extra."`" : '';
 			
 			$query = "SELECT `id`,`".$this -> name_field."`".$extra." 
-					  FROM `".$object -> getTable()."`".Model :: processSQLConditions($params);
+					  FROM `".$object -> getTable()."`".Model::processSQLConditions($params);
 			
 			$filtered_data = $object -> db -> getAll($query);
 			
@@ -123,10 +125,10 @@ class EnumModelElement extends ModelElement
 		if($this -> display_radio)
 			return $this -> displayAsRadio();
 		
-		$options_html = "";
+		$options_html = '';
 		$data_for_options = $this -> values_list;
 		$arguments = func_get_args();
-		$form_frontend = (isset($arguments[0]) && $arguments[0] == "frontend");
+		$form_frontend = (isset($arguments[0]) && $arguments[0] == 'frontend');
 		
 		if($this -> long_list)
 		{
@@ -134,7 +136,7 @@ class EnumModelElement extends ModelElement
 			
 			if($this -> is_parent && $this -> show_parent)
 				if($parent_name = $this -> getNameOfParentOfForeignKey($this -> value))
-					$value .= " (".$parent_name.")";
+					$value .= ' ('.$parent_name.')';
 
 			$value = $this -> cleanTextValueForInput($value);
 			
@@ -147,16 +149,16 @@ class EnumModelElement extends ModelElement
 		
 		if($this -> empty_value)
 		{
-			$empty_text = is_bool($this -> empty_value) ? I18n :: locale("not-defined") : $this -> empty_value;
+			$empty_text = is_bool($this -> empty_value) ? I18n::locale('not-defined') : $this -> empty_value;
 			$options_html .= "<option value=\"\">".$empty_text."</option>\n";
 		}
 		else if(!$form_frontend)
-			$options_html = "<option value=\"\">".I18n :: locale("select-value")."</option>\n";
+			$options_html = "<option value=\"\">".I18n::locale("select-value")."</option>\n";
 		
 		if(is_array($data_for_options))
 			foreach($data_for_options as $id => $name)
 			{
-				$selected = ($id == $this -> value) ? " selected=\"selected\"" : "";
+				$selected = ($id == $this -> value) ? " selected=\"selected\"" : '';
 				$options_html .= "<option value=\"".$id."\"".$selected.">".$name."</option>\n";
 			}
 
@@ -168,16 +170,16 @@ class EnumModelElement extends ModelElement
 	
 	public function displayAsRadio()
 	{
-		$checked = $this -> value ? $this -> value : "";		
-		$html = Service :: displayOrderedFormTable($this -> values_list, $this -> display_radio, $checked, $this -> name, "radio");
+		$checked = $this -> value ? $this -> value : '';		
+		$html = Service::displayOrderedFormTable($this -> values_list, $this -> display_radio, $checked, $this -> name, 'radio');
 		
 		return $html.$this -> addHelpText();
 	}
 	
 	public function displayAsCheckboxes()
 	{
-		$checked = $this -> value ? explode(",", $this -> value) : [];
-		$html = Service :: displayOrderedFormTable($this -> values_list, $this -> multiple_choice, $checked, $this -> name);
+		$checked = $this -> value ? explode(',', $this -> value) : [];
+		$html = Service::displayOrderedFormTable($this -> values_list, $this -> multiple_choice, $checked, $this -> name);
 		
 		return $html.$this -> addHelpText();
 	}
@@ -187,23 +189,23 @@ class EnumModelElement extends ModelElement
 		$this -> value = [];
 		
 		foreach($this -> values_list as $key => $value)
-			if(isset($_POST[$this -> name."-".$key]) && $_POST[$this -> name."-".$key] == $key)
+			if(isset($_POST[$this -> name.'-'.$key]) && $_POST[$this -> name.'-'.$key] == $key)
 				$this -> value[] = $key;
 		
-		$this -> value = count($this -> value) ?  implode(",", $this -> value) : "";
+		$this -> value = count($this -> value) ?  implode(',', $this -> value) : '';
 	}
 	
 	public function createNameFromNameFields($row, $object)
 	{
 		if(!is_array($row))
-			return "";
+			return '';
 		
-		$type = ($this -> name_field == "id") ? "id" : $object -> getElement($this -> name_field) -> getType();		
-		$name_fields = array($this -> name_field => $type);
+		$type = ($this -> name_field == 'id') ? 'id' : $object -> getElement($this -> name_field) -> getType();		
+		$name_fields = [$this -> name_field => $type];
 		
 		if($this -> name_field_extra)
 		{
-			$type = ($this -> name_field_extra == "id") ? "id" : $object -> getElement($this -> name_field_extra) -> getType();
+			$type = ($this -> name_field_extra == 'id') ? 'id' : $object -> getElement($this -> name_field_extra) -> getType();
 			$name_fields[$this -> name_field_extra] = $type;
 		}
 		
@@ -211,17 +213,17 @@ class EnumModelElement extends ModelElement
 			
 		foreach($name_fields as $field_name => $field_type)
 		{
-			if($field_type == "enum")
+			if($field_type == 'enum')
 				$name[] = $object -> getElement($field_name) -> getValueName($row[$field_name]);
 			else if($field_type == 'date' || $field_type == 'date_time')
-				$name[] = I18n :: dateFromSQL($row[$field_name]);
+				$name[] = I18n::dateFromSQL($row[$field_name]);
 			else if($field_type == 'text')
-				$name[] = Service :: cutText(strip_tags($row[$field_name]), 30, " ...");
+				$name[] = Service::cutText(strip_tags($row[$field_name]), 100, ' ...');
 			else
 				$name[] = $row[$field_name];
 		}
 			
-		return implode(" ", $name);
+		return implode(' ', $name);
 	}
 	
 	public function getDataOfForeignKey()
@@ -229,15 +231,15 @@ class EnumModelElement extends ModelElement
 		$object = new $this -> foreign_key();
 		$foreign_name_field = $object -> getElement($this -> name_field);
 		
-		if(!is_object($foreign_name_field) && $this -> name_field != "id")
+		if(!is_object($foreign_name_field) && $this -> name_field != 'id')
 		{
 			$message = "You must specify correct name field from model '".$this -> foreign_key;
 			$message .= "' for model element with name '".$this -> name."'.";
 			
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 			
-		$condition = $order = "";
+		$condition = $order = '';
 		
 		if($this -> order_asc && $object -> getElement($this -> order_asc))
 			$order = " ORDER BY `".$this -> order_asc."` ASC";
@@ -252,7 +254,7 @@ class EnumModelElement extends ModelElement
 		}
 			
 		$query = "SELECT `id`,`".$this -> name_field."`".
-				 ($this -> name_field_extra ? ",`".$this -> name_field_extra."`" : "").
+				 ($this -> name_field_extra ? ",`".$this -> name_field_extra."`" : '').
 				 "FROM `".$object -> getTable()."` ".$condition.$order;
 				  
 		if(!$order)
@@ -261,7 +263,7 @@ class EnumModelElement extends ModelElement
 		$result = $object -> db -> query($query);
 		$ids = $names = [];
 		
-		while($row = $object -> db -> fetch($result, "ASSOC"))
+		while($row = $object -> db -> fetch($result, 'ASSOC'))
 		{
 			$ids[] = $row['id'];
 			$names[] = $this -> createNameFromNameFields($row, $object);
@@ -293,9 +295,9 @@ class EnumModelElement extends ModelElement
 
 			foreach($names as $key => $name)
 				if($parents_ids[$ids[$key]][$parent_field_name] == -1)
-					$names[$key] .= " (".I18n :: locale('root-catalog').")";
+					$names[$key] .= ' ('.I18n::locale('root-catalog').')';
 				else if(isset($parents_names[$parents_ids[$ids[$key]][$parent_field_name]][$foreign_key_name_field]))
-					$names[$key] .= " (".$parents_names[$parents_ids[$ids[$key]][$parent_field_name]][$foreign_key_name_field].")";
+					$names[$key] .= ' ('.$parents_names[$parents_ids[$ids[$key]][$parent_field_name]][$foreign_key_name_field].')';
 		}
 			
 		$options = array_combine($ids, $names);
@@ -321,13 +323,13 @@ class EnumModelElement extends ModelElement
 			$key_ = $key;
 			$val_ = $val;
 			
-			if(strpos($key, "{") !== false || strpos($val, "{") !== false)
+			if(strpos($key, '{') !== false || strpos($val, '{') !== false)
 			{
-				if(preg_match("/^\{.*\}$/", $key))
-					$key_ = I18n :: locale(preg_replace("/^\{(.*)\}$/", "$1", $key));
+				if(preg_match('/^\{.*\}$/', $key))
+					$key_ = I18n::locale(preg_replace('/^\{(.*)\}$/', '$1', $key));
 	
-				if(preg_match("/^\{.*\}$/", $val))
-					$val_ = I18n :: locale(preg_replace("/^\{(.*)\}$/", "$1", $val));
+				if(preg_match('/^\{.*\}$/', $val))
+					$val_ = I18n::locale(preg_replace('/^\{(.*)\}$/', '$1', $val));
 			}
 			
 			$transformed[$key_] = $val_;
@@ -371,7 +373,7 @@ class EnumModelElement extends ModelElement
 	
 	public function getDataForMultiAction()
 	{
-		$options_xml = "<value id=\"\">".I18n :: locale("select-value")."</value>\n";
+		$options_xml = "<value id=\"\">".I18n::locale("select-value")."</value>\n";
 		
 		if($this -> foreign_key && !$this -> values_list)
 			$data_for_options = $this -> getDataOfForeignKey();
@@ -380,7 +382,7 @@ class EnumModelElement extends ModelElement
 			
 		if(!$this -> required && $this -> empty_value)
 		{
-			$empty_text = is_bool($this -> empty_value) ? I18n :: locale("not-defined") : $this -> empty_value;
+			$empty_text = is_bool($this -> empty_value) ? I18n::locale('not-defined') : $this -> empty_value;
 			$options_xml .= "<value id=\"0\">".$empty_text."</value>\n";
 		}
 		
@@ -403,13 +405,13 @@ class EnumModelElement extends ModelElement
 			$foreign_name_field = $object -> getElement($this -> name_field);
 			$foreign_name_field_extra = $object -> getElement($this -> name_field_extra);
 			
-			if($foreign_name_field -> getType() == "enum" || (is_object($foreign_name_field_extra) && 
-			   $foreign_name_field_extra -> getType() == "enum")) //If we search in enum fields
+			if($foreign_name_field -> getType() == 'enum' || (is_object($foreign_name_field_extra) && 
+			   $foreign_name_field_extra -> getType() == 'enum')) //If we search in enum fields
 			{
-				$request_re = Service :: prepareRegularExpression($request);
+				$request_re = Service::prepareRegularExpression($request);
 				
 				foreach($this -> defineValuesList() -> values_list as $key => $value)
-					if(preg_match("/".$request_re."/ui", $value))
+					if(preg_match('/'.$request_re.'/ui', $value))
 						$result_rows[$key] = htmlspecialchars_decode($value, ENT_QUOTES);
 			}
 			else //Regular search in text fields
@@ -436,19 +438,21 @@ class EnumModelElement extends ModelElement
 		else //If its just values list
 		{
 			$this -> defineValuesList();
-			$request_re = Service :: prepareRegularExpression($request);
+			$request_re = Service::prepareRegularExpression($request);
 			
 			if(count($this -> values_list) <= 10) //If short list we give it all back
 				$result_rows = $this -> values_list;
 			else
 				foreach($this -> values_list as $key => $value) //String search in list
-					if(preg_match("/".$request_re."/ui", $value))
+					if(preg_match('/'.$request_re.'/ui', $value))
 						$result_rows[$key] = htmlspecialchars_decode($value, ENT_QUOTES);
 		}
 		
-		return array('query' => $request,
-					 'suggestions' => array_values($result_rows),
-					 'data' => array_keys($result_rows));
+		return [
+			'query' => $request,
+			'suggestions' => array_values($result_rows),
+			'data' => array_keys($result_rows)
+		];
 	}
 	
 	public function getValueName($key)
@@ -456,22 +460,18 @@ class EnumModelElement extends ModelElement
 		//If we need to get the enum value by key at the frontend
 		if($this -> foreign_key)
 		{
-			if(!is_numeric($key))
-				return '';
-
 			$object = new $this -> foreign_key();
 
 			$row = $object -> db -> getRow("SELECT `".$this -> name_field."`".
-					  					   ($this -> name_field_extra ? ",`".$this -> name_field_extra."`" : "")."
+					  					   ($this -> name_field_extra ? ",`".$this -> name_field_extra."`" : '')."
 										   FROM `".$object -> getTable()."` 
 										   WHERE `id`='".$key."'");
 
 			return $this -> createNameFromNameFields($row, $object);
 		}
-		else if(array_key_exists($key, $this -> values_list))
-			return $this -> values_list[$key];
-
-		return '';
+		else
+			if(isset($this -> values_list[$key]))
+				return $this -> values_list[$key];
 	}
 	
 	public function getNameOfParentOfForeignKey($id)
@@ -486,7 +486,7 @@ class EnumModelElement extends ModelElement
 											   WHERE `id`='".$id."'");
 		
 		if($parent_id == -1)
-			return I18n :: locale('root-catalog');
+			return I18n::locale('root-catalog');
 		else if($parent_id)
 			return $object -> db -> getCell("SELECT `".$foreign_key_name_field."`
 											 FROM `".$object -> getTable()."`
@@ -507,9 +507,7 @@ class EnumModelElement extends ModelElement
 	{
 		if($this -> name_field_extra)
 		{
-			$registry = Registry :: instance();
-			
-			if($registry -> getSetting("DbEngine") == "sqlite")
+			if(Registry::get('DbEngine') == 'sqlite')
 				$replace = " (`".$this -> name_field."` || ' ' || `".$this -> name_field_extra."`) AS `".$this -> name_field."`";
 			else
 				$replace = "CONCAT_WS(' ', `".$this -> name_field."`, `".$this -> name_field_extra."`) AS `".$this -> name_field."`";
@@ -522,7 +520,8 @@ class EnumModelElement extends ModelElement
 	
 	public function getKeyUsingName($name)
 	{
-		if(!$name) return;
+		if(!$name)
+			return;
 
 		if(!$this -> foreign_key)
 		{
@@ -531,7 +530,7 @@ class EnumModelElement extends ModelElement
 		}
 		else
 		{
-			$db = Database :: instance();
+			$db = Database::instance();
 	
 			return $db -> getCell("SELECT `id`
 					  			   FROM `".strtolower($this -> foreign_key)."` 
@@ -541,7 +540,7 @@ class EnumModelElement extends ModelElement
 
 	public function displayAdminFilter(mixed $data)
 	{
-		return self :: createAdminFilterHtml($this -> name, $data);
+		return self::createAdminFilterHtml($this -> name, $data);
 	}
 
 	static public function createAdminFilterHtml(string $name, mixed $data)
@@ -551,13 +550,13 @@ class EnumModelElement extends ModelElement
 		if($data['long_list'])
 		{
 			$options = [
-				I18n :: locale('search-by-name') => '',
-				I18n :: locale('has-value') => '*',
-				I18n :: locale('has-no-value') => '-'
+				I18n::locale('search-by-name') => '',
+				I18n::locale('has-value') => '*',
+				I18n::locale('has-no-value') => '-'
 			];
 			
 			$html = "<div class=\"long-list-select\">";
-			$html .= Filter :: createSelectTag($name, $options, $value, 'backend')."</div>\n";
+			$html .= Filter::createSelectTag($name, $options, $value, 'backend')."</div>\n";
 
 			$value_name = $value;
 
@@ -579,15 +578,15 @@ class EnumModelElement extends ModelElement
 		else
 		{
 			$options = [
-				I18n :: locale('not-defined') => '',
-				I18n :: locale('has-value') => '*',
-				I18n :: locale('has-no-value') => '-'
+				I18n::locale('not-defined') => '',
+				I18n::locale('has-value') => '*',
+				I18n::locale('has-no-value') => '-'
 			];
 
 			if(count($data['values_list']))
 				$options = array_merge($options, array_flip($data['values_list']));
 
-			$html = Filter :: createSelectTag($name, $options, $value, 'backend');
+			$html = Filter::createSelectTag($name, $options, $value, 'backend');
 		}
 		
 		return $html;
