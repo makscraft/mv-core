@@ -186,7 +186,7 @@ class Database
 		catch(PDOException $error)
 		{
 			if(Registry::onDevelopment())
-				Debug::displayError($error -> getMessage().'. SQL query: '.str_replace(["\n", "\r", "\t"], '', $query));
+				Debug::displayError($error -> getMessage());
 			else
 			{
 				Registry::set('ErrorAlreadyLogged', true);
