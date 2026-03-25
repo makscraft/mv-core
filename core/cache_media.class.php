@@ -69,31 +69,31 @@ class CacheMedia
 	 */
 	static public function instance(Router $router = null)
 	{
-		if(!isset(self :: $instance))
+		if(!isset(self::$instance))
         {
-            self :: $build = Registry :: get('Build') ?? 0;
-            self :: $folder = Registry :: get('IncludePath').'userfiles/cache/';
+            self::$build = Registry::get('Build') ?? 0;
+            self::$folder = Registry::get('IncludePath').'userfiles/cache/';
 
-            if(!is_dir(self :: $folder))
-                Filemanager :: createDirectory(self :: $folder);
+            if(!is_dir(self::$folder))
+                Filemanager::createDirectory(self::$folder);
 
-            self :: $map_file = self :: $folder.'media-map-'.self :: $build.'.php';
-            self :: $folder .= 'media/';
+            self::$map_file = self::$folder.'media-map-'.self::$build.'.php';
+            self::$folder .= 'media/';
 
-            if(!is_dir(self :: $folder))
-                Filemanager :: createDirectory(self :: $folder);
+            if(!is_dir(self::$folder))
+                Filemanager::createDirectory(self::$folder);
 
             //We check files modification time if on development mode and certan period of time after new build
-            if(Registry :: onDevelopment() || Registry :: get('CheckConfigFilesUntil') - time() > 0)
-                self :: $flags['check_filetimes'] = true;
+            if(Registry::onDevelopment() || Registry::get('CheckConfigFilesUntil') - time() > 0)
+                self::$flags['check_filetimes'] = true;
 
             if(is_object($router))
-                self :: $route = $router -> getRoute();
+                self::$route = $router -> getRoute();
 
-			self :: $instance = new self();
+			self::$instance = new self();
         }
 
-        return self :: $instance;
+        return self::$instance;
 	}
 
     /**
@@ -102,7 +102,7 @@ class CacheMedia
      */
     static public function getFiles()
     {
-        return self :: $files;
+        return self::$files;
     }
 
     /**
@@ -111,7 +111,7 @@ class CacheMedia
      */
     static public function getPreloads()
     {
-        return self :: $preloads;
+        return self::$preloads;
     }
 
     /**
@@ -120,10 +120,10 @@ class CacheMedia
      */
     static private function combineFiles(string $type)
     {
-        $result = self :: $files[$type] ?? [];
+        $result = self::$files[$type] ?? [];
 
-        if(array_key_exists($type, self :: $preloads) && is_array(self :: $preloads[$type]))
-            foreach(self :: $preloads[$type] as $file)
+        if(array_key_exists($type, self::$preloads) && is_array(self::$preloads[$type]))
+            foreach(self::$preloads[$type] as $file)
                 if(!in_array($file, $result))
                     $result[] = $file;
 
@@ -138,9 +138,9 @@ class CacheMedia
     {
         $all = [];
 
-        foreach(self :: $files as $type => $files)
+        foreach(self::$files as $type => $files)
         {
-            $files = self :: combineFiles($type);
+            $files = self::combineFiles($type);
             $all = array_merge($all, $files);
         }
 
@@ -153,9 +153,14 @@ class CacheMedia
      */
     static public function getDropMark()
     {
-        $mark = str_replace('.', '', (string) Registry::getVersion());
+        if(Registry::get('LoadedFromCache') && $mark = Registry::get('CacheMediaDropMark'))
+            return '?'.$mark;
 
-        return '?'.$mark.(Registry::get('Build') ?? 0);
+        $version = intval(str_replace('.', '', (string) Registry::getVersion()));
+        $setup = filemtime(Registry::get('IncludePath').'config/setup.php');
+        $build = Registry::get('Build') ?? 0;
+
+        return '?'.round($setup * $build / $version);
     }
 
     /**
@@ -164,31 +169,31 @@ class CacheMedia
     static public function addFile(mixed $file, string $type)
     {
         $files = is_string($file) ? [$file] : $file;
-        $preload = self :: $instance ? false : true;
+        $preload = self::$instance ? false : true;
 
         foreach($files as $file)
         {
             $folder = (strpos($file, '/') === false) ? 'media/'.$type : dirname($file);
-            $file = Registry :: get('IncludePath').$folder.'/'.basename($file);
+            $file = Registry::get('IncludePath').$folder.'/'.basename($file);
 
             if(!is_file($file))
                 continue;
 
             if($preload)
             {
-                if(!array_key_exists($type, self :: $preloads))
-                    self :: $preloads[$type] = [];
+                if(!array_key_exists($type, self::$preloads))
+                    self::$preloads[$type] = [];
 
-                if(!in_array($file, self :: $preloads[$type]))
-                    self :: $preloads[$type][] = $file;
+                if(!in_array($file, self::$preloads[$type]))
+                    self::$preloads[$type][] = $file;
             }
             else
             {
-                if(!array_key_exists($type, self :: $files))
-                    self :: $files[$type] = [];
+                if(!array_key_exists($type, self::$files))
+                    self::$files[$type] = [];
 
-                if(!in_array($file, self :: $files[$type]))
-                    self :: $files[$type][] = $file;
+                if(!in_array($file, self::$files[$type]))
+                    self::$files[$type][] = $file;
             }
         }
     }
@@ -198,7 +203,7 @@ class CacheMedia
      */
     static public function addJavaScriptFile(mixed $file)
     {
-        self :: addFile($file, 'js');
+        self::addFile($file, 'js');
     }
 
     /**
@@ -206,7 +211,7 @@ class CacheMedia
      */
     static public function addCssFile(mixed $file)
     {
-        self :: addFile($file, 'css');
+        self::addFile($file, 'css');
     }
 
     /**
@@ -215,30 +220,30 @@ class CacheMedia
      */
     static public function getCachedFile(string $type)
     {
-        $files = self :: combineFiles($type);
+        $files = self::combineFiles($type);
         $file_path = '';
 
         if(!count($files))
             return '';
 
-        if(self :: $flags['check_filetimes'])
+        if(self::$flags['check_filetimes'])
         {
-            $files_ = Service :: addFilesWithModificationTimes($files);
-            $hash = md5(json_encode($files_).strval(self :: $route));
+            $files_ = Service::addFilesWithModificationTimes($files);
+            $hash = md5(json_encode($files_).strval(self::$route));
         }
         else
-            $hash = md5(json_encode($files).strval(self :: $route));
+            $hash = md5(json_encode($files).strval(self::$route));
 
-        $file_path = self :: $folder.$type.'-'.self :: $build.'-'.$hash.'.'.$type;
+        $file_path = self::$folder.$type.'-'.self::$build.'-'.$hash.'.'.$type;
 
         if(!is_file($file_path))
         {
-            self :: cleanupMediaFiles($type);
-            self :: compressFiles($files, $file_path);
-            self :: $flags['save_map'] = true;
+            self::cleanupMediaFiles($type);
+            self::compressFiles($files, $file_path);
+            self::$flags['save_map'] = true;
         }
 
-        $file = Service :: addRootPath($file_path);
+        $file = Service::addRootPath($file_path);
         
         return $file;
     }
@@ -249,7 +254,7 @@ class CacheMedia
      */
     static public function getJavaScriptCache()
     {
-        $file = self :: getCachedFile('js');
+        $file = self::getCachedFile('js');
 
         return "<script type=\"text/javascript\" src=\"".$file."\"></script>\n";
     }
@@ -260,7 +265,7 @@ class CacheMedia
      */
     static public function getCssCache()
     {
-        $file = self :: getCachedFile('css');
+        $file = self::getCachedFile('css');
                 
         return "<link rel=\"stylesheet\" type=\"text/css\" href=\"".$file."\" />\n";
     }
@@ -271,8 +276,8 @@ class CacheMedia
      */
     static public function getAllCache()
     {
-        $all = self :: getCssCache();
-        $all .= self :: getJavaScriptCache();
+        $all = self::getCssCache();
+        $all .= self::getJavaScriptCache();
 
         return $all;
     }
@@ -285,16 +290,16 @@ class CacheMedia
     static public function getInitialFiles(string $type = '')
     {
         $html = '';
-        $hash = substr(md5(self :: $build), 5, 7);
+        $hash = substr(md5(self::$build), 5, 7);
 
         if($type === 'css' || $type === '')
         {
-            $files = self :: combineFiles('css');
+            $files = self::combineFiles('css');
 
             foreach($files as $file)
             {
-                $drop =  '?'.(self :: $flags['check_filetimes'] ? filemtime($file) : $hash);
-                $file = Service :: addRootPath($file).$drop;
+                $drop =  '?'.(self::$flags['check_filetimes'] ? filemtime($file) : $hash);
+                $file = Service::addRootPath($file).$drop;
                 
                 $html .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"".$file."\" />\n";
             }
@@ -302,12 +307,12 @@ class CacheMedia
 
         if($type === 'js' || $type === '')
         {
-            $files = self :: combineFiles('js');
+            $files = self::combineFiles('js');
 
             foreach($files as $file)
             {
-                $drop =  '?'.(self :: $flags['check_filetimes'] ? filemtime($file) : $hash);
-                $file = Service :: addRootPath($file).$drop;
+                $drop =  '?'.(self::$flags['check_filetimes'] ? filemtime($file) : $hash);
+                $file = Service::addRootPath($file).$drop;
 
                 $html .= "<script type=\"text/javascript\" src=\"".$file."\"></script>\n";
             }
@@ -321,15 +326,15 @@ class CacheMedia
      */
     static public function cleanupMediaFiles(string $type)
     {
-        if(!is_dir(self :: $folder))
+        if(!is_dir(self::$folder))
             return;
 
-        $files = scandir(self :: $folder);
-        $begin = $type.'-'.self :: $build.'-';
+        $files = scandir(self::$folder);
+        $begin = $type.'-'.self::$build.'-';
 
         foreach($files as $file)
-            if(strpos($file, $begin) !== 0 && Service :: getExtension($file) === $type)
-                unlink(self :: $folder.$file);
+            if(strpos($file, $begin) !== 0 && Service::getExtension($file) === $type)
+                unlink(self::$folder.$file);
     }
 
     /**
@@ -337,7 +342,7 @@ class CacheMedia
      */
     static private function compressFiles(array $files, string $file_path)
     {
-        if(!is_dir(self :: $folder))
+        if(!is_dir(self::$folder))
             return false;
 
         $content = '';
@@ -346,9 +351,9 @@ class CacheMedia
         {
             $data = file_get_contents($file);
 
-            if(Service :: getExtension($file) === 'css')
+            if(Service::getExtension($file) === 'css')
             {
-                $path = dirname(Service :: addRootPath($file)).'/';
+                $path = dirname(Service::addRootPath($file)).'/';
                 $data = str_replace(':url(', ': url(', $data);
                 $data = preg_replace('/\Wurl\s*\(\s*(\'|\")?\s*/', ' url($1'.$path, $data);
             }
@@ -368,21 +373,21 @@ class CacheMedia
 
     static public function findByRoute(Router $router)
     {
-        self :: $route = $router -> getRoute();
-        self :: $flags['save_map'] = true;
+        self::$route = $router -> getRoute();
+        self::$flags['save_map'] = true;
 
-        if(is_file(self :: $map_file))
+        if(is_file(self::$map_file))
         {
-            $cache = include(self :: $map_file);
+            $cache = include(self::$map_file);
 
-            if($cache['Build'] != self :: $build)
+            if($cache['Build'] != self::$build)
                 return false;
 
-            if(array_key_exists(self :: $route, $cache['Routes']))
+            if(array_key_exists(self::$route, $cache['Routes']))
             {
-                $files = $cache['Routes'][self :: $route];
+                $files = $cache['Routes'][self::$route];
 
-                if(Registry :: get('Mode') == 'development')
+                if(Registry::get('Mode') == 'development')
                 {
                     $hash = $files['check_hash'] ?? null;
                     $sources = $files['sources'] ?? null;
@@ -394,16 +399,16 @@ class CacheMedia
                 unset($files['check_hash'], $files['sources']);
 
                 foreach($files as $file)
-                    if(!is_file(self :: $folder.$file))
+                    if(!is_file(self::$folder.$file))
                         return false;
                 
                 if(isset($files['css']) && $files['css'])
-                    echo self :: getCssCache($files['css']);
+                    echo self::getCssCache($files['css']);
 
                 if(isset($files['js']) && $files['js'])
-                    echo self :: getJavaScriptCache($files['js']);
+                    echo self::getJavaScriptCache($files['js']);
 
-                self :: $flags['save_map'] = false;
+                self::$flags['save_map'] = false;
 
                 return true;
             }
@@ -414,21 +419,21 @@ class CacheMedia
 
     static public function addDataIntoMediaCacheMap()
     {
-        $map = ['Build' => self :: $build, 'Common' => [], 'Routes' => []];
+        $map = ['Build' => self::$build, 'Common' => [], 'Routes' => []];
 
-        if(is_file(self :: $map_file))
-            $map = include(self :: $map_file);
+        if(is_file(self::$map_file))
+            $map = include(self::$map_file);
         else
-            Cache :: cleanConfigCacheFilesByKey('media-map');
+            Cache::cleanConfigCacheFilesByKey('media-map');
 
-        if(self :: $route === null)
+        if(self::$route === null)
         {
             $map['Common'] = [
-                'css' => self :: combineFiles('css'),
-                'js' => self :: combineFiles('js')
+                'css' => self::combineFiles('css'),
+                'js' => self::combineFiles('js')
             ];
         }
         
-        Cache :: saveConfigCacheIntoFile($map, 'media-map');
+        Cache::saveConfigCacheIntoFile($map, 'media-map');
     }
 }

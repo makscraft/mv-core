@@ -74,6 +74,11 @@ class Registry
 			if(!isset($settings_list['DomainName']) || !$settings_list['DomainName'])
 				$settings_list['DomainName'] = $settings_list['ServerDomain'];
 		}
+
+		//Drop mark for CSS and JS files, based on build number and MV core version 
+		Registry::set('Build', $settings_list['Build'] ?? 0);
+		Registry::set('IncludePath', $settings_list['IncludePath']);
+		$settings_list['CacheMediaDropMark'] = str_replace('?', '', CacheMedia::getDropMark());
 	}
 
 	/**
