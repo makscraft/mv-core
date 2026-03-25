@@ -40,7 +40,7 @@ foreach($backtrace as $key => $data)
 					<div class="version">MV framework, version <?php echo $version_package.$engine; ?>, 
 					project build <?php echo Registry::get('Build', 0); ?></div>
 					<?php if($version_initial): ?>
-						<div class="version-initial">updated from version <?php echo number_format($version_initial, 1); ?></div>
+						<div class="version-initial">MV core is updated from version <?php echo number_format($version_initial, 1); ?></div>
 					<?php endif; ?>
 				</div>
 			</header>
