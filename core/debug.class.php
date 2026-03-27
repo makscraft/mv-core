@@ -176,6 +176,8 @@ class Debug
 			return 'yandex';
 		if(strpos($_SERVER['HTTP_USER_AGENT'], 'Edg') !== false)
 			return 'edge';
+		if(strpos($_SERVER['HTTP_USER_AGENT'], 'SamsungBrowser') !== false)
+			return 'samsung';		
 		if(strpos($agent, 'chrome') !== false)
 			return 'chrome';
 		if(strpos($agent, 'firefox') !== false)
