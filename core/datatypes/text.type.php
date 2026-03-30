@@ -26,24 +26,29 @@ class TextModelElement extends CharModelElement
 	
 	public function setValue($value)
 	{
-		$value = is_null($value) ? '' : $value;
-		$this -> value = str_replace("\t", '', $value);
+		if(is_null($value))
+			$this -> value = '';
+		else if(!$this -> json)
+		{
+			$this -> value = str_replace("\t", '', strval($value));
 		
-		if($this -> rich_text)
-		{
-			$search = array("'", "\\");
-			$replace = array("&#039;", "&#92;");
-			$this -> value = preg_replace("/<script([^>]*)>/i", "&lt;script$1&gt;", $this -> value);
-			$this -> value = str_ireplace("</script>", "&lt;/script&gt;", $this -> value);
-			$this -> value = str_ireplace("<meta ", "&lt;meta ", $this -> value);
-			
-			if($this -> auto_cleanup)
-				$this -> value = $this -> cleanupText($this -> value);
-		}
-		else 
-		{
-			$search = array("&", "'", "<", ">", '"', "\\");
-			$replace = array("&amp;", "&#039;", "&lt;", "&gt;", "&quot;", "&#92;");
+			if($this -> rich_text)
+			{
+				$search = ["'", "\\"];
+				$replace = ["&#039;", "&#92;"];
+
+				$this -> value = preg_replace("/<script([^>]*)>/i", "&lt;script$1&gt;", $this -> value);
+				$this -> value = str_ireplace("</script>", "&lt;/script&gt;", $this -> value);
+				$this -> value = str_ireplace("<meta ", "&lt;meta ", $this -> value);
+				
+				if($this -> auto_cleanup)
+					$this -> value = $this -> cleanupText($this -> value);
+			}
+			else 
+			{
+				$search = ["&", "'", "<", ">", '"', "\\"];
+				$replace = ["&amp;", "&#039;", "&lt;", "&gt;", "&quot;", "&#92;"];
+			}
 		}
 		
 		if($this -> json)
@@ -59,7 +64,7 @@ class TextModelElement extends CharModelElement
 		
 	public function displayHtml()
 	{
-		$id = "textarea_".$this -> name;
+		$id = 'textarea_'.$this -> name;
 
 		if(is_string($this -> height))
 			$this -> height = str_replace('px', '', $this -> height);
@@ -78,7 +83,7 @@ class TextModelElement extends CharModelElement
 		if($this -> rich_text)
 		{
 			$height = $this -> height ? $this -> height : 300;
-			$html .= Editor :: run($id, $height);
+			$html .= Editor::run($id, $height);
 		}
 		
 		return $html;
@@ -86,7 +91,7 @@ class TextModelElement extends CharModelElement
 	
 	private function cleanupText($text)
 	{
-		$tags = "(p|li|div|span|strong|em|h1|h2|h3|h4|h5|h6)";
+		$tags = '(p|li|div|span|strong|em|h1|h2|h3|h4|h5|h6)';
 		
 		$text = preg_replace("/(\s*&nbsp;\s*){2,}/", " ", $text);
 		$text = preg_replace("/\s*(&nbsp;)?\s*<\/".$tags.">/", "</$2>", $text);
