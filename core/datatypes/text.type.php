@@ -99,4 +99,14 @@ class TextModelElement extends CharModelElement
 
 		return $text;
 	}
+
+	static public function unpackJsonValue(mixed $value)
+	{
+		if(is_array($value))
+			return $value;
+
+		$value = json_decode(strval($value), true);
+
+		return is_array($value) ? $value : [];
+	}
 }

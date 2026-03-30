@@ -75,10 +75,7 @@ abstract class ModelInitial
 					$content[$name] = implode(',', $ids);
 				}
 				else if($object -> getType() === 'text' && $object -> getProperty('json'))
-				{
-					$value = json_decode($content[$name], true) ?? [];
-					$content[$name] = is_array($value) ? $value : [];
-				}
+					$content[$name] = TextModelElement::unpackJsonValue($content[$name]);
 		}
 		
 		return $content ? new Record($content, $model_object) : null;
