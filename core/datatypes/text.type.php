@@ -26,9 +26,9 @@ class TextModelElement extends CharModelElement
 	
 	public function setValue($value)
 	{
-		if(is_null($value))
-			$this -> value = '';
-		else if(!$this -> json)
+		$value ??= '';
+		
+		if(!$this -> json)
 		{
 			$this -> value = str_replace("\t", '', strval($value));
 		
