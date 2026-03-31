@@ -398,6 +398,7 @@ class EnumModelElement extends ModelElement
 		$result_rows = [];
 		$request_like = str_replace("%", "[%]", $request);
 		$request_like = $db -> secure("%".$request_like."%");
+		$request_equal = $db -> secure($request);
 		
 		if($this -> foreign_key && !$this -> is_parent) //If its regular enum field with foreign key
 		{
@@ -414,10 +415,18 @@ class EnumModelElement extends ModelElement
 					if(preg_match('/'.$request_re.'/ui', $value))
 						$result_rows[$key] = htmlspecialchars_decode($value, ENT_QUOTES);
 			}
-			else //Regular search in text fields
+			else //Regular search in text captions in FK table
 			{
-				$query = "SELECT `id`,`".$this -> name_field."` 
-						  FROM `".$object -> getTable()."`";
+				//Search for exact match first
+				$query = "SELECT `id`,`".$this -> name_field."` FROM `".$object -> getTable()."`";
+
+				//If we have complex name field with other field of model
+				$query = $this -> processNameFields($query);
+				$query .= " WHERE `".$this -> name_field."`=".$request_equal." LIMIT 5";
+				
+				$rows_equal = $db -> getAll($query);
+
+				$query = "SELECT `id`,`".$this -> name_field."` FROM `".$object -> getTable()."`";
 				
 				//If we have complex name field with other field of model
 				$query = $this -> processNameFields($query);
@@ -427,11 +436,19 @@ class EnumModelElement extends ModelElement
 				if($this -> name_field_extra) //Extra condition if complex name field
 					$query .= " OR `".$this -> name_field_extra."` LIKE ".$request_like;
 				
-				$query .= " ORDER BY `".$this -> name_field."` ASC LIMIT 10";
+				$query .= " ORDER BY `".$this -> name_field."` ASC LIMIT 15";
 				
-				$rows = $db -> getAll($query);
-				
-				foreach($rows as $row) //Collects suggestions
+				$rows_like = $db -> getAll($query);
+				$rows = array_values($rows_equal);
+
+				//Adds like matches to exact ones
+				foreach($rows_like as $id => $row)
+					if(!array_key_exists($id, $rows_equal))
+						$rows[] = $row;
+
+				$rows = array_slice($rows, 0, 10);
+
+				foreach($rows as $row) //Collects suggestions for JS search
 					$result_rows[$row['id']] = htmlspecialchars_decode($row[$this -> name_field], ENT_QUOTES);
 			}
 		}
