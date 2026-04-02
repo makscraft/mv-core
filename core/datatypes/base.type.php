@@ -121,7 +121,7 @@ abstract class ModelElement
 	 */
 	public function addHtmlParams()
 	{ 
-		return ($this -> html_params) ? ' '.$this -> html_params : '';
+		return $this -> html_params ? ' '.trim($this -> html_params) : '';
 	}
 	
 	/**
@@ -174,8 +174,10 @@ abstract class ModelElement
 		$value = htmlspecialchars(trim($value), ENT_QUOTES);
 				
 		return Service::cleanHtmlSpecialChars($value);
-	}	
+	}
 	
+	/* Accessors */
+
 	public function setRequired($value) { $this -> required = $value; return $this; }
 	public function setHelpText($value) { $this -> help_text = $value; return $this; }
 	public function setCaption($value) { $this -> caption = $value; return $this; }
@@ -211,17 +213,19 @@ abstract class ModelElement
 	{
 		$properties = get_object_vars($this);
 		
-		$int_properties = ["max_size", "max_width", "max_height", "min_length", "max_length", "length", "height",
-						   "form_preview_width", "form_preview_height"];
+		$int_properties = [
+			'max_size', 'max_width', 'max_height', 'min_length', 'max_length', 'length', 'height',
+			'form_preview_width', 'form_preview_height'
+		];
 		
-		if($property === "value")
+		if($property === 'value')
 			return $this -> setValue($value);
 		
 		if(array_key_exists($property, $properties))
 		{
-			if($property === "min_max_length")
+			if($property === 'min_max_length')
 			{
-				if(preg_match("/^\d+,\s*\d+$/", $value))
+				if(preg_match('/^\d+,\s*\d+$/', $value))
 				{
 					$numbers = explode(",", $value);
 					$this -> min_length = abs(intval(trim($numbers[0])));
@@ -269,7 +273,7 @@ abstract class ModelElement
 			if(preg_match("/^\{.*\}$/", $this -> help_text))
 				$this -> help_text = I18n::locale(preg_replace("/^\{(.*)\}$/", "$1", $this -> help_text));
 			
-			return "<div class=\"help-text\">".$this -> help_text."</div>\n";
+			return "<div class=\"help-text\">".trim($this -> help_text)."</div>\n";
 		}
 
 		return '';
@@ -285,8 +289,7 @@ abstract class ModelElement
 	 */
 	abstract function displayHtml();
 
-
-
+	
 	public function prepareValue()
 	{
 		return null;

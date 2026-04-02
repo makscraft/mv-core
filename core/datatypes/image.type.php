@@ -10,9 +10,9 @@ class ImageModelElement extends FileModelElement
 	
 	public function displayHtml()
 	{
-		$html = "";
+		$html = '';
 		$arguments = func_get_args();
-		$form_frontend = (isset($arguments[0]) && $arguments[0] == "frontend");
+		$form_frontend = (isset($arguments[0]) && $arguments[0] == 'frontend');
 		
 		$preview_width = ($form_frontend && $this -> form_preview_width) ? $this -> form_preview_width : 150;
 		$preview_height = ($form_frontend && $this -> form_preview_height) ? $this -> form_preview_height : 150;
@@ -30,7 +30,7 @@ class ImageModelElement extends FileModelElement
 			{
 				$html .= "<img src=\"".$src."\" alt=\"".$this -> file_name."\" />\n";
 				$html .= "<p><span class=\"file\">".$this -> file_name."</span>\n";
-				$html .= "<span class=\"delete image\">".I18n :: locale('delete')."</span></p>\n";
+				$html .= "<span class=\"delete image\">".I18n::locale('delete')."</span></p>\n";
 			}
 			else
 			{
@@ -38,26 +38,26 @@ class ImageModelElement extends FileModelElement
 				$html .= "<img src=\"".$src."\" alt=\"".$this -> file_name."\" />\n</div>\n";
 				$html .= "<div class=\"params\">\n";
 				$html .= "<div class=\"name\">".$this -> file_name."</div>\n";
-				$html .= "<span class=\"delete\" title=\"".I18n :: locale('delete')."\"></span>\n";
-				$html .= "<p>".I18n :: locale('size').": ".I18n :: convertFileSize(filesize($this -> value))."</p>\n";
+				$html .= "<span class=\"delete\" title=\"".I18n::locale('delete')."\"></span>\n";
+				$html .= "<p>".I18n::locale('size').": ".I18n::convertFileSize(filesize($this -> value))."</p>\n";
 
-				if(Service :: getExtension($this -> value) != "svg")
+				if(Service::getExtension($this -> value) != "svg")
 				{
-					$html .= "<p>".I18n :: locale('width').": ".$size[0]."</p>\n";
-					$html .= "<p>".I18n :: locale('height').": ".$size[1]."</p>\n";
+					$html .= "<p>".I18n::locale('width').": ".$size[0]."</p>\n";
+					$html .= "<p>".I18n::locale('height').": ".$size[1]."</p>\n";
 				}
 
 				$html .= "<p><a target=\"_blank\" class=\"download\" href=\"";
-				$html .= Service :: removeDocumentRoot($this -> value)."\">";
-				$html .= I18n :: locale('view-download')."</a></p>\n";
+				$html .= Service::removeDocumentRoot($this -> value)."\">";
+				$html .= I18n::locale('view-download')."</a></p>\n";
 			}
 			
 			$html .= "<input type=\"hidden\" value=\"".$this -> packUploadedFileData()."\" ";
 			$html .= "name=\"value-".$this -> name."\" />\n</div>\n";
-			$html .= $form_frontend ? "" : "</div>\n";
+			$html .= $form_frontend ? '' : "</div>\n";
 		}
 		
-		$css_class = ($this -> value && file_exists($this -> value)) ? ($form_frontend ? " hidden" : " no-display") : "";
+		$css_class = ($this -> value && file_exists($this -> value)) ? ($form_frontend ? ' hidden' : ' no-display') : '';
 		
 		$html .= "<div class=\"image-input".$css_class."\"".$this -> addHtmlParams().">\n";
 		$html .= "<input type=\"file\" name=\"".$this -> name."\" value=\"\" />\n";

@@ -11,7 +11,7 @@ class OrderModelElement extends IntModelElement
 	public function validate()
 	{
 		$arguments = func_get_args();
-		parent :: validate($arguments[0], $arguments[1]);
+		parent::validate($arguments[0] ?? null, $arguments[1] ?? null);
 		
 		if($this -> error == '{error-not-order}')
 			$this -> error = '{error-not-int}';
@@ -23,27 +23,27 @@ class OrderModelElement extends IntModelElement
 	{
 		$arguments = func_get_args();
 		
-		if(isset($arguments[0]) && $arguments[0] && $arguments[0] != "frontend")
+		if(isset($arguments[0]) && $arguments[0] && $arguments[0] != 'frontend')
 			$this -> value = intval($arguments[0]);
 			
-		return parent :: displayHtml();
+		return parent::displayHtml();
 	}
 	
 	public function displayHtmlForTable($value, $row_id)
 	{		
 		$html = "<div class=\"move_position_".$this -> name." ordering-area\">\n";
-		$html .= "<span title=\"".I18n :: locale('move-first')."\" class=\"top\"></span>\n";
-		$html .= "<span title=\"".I18n :: locale('move-up')."\" class=\"up\"></span>\n";
+		$html .= "<span title=\"".I18n::locale('move-first')."\" class=\"top\"></span>\n";
+		$html .= "<span title=\"".I18n::locale('move-up')."\" class=\"up\"></span>\n";
 		$html .= "<span id=\"row_".$row_id."\" class=\"number\">".intval($value)."</span>\n";
-		$html .= "<span title=\"".I18n :: locale('move-down')."\" class=\"down\"></span>\n";
-		$html .= "<span title=\"".I18n :: locale('move-last')."\" class=\"bottom\"></span>\n";
+		$html .= "<span title=\"".I18n::locale('move-down')."\" class=\"down\"></span>\n";
+		$html .= "<span title=\"".I18n::locale('move-last')."\" class=\"bottom\"></span>\n";
 
 		return $html."</div>\n";
 	}
 	
 	public function getLastNumber($model_table, $condition)
 	{
-		$db = Database :: instance();
+		$db = Database::instance();
 		
 		return (int) $db -> getCell("SELECT MAX(`".$this -> name."`) 
 								     FROM `".$model_table."` 

@@ -19,12 +19,14 @@ class ManyToOneModelElement extends ModelElement
 	public function setRelatedId($related_id)
 	{
 		$this -> related_id = intval($related_id);
+
 		return $this;
 	}
 	
 	public function setRelatedFeild($related_field)
 	{	
 		$this -> related_field = $related_field;
+
 		return $this;
 	}
 	
@@ -35,7 +37,7 @@ class ManyToOneModelElement extends ModelElement
 	
 	public function displayHtml()
 	{
-		$html = "";
+		$html = '';
 		
 		$object = new $this -> related_model();
 		
@@ -51,7 +53,7 @@ class ManyToOneModelElement extends ModelElement
 			$message = "You must set correct name field in related model '".get_class($object)."' ";
 			$message .= "for '".$this -> name."' field of current model. Model '".get_class($object)."' ";
 			$message .= "has no field with name 'name'. Set it like 'name_field' => 'label'.";
-			Debug :: displayError($message);
+			Debug::displayError($message);
 		}
 		
 		$type = $element -> getType();
@@ -70,7 +72,7 @@ class ManyToOneModelElement extends ModelElement
 				if($type == 'enum')
 					$result[] = $enum_values[$name];
 				else if($type == 'date' || $type == 'date_time')
-					$result[] = I18n :: dateFromSQL($name);
+					$result[] = I18n::dateFromSQL($name);
 				else
 					$result[] = $name;
 		
@@ -79,7 +81,7 @@ class ManyToOneModelElement extends ModelElement
 			{
 				$href = $object -> registry -> getSetting("AdminPanelPath")."?model=";
 				$href .= $object -> getModelClass()."&action=index&".$this -> related_field."=".$this -> related_id;
-				$html .= "<a class=\"to-children\" href=\"".$href."\">".I18n :: formatIntNumber(count($result))."</a>";
+				$html .= "<a class=\"to-children\" href=\"".$href."\">".I18n::formatIntNumber(count($result))."</a>";
 			}
 			else
 				$html .= implode("<br />", $result);
@@ -98,12 +100,11 @@ class ManyToOneModelElement extends ModelElement
 		  			    			   		    	      FROM `".$related_object -> getTable()."` 
 								        	    		  WHERE `".$this -> related_field."`='".$this -> related_id."'");
 		
-		return $number ? $html.I18n :: formatIntNumber($number)."</a>" : '-';
+		return $number ? $html.I18n::formatIntNumber($number)."</a>" : '-';
 	}
 
 	public function displayAdminFilter(mixed $data)
 	{
-		return IntModelElement :: createAdminFilterHtml($this -> name, $data);
+		return IntModelElement::createAdminFilterHtml($this -> name, $data);
 	}
 }
-

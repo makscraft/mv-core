@@ -45,7 +45,7 @@ class FileModelElement extends CharModelElement
 		if(!$this -> error)
 		{
 			$this -> unique = false;
-			parent :: validate();
+			parent::validate();
 		}
 			
 		return $this;
@@ -53,7 +53,7 @@ class FileModelElement extends CharModelElement
 
 	public function displayAdminFilter(mixed $data)
 	{
-		return BoolModelElement  :: createAdminFilterHtml($this -> name, $data);
+		return BoolModelElement::createAdminFilterHtml($this -> name, $data);
 	}
 	
 	public function defineFolderEnd()
@@ -66,23 +66,23 @@ class FileModelElement extends CharModelElement
 
 	public function packUploadedFileData()
 	{
-		$token = Registry :: get('SecretCode');
-		$token = Service :: createHash($this -> file_name.$token.$this -> value);
+		$token = Registry::get('SecretCode');
+		$token = Service::createHash($this -> file_name.$token.$this -> value);
 
 		$value = [$this -> file_name, $this -> value, $token];
 		
-		return Service :: encodeBase64(json_encode($value));
+		return Service::encodeBase64(json_encode($value));
 	}
 
 	public function unpackUploadedFileData(string $value)
 	{
-		$value = json_decode(Service :: decodeBase64($value), true);
+		$value = json_decode(Service::decodeBase64($value), true);
 		
 		if(!is_array($value) || count($value) !== 3 || !is_file($value[1]))
 			return null;
 
-		$token = Registry :: get('SecretCode');
-		$token = Service :: createHash($value[0].$token.$value[1]);
+		$token = Registry::get('SecretCode');
+		$token = Service::createHash($value[0].$token.$value[1]);
 
 		if($token === $value[2])
 			return ['name' => $value[0], 'path' => $value[1]];
@@ -98,7 +98,7 @@ class FileModelElement extends CharModelElement
 
 		if($this -> value && file_exists($this -> value))
 		{
-			$size = $this -> file_name ? " (".I18n :: convertFileSize(filesize($this -> value)).")" : "";
+			$size = $this -> file_name ? " (".I18n::convertFileSize(filesize($this -> value)).")" : "";
 			
 			$css_class = $form_frontend ? "file-params" : "file-input";
 			
@@ -108,15 +108,15 @@ class FileModelElement extends CharModelElement
 			$html .= "name=\"value-".$this -> name."\" />\n";
 			
 			if($form_frontend)
-				$html .= "<span class=\"delete file\">".I18n :: locale('delete')."</span>\n";
+				$html .= "<span class=\"delete file\">".I18n::locale('delete')."</span>\n";
 			else
-				$html .= "<span class=\"delete\" title=\"".I18n :: locale('delete')."\"></span>\n";
+				$html .= "<span class=\"delete\" title=\"".I18n::locale('delete')."\"></span>\n";
 						
 			if(!$form_frontend)
 			{
 				$html .= "<p><a target=\"_blank\" class=\"download\" href=\"";
-				$html .= Service :: removeDocumentRoot($this -> value)."\">";
-				$html .= I18n :: locale('view-download')."</a></p>\n";
+				$html .= Service::removeDocumentRoot($this -> value)."\">";
+				$html .= I18n::locale('view-download')."</a></p>\n";
 			}
 			
 			$html .= "</div>\n";
@@ -134,14 +134,14 @@ class FileModelElement extends CharModelElement
 	public function displayMultipleHtml()
 	{
 		$html = "<div class=\"multiple-files-data\">\n";
-		$salt = Registry :: get('SecretCode');
+		$salt = Registry::get('SecretCode');
 
 		foreach($this -> multiple_files as $file)
 		{
 			$html .= "<div class=\"file-element\">\n";
 			$html .= "<span class=\"file\">".$file["name"]."</span>\n";
-			$html .= "<span class=\"delete multiple-file\">".I18n :: locale('delete')."</span>\n";
-			$html .= "<input type=\"hidden\" value=\"".Service :: serializeArray($file)."\" ";
+			$html .= "<span class=\"delete multiple-file\">".I18n::locale('delete')."</span>\n";
+			$html .= "<input type=\"hidden\" value=\"".Service::serializeArray($file)."\" ";
 			$html .= "name=\"multiple-".$this -> name."-".md5($file["file"].$salt)."\" />\n";			
 			$html .= "</div>\n";
 		}
@@ -155,7 +155,7 @@ class FileModelElement extends CharModelElement
 	
 	public function setRealValue($value, $file_name)
 	{
-		if(self :: checkTmpFileBeforeUpload($value) === false)
+		if(self::checkTmpFileBeforeUpload($value) === false)
 			return;
 		
 		if(is_file($value))
@@ -178,8 +178,8 @@ class FileModelElement extends CharModelElement
 		}
 		
 		$image_type = (get_class($this) == 'ImageModelElement');		
-		$registry = Registry :: instance();
-		$extension = Service :: getExtension($file_data['name']);
+		$registry = Registry::instance();
+		$extension = Service::getExtension($file_data['name']);
 		
 		$max_image_size = $this -> max_size ? $this -> max_size : $registry -> getSetting("MaxImageSize");
 		$max_file_size = $this -> max_size ? $this -> max_size : $registry -> getSetting("MaxFileSize");
@@ -237,11 +237,11 @@ class FileModelElement extends CharModelElement
 			return;
 		
 		if($this -> transform_file_name)
-			$initial_name = Service :: translateFileName($file_data['name']);
+			$initial_name = Service::translateFileName($file_data['name']);
 		else
-			$initial_name = Service :: removeExtension(trim($file_data['name']));
+			$initial_name = Service::removeExtension(trim($file_data['name']));
 		
-		$tmp_name = Service :: randomString(30); //New name of file
+		$tmp_name = Service::randomString(30); //New name of file
 			
 		$this -> file_name = $file_data['name']; //Pass the name of file
 		
@@ -262,8 +262,8 @@ class FileModelElement extends CharModelElement
 		if(!is_string($file) || $file === '')
 			return false;
 
-		$tmp_folder = Service :: prepareRegularExpression(Registry :: get('FilesPath').'tmp/');
-		$extension = Service :: getExtension($file);
+		$tmp_folder = Service::prepareRegularExpression(Registry::get('FilesPath').'tmp/');
+		$extension = Service::getExtension($file);
 		$deny = ['phtml', 'php', 'php3', 'php4', 'php5', 'inc', 'pl', 'pm', 'cgi', 'lib', 'py', 'asp', 'aspx', 
 				 'jsp', 'jspx', 'jsw', 'jsv', 'jspf', 'cfm', 'cfml', 'cfc', 'dbm'];
 
@@ -281,7 +281,7 @@ class FileModelElement extends CharModelElement
 	
 	public function copyFile(string $model_name = '')
 	{
-		$check = self :: checkTmpFileBeforeUpload($this -> value);
+		$check = self::checkTmpFileBeforeUpload($this -> value);
 
 		//If we don't have the image file or it's the alredy uploaded image
 		if($check === false)
@@ -289,7 +289,7 @@ class FileModelElement extends CharModelElement
 		else if($check === 'moved')		
 			return $this -> value;
 		
-		$registry = Registry :: instance();
+		$registry = Registry::instance();
 	
 		//Name of current model, or we upload via front form without model
 		$model_name = $model_name !== '' ? strtolower($model_name) : '';
@@ -307,10 +307,10 @@ class FileModelElement extends CharModelElement
 		
 		if(strpos(basename($this -> value), "-") !== false)
 		{
-			$new_value = Service :: removeExtension(basename($this -> value));
+			$new_value = Service::removeExtension(basename($this -> value));
 			$new_value = substr($new_value, 0, -31);
 			
-			$extension = Service :: getExtension($this -> value);
+			$extension = Service::getExtension($this -> value);
 			$extension = ($extension === "jpeg") ? "jpg" : $extension;
 			
 			$check_new_value = $path.$new_value.".".$extension;
@@ -321,12 +321,12 @@ class FileModelElement extends CharModelElement
 				$new_value = $check_new_value;
 		}
 		else
-			$new_value = $path."f".$counter.".".Service :: getExtension($this -> value); //Simple name of file
+			$new_value = $path."f".$counter.".".Service::getExtension($this -> value); //Simple name of file
 		
 		if(!file_exists($new_value)) //If this file was not copied before
 		{
 			if(!is_dir($path)) //Makes the target folder if needed
-				Filemanager :: createDirectory($path);
+				Filemanager::createDirectory($path);
 				
 			if(is_file($this -> value)) //Moves the file to the target folder
 				@rename($this -> value, $new_value);
@@ -340,7 +340,7 @@ class FileModelElement extends CharModelElement
 
 	public function removeFileRoot()
 	{
-		$this -> value = Service :: removeFileRoot($this -> value);
+		$this -> value = Service::removeFileRoot($this -> value);
 	}
 
 	public function deleteFile($file)

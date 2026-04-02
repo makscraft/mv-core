@@ -26,7 +26,7 @@ class BoolModelElement extends ModelElement
 	public function validate()
 	{
 		if($this -> required && !$this -> value)
-			$this -> error = $this -> chooseError("required", "{error-required-bool}");
+			$this -> error = $this -> chooseError('required', '{error-required-bool}');
 		
 		return $this;
 	}

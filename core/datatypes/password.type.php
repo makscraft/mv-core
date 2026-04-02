@@ -34,10 +34,10 @@ class PasswordModelElement extends CharModelElement
 		parent::validate();
 				
 		if(!$this -> error && $this -> value)
-			if($this -> letters_required && !preg_match("/\D/iu", $this -> value))
-				$this -> error = "{error-letters-required}";
-			else if($this -> digits_required && !preg_match("/\d/", $this -> value))
-				$this -> error = "{error-digits-required}";
+			if($this -> letters_required && !preg_match('/\D/iu', $this -> value))
+				$this -> error = '{error-letters-required}';
+			else if($this -> digits_required && !preg_match('/\d/', $this -> value))
+				$this -> error = '{error-digits-required}';
 		
 		return $this;
 	}

@@ -9,6 +9,7 @@ class RedirectModelElement extends CharModelElement
 	public function validate()
 	{
 		$arguments = func_get_args();
+		
 		parent::validate($arguments[0] ?? null, $arguments[1] ?? null);
 		
 		if(!$this -> error && $this -> value)

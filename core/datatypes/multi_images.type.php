@@ -30,11 +30,13 @@ class MultiImagesModelElement extends CharModelElement
 	{
 		$registry = Registry::instance();
 		
-		$settings = ["max_size" => "MaxImageSize", 
-					 "max_width" => "MaxImageWidth", 
-					 "max_height" => "MaxImageHeight", 
-					 "allowed_extensions" => "AllowedImages", 
-					 "allowed_mime_types" => "DefaultImagesMimeTypes"];
+		$settings = [
+			'max_size' => 'MaxImageSize', 
+			'max_width' => 'MaxImageWidth', 
+			'max_height' => 'MaxImageHeight', 
+			'allowed_extensions' => 'AllowedImages', 
+			'allowed_mime_types' => 'DefaultImagesMimeTypes'
+		];
 		
 		if(isset($this -> $property) && array_key_exists($property, $settings))
 			if(is_array($this -> $property))
@@ -49,6 +51,7 @@ class MultiImagesModelElement extends CharModelElement
 			return $this;
 
 		$this -> unique = false;
+
 		parent::validate();
 
 		$images = self::unpackValue($this -> value);
