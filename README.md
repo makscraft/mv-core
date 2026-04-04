@@ -7,7 +7,7 @@ Update via composer
 cd your_project
 composer update
 ```
-- After the update completes, the adminpanel directory will be automatically updated with the latest files.
+- After the update completes, the admin panel directory will be automatically updated with the latest files.
 
 
 Manual update
