@@ -1,7 +1,7 @@
 # MV framework core
 This repo contains the core classes and admin panel of [MV framework](https://github.com/makscraft/mv-framework). You can update your MV project by syncing it with the latest version of the core and admin panel.
 
-Updating via composer
+Update via composer
 ---
 ```
 cd your_project
