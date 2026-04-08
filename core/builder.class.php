@@ -194,6 +194,9 @@ class Builder
 		
 		Http::sendStatusCodeHeader(404);
 
+		if(Http::isAjaxRequest())
+			exit();
+
 		if(file_exists($this -> views_path.'before-view.php'))
 			include $this -> views_path.'before-view.php';
 
