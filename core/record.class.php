@@ -113,7 +113,7 @@ class Record extends Content
 	/**
 	 * Gets values of fields ready for create/update action for current DB record.
 	 */
-	public function prepareContentValues()
+	public function prepareContentValuesForUpdate()
 	{
 		$prepared_values = [];
 		$version = Registry::getInitialVersion();
@@ -235,7 +235,22 @@ class Record extends Content
 		
 		return $prepared_values;
 	}
-	
+
+	/**
+	 * Returns working values for record fields after database create/update operation.
+	 */
+	public function unwrapContentValues()
+	{		
+		foreach($this -> content as $field => $value)
+		{
+			if($field === 'id' || null === $object = $this -> model -> getElement($field))
+				continue;
+			
+			if($object -> getType() === 'text' && $object -> getProperty('json'))
+				$this -> content[$field] = TextModelElement::unpackJsonValue($value);
+		}
+	}
+
 	/**
 	 * Returns title (caption, not key) of particular enum field. 
 	 */
@@ -273,7 +288,7 @@ class Record extends Content
 			return;
 			
 		$params = [];
-		$prepared_values = $this -> prepareContentValues();
+		$prepared_values = $this -> prepareContentValuesForUpdate();
 						
 		foreach($prepared_values as $field => $value)
 			if($this -> model -> getElement($field))
@@ -287,6 +302,8 @@ class Record extends Content
 			{
 				$this -> content = $prepared_values;
 				$this -> content['id'] = $this -> id;
+
+				$this -> unwrapContentValues();
 			}
 
 			return $this -> id;
@@ -301,7 +318,7 @@ class Record extends Content
 		if($this -> id && get_parent_class($this -> model) !== 'ModelSimple')
 		{	
 			$params = [];
-			$prepared_values = $this -> prepareContentValues();
+			$prepared_values = $this -> prepareContentValuesForUpdate();
 						
 			foreach($prepared_values as $field => $value)
 				if($this -> model -> getElement($field))
@@ -311,6 +328,7 @@ class Record extends Content
 			{
 				$this -> model -> updateRecord($this -> id, $params);
 				$this -> content = $prepared_values;
+				$this -> unwrapContentValues();
 			}
 		}
 		
@@ -384,16 +402,21 @@ class Record extends Content
 			return $this;
 
 		$sql = [];
-		$prepared_values = $this -> prepareContentValues();
+		$prepared_values = $this -> prepareContentValuesForUpdate();
 
 		foreach($prepared_values as $field => $value)
 			if(in_array($field, $fields) && $this -> model -> getElement($field))
+			{
 				$sql[] = "`".$field."`=".$this -> model -> db -> secure($value);
+				$this -> content[$field] = $value;
+			}
 		
 		if(count($sql))
 			$this -> model -> db -> query("UPDATE `".$this -> model -> getTable()."` 
 										   SET ".implode(', ', $sql)." 
 										   WHERE `id`='".$this -> id."'");
+
+		$this -> unwrapContentValues();
 
 		return $this;
 	}
