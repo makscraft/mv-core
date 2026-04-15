@@ -395,10 +395,13 @@ class Record extends Content
 
 	/**
 	 * Updates certain record's fields in database without whole record's data update.
+	 * @param mixed $fields - array of fields or one single field as string
 	 */
-	public function updateFields(array $fields)
+	public function updateFields(mixed $fields)
 	{
-		if(count($fields) === 0 || !$this -> id)
+		$fields = is_string($fields) ? [$fields] : $fields;
+
+		if(!is_array($fields) || count($fields) === 0 || !$this -> id)
 			return $this;
 
 		$sql = [];
@@ -423,9 +426,9 @@ class Record extends Content
 	
 	public function __call(string $method, $arguments)
 	{
-		if($method == "getContent")
+		if($method === 'getContent')
 			return $this -> getValues();
-		else if($method == "getEnumValue")
+		else if($method === 'getEnumValue')
 			return $this -> getEnumTitle($arguments[0]);
 		else
 		{
