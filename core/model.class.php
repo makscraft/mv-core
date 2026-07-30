@@ -2143,7 +2143,7 @@ class Model extends ModelBase
 				}				
 				else
 				{
-					if($object -> getType() !== 'text')
+					if($object -> getType() !== 'text' || $object -> getProperty('json'))
 						$value = $this -> db -> secure($value);
 					else
 						$value = "'".$value."'";
