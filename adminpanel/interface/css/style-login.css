@@ -35,7 +35,7 @@ background-size: 65px 25px;}
 
 div.errors, div.error, div.success{padding: 10px 16px; border-radius: 4px; margin-bottom: 14px;}
 div.errors, div.error{color: #ff1d1d; border: 1px solid #fbd689; background: #fdf4e1}
-div.success{background: #deee85;}
+div.success{background: #deee85; color: #2d2d33;}
 div.errors p{margin: 0 0 1px 0;}
 div.success p{margin: 0 0 1px 0; color: #2d2d33;}
 
