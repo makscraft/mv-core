@@ -243,11 +243,15 @@ class Email
 		{
 			//If style attribute exists we move it to the first position
 			$message = preg_replace("/<(".$key.")([^>]*)\sstyle=.([^\"'>]+).(.*)>/", "<$1 style=\"$3\"$2$4>", $message);
-			$message = preg_replace("/<(".$key.")([^>]*)>/", "<$1 style=\"".$style."\"$2>", $message); //Adds config styles
+
+			//Adds config styles
+			$message = preg_replace("/<(".$key.")([^>]*)>/", "<$1 style=\"".$style."\"$2>", $message);
 			
-			$re = "/<(".$key.")\sstyle=.([^\"'>]+).\sstyle=.([^\"'>]+).(.*)>/";			
-			$message = preg_replace($re, "<$1 style=\"$2; $3\"$4>", $message); //Deletes double attribute style
-			$message = str_replace(";;", ";", $message); //Clean up
+			//Deletes double attribute style
+			$message = preg_replace('/(\s+style=.[^\"\']+).\s+style=.([^\"\']+.)/', '$1; $2', $message);
+
+			//Clean up
+			$message = str_replace(';;', ';', $message);
 		}
 			
 		return $message;
