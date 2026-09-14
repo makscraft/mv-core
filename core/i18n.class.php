@@ -443,16 +443,16 @@ class I18n
 	 * Converts date value to timestamp.
 	 * @return int
 	 */
-	static public function dateToTimestamp($date)
+	static public function dateToTimestamp(string $date)
 	{
-		if(!preg_match("/^\d{4}-\d{2}-\d{2}(\s\d{2}:\d{2})?(:\d{2})?$/", $date))
+		if(!preg_match('/^\d{4}-\d{2}-\d{2}(\s\d{2}:\d{2})?(:\d{2})?$/', $date))
 			return 0;
 		
-		$date = explode(" ", $date);
-		$day = explode("-", $date[0]);
-		$time = isset($date[1]) ? explode(":", $date[1]) : array(0, 0, 0);
+		$date = explode(' ', $date);
+		$day = explode('-', $date[0]);
+		$time = isset($date[1]) && $date[1] ? explode(':', $date[1]) : [0, 0, 0];
 		
-		return mktime(intval($time[0]), intval($time[1]), intval($time[2]), 
+		return mktime(intval($time[0]), intval($time[1]), intval($time[2] ?? 0), 
 					  intval($day[1]), intval($day[2]), intval($day[0]));
 	}
 	
