@@ -6,8 +6,8 @@
  * License: MIT
  * Copyright: Maksim Zaikov
  * 
- * http://mv-framework.com
- * http://mv-framework.ru
+ * https://mv-framework.com
+ * https://mv-framework.ru
  */
 
 ini_set('display_errors', 1);
