@@ -89,20 +89,23 @@ class Email
 		//Starts mail process
    		$mail = new PHPMailer(true);
    		
-   		$mail -> CharSet = "UTF-8";
-   		$mail -> Encoding = "quoted-printable";
+   		$mail -> CharSet = 'UTF-8';
+   		$mail -> Encoding = 'quoted-printable';
 
    		try
    		{
-	   		if($registry -> getSetting("EmailMode") == "smtp")
+	   		if($registry -> getSetting('EmailMode') == 'smtp')
 	   		{
 			    $mail -> isSMTP();
-			    $mail -> Host       = $registry -> getSetting("SMTPHost");
-			    $mail -> SMTPAuth   = true;
-			    $mail -> Username   = $registry -> getSetting("SMTPUsername");
-			    $mail -> Password   = $registry -> getSetting("SMTPPassword");
-			    $mail -> SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-			    $mail -> Port       = $registry -> getSetting("SMTPPort");
+			    $mail -> Host = $registry -> getSetting('SMTPHost');
+				$mail -> Port = $registry -> getSetting('SMTPPort');
+			    $mail -> Username = $registry -> getSetting('SMTPUsername');
+			    $mail -> Password = $registry -> getSetting('SMTPPassword');
+			    $mail -> SMTPAuth = true;
+
+				$secure = $registry -> getSetting('SMTPSecure');
+			    $mail -> SMTPSecure = $secure ? $secure : PHPMailer::ENCRYPTION_SMTPS;			    
+				$mail -> SMTPOptions = Registry::get('SMTPOptions', []);
 	   		}
 
 	   		if($from)
