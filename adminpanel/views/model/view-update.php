@@ -1,11 +1,15 @@
 <?php
 $model = new (Http::fromGet('model'));
+$current_id = (int) Http::fromGet('id');
 
 if(!$model -> checkDisplayParam('update_actions') || 
    !$admin_panel -> user -> checkModelRights($model -> getModelClass(), 'read'))
 {
 	$admin_panel -> displayInternalError('error-no-rights');
 }
+
+if(!$admin_panel -> user -> checkModelRights($model -> getModelClass(), 'read', $current_id))
+	$admin_panel -> displayInternalError('no-rights');
 
 $model -> loadRelatedData() -> runPagerFilterSorter() -> setUser($admin_panel -> user);
 
@@ -15,7 +19,7 @@ if($model -> getParentId())
 $url_params = $back_url_params = $model -> getAllUrlParams(['parent','model','filter','pager']);
 $current_tab = $model -> checkCurrentTab();
 
-if(!$current_id = Http::fromGet('id'))
+if(!$current_id)
     $admin_panel -> displayInternalError('error-params-needed');
 
 if($model -> checkRecordById($current_id))
@@ -35,7 +39,7 @@ $admin_panel -> versions -> setUrlParams($url_params.'&action=update');
 
 if(Http::isPostRequest() && 'update' === Http::fromGet('action'))
 {
-    $admin_panel -> user -> extraCheckModelRights($model -> getModelClass(), 'update');
+    $admin_panel -> user -> extraCheckModelRights($model -> getModelClass(), 'update', $current_id);
     $editable_fields = $model -> getEditableFields(); 
     $form_errors = $model -> getDataFromPost() -> validate($editable_fields);
 
@@ -128,7 +132,7 @@ include $registry -> getSetting('IncludeAdminPath')."includes/header.php";
 		         <tr class="model-form-navigation">
 			         <td colspan="2" class="bottom-navigation">
                         <?php 
-                        	if($admin_panel -> user -> checkModelRights($model -> getModelClass(), "update"))
+                        	if($admin_panel -> user -> checkModelRights($model -> getModelClass(), 'update', $current_id))
                         	{
                         		$submit_button = "type=\"button\" id=\"submit-button\"";
                         		$continue_button = "id=\"continue-button\"";

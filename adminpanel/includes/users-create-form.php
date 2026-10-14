@@ -1,5 +1,6 @@
 
 <script type="text/javascript" src="<?php echo $registry -> getSetting("AdminPanelPath"); ?>interface/js/rights-table.js"></script>
+<?php $rights_list = $model -> displayUsersRights(); ?>
 
 <tr>
    <td class="field-name"><?php echo I18n::locale("users-rights"); ?></td>
@@ -12,14 +13,15 @@
 		      <th><?php echo I18n::locale('edit'); ?></th>
 		      <th><?php echo I18n::locale('delete'); ?></th>
 	      </tr>
-	      <?php echo $model -> displayUsersRights(); ?>
+	      <?php echo $rights_list['html']; ?>
       </table>      
    </td>
 </tr>
 <tr>
    <td class="field-name" colspan="2">
-      <?php $checked = (Http::fromPost('send_admin_info_email')) ? " checked=\"checked\"" : ""; ;?>
-      <input type="checkbox"<?php echo $checked; ?> id="send-admin-info-email" name="send_admin_info_email" value="1" />
+      <?php $checked = Http::fromPost('send_admin_info_email') ? ' checked="checked"' : ''; ?>
+      <input type="checkbox"<?php echo $checked; ?> id="send-admin-info-email" name="send_admin_info_email" value="1">
       <label for="send-admin-info-email"><?php echo I18n::locale("send-user-info"); ?></label>
+      <input type="hidden" name="admin_rights_list" value="<?php echo $rights_list['json']; ?>">
    </td>
 </tr>

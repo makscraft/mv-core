@@ -69,8 +69,7 @@ class User
 		$this -> db = DataBase::instance(); //Manages database
 
 		 //Current user's data
-		$this -> content = $this -> db -> getRow("SELECT * FROM `".self::TABLE."` 
-		                                          WHERE `id`=".intval($id));
+		$this -> content = $this -> db -> getRow("SELECT * FROM `".self::TABLE."` WHERE `id`=".intval($id));
 		
 		if(!isset($this -> content['id']) || !$this -> content['id'])
 		{
@@ -78,11 +77,10 @@ class User
 			return;
 		}
 											
-		$this -> id = $this -> content['id']; //Sets user id
+		$this -> id = $this -> content['id']; //Sets current user id
 		
 		//Gets user's rights in amdin panel
-		$this -> rights = $this -> db -> getAll("SELECT * FROM `".self::RIGHTS_TABLE."` 
-		                                         WHERE `user_id`='".$this -> id."'");
+		$this -> rights = $this -> db -> getAll("SELECT * FROM `".self::RIGHTS_TABLE."` WHERE `user_id`='".$this -> id."'");
 		
 		//Changes the format of rights for the class methods
 		$this -> rights = Users::arrangeRights($this -> rights);
@@ -148,17 +146,17 @@ class User
  	}
  	
 	/**
-	 * Checks if the user's credential for the modele exists.
+	 * Checks if the user's credential for the model allowed.
 	 */
-	public function checkModelRights($module, $right): bool
+	public function checkModelRights(string $module, string $right, int $id = 0): bool
 	{
 		//Root user has access to any module othe users must have rights via policy
-		if($this -> id == 1) 
+		if($this -> id == 1)
 			return true;
-			
-		$all_modules = array_merge(array_keys(Registry::get('ModelsLower')), 
-								  ["users", "log", "garbage", "file_manager"]);
-		
+		else if($module === 'users' && $id == 1)
+			return false;
+
+		$all_modules = array_merge(array_keys(Registry::get('ModelsLower')), ['users', 'log', 'garbage', 'file_manager']);
 		$module = strtolower($module);
 		
 		if(!isset($this -> rights[$module]) || !in_array($module, $all_modules))
@@ -171,12 +169,12 @@ class User
 	 * Check the rights inside the any amdin panel page related to module (edit, create, ...) 
 	 * and redirects if no rights.
 	 */
-	public function extraCheckModelRights($module, $right)
+	public function extraCheckModelRights(string $module, string $right, int $id = 0)
 	{
-		if(!$this -> checkModelRights($module, $right))
+		if(!$this -> checkModelRights($module, $right, $id))
 		{
-			$interal_error_text = I18n::locale("error-no-rights");
-            include $this -> registry -> getSetting("IncludeAdminPath")."controls/internal-error.php";
+			$interal_error_text = I18n::locale('error-no-rights');
+            include $this -> registry -> getSetting('IncludeAdminPath').'controls/internal-error.php';
 		}
 	}
 	
@@ -217,7 +215,7 @@ class User
 		return $skins;
 	}
 	
-	public function setUserSkin($name) 
+	public function setUserSkin(string $name) 
 	{
 		$path = $this -> registry -> getSetting("IncludeAdminPath")."interface/skins/";
 		

@@ -138,9 +138,9 @@ class Users extends Model
 	
 	public function displayUsersRights()
 	{
-		$html = "";
-		
-		$models_names = [];
+		$html = '';
+		$models_names = $rights_list = [];
+		$rights = ['create', 'read', 'update', 'delete'];
 		
 		foreach($this -> models_list as $model)
 		{
@@ -148,29 +148,33 @@ class Users extends Model
 			$models_names[$model] = $model_object -> getName();
 		}
 		
-		$models_names["file_manager"] = I18n::locale("file-manager");
+		$models_names['file_manager'] = I18n::locale('file-manager');
 		
 		natsort($models_names); //A-z sorting of names list
 
 		//Displays module name and right (set rights are checked)
 		foreach($models_names as $model => $name) 
 		{
-			if($model != "file_manager")
+			if($model != 'file_manager')
 				$model_object = new $model();
-			
-			$rights = array('create', 'read', 'update', 'delete');
 			
 			$html .= "<tr>\n";
 			$html .= "<td class=\"model-name\">".$name."</td>\n";
 			
 			foreach($rights as $right)
 			{
+				$rights_list[$model.'_'.$right] = null;
+
 				$html .= "<td>\n";
 				
-				if(get_parent_class($model_object) == "ModelSimple" && ($right == "delete" || $right == "create"))
+				if(get_parent_class($model_object) == 'ModelSimple' && ($right == 'delete' || $right == 'create'))
 					$html .= "<span>-</span>";
-				else if($name == "file_manager" || $right == "read" || $model_object -> checkDisplayParam($right."_actions"))
-					$html .= "<input name=\"".$model."_".$right."_right\" type=\"checkbox\" ".$this -> checkRight($model, $right)." />\n";
+				else if($name == 'file_manager' || $right == 'read' || $model_object -> checkDisplayParam($right.'_actions'))
+				{
+					$html .= "<input data=\"".$model.'_'.$right."\" ";
+					$html .= "type=\"checkbox\"".($this -> checkRight($model, $right) ? ' checked="checked"' : '').">\n";
+					$rights_list[$model.'_'.$right] = $this -> checkRight($model, $right);
+				}
 				else
 					$html .= "<span>-</span>";
 					
@@ -178,25 +182,32 @@ class Users extends Model
 			}
 			
 			$html .= "</tr>\n";		
-		}		
-		
-		return $html;
+		}
+
+		return ['html' => $html, 'json' => htmlspecialchars(json_encode($rights_list))];
 	}
 	
-	private function checkRight($model, $right)
+	private function checkRight(string $model, string $right)
 	{
-		if(isset($_POST[$model."_".$right."_right"]) || 
-		  (empty($_POST) && isset($this -> users_rights[$model], $this -> users_rights[$model][$right]) && 
-		  	$this -> users_rights[$model][$right]))
-			return " checked=\"checked\"";
+		if(Http::isPostRequest())
+		{
+			$all = Http::fromPost('admin_rights_list', '[]');
+			$all = json_decode(htmlspecialchars_decode($all), true);
+
+			return is_array($all) && isset($all[$model.'_'.$right]) && $all[$model.'_'.$right] == 1;
+		}
+		else if(is_array($this -> users_rights) && isset($this -> users_rights[$model], $this -> users_rights[$model][$right]))
+			return (bool) $this -> users_rights[$model][$right];
 	}
 	
 	public function updateRights($all_rights)
 	{
+		//Deletes all old rights
 		$this -> db -> query("DELETE FROM `".$this -> rights_table."` 
-		                      WHERE `user_id`='".$this -> id."' OR `user_id`=''"); //Deletes all old rights
-				
-		foreach($all_rights as $key => $val) //Updates the table with rights
+		                      WHERE `user_id`='".$this -> id."' OR `user_id`=''");
+		
+		//Updates the table with rights
+		foreach($all_rights as $key => $val)
 			$this -> db -> query("INSERT INTO `".$this -> rights_table."`(`user_id`,`module`,`create`,`read`,`update`,`delete`) 
 					  VALUES('".$this -> id."','".$key."','".$val['create']."','".$val['read']."',
 					  '".$val['update']."','".$val['delete']."')");
@@ -208,20 +219,22 @@ class Users extends Model
 	{
 		$all_rights = [];
 
-		foreach($_POST as $key => $val) //Take checked rights from POST
-			if(preg_match("/(create|read|update|delete)_right$/", $key))
-			{
-				$right = [];
-				$right[0] = preg_replace("/^(\w+)_(create|read|update|delete)_right$/", "$1", $key);
-				$right[1] = preg_replace("/^(\w+)_(create|read|update|delete)_right$/", "$2", $key);
-				
-				if(!array_key_exists($right[0], $all_rights) && (in_array($right[0], $this -> models_list) || $right[0] == "file_manager"))
-					$all_rights[$right[0]] = array("create" => 0, "read" => 0, "update" => 0, "delete" => 0);
-					
-				if(array_key_exists($right[0], $all_rights) && array_key_exists($right[1], $all_rights[$right[0]]))
-					$all_rights[$right[0]][$right[1]] = 1;
-			}
+		$post = Http::fromPost('admin_rights_list', '[]');
+		$post = json_decode(htmlspecialchars_decode($post), true);
 
+		foreach($post as $key => $value)
+			if(preg_match('/_(create|read|update|delete)$/', $key) && $value !== null)
+			{
+				$model = preg_replace('/^(\w+)_(create|read|update|delete)$/', '$1', $key);
+				$right = preg_replace('/^(\w+)_(create|read|update|delete)$/', '$2', $key);
+
+				if(Registry::checkModel($model) || $model === 'file_manager')
+				{
+					$all_rights[$model] ??= ['create' => 0, 'read' => 0, 'update' => 0, 'delete' => 0];
+					$all_rights[$model][$right] = (int) $value;
+				}
+			}
+		
 		return $all_rights;
 	}
 	

@@ -8,7 +8,7 @@ $(document).ready(function()
 		data: "get-online-users=1",
 		success: function(data)
 		{           
-            for(var i=0; i < data.length; i ++)
+            for(var i = 0; i < data.length; i ++)
             	$("table.model-table :checkbox[name='item_" + data[i] + "']").parent().next()
                                                                              .append("<small class=\"online\">online</small>");
 		}
