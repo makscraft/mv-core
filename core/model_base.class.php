@@ -69,13 +69,13 @@ abstract class ModelBase extends ModelInitial
 	 * Name field of model, which is used to show record in admin panel.
 	 * @var string
 	 */
-	protected string $name_field = 'name';
+	protected $name_field = 'name';
 	
 	/**
 	 * Additional field for record name in admin panel (added to $name_field).
 	 * @var string
 	 */
-	protected string $name_field_extra = '';
+	protected $name_field_extra = '';
 	
 	/**
 	 * SQL query for main table with model's records in admin panel.
