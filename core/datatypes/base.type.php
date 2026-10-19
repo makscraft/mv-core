@@ -9,85 +9,85 @@ abstract class ModelElement
 	 * Name (string title) of field which is shown in left column of form table.
 	 * @var string
 	 */
-	protected $caption;
+	protected string $caption = '';
 
 	/**
 	 * All extra parameters for html element (id, class, cols, rows).
 	 * @var string
 	 */
-	protected $html_params;
+	protected string $html_params = '';
 
 	/**
 	 * Name of element (html form tag parameter and db field name).
 	 * @var string
 	 */
-	protected $name;
+	protected string $name = '';
 	
 	/**
 	 * Says if this element must be filled in form.
 	 * @var bool
 	 */
-	protected $required = false;
+	protected bool $required = false;
 
 	/**
 	 * Error collected during validation process.
 	 * @var string
 	 */
-	protected $error;
+	protected ?string $error = null;
 
 	/**
 	 * Help text for form element to show additional information.
 	 * @var string
 	 */	
-	protected $help_text;
+	protected string $help_text = '';
 
 	/**
 	 * Data type of element (int, char, bool, ...)
 	 * @var string
 	 */	
-	protected $type;
+	protected string $type = '';
 
 	/**
 	 * Says if this field must have unique values in model table.
 	 * @var bool
 	 */
-	protected $unique = false;
+	protected bool $unique = false;
 
 	/**
 	 * Current value of element (field).
 	 * @var mixed
 	 */	
-	protected $value;
+	protected mixed $value = null;
 
 	/**
 	 * Says if this field must have the same value as other field in form.
 	 * @var string
 	 */	
-	protected $must_match;
+	protected ?string $must_match = null;
 
 	/**
 	 * Minimal length of field value.
 	 * @var int
 	 */	
-	protected $min_length;
+	protected ?int $min_length = null;
 
 	/**
 	 * Maximal length of field value.
 	 * @var int
 	 */	
-	protected $max_length;
+	protected ?int $max_length = null;
 
 	/**
 	 * Model name which this element is related to.
 	 * @var string
 	 */	
-	protected $model;
+	protected ?string $model = null;
 
 	/**
 	 * Array of additioanl errors messages.
 	 * @var array
 	 */	
-	protected $custom_errors = [];
+	protected array $custom_errors = [];
 	
 	/**
 	 * Creates datatype object according to title, type, filed name and extra params.
@@ -166,7 +166,7 @@ abstract class ModelElement
 	/**
 	 * Cleans value before displaying in html text input.
 	 */
-	public function cleanTextValueForInput($value)
+	public function cleanTextValueForInput(mixed $value)
 	{
 		if($value === null || $value === '')
 			return '';
@@ -178,11 +178,11 @@ abstract class ModelElement
 	
 	/* Accessors */
 
-	public function setRequired($value) { $this -> required = $value; return $this; }
-	public function setHelpText($value) { $this -> help_text = $value; return $this; }
-	public function setCaption($value) { $this -> caption = $value; return $this; }
-	public function setHtmlParams($value) { $this -> html_params = $value; return $this; }
-	public function setError($error) { $this -> error = $error; return $this; }
+	public function setRequired(bool $value) { $this -> required = $value; return $this; }
+	public function setHelpText(string $value) { $this -> help_text = $value; return $this; }
+	public function setCaption(string $value) { $this -> caption = $value; return $this; }
+	public function setHtmlParams(string $value) { $this -> html_params = $value; return $this; }
+	public function setError(?string $error) { $this -> error = $error; return $this; }
 	
 	public function getName() { return $this -> name; }
 	public function getCaption() { return $this -> caption; }
@@ -194,7 +194,7 @@ abstract class ModelElement
 	 */
 	public function getProperty(string $property)
 	{
-		if(isset($this -> $property))
+		if(property_exists($this, $property))
 			return $this -> $property;
 	}
 	

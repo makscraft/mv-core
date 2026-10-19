@@ -4,25 +4,23 @@
  */
 class GroupModelElement extends ModelElement
 {
-	protected $long_list = false;
+	protected bool $long_list = false;
 	
-	protected $name_field = 'name';
+	protected string $name_field = 'name';
 	
-	protected $table;
+	protected ?string $table = null;
 	
-	protected $id;
+	protected ?int $id = null;
 	
-	public function setTable($table)
+	public function setTable(string $table)
 	{
 		$this -> table = $table;
-
 		return $this;
 	}
 	
-	public function setId($id)
+	public function setId(int $id)
 	{
 		$this -> id = $id;
-
 		return $this;
 	}
 	
@@ -44,12 +42,12 @@ class GroupModelElement extends ModelElement
 		return EnumModelElement::createAdminFilterHtml($this -> name, $data);
 	}
 
-	public function countGroupRecords($value)
+	public function countGroupRecords(mixed $value)
 	{
 		return $value ? Database::instance() -> getCount($this -> table, "`id` IN(".$value.")") : 0;
 	}
 	
-	public function checkGroupRecords($value)
+	public function checkGroupRecords(mixed $value)
 	{
 		$ids = [];
 
@@ -151,7 +149,7 @@ class GroupModelElement extends ModelElement
 		return $html."</div>".$this -> addHelpText();
 	}
 		
-	public function getOptionsForSearch($request, $ids, $self_id)
+	public function getOptionsForSearch(string $request, array $ids = [], ?int $self_id = null)
 	{
 		$db = Database::instance();
 		$html = '';
@@ -162,7 +160,7 @@ class GroupModelElement extends ModelElement
 		
 		$request_like = $db -> secure("%".$request_like."%");
 		
-		$where = ($ids && count($ids)) ? " WHERE `id` NOT IN(".implode(",", $ids).") " : '';		
+		$where = count($ids) ? " WHERE `id` NOT IN(".implode(",", $ids).") " : '';		
 		$where .= $where ? " AND " : " WHERE ";
 		$where .= $self_id ? "`id`!='".$self_id."' AND " : '';
 		$where .= "`".$this -> name_field."` LIKE ".$request_like;
@@ -181,7 +179,7 @@ class GroupModelElement extends ModelElement
 		return $html;
 	}
 	
-	public function getDataForAutocomplete($request)
+	public function getDataForAutocomplete(string $request)
 	{
 		$db = Database::instance();
 		$result_rows = [];
@@ -207,7 +205,7 @@ class GroupModelElement extends ModelElement
 		];
 	}
 	
-	public function checkValue($id)
+	public function checkValue(mixed $id)
 	{
 		return Database::instance() -> getCell("SELECT `".$this -> name_field."` 
 												FROM `".$this -> table."` 

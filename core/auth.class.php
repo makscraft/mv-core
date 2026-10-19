@@ -12,25 +12,25 @@ class Auth
      * Current model class name.
      * @var string
      */
-    protected static $current = null;
+    protected static ?string $current = null;
 
     /**
      * Current model object.
      * @var object
      */
-    protected static $model = null;
+    protected static ?object $model = null;
 
     /**
      * List of separate auth containers for each model.
      * @var array
      */
-    protected static $containers = [];
+    protected static array $containers = [];
 
     /**
      * List of currently logged in users (last one from each model).
      * @var array
      */
-    protected static $users = [];
+    protected static array $users = [];
 
     /**
      * List of default authorization settings for each model (can be overriden).
@@ -291,7 +291,9 @@ class Auth
         Session::destroy(self::$containers[self::$current]['session_key']);
 
         self::forget();
-        self::removeAuthorizedUser(self::$current);
+        self::removeAuthorizedUser();
+
+        return null;
     }
 
     /**

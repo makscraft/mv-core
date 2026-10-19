@@ -10,19 +10,19 @@ class User
 	 * Object with settings.
 	 * @var object Registry
 	 */ 
-	public $registry;
+	public ?Registry $registry = null;
    
 	/**
 	 * Database manager object.
 	 * @var object Database
 	 */ 
-	public $db;
+	public ?Database $db = null;
 
 	/**
 	 * UserSession object to control the session.
 	 * @var object UserSession
 	 */  
-	public $session;
+	public ?UserSession $session = null;
 	
 	/**
 	 * Current SQL table name.
@@ -40,30 +40,30 @@ class User
 	 * All data related to current user (login, name, ...)
 	 * @var array
 	 */ 
-	private $content;
+	private ?array $content = null;
 	
 	/**
 	 * Id of current user.
 	 * @var int
 	 */ 
-	private $id;
+	private ?int $id = null;
 	
 	/**
 	 * Error message text.
 	 * @var string
 	 */
-	private $error;
+	private ?string $error = null;
 
 	/**
 	 * List of current user's rights.
 	 * @var array
 	 */ 
-	private $rights = [];
+	private array $rights = [];
 	
 	/**
 	 * Sets tables and needed objects, also gets the users rights and starts session.
 	 */
-	public function __construct($id)
+	public function __construct(int $id)
 	{
 		$this -> registry = Registry::instance(); //Langs and settings
 		$this -> db = DataBase::instance(); //Manages database
@@ -99,10 +99,10 @@ class User
 	
 	public function getContent() { return $this -> content; }
 	public function getId() { return $this -> id; }
- 	public function getField($field) { return $this -> content[$field]; }
+ 	public function getField(string $field) { return $this -> content[$field]; }
  	public function getError() { return $this -> error; }
 
-	static public function updateLoginData($login, $password)
+	static public function updateLoginData(string $login, string $password)
  	{
 		Session::start('admin_panel');
         $auth = Session::get('user');
@@ -118,7 +118,7 @@ class User
 		 Session::set('user', $auth);
  	}
  	
- 	public function saveSettings($settings)
+ 	public function saveSettings(array $settings)
  	{
  		$settings = base64_encode(json_encode($settings));
  		
@@ -136,7 +136,7 @@ class User
 		return json_decode(base64_decode(strval($data)), true);
  	}
  	
- 	public function updateSetting($key, $value)
+ 	public function updateSetting(string $key, mixed $value)
  	{
  		$settings = $this -> loadSettings();
  		$settings[$key] = $value;
@@ -178,7 +178,7 @@ class User
 		}
 	}
 	
-	public function checkModelRightsJS($module, $right, $href)
+	public function checkModelRightsJS(string $module, string $right, string $href)
 	{
 		if($this -> checkModelRights($module, $right))
     		return $href;

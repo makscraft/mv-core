@@ -400,7 +400,7 @@ class Service
 	
 	/**
 	 * Compares hash value with given string.
-	 * @return string
+	 * @return bool
 	 */
 	static public function checkHash(string $string, string $hash): bool
 	{
@@ -494,7 +494,7 @@ class Service
 	/**
 	 * Mixes digits on the number with random characters (not numbers).
 	 * @param int $number initial number to mix
-	 * @param int $length final approximate string length
+	 * @param int $lenght final approximate string length
 	 * @return string
 	 */
 	static public function mixNumberWithLetters(int $number, int $lenght, bool $flat = false): string

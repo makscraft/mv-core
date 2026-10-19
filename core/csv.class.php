@@ -5,15 +5,15 @@
 class Csv
 {
 	//Allowed datatypes for export in csv
-	private $export_types = array('bool','int','float','char','url','redirect',
-								  'email','phone','enum','password',
-					       		  'order','date','date_time');
+	private array $export_types = [
+		'bool','int','float','char','url','redirect', 'email','phone','enum','password', 'order','date','date_time'
+	];
 	
 	//Allowed encodings of csv files
-	private $encodings = array("windows-1251", "utf-8");
+	private array $encodings = ['windows-1251', 'utf-8'];
 	
 	//Allowed separators of csv files
-	private $separators = array("semicolon" => ";", "comma" => ",", "tabulation" => "\t");
+	private array $separators = ['semicolon' => ';', 'comma' => ',', 'tabulation' => "\t"];
 	
 	public function getEncodings() { return $this -> encodings; }
 	
@@ -21,7 +21,7 @@ class Csv
 	
 	public function getExportTypes() { return $this -> export_types; }
 	
-	public function displayFieldsLists($model)
+	public function displayFieldsLists(object $model)
 	{
 		//2 lists of fields to select columns of csv file
 		$html = "<div class=\"m2m-wrapper csv-fields\">\n";		
@@ -53,7 +53,7 @@ class Csv
 		return $html."</div>\n";
 	}
 	
-	public function composeCSVFile($model, $fields, $separator, $encoding, $headers)
+	public function composeCSVFile(object $model, array $fields, string $separator, string $encoding, bool $headers)
 	{
 		$columns = $csv = [];
 		$model -> loadRelatedData();
@@ -65,7 +65,7 @@ class Csv
 				$columns[] = $field;
 				
 		if(!count($columns))
-			return "";
+			return '';
 			
 		//Extracts data from database
 		$columns_sql = "`".implode("`,`", $columns)."`";
@@ -96,44 +96,44 @@ class Csv
 			{
 				$value = trim($row[$field]);
 				
-				if($field != "id") //Special data transformations
+				if($field != 'id') //Special data transformations
 				{
 					$type = $model -> getElement($field) -> getType();
 				
-					if($type == "date" || $type == "date_time")
-						$value = I18n :: formatDate($value, "no-seconds");
-					else if($type == "enum")
+					if($type == 'date' || $type == 'date_time')
+						$value = I18n :: formatDate($value, 'no-seconds');
+					else if($type == 'enum')
 						$value = $model -> getEnumTitle($field, $value);
-					else if($type == "float" && $separator != "," && $decimal_mark && $decimal_mark != ".")
-						$value = str_replace(".", $decimal_mark, $value);
+					else if($type == 'float' && $separator != ',' && $decimal_mark && $decimal_mark != '.')
+						$value = str_replace('.', $decimal_mark, $value);
 				}
 				
-				$value = is_null($value) ? "" : $value;
+				$value = is_null($value) ? '' : $value;
 				$value = htmlspecialchars_decode($value, ENT_QUOTES);
-				$value = str_replace($separator, "", $value); //Remove separator from line
+				$value = str_replace($separator, '', $value); //Remove separator from line
 				
 				$string[] = $value;
 			}
 			
 			$string = implode($separator, $string); //Creates string and converts encoding
-			$csv[] = ($encoding != "utf-8") ? @iconv("utf-8", $encoding, $string) : $string;
+			$csv[] = ($encoding != 'utf-8') ? @iconv('utf-8', $encoding, $string) : $string;
 		}
 		
 		return implode("\r\n", $csv); //Glues string into file
 	}
 	
-	public function updateFromCSVFile($data, $model, $fields, $update_order, $headers)
+	public function updateFromCSVFile(array $data, object $model, array $fields, string $update_order, bool $headers)
 	{
 		$data_processed = [];
 		$columns_number = count($fields);
 		$db = Database :: instance();
-		$result = array("updated_ids" => [], "created_ids" => [], "declined_strings" => []);
+		$result = ['updated_ids' => [], 'created_ids' => [], 'declined_strings' => []];
 		
-		$allow_update = ($update_order == "update-and-create" || $update_order == "update-only");
-		$allow_create = ($update_order == "update-and-create" || $update_order == "create-only");
+		$allow_update = ($update_order == 'update-and-create' || $update_order == 'update-only');
+		$allow_create = ($update_order == 'update-and-create' || $update_order == 'create-only');
 		
 		foreach($fields as $key => $value) //Security process for fields names
-			$fields[$key] = str_replace("'", "", $value);
+			$fields[$key] = str_replace("'", '', $value);
 		
 		$string_number = $headers ? 1 : 0;
 		
@@ -150,7 +150,7 @@ class Csv
 				{
 					$row[$index] = trim($value);
 					
-					if($row[$index] == "")
+					if($row[$index] === '')
 						$empty_values ++;
 				}
 				
@@ -164,7 +164,7 @@ class Csv
 				{
 					$id = $row[array_search("id", $fields)];
 
-					if(!is_numeric($id) && $id != "")
+					if(!is_numeric($id) && $id != '')
 					{
 						$result["declined_strings"][$string_number] = "not-integer-id";
 						continue;
@@ -281,7 +281,7 @@ class Csv
 		return $result;
 	}
 	
-	private function checkUniqueValues($model, $row, $id)
+	private function checkUniqueValues(object $model, array $row, int $id)
 	{		
 		foreach($model -> getElements() as $name => $object)
 			if($object -> getProperty("unique") && isset($row[$name]) && $row[$name])

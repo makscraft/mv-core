@@ -10,67 +10,67 @@ class Builder
 	 * Router object to define the view for the current request. 
 	 * @var object Router
 	 */
-	public $router; 
+	public ?Router $router = null;
    
 	/**
 	 * Settings manager.
 	 * @var object Registry
 	 */
-	public $registry;
+	public ?Registry $registry = null;
    
 	/**
 	 * Database manager.
 	 * @var object Database
 	 */
-	public $db;
+	public ?Database $db = null;
 	
 	/**
 	 * Cache manager object.
 	 * @var object Cache
 	 */ 
-	public $cache;
+	public ?Cache $cache = null;
 	
 	/**
 	 * Path from root of the application, including subfolder.
 	 * @var string
 	 */
-	public $root_path;
+	public string $root_path = '';
 	
 	/**
 	 * Path to css, images, fonts and js files.
 	 * @var string
 	 */
-	public $media_path;
+	public string $media_path = '';
 	
 	/**
 	 * Absolute path from server root to include the files.
 	 * @var string
 	 */
-	public $include_path;
+	public string $include_path = '';
 	
 	/**
 	 * Absolute path from server root to the views files (templates).
 	 * @var string
 	 */
-	public $views_path;
+	public string $views_path = '';
 
 	/**
 	 * Application domain name.
 	 * @var string
 	 */
-	public $domain;
+	public string $domain = '';
 
 	/**
 	 * Available models, their objects are being created by __call() method (lazy load).
 	 * @var array
 	 */
-	private $models = [];
+	private array $models = [];
 
 	/**
 	 * Available plugins, their objects are being created in Builder __construct() method.
 	 * @var array of objects
 	 */
-	private $plugins = [];
+	private array $plugins = [];
 	
 	/**
 	 * Sets all variables and runs required objects.
@@ -125,7 +125,7 @@ class Builder
 	 * Returns models and plugins objects by name, creating them on the fly.
 	 * @return object|null
 	 */
-	public function __get($name)
+	public function __get(string $name)
 	{
 		$keep = $name;
 		$name = Registry::getQuickAccessKeyName($name);
@@ -154,7 +154,7 @@ class Builder
 	 * Executes http redirect (initially to the app root).
 	 * @param string $path additional part, is being added to root path
 	 */
-	public function redirect($path = '')
+	public function redirect(string $path = '')
 	{
 		$path = preg_replace('/^\//', '', $path);
 
@@ -166,7 +166,7 @@ class Builder
 	 * Executes http redirect to the same URL without GET query string.
 	 * @param string $part additional part or GET params, will be added to current url
 	 */
-	public function reload($part = '')
+	public function reload(string $part = '')
 	{
 		$path = str_replace([$_SERVER['QUERY_STRING'], '?'], '', $_SERVER['REQUEST_URI']);
 		
@@ -227,7 +227,7 @@ class Builder
 	 * @param string $condition optional value 'numeric'
 	 * @return string part or url or executes 404 redirect if part does not exist
 	 */
-	public function checkUrlPart($index, $condition = '')
+	public function checkUrlPart(int $index, string $condition = '')
 	{
 		$url_parts = $this -> router -> getUrlParts();
 
@@ -242,9 +242,9 @@ class Builder
 
 	/**
 	 * Searches the record in model according to URL parameters and extra conditions.
-	 * @param string name of model to search the record in
-	 * @param string name of url field in model (if exists)
-	 * @param array extra conditions in query builder format
+	 * @param string $model of model to search the record in
+	 * @param string $url_field of url field in model (if exists)
+	 * @param array $conditions in query builder format
 	 * @return object|null Record object if found, otherwise 404 error will be shown
 	 */
 	public function findRecordByUrl(string $model, string $url_field = '', array $conditions = []): ?Record

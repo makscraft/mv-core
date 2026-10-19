@@ -8,11 +8,12 @@ class Editor
 	 * Makes sure we already added base js scripts on the page.
 	 * @var bool
 	 */
-   	private static $instance = false;
+   	private static bool $instance = false;
 
 	static public function createSecurityToken()
 	{
 		$token = $_SERVER['HTTP_USER_AGENT'].Registry::get('SecretCode').Http::getIpAddress();
+		
 		return Service::createHash($token, 'random');
 	}
 

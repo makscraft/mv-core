@@ -11,55 +11,55 @@ class Form
 	 * Class of model if form is created from model.
 	 * @var string
 	 */
-	private $model_class;
+	private ?string $model_class = null;
 	
 	/**
 	 * Record id of model to load values from it into the form.
 	 * @var int
 	 */
-	private $record_id;
+	private ?int $record_id = null;
 
 	/**
 	 * Fields of current form (objects of datatypes).
 	 * @var array
 	 */
-	public $fields;
+	public ?array $fields = null;
 	
 	/**
 	 * Errors of form after validation.
 	 * @var array
 	 */ 
-	private $errors = [];
+	private array $errors = [];
 	
 	/**
 	 * Mode when errors of form are displayed near inputs.
 	 * @var bool
 	 */
-	private $display_with_errors = false;
+	private bool $display_with_errors = false;
 	
 	/**
 	 * Keeps regular CSRF token for form validation (if applied).
 	 * @var string
 	 */
-	private $csrf_token;
+	private ?string $csrf_token = null;
 
 	/**
 	 * Keeps ajax CSRF token for form validation (if applied).
 	 * @var string
 	 */
-	private static $ajax_csrf_token;
+	private static ?string $ajax_csrf_token = null;
 	
 	/**
 	 * Keeps special javascript token for form validation  (if applied).
 	 * @var string
 	 */ 
-	private static $jquery_token;
+	private static ?string $jquery_token = null;
 
 	/**
 	 * List of applied security tokens to validate in current form processing.
 	 * @var array
 	 */ 
-	private $used_tokens = [
+	private array $used_tokens = [
 		'regular' => false, 
 		'ajax' => false, 
 		'jquery' => false
@@ -69,19 +69,19 @@ class Form
 	 * Localization object.
 	 * @var object I18n
 	 */
-	public $i18n;
+	public ?I18n $i18n = null;
 	
 	/**
 	 * App settings manager.
 	 * @var object Registry
 	 */
-	public $registry;
+	public ?Registry $registry = null;
 
 	/**
 	 * Current state of the form (validation, errors, success, ...)
 	 * @var array
 	 */
-	private $state = [
+	private array $state = [
 		'submitted' => false,
 		'valid' => false,
 		'uploaded' => false,
@@ -93,7 +93,7 @@ class Form
 	 * Settings storage if the form uses catcha.
 	 * @var array
 	 */
-	private $captcha;
+	private ?array $captcha = null;
 	
 	/**
 	 * Creates form object from model class name or array of fields.
@@ -139,7 +139,7 @@ class Form
 		}
 	}
 	
-	public function __call($method, $arguments)
+	public function __call(string $method, array $arguments)
 	{
 	    if($method == "displayFormErrors")
 	        return $this -> displayErrors();
@@ -152,13 +152,7 @@ class Form
 	    else if($method == "checkTokenCSFR")
 	        return $this -> checkTokenCSRF();
 	    else
-		{
-			$trace = debug_backtrace();
-			$message = "Call to undefiend method '".$method."' of Form class object";
-			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
-
-			Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);
-		}
+			Debug::handleCallMagicMethod($method, self::class, debug_backtrace());
 	}
 
 	/**
@@ -220,7 +214,7 @@ class Form
 	
 	/**
 	 * Returns form fields values as array.
-	 * @param array $fiedls optional, names of needed fields
+	 * @param array $fields optional, names of needed fields
 	 * @return array 
 	 */
 	public function all(?array $fields = null)
@@ -307,13 +301,13 @@ class Form
 		{
 			$type = $object -> getType();
 			
-			if($type == 'image' || $type == 'file')
+			if($type === 'image' || $type === 'file')
 			{
 				//Tmp files cleanup
-				Filemanager::deleteOldFiles($this -> registry -> getSetting("FilesPath")."tmp/");
-				Filemanager::deleteOldFiles($this -> registry -> getSetting("FilesPath")."tmp/filemanager/");
+				Filemanager::deleteOldFiles($this -> registry -> getSetting('FilesPath').'tmp/');
+				Filemanager::deleteOldFiles($this -> registry -> getSetting('FilesPath').'tmp/filemanager/');
 
-				if($type == "file" && $object -> getProperty("multiple")) //Multiple files processing
+				if($type === 'file' && $object -> getProperty('multiple')) //Multiple files processing
 				{
 					$this -> processMultipleFilesData($object);
 					continue;
@@ -400,7 +394,7 @@ class Form
 
 	/**
 	 * Checks if the form has certain field.
-	 * @return object|null
+	 * @return bool
 	 */
 	public function hasField(string $field): bool
 	{
@@ -1335,7 +1329,7 @@ class Form
 	public function useAjaxTokenCSRF()
 	{
 		self::createAjaxTokenCSRF();
-		$this -> used_tokens["ajax"] = true;
+		$this -> used_tokens['ajax'] = true;
 		
 		return $this;
 	}
@@ -1392,7 +1386,7 @@ class Form
 	 */
 	public function checkAjaxTokenCSRF()
 	{
-	    return (isset($_POST["csrf_ajax_token"]) && $_POST["csrf_ajax_token"] == self::$ajax_csrf_token);
+		return Http::fromPost('csrf_ajax_token') === self::$ajax_csrf_token;
 	}
 
 
@@ -1403,19 +1397,19 @@ class Form
 	 */
 	public function useTokenCSRF()
 	{
-		$token = isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER["HTTP_USER_AGENT"] : "";
-		$token .= $_SERVER["REMOTE_ADDR"].$this -> model_class;
+		$token = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+		$token .= $_SERVER['REMOTE_ADDR'].$this -> model_class;
 		
 		if(Service::sessionIsStarted())
 		{
-			if(!isset($_SESSION["csrf-individual-token"]))
-				$_SESSION["csrf-individual-token"] = Service::strongRandomString(50);
+			if(!isset($_SESSION['csrf-individual-token']))
+				$_SESSION['csrf-individual-token'] = Service::strongRandomString(50);
 			
-			$token .= $_SESSION["csrf-individual-token"];
+			$token .= $_SESSION['csrf-individual-token'];
 		}
 
-		$this -> csrf_token = Service::createHash($token.$this -> registry -> getSetting("SecretCode"));
-		$this -> used_tokens["regular"] = true;
+		$this -> csrf_token = Service::createHash($token.$this -> registry -> getSetting('SecretCode'));
+		$this -> used_tokens['regular'] = true;
 		
 		return $this;
 	}
@@ -1454,7 +1448,7 @@ class Form
 	 */
 	public function checkTokenCSRF()
 	{
-	    return (isset($_POST["csrf_individual_token"]) && $_POST["csrf_individual_token"] == $this -> csrf_token);
+		return Http::fromPost('csrf_individual_token') === $this -> csrf_token;
 	}
 
 
@@ -1466,7 +1460,7 @@ class Form
 	public function useJqueryToken()
 	{
 		self::createJqueryToken();
-		$this -> used_tokens["jquery"] = true;
+		$this -> used_tokens['jquery'] = true;
 	    
 	    return $this;
 	}
@@ -1527,7 +1521,7 @@ class Form
 	 */
 	public function checkJqueryToken()
 	{
-	    return (isset($_POST["jquery_check_code"]) && $_POST["jquery_check_code"] == self::$jquery_token);
+	    return Http::fromPost('jquery_check_code') === self::$jquery_token;
 	}
 
 
@@ -1543,8 +1537,8 @@ class Form
 	{
 		$files = [];
 
-		if(isset($this -> fields[$field]) && $this -> fields[$field] -> getType() == "file")
-			if($this -> fields[$field] -> getProperty("multiple"))
+		if(isset($this -> fields[$field]) && $this -> fields[$field] -> getType() === 'file')
+			if($this -> fields[$field] -> getProperty('multiple'))
 				$files = $this -> fields[$field] -> getMultipleFilesPaths();
 
 		if($http_path)
@@ -1564,27 +1558,27 @@ class Form
 					$files[$key][$section] = $value;
 
 		foreach($files as $key => $data)
-			if(!$data["name"] || !$data["type"] || !$data["size"])
+			if(!$data['name'] || !$data['type'] || !$data['size'])
 				unset($files[$key]);
 
 		return $files;
 	}
 
-	public function processMultipleFilesData(object $object)
+	public function processMultipleFilesData(FileModelElement $object)
 	{
 		$field = $object -> getName();
-		$limit = (int) $object -> getProperty("multiple");
+		$limit = (int) $object -> getProperty('multiple');
 		$new_files = self::getMultipleFilesData($field);
 		$old_files = [];
 		$salt = Registry::get('SecretCode');
 
 		foreach($_POST as $key => $value)
-			if(preg_match("/^multiple-".$field."-\w+$/", $key))
+			if(preg_match('/^multiple-'.$field.'-\w+$/', $key))
 			{
-				$parts = explode("-", $key);
+				$parts = explode('-', $key);
 				$data = Service::unserializeArray($value);
 
-				if(md5($data["file"].$salt) == $parts[2] && is_file($data["file"]))
+				if(md5($data['file'].$salt) == $parts[2] && is_file($data['file']))
 					$old_files[] = $data;
 			}
 		
@@ -1594,7 +1588,7 @@ class Form
 		if(!count($new_files))
 			return;
 
-		$error = I18n::locale("maximum-files-one-time", ["number" => $object -> getProperty("multiple")]).'.';
+		$error = I18n::locale('maximum-files-one-time', ['number' => $object -> getProperty('multiple')]).'.';
 		$max = $limit - count($old_files);
 
 		if($max <= 0)
@@ -1605,12 +1599,15 @@ class Form
 
 		foreach($new_files as $file)
 		{
-			$object -> setValue($file);
-
-			if(!$object -> getError())
+			if(!$object -> setValue($file) -> getError())
+			{
 				$object -> addMultipleFile($object);
+				$max --;
+			}
 
-			if(-- $max == 0)
+			$object -> setError(null);
+			
+			if($max <= 0)
 				break;
 		}
 
@@ -1623,7 +1620,7 @@ class Form
 		$type = $this -> fields[$field] -> getType();
 		$data = $this -> fields[$field] -> getValue();
 
-		if($type != "file" || !$this -> fields[$field] -> getProperty("multiple") || !is_numeric($data))
+		if($type != 'file' || !$this -> fields[$field] -> getProperty('multiple') || !is_numeric($data))
 			return $this;
 
 		$files = $this -> fields[$field] -> getMultipleFilesPaths();
@@ -1634,7 +1631,7 @@ class Form
 			$this -> fields[$field] -> setRealValue($file, basename($file));
 			
 			if($path = $this -> fields[$field] -> copyFile())
-				$values[] = ["name" => basename($path), "file" => Service::removeFileRoot($path)];
+				$values[] = ['name' => basename($path), 'file' => Service::removeFileRoot($path)];
 		}
 
 		$this -> fields[$field] -> setMultipleFiles($values);

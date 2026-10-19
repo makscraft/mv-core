@@ -5,9 +5,9 @@
  */
 class UrlModelElement extends CharModelElement
 {
-	protected $format = '/^[a-z\d-]+$/';
+	protected string $format = '/^[a-z\d-]+$/';
 	
-	protected $translit_from;
+	protected ?string $translit_from = null;
 
 	public function validate()
 	{

@@ -4,13 +4,13 @@
  */
 class PasswordModelElement extends CharModelElement
 {
-	protected $min_length = 6;
+	protected ?int $min_length = 6;
 	
-	protected $letters_required = false;
+	protected bool $letters_required = false;
 	
-	protected $digits_required = false;
+	protected bool $digits_required = false;
 
-	protected $salt = 'APP_TOKEN';
+	protected ?string $salt = 'APP_TOKEN';
 	
 	public function prepareValue()
 	{

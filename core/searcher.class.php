@@ -8,13 +8,13 @@ class Searcher
 	 * Database manager object.
 	 * @var object Database
 	 */
-	public $db;
+	public ?Database $db = null;
 
 	/**
 	 * Models rows total numbers cache, to speed up the search.
 	 * @var array
 	 */
-	protected $totals = [];
+	protected array $totals = [];
 
 	/**
 	 * Max allowed records limit in model for search in it.
@@ -43,7 +43,7 @@ class Searcher
 		$this -> totals = $totals;
     }
 
-	public function allow($model, $is_ajax = false): bool
+	public function allow(string $model, bool $is_ajax = false): bool
 	{
 		if(isset($this -> totals[$model]) && $this -> totals[$model] > 0)
 		{

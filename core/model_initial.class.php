@@ -9,13 +9,13 @@ abstract class ModelInitial
 	 * Settings manager.
 	 * @var object Registry
 	 */
-	public $registry;
+	public ?Registry $registry = null;
 	
 	/**
 	 * Database manager.
-	 * @var object Registry
+	 * @var object Database
 	 */
-	public $db;
+	public ?Database $db = null;
 
 	/**
 	 * Current table name in database,
@@ -34,6 +34,14 @@ abstract class ModelInitial
 	 * @var object Versions
 	 */
 	protected $versions;
+
+	/**
+	 * Elements, fields of current model.
+	 * @var array of datatypes objects
+	 */
+	protected array $elements = [];
+	
+	abstract public function getElement(string $name);
 
 	/**
 	 * Checks if record with certain id exist in db table.

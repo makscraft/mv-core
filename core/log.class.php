@@ -112,13 +112,13 @@ class Log extends Model
 		$file_name = $folder.self::defineLogFileName($file_name);
 
 		if(!file_exists($file_name))
-			file_put_contents($file_name, $message."\n");
+			file_put_contents($file_name, $message."\n", LOCK_EX);
 		else
 		{
 			$content = file_get_contents($file_name);
 
 			if(strpos($content, $message) === false)
-				file_put_contents($file_name, $message."\n", FILE_APPEND);
+				file_put_contents($file_name, $message."\n", FILE_APPEND | LOCK_EX);
 		}
 	}
 

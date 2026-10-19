@@ -10,61 +10,61 @@ class Versions
 	 * Database manager
 	 * @var object Database
 	 */ 
-	private $db;
+	private ?Database $db = null;
 	
 	/**
 	 * Pagination object
-	 * @var object Pager
+	 * @var object Paginator
 	 */
-	public $pager;
+	public ?Paginator $pager = null;
 	
 	/**
 	 * Name of current model
 	 * @var string
 	 */ 
-	private $model;
+	private ?string $model = null;
 	
 	/**
 	 * Table with versions
 	 * @var string
 	 */ 
-	private $table;
+	private string $table = 'versions';
 	
 	/**
 	 * Id of current row of model
 	 * @var int
 	 */ 
-	private $row_id;
+	private ?int $row_id = null;
 	
 	/**
 	 * Current version number
 	 * @var int
 	 */ 
-	private $version;
+	private ?int $version = null;
 	
 	/**
 	 * Last version of row of current model
 	 * @var int
 	 */
-	private $last_version;
+	private ?int $last_version = null;
 	
 	/**
 	 * Params for url to pass in admin panel
 	 * @var string
 	 */ 
-	private $url_params;
+	private string $url_params = '';
 	
 	/**
-	 * Max number of keept versions of one model record
+	 * Max number of keept versions of one model record (from configs and model's settings).
 	 * @var int
 	 */ 
-	private $limit = 25;
+	private int $limit = 25;
 	
 	/**
 	 * Number of all versions of current record
 	 * @var int
 	 */ 
-	private $total;
+	private int $total = 0;
 	
 	public function __construct(string $model, int $row_id)
 	{
@@ -72,7 +72,6 @@ class Versions
 		
 		$this -> model = $model;
 		$this -> row_id = $row_id;
-		$this -> table = "versions";
 		
 		//Gets the number of last version of current record
 		$this -> last_version = (int) $this -> db -> getCell("SELECT MAX(`version`) 
@@ -97,7 +96,7 @@ class Versions
 		return $this -> limit;
 	}
 	
-	public function setVersion($version)
+	public function setVersion(int $version)
 	{
 		$this -> version = intval($version);
 
@@ -116,7 +115,7 @@ class Versions
 		return $this;
 	}
 		
-	public function checkVersion($version)
+	public function checkVersion(int $version)
 	{
 		return (bool) $this -> db -> getCount($this -> table, "`model`='".$this -> model."' 
 																AND `version`='".intval($version)."'"); 

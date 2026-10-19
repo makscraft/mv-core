@@ -11,37 +11,37 @@ class Paginator
 	 * Total number of items in list (usually in current table).
 	 * @var int
 	 */ 
-   	private $total;
+   	private int $total = 0;
    
    	/**
 	 * Limit of items to show per one page.
 	 * @var int
 	 */ 
-   	private $limit;
+   	private int $limit = 0;
    
    	/**
 	 * Total number of pages according to $this -> total and $this -> limit.
 	 * @var int
 	 */ 
-   	private $intervals;
+   	private int $intervals = 0;
    
    	/**
 	 * First element to show from current page according to params.
 	 * @var int
 	 */ 
-   	private $start = 0;
+   	private int $start = 0;
    
    	/**
 	 * Current number of page to show (usually passed from GET).
 	 * @var int
 	 */ 
-   	private $page = 1;
+   	private int $page = 1;
 
    	/**
 	 * Params for url string.
 	 * @var string
 	 */
-   	private $url_params = '';
+   	private string $url_params = '';
         
 	/**
 	 * Gets the limits form GET and counts the needed params.
@@ -320,13 +320,14 @@ class Paginator
       	if($this -> intervals < 2)
          	return '';
       
+		$totint = $cint = 0;
       	$html = "<div class=\"pager\">\n<div>\n<span>".I18n :: locale('page')."</span>\n";
 
       	//In case if we have more than 10 pages we need to show only 10 current ones and show the link for next pages
       	if($this -> intervals > 10) 
       	{
          	$totint = ceil($this -> intervals / 10); //Total number of intervals (by 10)
-         	$cint  = ceil($this -> page / 10); //Current interval (by 10)
+         	$cint = ceil($this -> page / 10); //Current interval (by 10)
 
          	if($cint == 1) //If we at the first interval
             	$int_start = ($cint - 1) * 10 + 1;
@@ -575,9 +576,11 @@ class Paginator
 	/**
 	 * Old versions of MV support.
 	 */
-	public function __call($method, $arguments)
+	public function __call(string $method, array $arguments)
 	{		
 		if($method === 'getIntervals')
 			return $this -> getLast();
+		else
+			Debug::handleCallMagicMethod($method, self::class, debug_backtrace());
 	}
 }

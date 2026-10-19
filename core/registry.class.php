@@ -11,19 +11,19 @@ class Registry
 	 * Works together with 'Version' setting from config/settings.php 
 	 * @var float
 	 */
-	private static $version = 3.43;
+	private static float $version = 3.5;
 	
 	/**
 	 * Instance of singleton pattern to keep only one copy of object.
 	 * @var Registry
 	 */
-	private static $instance;
+	private static ?object $instance = null;
 	
 	/**
 	 * Configuration settings from /config/ directory and .env file.
 	 * @var array
 	 */
-	private static $settings = [];
+	private static array $settings = [];
 	
 	private function __construct() {}
 	

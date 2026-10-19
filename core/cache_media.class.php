@@ -10,44 +10,44 @@ class CacheMedia
 	 * Instance of singleton pattern to keep only one copy of object.
      * @var CacheMedia
 	 */
-	private static $instance;
+	private static ?object $instance = null;
 
     /**
      * Folder with cached media files.
      * @var string
      */
-    private static $folder;
+    private static string $folder;
 
     /**
      * File with map connwcting routes with cached nedia files.
      * @var string
      */
-    private static $map_file;
+    private static string $map_file;
 
     /**
      * Current build number from config/setup.php
      * @var int
      */
-    private static $build;
+    private static int $build;
 
     /**
      * Media files added before instance() method call.
      * These files will go later at the end of combined media files list.
      * @var array
      */
-    public static $preloads = [];
+    public static array $preloads = [];
 
     /**
      * Media files list, containing all files divided into subarrays.
      * @var array
      */
-    public static $files = [];
+    public static array $files = [];
 
     /**
      * Current route passed from Router object.
      * @var string
      */
-    private static $route;
+    private static ?string $route = null;
 
     /**
      * Flags to memorize current state and use it during the work.
@@ -61,13 +61,13 @@ class CacheMedia
     /**
      * Disable the native constructor.
      */
-	private function __construct() {}
+	private function __construct(){}
 	
 	/**
 	 * Creates or returns the current class instanse as a singleton pattern.
      * @return self
 	 */
-	static public function instance(Router $router = null)
+	static public function instance(?Router $router = null)
 	{
 		if(!isset(self::$instance))
         {
@@ -166,9 +166,9 @@ class CacheMedia
     /**
      * Adds one or more media files into local array.
      */
-    static public function addFile(mixed $file, string $type)
+    static public function addFile(string|array $file_path, string $type)
     {
-        $files = is_string($file) ? [$file] : $file;
+        $files = is_string($file_path) ? [$file_path] : $file_path;
         $preload = self::$instance ? false : true;
 
         foreach($files as $file)
@@ -363,7 +363,7 @@ class CacheMedia
             $content .= "\n/* End of file */\n\n";
         }
 
-        file_put_contents($file_path, $content);
+        Filemanager::saveContentIntoFile($file_path, $content);
 
         if(PHP_OS_FAMILY === 'Darwin')
             chmod($file_path, 0777);
@@ -403,10 +403,10 @@ class CacheMedia
                         return false;
                 
                 if(isset($files['css']) && $files['css'])
-                    echo self::getCssCache($files['css']);
+                    echo self::getCssCache();
 
                 if(isset($files['js']) && $files['js'])
-                    echo self::getJavaScriptCache($files['js']);
+                    echo self::getJavaScriptCache();
 
                 self::$flags['save_map'] = false;
 

@@ -4,11 +4,11 @@
  */
  class IntModelElement extends CharModelElement
 {
-	protected $format = '/^-?[1-9]\d*$/';
+	protected string $format = '/^-?[1-9]\d*$/';
 	
-	protected $zero_allowed = true;
+	protected bool $zero_allowed = true;
 	
-	protected $positive = false;
+	protected bool $positive = false;
 	
 	public function prepareValue()
 	{

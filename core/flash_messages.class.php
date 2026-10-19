@@ -8,7 +8,7 @@ class FlashMessages
     /**
      * Container with messages of all types.
      */
-    private static $messages = null;
+    private static ?array $messages = null;
 
     /**
      * Available types list.

@@ -4,17 +4,17 @@
  */
 class MultiImagesModelElement extends CharModelElement
 {
-	protected $max_size = false;
+	protected ?int $max_size = null;
 	
-	protected $max_width = false;
+	protected ?int $max_width = null;
 	
-	protected $max_height = false;
+	protected ?int $max_height = null;
 	
-	protected $allowed_extensions = [];
+	protected array $allowed_extensions = [];
 	
-	protected $allowed_mime_types = [];
+	protected array $allowed_mime_types = [];
 
-	protected $files_folder;
+	protected string $files_folder = '';
 	
 	public function setValue(mixed $value)
 	{
@@ -26,7 +26,7 @@ class MultiImagesModelElement extends CharModelElement
 		$this -> value = $value;
 	}
 
-	public function getOverriddenProperty($property)
+	public function getOverriddenProperty(string $property)
 	{
 		$registry = Registry::instance();
 		
@@ -38,11 +38,11 @@ class MultiImagesModelElement extends CharModelElement
 			'allowed_mime_types' => 'DefaultImagesMimeTypes'
 		];
 		
-		if(isset($this -> $property) && array_key_exists($property, $settings))
+		if(property_exists($this, $property) && array_key_exists($property, $settings))
 			if(is_array($this -> $property))
 				return count($this -> $property) ? $this -> $property : $registry -> getSetting($settings[$property]);
 			else
-				return $this -> $property ? $this -> $property : $registry -> getSetting($settings[$property]);
+				return $this -> $property !== null ? $this -> $property : $registry -> getSetting($settings[$property]);
 	}
 	
 	public function validate()
@@ -75,7 +75,7 @@ class MultiImagesModelElement extends CharModelElement
 	{
 		$arguments = func_get_args();
 		
-		if(isset($arguments[0]) && $arguments[0] == "frontend")
+		if(isset($arguments[0]) && $arguments[0] === 'frontend')
 			return $this -> displayHtmlInFrom();
 		
 		$html = "<div class=\"images-area\" id=\"area-images-".$this -> name."\">\n";
@@ -163,7 +163,7 @@ class MultiImagesModelElement extends CharModelElement
 		return $html;
 	}
 	
-	public function uploadImage($file_data, $value)
+	public function uploadImage(mixed $file_data, mixed $value)
 	{
 		$input_value = self::unpackValue($value);
 		$extension = Service::getExtension($file_data['name']);

@@ -4,7 +4,7 @@
  */
 class RedirectModelElement extends CharModelElement
 {
-	protected $format = '/^https?:\/\/(www\.)?(([a-z\d-]+\.)+[a-z]{2,4}|localhost)((\/|\?).*)*$/';
+	protected string $format = '/^https?:\/\/(www\.)?(([a-z\d-]+\.)+[a-z]{2,4}|localhost)((\/|\?).*)*$/';
 	
 	public function validate()
 	{

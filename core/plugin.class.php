@@ -10,19 +10,19 @@ abstract class Plugin extends ModelInitial
 	 * Url from the domain root including the app folder (if actual).
 	 * @var string
 	 */
-    public $root_path;
+    public ?string $root_path = null;
 
    	/**
 	 * Pagination manager.
 	 * @var object Paginator
 	 */
-	public $paginator;
+	public ?Paginator $paginator = null;
 
 	/**
 	 * Says if we need to start the plugin right after main MV object (Builder class) is constructed.
 	 * @var bool
 	 */
-	protected $auto_start;
+	protected ?bool $auto_start = null;
 	
 	public function __construct()
 	{
@@ -50,29 +50,23 @@ abstract class Plugin extends ModelInitial
 			$this -> paginator -> definePage(intval($current));
 	}	
 
-	public function __get($name)
+	public function __get(string $name)
 	{
 		if($name === 'pager')
 			return $this -> paginator;
 	}
 
-	public function __isset($name)
+	public function __isset(string $name)
 	{
 		if($name === 'pager')
 			return isset($this -> paginator);
 	}
 
-	public function __call($method, $arguments)
+	public function __call(string $method, array $arguments)
 	{		
 		if($method == 'runPager')
-			return $this -> runPaginator($arguments[0], $arguments[1], $arguments[2] ?? null);
+			return $this -> runPaginator(...$arguments);
 		else
-		{
-			$trace = debug_backtrace();
-			$message = "Call to undefiend method '".$method."' of plugin '".get_class($this)."'";
-			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
-
-			Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);
-		}		
+			Debug::handleCallMagicMethod($method, self::class, debug_backtrace());
 	}
 }

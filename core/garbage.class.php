@@ -46,7 +46,7 @@ class Garbage extends Model
 		return parent::displaySortableTable('garbage');
 	}
 	
-	public function save($model, $row_id, $name, $content)
+	public function save(string $model, int $row_id, string $name, array $content)
 	{
 		$content = Service::serializeArray($content);
 		

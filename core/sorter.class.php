@@ -10,37 +10,37 @@ class Sorter
 	 * Allowed fields for sorting the same as names of model fields.
 	 * @var array
 	 */ 
-	protected $fields = [];
+	protected array $fields = [];
 
 	/**
 	 * Curent field of sorting.
 	 * @var string
 	 */ 
-	protected $field = '';
+	protected string $field = '';
 
 	/**
 	 * Current order of sorting (SQL ASC / DESC).
 	 * @var string
 	 */ 
-	protected $order = ''; 
+	protected string $order = ''; 
 
 	/** 
 	 * Url params from model.
 	 * @var string
 	 */
-	private $url_params;
+	private ?string $url_params = null;
 
 	/**
 	 * Field param name of sorting in GET.
 	 * @var string
 	 */ 
-	public $source_field;
+	public ?string $source_field = null;
 
 	/**
 	 * Order param name of sorting in GET.
 	 * @var string
 	 */ 
-	public $source_order;
+	public ?string $source_order = null;
 
 	public function __construct(array $fields = [])
 	{

@@ -4,9 +4,9 @@
  */
 class PhoneModelElement extends CharModelElement
 {
-	protected $format = '/^[\+\d\s\(\)-]+$/';
+	protected string $format = '/^[\+\d\s\(\)-]+$/';
 	
-	protected $min_length = 6;
+	protected ?int $min_length = 6;
 	
 	public function validate()
 	{

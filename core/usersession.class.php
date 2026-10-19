@@ -9,42 +9,40 @@ class UserSession
 	 * Object with settings.
 	 * @var object Registry
 	 */ 
-	public $registry;
+	public ?Registry $registry = null;
    
 	/**
 	 * Database manager object.
 	 * @var object Database
 	 */ 
-	public $db;
+	public ?Database $db = null;
 
 	/**
 	 * Table with users sessions.
 	 * @var string
 	 */ 
-	private $table;
+	private string $table = 'users_sessions';
 	
 	/**
 	 * Table with users data.
 	 * @var string
 	 */ 
-	private $users_table;
+	private string $users_table = 'users';
 	
 	/**
 	 * Id of current user.
 	 * @var int
 	 */ 
-	private $id;
+	private ?int $id = null;
 
 	/**
 	 * Pass the current admin id and sets tables and db object.
 	 */
-	public function __construct($id)
+	public function __construct(int $id)
 	{
 		$this -> registry = Registry::instance();
 		$this -> db = DataBase::instance();
-		$this -> id = intval($id);
-		$this -> table = 'users_sessions';
-		$this -> users_table = 'users';
+		$this -> id = $id;
 	}
 	
 	/**

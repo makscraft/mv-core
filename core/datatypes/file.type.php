@@ -4,25 +4,25 @@
  */
 class FileModelElement extends CharModelElement
 {
-	protected $file_name;
+	protected string $file_name = '';
 	
-	protected $allowed_extensions = [];
+	protected array $allowed_extensions = [];
 	
-	protected $allowed_mime_types = [];
+	protected array $allowed_mime_types = [];
 	
-	protected $files_folder;
+	protected string $files_folder = '';
 	
-	protected $transform_file_name = true;
+	protected bool $transform_file_name = true;
 	
-	protected $max_size;
+	protected ?int $max_size = null;
 
-	protected $multiple;
+	protected ?int $multiple = null;
 
-	protected $multiple_files = [];
+	protected array $multiple_files = [];
 
-	protected $max_width;
+	protected ?int $max_width = null;
 	
-	protected $max_height;	
+	protected ?int $max_height = null;	
 	
 	public function setAllowedExtensions($values)
 	{
@@ -234,7 +234,7 @@ class FileModelElement extends CharModelElement
 	  	}		
 		
 		if($this -> error) //If it was any type of error we don't copy the file and go back
-			return;
+			return $this;
 		
 		if($this -> transform_file_name)
 			$initial_name = Service::translateFileName($file_data['name']);

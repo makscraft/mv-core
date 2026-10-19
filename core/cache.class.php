@@ -9,13 +9,13 @@ class Cache
 	 * ODatabase manager object.
 	 * @var Database
 	 */
-	public $db;
+	public ?Database $db;
 
 	/**
 	 * Key of cache fragment to store it in database.
 	 * @var string
 	 */
-	private $current_key;
+	private ?string $current_key = null;
 	
 	/**
 	 * Table name for saved html cached fragments.
@@ -267,7 +267,7 @@ class Cache
 	/**
 	 * Saves routes map into cache file.
 	 */
-	static public function createMainConfigFile($config_files)
+	static public function createMainConfigFile(array $config_files)
 	{
 		$env = Registry::get('IncludePath').Registry::get('EnvFile');
 
@@ -312,10 +312,14 @@ class Cache
 
 		self::cleanConfigCacheFilesByKey($file_key);
 
-		$content = "<?php\nreturn ".var_export($data, true).";";
+		$original_precision = ini_get('serialize_precision');
+		ini_set('serialize_precision', -1);
 
-		$file = $cache_folder.$file_key.'-'.(Registry::get('Build') ?? '0').'.php';
-		file_put_contents($file, $content);
+		$content = "<?php\nreturn ".var_export($data, true).";";
+		ini_set('serialize_precision', $original_precision);
+
+		$file_path = $cache_folder.$file_key.'-'.(Registry::get('Build') ?? '0').'.php';
+		Filemanager::saveContentIntoFile($file_path, $content);
 
 		if(PHP_OS_FAMILY === 'Darwin')
 			chmod($file, 0777);

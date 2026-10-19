@@ -4,19 +4,17 @@
  */
 class ParentModelElement extends EnumModelElement
 {
-	protected $self_id;
+	protected ?int $self_id = null;
 	
-	protected $self_model;
+	protected ?string $self_model = null;
 	
-	protected $parent_for;
+	protected ?string $parent_for = null;
 	
-	protected $child_records = [];
+	protected array $child_records = [];
+		
+	protected ?int $max_depth = null;
 	
-	protected $name_field = 'name';
-	
-	protected $max_depth;
-	
-	protected $show_parent = false;
+	protected bool $show_parent = false;
 	
 	public function prepareValue()
 	{
@@ -41,7 +39,7 @@ class ParentModelElement extends EnumModelElement
 		return $this -> child_records;
 	}
 	
-	public function setSelfModel($model_name)
+	public function setSelfModel(string $model_name)
 	{
 		$this -> self_model = $model_name;
 		
@@ -70,7 +68,7 @@ class ParentModelElement extends EnumModelElement
 				$order_by = $arguments[1]; //Ordering by filterValuesList() of Filter
 		}
 				
-		$where = "";
+		$where = '';
 		
 		if($this -> self_id) //If we have direct child rows in db
 		{
@@ -279,8 +277,7 @@ class ParentModelElement extends EnumModelElement
 		if(!$in_recursion)
 			$this -> child_records = [];
 
-		$ids = DataBase::instance() -> getColumn("SELECT `id` FROM `".$table."` 
-													WHERE `".$this -> name."`='".$id."'");
+		$ids = DataBase::instance() -> getColumn("SELECT `id` FROM `".$table."` WHERE `".$this -> name."`='".$id."'");
 		
 		foreach($ids as $id)
 			if($id && !in_array($id, $this -> child_records)) //Adds new child record

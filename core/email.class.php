@@ -11,7 +11,7 @@ class Email
 	 * Email css template settings.
 	 * @var array
 	 */
-	static private $template = [];
+	static private array $template = [];
 	
 	/**
 	 * Sets email css template from file.
@@ -110,9 +110,9 @@ class Email
 
 	   		if($from)
 	   		{
-	   			if(preg_match("/^[^<]+<[^<>]+>$/", $from))
+	   			if(preg_match('/^[^<]+<[^<>]+>$/', $from))
 	   			{
-	   				$from = explode("<", str_replace(">", "", $from));
+	   				$from = explode('<', str_replace('>', '', $from));
 	   				$mail -> setFrom(trim($from[1]), trim($from[0]));
 	   			}
 	   			else
@@ -167,17 +167,17 @@ class Email
 	 * Divides string of email addresses.
 	 * @return array
 	 */
-	static public function explodeEmailAddress(string $email)
+	static public function explodeEmailAddress(string $email_address)
 	{
-		$emails = (strpos($email, ",") === false) ? array($email) : explode(",", $email);
+		$emails = strpos($email_address, ',') === false ? [$email_address] : explode(',', $email_address);
 		$result = [];
 		
 		foreach($emails as $email)
 		{   			
-   			if(strpos($email, "<") !== false)
+   			if(strpos($email, '<') !== false)
    			{
-   				$address = trim(preg_replace("/.*<([^>]+)>.*/", "$1", $email));
-   				$name = trim(preg_replace("/(.*)<[^>]+>.*/", "$1", $email));
+   				$address = trim(preg_replace('/.*<([^>]+)>.*/', '$1', $email));
+   				$name = trim(preg_replace('/(.*)<[^>]+>.*/', '$1', $email));
 			    $result[] = [$address, $name];
    			}
    			else
@@ -199,8 +199,8 @@ class Email
 		if(!is_array($css_templates))
 			$css_templates = [];
 		
-		if(isset(self::$template["css"]) && count(self::$template["css"]))
-			foreach(self::$template["css"] as $key => $value)
+		if(isset(self::$template['css']) && count(self::$template['css']))
+			foreach(self::$template['css'] as $key => $value)
 				$css_templates[$key] = $value;
 		
 		$common_styles = false;
@@ -212,27 +212,27 @@ class Email
 		
 		foreach($css_templates as $key => $template)
 		{
-			$template = preg_replace("/;\s*$/", "", $template);
+			$template = preg_replace('/;\s*$/', '', $template);
 
-			if($key == "*" && $template)
+			if($key == '*' && $template)
 			{
 				$common_styles = $template;
 				continue;
 			}
-			else if(strpos($key, ",") !== false)
+			else if(strpos($key, ',') !== false)
 			{
-				$keys = preg_split("/\s*,\s*/", $key);
+				$keys = preg_split('/\s*,\s*/', $key);
 				
 				foreach($keys as $i)
 					if(isset($tags[$i]) && $tags[$i])
-						$tags[$i] .= ";".$template;
+						$tags[$i] .= ';'.$template;
 					else
 						$tags[$i] = $template;
 			}
 			else
 			{
 				if(isset($tags[$key]) && $tags[$key])
-					$tags[$key]	.= "; ".$template;
+					$tags[$key]	.= '; '.$template;
 				else
 					$tags[$key]	= $template;
 			}

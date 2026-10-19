@@ -139,7 +139,7 @@ class Http
 	 * Sets one cookie with passed parametares.
      * @param string $key name of cookie
      * @param string $value value of cookie
-     * @param string $params extra cookie parameters
+     * @param array $params extra cookie parameters
 	 */
     static public function setCookie(string $key, string $value, array $params = []): void
     {
@@ -194,7 +194,7 @@ class Http
     /**
      * Checks if the current request has passed keys.
      */
-    static public function requestHas(...$keys): bool
+    static public function requestHas(string ...$keys): bool
     {
         foreach($keys as $key)
             if(!array_key_exists($key, $_REQUEST))

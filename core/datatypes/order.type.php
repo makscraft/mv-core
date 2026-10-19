@@ -4,9 +4,9 @@
  */
 class OrderModelElement extends IntModelElement
 {
-	protected $positive = true;
+	protected bool $positive = true;
 	
-	protected $depend_on_enum = false;
+	protected ?string $depend_on_enum = null;
 	
 	public function validate()
 	{

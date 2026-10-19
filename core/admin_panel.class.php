@@ -8,13 +8,13 @@ class AdminPanel
 	 * Current user object of admin panel with credentials and settings.
 	 * @var User
 	 */ 
-	public $user;
+	public ?User $user = null;
 
     /**
      * Current view template in admin panes.
      * @var string
      */
-    private $view = '';
+    private string $view = '';
 
     /**
      * Available limits for pagination in admin panel, for all modules.
@@ -25,9 +25,9 @@ class AdminPanel
 	 * Versions manager object.
 	 * @var object Versions
 	 */
-	public $versions;
+	public ?object $versions = null;
 
-    public function __construct(User $user = null)
+    public function __construct(?User $user = null)
     {
         ob_start();
         
@@ -145,11 +145,11 @@ class AdminPanel
      */
     public function createCSRFToken(): string
 	{
-		$token = $_SERVER["REMOTE_ADDR"].$_SERVER["HTTP_USER_AGENT"];
-		$token .= $this -> user -> getField("login").$this -> user -> getField("password");
+		$token = $_SERVER['REMOTE_ADDR'].$_SERVER['HTTP_USER_AGENT'];
+		$token .= $this -> user -> getField('login').$this -> user -> getField('password');
         $token .= Registry::get('SecretCode');
 		
-		return Service::createHash($token, "random");
+		return Service::createHash($token, 'random');
 	}
 
     /**
@@ -259,7 +259,7 @@ class AdminPanel
 		return $this;
 	}
 
-    public function allowDeleteRecord($model, $id)
+    public function allowDeleteRecord(object $model, int $id)
     {
         $error = '';
         $arguments = [];
@@ -292,25 +292,25 @@ class AdminPanel
 		$message = [];
 		
 		if(!Router::isLocalHost() && Registry::onDevelopment())
-			$message[] = I18n::locale("warning-development-mode");
+			$message[] = I18n::locale('warning-development-mode');
 			
 		$root_password = Database::instance() -> getCell("SELECT `password` FROM `users` WHERE `id`='1'");
 			
-		if(!Router::isLocalHost() && Service::checkHash("root", $root_password))
-			$message[] = I18n::locale("warning-root-password");
+		if(!Router::isLocalHost() && Service::checkHash('root', $root_password))
+			$message[] = I18n::locale('warning-root-password');
 
-		$logs_folder = Registry::get("IncludePath")."log/";
+		$logs_folder = Registry::get('IncludePath').'log/';
 		
 		if(is_dir($logs_folder) && !is_writable($logs_folder))
-			$message[] = I18n::locale("warning-logs-folder");
+			$message[] = I18n::locale('warning-logs-folder');
 			
-		$files_folders = array("", "files/", "images/", "models/", "tmp/", "tmp/filemanager/");
-		$files_root = Registry::get("FilesPath");
+		$files_folders = array('', 'files/', 'images/', 'models/', 'tmp/', 'tmp/filemanager/');
+		$files_root = Registry::get('FilesPath');
 		
 		foreach($files_folders as $folder)
 			if(is_dir($files_root.$folder) && !is_writable($files_root.$folder))
 			{
-				$message[] = I18n::locale("warning-userfiles-folder");
+				$message[] = I18n::locale('warning-userfiles-folder');
 				break;
 			}
         

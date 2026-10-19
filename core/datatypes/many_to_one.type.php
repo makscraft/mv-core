@@ -4,26 +4,26 @@
  */  
 class ManyToOneModelElement extends ModelElement
 {
-	protected $related_model;
+	protected string $related_model = '';
 	
-	protected $related_id;
+	protected ?int $related_id = null;
 	
-	protected $related_field;
+	protected ?string $related_field = null;
 	
-	protected $name_field = 'name';
+	protected string $name_field = 'name';
 	
-	protected $display_count = true;
+	protected bool $display_count = true;
 	
-	protected $allow_sorting = true;
+	protected bool $allow_sorting = true;
 	
-	public function setRelatedId($related_id)
+	public function setRelatedId(mixed $related_id)
 	{
 		$this -> related_id = intval($related_id);
 
 		return $this;
 	}
 	
-	public function setRelatedFeild($related_field)
+	public function setRelatedFeild(string $related_field)
 	{	
 		$this -> related_field = $related_field;
 

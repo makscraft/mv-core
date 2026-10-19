@@ -5,15 +5,15 @@
  */
 class DateModelElement extends CharModelElement
 {
-	protected $display_selects = false;
+	protected bool $display_selects = false;
 	
-	protected $now_on_create = true;
+	protected bool $now_on_create = true;
 	
-	protected $selects_values = ['dd' => '', 'mm' => '', 'yyyy' => ''];
+	protected array $selects_values = ['dd' => '', 'mm' => '', 'yyyy' => ''];
 	
-	protected $years;
+	protected string|array|null $years = null;
 	
-	protected $format = true;
+	protected bool $format = true;
 
 	public function validate()
 	{
@@ -59,9 +59,10 @@ class DateModelElement extends CharModelElement
 		return $html;
 	}
 		
-	public function setDisplaySelects($display_selects) 
+	public function setDisplaySelects(bool $display_selects) 
 	{ 
-		$this -> display_selects = $display_selects; 
+		$this -> display_selects = $display_selects;
+
 		return $this; 
 	}
 	
@@ -86,7 +87,7 @@ class DateModelElement extends CharModelElement
 		return null;
 	}
 	
-	public function setValue($value)
+	public function setValue(mixed $value)
 	{
 		if(!$value)
 		{
@@ -123,7 +124,7 @@ class DateModelElement extends CharModelElement
 		return $this;
 	}
 	
-	public function setSelectValue($key, $value)
+	public function setSelectValue(string $key, mixed $value)
 	{
 		if(array_key_exists($key, $this -> selects_values))
 		{
@@ -219,6 +220,6 @@ class DateModelElement extends CharModelElement
 		
 		$html .= "</select>\n";
 		
-		return (get_class($this) == 'DateModelElement') ? $html.$this -> addHelpText() : $html;
+		return get_class($this) === 'DateModelElement' ? $html.$this -> addHelpText() : $html;
 	}
 }

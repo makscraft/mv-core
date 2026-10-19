@@ -9,31 +9,31 @@ class Filter
 	 * Model's fields, settings for filtering.
 	 * @var array
 	 */
-	private $fields = [];
+	private array $fields = [];
 	
 	/**
 	 * URL parametes for merge with other params.
 	 * @var string
 	 */
-	private $url_params;
+	private ?string $url_params = null;
 	
 	/**
 	 * Model object, source of current filters.
 	 * @var object
 	 */ 
-	private $model;
+	private mixed $model = null;
 
 	/**
 	 * Custom (not from model) filters fields.
 	 * @var array
 	 */
-	public $custom_filters_ids = [];
+	public array $custom_filters_ids = [];
 
 	/**
 	 * Filter field of m2o type, connected with sorter.
 	 * @var string
 	 */
-	public $allowed_count_field;
+	public ?string $allowed_count_field = null;
 
 	/**
 	 * Conditions list for numeric values.
@@ -579,14 +579,14 @@ class Filter
 		if($extra !== '' && $extra !== "backend")
 			$html .= "<option value=\"\">".$extra."</option>\n";
 
-		foreach($options as $name => $value)
+		foreach($options as $title => $value)
 		{
 			$html .= "<option value=\"".$value."\"";
 			
 			if($selected != "" && strval($selected) == $value)
 				$html .=  " selected=\"selected\"";
 				
-			$html .= ">".$name."</option>\n";
+			$html .= ">".$title."</option>\n";
 		}
 
 		return $html."</select>\n";

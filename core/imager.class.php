@@ -10,37 +10,37 @@ class Imager
     * Initial image file location.
     * @var string
     */
-   private $image;
+   private ?string $image = null;
    
    /**
     * Type (extension) of image .jpg, .gif or .png
     * @var string
     */
-   public $type;
+   public ?string $type = null;
    
    /**
     * Width of inintial image in pixels.
     * @var int
     */
-   private $width;
+   private ?int $width = null;
    
    /**
     * Height of inintial image in pixels.
     * @var int
     */
-   private $height;
+   private ?int $height = null;
    
    /**
     * Quality of created jpg images.
     * @var int
     */   
-   private $jpg_quality = 90;
+   private int $jpg_quality = 90;
    
    /**
     * Internal flag says if the file was created erlier.
     * @var bool
     */
-   private $created_erlier = false;
+   private bool $created_erlier = false;
       
    public function __construct(string $image = '')
    {
@@ -63,14 +63,14 @@ class Imager
       else
          $this -> type = null;
       
-      if($quality = intval(Registry :: get('JpgQuality')))
+      if($quality = intval(Registry::get('JpgQuality')))
          $this -> jpg_quality = $quality;
    }
    
-   public function setImage($image)
+   public function setImage(string $image)
    {
       //If we deside to get another image after the Imager object is constructed
-      self :: __construct($image);
+      self::__construct($image);
    }
    
    public function wasCreatedErlier()
@@ -78,7 +78,7 @@ class Imager
    	return $this -> created_erlier;
    }
    
-   public function prepare($location, $prefix)
+   public function prepare(string $location, string $prefix)
    {
       $this -> setImage($location);
       
@@ -87,12 +87,12 @@ class Imager
       $new_file = $path.$file; //Path of small copy of image
             
       if(!is_dir($path))
-         Filemanager :: createDirectory($path);
+         Filemanager::createDirectory($path);
       
       return $new_file;
    }
    
-   public function removePngTransparency($pattern)
+   public function removePngTransparency(GdImage $pattern)
    {
 	   imagealphablending($pattern, false);
 	   imagesavealpha($pattern, true);
@@ -102,7 +102,7 @@ class Imager
 	   return $pattern;
    }
    
-   public function defineImageParams($image)
+   public function defineImageParams(string $image)
    {
       if(!Service::checkImageFile($image))
          return false;
@@ -136,7 +136,7 @@ class Imager
       return ["type" => $type, "width" => $width, "height" => $height];
    }
    
-   private function createImageFromSource($type, $image)
+   private function createImageFromSource(string $type, string $image)
    {
       switch($type)
       {
@@ -151,7 +151,7 @@ class Imager
       }
    }
    
-   private function saveNewImage($type, $image, $file_name)
+   private function saveNewImage(string $type, GdImage $image, string $file_name)
    {
       switch($type)
       {
@@ -170,20 +170,20 @@ class Imager
     * Main function which executes the resize process with image.
     * It creates new image or copies old one if it is smaller than we need.
     */
-   public function compress($location, $prefix, $width, $height)
+   public function compress(string $location, string $prefix, int $width, int $height)
    {
       if(!$location || !is_file($location))
          return '';
 
-      if(Service :: getExtension($location) == "svg" && mime_content_type($location) == "image/svg+xml")
-         return Service :: removeDocumentRoot($location); //We don't resize svg images
+      if(Service::getExtension($location) == "svg" && mime_content_type($location) == "image/svg+xml")
+         return Service::removeDocumentRoot($location); //We don't resize svg images
 
    	$new_file = $this -> prepare($location, $prefix);
    	  
    	if(is_file($new_file)) //If the small copy already exists
    	{
          $this -> created_erlier = true;
-         return Service :: removeDocumentRoot($new_file);
+         return Service::removeDocumentRoot($new_file);
    	}
       
       if(!$this -> type || !$this -> image)
@@ -203,7 +203,7 @@ class Imager
       {
          @copy($this -> image, $new_file);
          
-         return Service :: removeDocumentRoot($new_file);
+         return Service::removeDocumentRoot($new_file);
       }
       else
          return '';
@@ -241,26 +241,24 @@ class Imager
          default:
          	return '';
       }
-      
-      imagedestroy($pattern); //Delete used pattern
-      
-      return Service :: removeDocumentRoot($new_file);
+            
+      return Service::removeDocumentRoot($new_file);
    }
    
-   public function crop($location, $prefix, $width, $height)
+   public function crop(string $location, string $prefix, int $width, int $height)
    {
       if(!$location || !is_file($location))
          return '';
       
-      if(Service :: getExtension($location) == "svg" && mime_content_type($location) == "image/svg+xml")
-         return Service :: removeDocumentRoot($location); //We don't resize svg images
+      if(Service::getExtension($location) == "svg" && mime_content_type($location) == "image/svg+xml")
+         return Service::removeDocumentRoot($location); //We don't resize svg images
             
    	$new_file = $this -> prepare($location, $prefix);
    	  
    	if(is_file($new_file)) //If the small copy already exists
    	{
          $this -> created_erlier = true;
-         return Service :: removeDocumentRoot($new_file);
+         return Service::removeDocumentRoot($new_file);
    	}
    	  	
       if(!$this -> type || !$this -> image) 
@@ -274,7 +272,7 @@ class Imager
       if($this -> width <= $width && $this -> height <= $height)
       {      	 
          @copy($this -> image, $new_file);
-         return Service :: removeDocumentRoot($new_file);
+         return Service::removeDocumentRoot($new_file);
       }		 
    	
       $ratio = max($width / $this -> width, $height / $this -> height);
@@ -305,17 +303,14 @@ class Imager
       imagecopy($croped_image, $pattern, 0, 0, $x_point, $y_point, $new_width, $new_height);	  
             
       $this -> saveNewImage($this -> type, $croped_image, $new_file);  
-      
-      imagedestroy($pattern); //Delete used patterns
-      imagedestroy($croped_image);
-	   
-      return Service :: removeDocumentRoot($new_file);
+      	   
+      return Service::removeDocumentRoot($new_file);
    }
    
-   public function addWatermark($image, $stamp, $margin_top, $margin_bottom, $margin_left, $margin_right)
+   public function addWatermark(string $image, string $stamp, int $margin_top, int $margin_bottom, int $margin_left, int $margin_right)
    {
-      $stamp = Service :: addFileRoot($stamp);      
-      $file_name = $image = Service :: addFileRoot($image);
+      $stamp = Service::addFileRoot($stamp);      
+      $file_name = $image = Service::addFileRoot($image);
       $image_params = $this -> defineImageParams($image);
       
       if(!$image_params["type"]) 

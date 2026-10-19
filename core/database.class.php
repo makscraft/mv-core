@@ -9,41 +9,41 @@ class Database
 	 * Instance of singleton pattern to keep only one copy of object.
 	 * @var object
 	 */
-	private static $instance;
+	private static ?object $instance = null;
 	
 	/**
 	 * PDO object to execute queries.
 	 * @var object
 	 */
-	public static $pdo;
+	public static ?PDO $pdo = null;
 	
 	/**
 	 * Object with settings.
 	 * @var object
 	 */
-	private static $registry;
+	private static ?Registry $registry = null;
 
 	/**
 	 * Adapter with db engine specific commands.
 	 * @var object
 	 */
-	public static $adapter;
+	public static ?object $adapter = null;
 	
 	/**
 	 * Storage with SQL queries for statistics.
 	 * @var array
 	 */
-	public static $total = [];
+	public static array $total = [];
 	
 	/**
 	 * Database engine type.
 	 * @var string
 	 */
-	public static $engine;
+	public static ?string $engine = null;
 	
 	private function __construct() {}
 	
-	public function __call($method, $params)
+	public function __call(string $method, array $params)
 	{
 		$param = $params[0] ?? null;
 		
@@ -141,7 +141,7 @@ class Database
 	/**
 	 * Makes value safe before insert into database.
 	 */
-	static public function secure($value)
+	static public function secure(mixed $value)
 	{		
 		return self::$pdo -> quote($value);
 	}

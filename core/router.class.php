@@ -10,31 +10,31 @@ class Router
 	 * Initial url from http request.
 	 * @var string
 	 */	
-   	private $url;
+   	private ?string $url = null;
    	
    	/**
 	 * Parts of requested url.
 	 * @var array
 	 */
-   	private $url_parts = [];  
+   	private array $url_parts = [];  
    
    	/**
 	 * Defined route, matching array element from config/routes.php file.
 	 * @var string
 	 */	
-   	private $route;
+   	private ?string $route = null;
 
 	/**
 	 * Matched url pattern according to config/routes.php file.
 	 * @var string
 	 */	
-	private $pattern;
+	private ?string $pattern = null;
 
 	/**
 	 * Route to 404 error page from config/routes.php file.
 	 * @var string
 	 */	
-	private $route_404;
+	private ?string $route_404 = null;
 
    	public function __construct()
    	{ 	
@@ -318,7 +318,7 @@ class Router
 	 * @param array list of routes from ~/config/routes.php
 	 * @return array
 	 */
-	private function createRoutesMap($mvFrontendRoutes)
+	private function createRoutesMap(array $mvFrontendRoutes)
 	{
 		$map = [];
 

@@ -10,73 +10,73 @@ class I18n
 	 * Singleton pattern instance.
 	 * @var object self
 	 */
-	private static $instance;
+	private static ?object $instance = null;
 	
 	/**
 	 * Current region key (en, am, de, ru).
 	 * @var string
 	 */
-	private static $region;
+	private static string $region;
 
 	/**
 	 * Current region name like 'English', 'Português'.
 	 * @var string
 	 */
-	private static $name;
+	private static string $name;
 	
 	/**
 	 * Current format of date.
 	 * @var string
 	 */ 
-	private static $date_format;
+	private static string $date_format;
 	
 	/** 
 	 * Delimeter of date parts (".", "/" or "-").
 	 * @var string
 	 */
-	private static $date_separator;
+	private static string $date_separator;
 	
 	/**
 	 * National rules for numbers translations.
 	 * @var array
 	 */ 
-	private static $plural_rules;
+	private static array $plural_rules;
 	
 	/**
 	 * Special translations of letters for non-english languages.
 	 * @var array
 	 */ 
-	private static $translit_rules;
+	private static array $translit_rules;
 	
 	/**
 	 * Main translations list for region.
 	 * @var array
 	 */ 
-	private static $translation;
+	private static array $translation;
 	
 	/**
 	 * Names of months.
 	 * @var array
 	 */
-	private static $month;
+	private static array $month;
 	
 	/**
 	 * Additional months' names for non-english languages.
 	 * @var array
 	 */ 
-	private static $month_case;
+	private static array $month_case;
 	
 	/**
 	 * Week days names.
 	 * @var array
 	 */ 
-	private static $week_days;
+	private static array $week_days;
 	
 	/**
 	 * Decimal mark for float numbers.
 	 * @var string
 	 */ 
-	private static $decimal_mark;
+	private static string $decimal_mark;
 	
 	private function __construct() {}
 	
@@ -434,7 +434,7 @@ class I18n
 	 * Converts timestamp value to formatted date value.
 	 * @return string
 	 */
-	static public function timestampToDate($timestamp)
+	static public function timestampToDate(int $timestamp)
 	{
 		return self::dateFromSQL(date("Y-m-d H:i:s", $timestamp));	
 	}
@@ -460,23 +460,24 @@ class I18n
 	 * Converts the size of file from bites to KB or MB.
 	 * @return float
 	 */
-	static public function convertFileSize($size)
+	static public function convertFileSize(int $size)
 	{
 		$sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-		if($size == 0)
+		if($size === 0)
 			return 0;
 
 		$decimals = ($size > 1073741824) ? 2 : ($size > 1048576 ? 1 : 0);
+		$i = (int) floor(log($size, 1024));
     
-		return round($size / pow(1024, ($i = floor(log($size, 1024)))), $decimals).' '.$sizes[$i];
+		return round($size / pow(1024, $i), $decimals).' '.$sizes[$i];
 	}
 	
 	/**
 	 * Returns translated name of passed month.
 	 * @return string
 	 */
-	static public function getMonth($number)
+	static public function getMonth(int $number)
 	{
 		return self::$month[$number - 1] ?? '';
 	}
@@ -485,7 +486,7 @@ class I18n
 	 * Returns translated name of passed month according to language rules.
 	 * @return string
 	 */
-	static public function getMonthCase($number)
+	static public function getMonthCase(int $number)
 	{
 		return self::$month_case[$number - 1] ?? '';
 	}

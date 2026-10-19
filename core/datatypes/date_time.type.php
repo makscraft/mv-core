@@ -4,7 +4,7 @@
  */
 class DateTimeModelElement extends DateModelElement
 {
-	protected $selects_values = ['dd' => '', 'mm' => '', 'yyyy' => '', 'hh' => '', 'mi' => ''];
+	protected array $selects_values = ['dd' => '', 'mm' => '', 'yyyy' => '', 'hh' => '', 'mi' => ''];
 	
 	public function validate()
 	{
@@ -25,7 +25,7 @@ class DateTimeModelElement extends DateModelElement
 		return $this;
 	}
 
-	public function setValue($value)
+	public function setValue(mixed $value)
 	{
 		if(!$value)
 		{

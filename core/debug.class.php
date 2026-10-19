@@ -9,24 +9,24 @@ class Debug
 	 * Says if we need to display the debug info at the end of the site page.
 	 * @var bool
 	 */
-	private $show_info = false;
+	private bool $show_info = false;
 
 	/**
 	 * Start time for worktime measuring.
 	 * @var int
 	 */
-	public $time_start;
+	public ?int $time_start;
 
 	/**
 	 * End time for worktime measuring.
 	 * @var int
 	 */
-	public $time_stop;
+	public ?int $time_stop;
 
 	/**
 	 * Buffer to collect ounput of pre() method before exit.
 	 */
-	private static $buffer = [];
+	private static array $buffer = [];
 		
 	public function __construct($show_info = false)
 	{
@@ -354,5 +354,16 @@ class Debug
 	static public function isCommandLineInterface(): bool
 	{
     	return php_sapi_name() === 'cli';
+	}
+
+	/**
+	 * Processing of firing the __call() method in different core classes.
+	 */
+	static public function handleCallMagicMethod(string $method_name, string $class_name, array $trace)
+	{
+		$message = "Call to undefiend method '".$method_name."' of ".$class_name." class ";
+		$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
+
+		self::displayError($message, $trace[0]['file'], $trace[0]['line']);
 	}
 }

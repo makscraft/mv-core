@@ -6,23 +6,23 @@
  */
 class TextModelElement extends CharModelElement
 {
-	protected $rich_text = false;
+	protected bool $rich_text = false;
 	
-	protected $height;
+	protected int|string|null $height = null;
 	
-	protected $show_in_admin = false;
+	protected ?int $show_in_admin = null;
 	
-	protected $auto_cleanup = true;
+	protected bool $auto_cleanup = true;
 	
-	protected $images_path = 'userfiles/images/';
+	protected string $images_path = 'userfiles/images/';
 	
-	protected $files_path = 'userfiles/files/';
+	protected string $files_path = 'userfiles/files/';
 	
-	protected $display_method;
+	protected ?string $display_method = null;
 	
-	protected $virtual = false;
+	protected bool $virtual = false;
 
-	protected $json = false;
+	protected bool $json = false;
 	
 	public function setValue($value)
 	{

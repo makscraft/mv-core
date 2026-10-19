@@ -9,98 +9,92 @@ abstract class ModelBase extends ModelInitial
 	 * Localization manager.
 	 * @var object I18n class instance
 	 */
-	public $i18n;
+	public ?I18n $i18n = null;
 	
 	/**
 	 * Pagination manager.
 	 * @var object Paginator class
 	 */
-	public $paginator;
+	public ?Paginator $paginator = null;
 	
 	/**
 	 * Filters manager.
 	 * @var object Filter class
 	 */
-	public $filter;
+	public ?Filter $filter = null;
 	
 	/**
 	 * Sorting manager.
 	 * @var object Sorter class
 	 */
-	public $sorter;
+	public ?Sorter $sorter = null;
 	
 	/**
 	 * Current user of admin panel.
 	 * @var object User class
 	 */
-	protected $user;
-	
-	/**
-	 * Elements, fields of current model.
-	 * @var array of datatypes objects
-	 */
-	protected $elements;
-		
+	protected ?User $user = null;
+			
 	/**
 	 * Name of parent type (tree builder) field of model.
 	 * @var string
 	 */
-	protected $parent_field;
+	protected ?string $parent_field = null;
 	
 	/**
 	 * Id of current parent in tree structure.
 	 * @var int
 	 */
-	protected $parent_id;
+	protected ?int $parent_id = null;
 	
 	/**
 	 * Errors list after validation in admin panel.
 	 * @var array
 	 */
-	protected $errors = [];
+	protected array $errors = [];
 	
 	/**
 	 * GET params to pass in url when in admin panel.
 	 * @var array
 	 */
-	protected $url_params = [];
+	protected array $url_params = [];
 	
 	/**
 	 * Total number of records in current model (with conditions).
 	 * @var int
 	 */
-	protected $total;
+	protected int $total = 0;
 	
 	/**
 	 * Name field of model, which is used to show record in admin panel.
 	 * @var string
 	 */
-	protected $name_field = 'name';
+	protected string $name_field = 'name';
 	
 	/**
 	 * Additional field for record name in admin panel (added to $name_field).
 	 * @var string
 	 */
-	protected $name_field_extra = '';
+	protected string $name_field_extra = '';
 	
 	/**
 	 * SQL query for main table with model's records in admin panel.
 	 * @var string
 	 */
-	protected $sql_for_table;
+	protected ?string $sql_for_table = null;
 	
 	/**
 	 * Cache of enum fields captions for method getEnumTitle().
 	 * @var array
 	 */
-	protected $enum_values = [];
+	protected array $enum_values = [];
 	
 	/**
 	 * Additional display parameters of model in admin panel.
 	 * Can be set individually in any model.
 	 * @var array
 	 */
-	protected $display_params = [
+	protected array $display_params = [
 		'visible_fields' => '*',
 		'hidden_fields' => [],
 		'editable_fields' => '*',
@@ -122,25 +116,29 @@ abstract class ModelBase extends ModelInitial
 	 * URL path from root of application (including folder, APP_FOLDER in .env)
 	 * @var string
 	 */
-	public $root_path;	
+	public ?string $root_path = null;
 	
 	/**
 	 * Folder with extra parts of code to include into admin panel interface.
 	 * @var string
 	 */
-	public $includes_folder = 'customs/models/';
+	public string $includes_folder = 'customs/models/';
 	
 	/**
 	 * File system path to the document root of the project.
 	 * @var string
 	 */
-	public $include_path;
+	public ?string $include_path = null;
 
 	/**
 	 * List with migrations to perform.
 	 * @var array
 	 */
-	protected $migrations;
+	protected $migrations = null;
+
+	abstract protected function instanceElement(array $field_data);
+	abstract public function displayFormErrors(): string;
+	abstract public function checkForChildren(): mixed;
 	
 	public function getParentField() { return $this -> parent_field; }
 	public function getParentId() { return $this -> parent_id; }
@@ -154,12 +152,12 @@ abstract class ModelBase extends ModelInitial
 		return $this -> tryToFindNameField();
 	}
 	
-	public function setParentId($parent_id)
+	public function setParentId(int $parent_id)
 	{
 		$this -> parent_id = intval($parent_id);
 	}
 	
-	public function setId($id)
+	public function setId(int $id)
 	{ 
 		$this -> id = intval($id);
 
@@ -188,7 +186,7 @@ abstract class ModelBase extends ModelInitial
 			return $this -> elements[$name];
 	}
 	
-	public function passElement($object)
+	public function passElement(?object $object)
 	{
 		if(is_object($object))
 			$this -> elements[$object -> getName()] = $object;
@@ -204,13 +202,13 @@ abstract class ModelBase extends ModelInitial
 		return $this;
 	}
 	
-	public function checkDisplayParam($name)
+	public function checkDisplayParam(string $name)
 	{
 		if(isset($this -> display_params[$name]))
 			return (bool) $this -> display_params[$name];
 	}
 	
-	public function setDisplayParam($name, $value)
+	public function setDisplayParam(string $name, mixed $value)
 	{
 		if(isset($this -> display_params[$name]))
 			$this -> display_params[$name] = $value;
@@ -218,13 +216,13 @@ abstract class ModelBase extends ModelInitial
 		return $this;
 	}
 	
-	public function getDisplayParam($name)
+	public function getDisplayParam(string $name)
 	{
 		if(isset($this -> display_params[$name]))
 			return $this -> display_params[$name];			
 	}
 	
-	public function checkIfFieldVisible($name)
+	public function checkIfFieldVisible(string $name)
 	{
 		if($this -> display_params['visible_fields'] == "*")
 			return !in_array($name, $this -> display_params['hidden_fields']);
@@ -232,7 +230,7 @@ abstract class ModelBase extends ModelInitial
 			return in_array($name, $this -> display_params['visible_fields']);
 	}
 	
-	public function checkIfFieldEditable($name)
+	public function checkIfFieldEditable(string $name)
 	{
 		if($this -> display_params['not_editable_fields'] == "*")
 			return false;
@@ -277,13 +275,13 @@ abstract class ModelBase extends ModelInitial
 		return $name;
 	}
 	
-	public function getUrlParam($name)
+	public function getUrlParam(string $name)
 	{
 		if(isset($this -> url_params[$name]))
 			return $this -> url_params[$name];
 	}
 	
-	public function setUrlParam($name, $value)
+	public function setUrlParam(string $name, string $value)
 	{
 		if(isset($this -> url_params[$name]))
 			$this -> url_params[$name] = $value;
@@ -291,19 +289,19 @@ abstract class ModelBase extends ModelInitial
 		return $this;
 	}
 	
-	public function getAllUrlParams($allowed_params)
+	public function getAllUrlParams(string|array $allowed_params)
 	{
 		$all_params = [];
 		
 		foreach($this -> url_params as $name => $value)
-			if(($allowed_params == '*' || in_array($name, $allowed_params)) && $value)
+			if(($allowed_params === '*' || in_array($name, $allowed_params)) && $value)
 				$all_params[] = $value;
 		
 		if(count($all_params))
 			return implode('&', $all_params);
 	}
 	
-	public function passUrlParams($object, $allowed_params)
+	public function passUrlParams(object $object, string|array $allowed_params)
 	{
 		$all_params = $this -> getAllUrlParams($allowed_params);
 
@@ -316,7 +314,7 @@ abstract class ModelBase extends ModelInitial
 	public function processUrlRarams()
 	{
 		$this -> url_params['pager'] = $this -> pager -> getUrlParams();
-		$this -> url_params['filter'] = $this -> filter -> getUrlParams("admin");
+		$this -> url_params['filter'] = $this -> filter -> getUrlParams('admin');
 		$this -> url_params['sorter'] = $this -> sorter -> getUrlParams();
 		
 		$this -> passUrlParams($this -> pager, array('model','parent','filter'));
@@ -326,7 +324,7 @@ abstract class ModelBase extends ModelInitial
 		return $this;
 	}
 		
-	public function checkFieldByType($type)
+	public function checkFieldByType(string $type)
 	{
 		foreach($this -> elements as $name => $object)
 			if($object -> getType() == $type)
@@ -335,7 +333,7 @@ abstract class ModelBase extends ModelInitial
 		return false;
 	}
 	
-	public function findElementByProperty($property, $value)
+	public function findElementByProperty(string $property, mixed $value)
 	{
 		$value = strtolower($value);
 		
@@ -344,7 +342,7 @@ abstract class ModelBase extends ModelInitial
 				return $object;
 	}
 	
-	public function anyElementHasProperty($property)
+	public function anyElementHasProperty(string $property)
 	{
 		foreach($this -> elements as $name => $object)
 			if($object -> getProperty($property))
@@ -563,7 +561,7 @@ abstract class ModelBase extends ModelInitial
 					$result_values = $this -> beforeUpdate($id, $old_fields, $version_dump);
 					
 					if(is_array($result_values) && count($result_values)) //If some values were changed
-						foreach($result_values as $name => $value)
+						foreach($result_values as $name => $_)
 						{
 							$changed_field = $this -> getElement($name);
 							
@@ -580,7 +578,7 @@ abstract class ModelBase extends ModelInitial
 				{
 					$query = [];
 					
-					foreach($updated_fields as $name => $value)
+					foreach($updated_fields as $name => $_)
 						$query[] = "`".$name."`=".$this -> db -> secure($value);
 						
 					$this -> db -> query("UPDATE `".$this -> table."` 
@@ -603,7 +601,7 @@ abstract class ModelBase extends ModelInitial
 					else if($current_m2m_condition == "remove" && array_search($current_value, $m2m_values) !== false)
 						unset($m2m_values[array_search($current_value, $m2m_values)]); //Removes value if needed
 						
-					foreach($m2m_values as $key => $value) //Filters empty values
+					foreach($m2m_values as $key => $_) //Filters empty values
 						if(empty($value))
 							unset($m2m_values[$key]);
 						
@@ -942,13 +940,13 @@ abstract class ModelBase extends ModelInitial
 		return true;
 	}
 
-	public function __get($name)
+	public function __get(string $name)
 	{
 		if($name === 'pager')
 			return $this -> paginator;
 	}
 
-	public function __isset($name)
+	public function __isset(string $name)
 	{
 		if($name === 'pager')
 			return isset($this -> paginator);

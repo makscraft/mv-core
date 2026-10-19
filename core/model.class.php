@@ -28,7 +28,7 @@ class Model extends ModelBase
 	 * Content storage for child simple model (ModelSimple class).
 	 * @var array|null
 	 */
-	protected $data = null;
+	protected ?array $data = null;
 
 	public function __construct(array $row_data = [])
 	{
@@ -202,7 +202,7 @@ class Model extends ModelBase
 			return get_class($this);
 	}
 	
-	public function setName($name)
+	public function setName(string $name)
 	{
 		$this -> name = $name;
 	}
@@ -245,7 +245,7 @@ class Model extends ModelBase
 		);
 	}
 	
-	public function instanceElement($field_data)
+	protected function instanceElement(array $field_data)
 	{
 		if($field_data[1] === 'one_to_many')
 			$field_data[1] = 'many_to_one';
@@ -391,7 +391,7 @@ class Model extends ModelBase
 		return $this;
 	}
 		
-	public function getDataFromArray($source)
+	public function getDataFromArray(array $source)
 	{
 		foreach($source as $name => $value)
 			if(isset($this -> elements[$name]))
@@ -475,7 +475,7 @@ class Model extends ModelBase
 		return $this;
 	}
 	
-	public function checkForChildren()
+	public function checkForChildren(): mixed
 	{
 		$children = false;
 		$arguments = func_get_args();
@@ -529,7 +529,7 @@ class Model extends ModelBase
 		return $children;
 	}
 	
-	public function defineAvailableParents($checked_ids)
+	public function defineAvailableParents(array $checked_ids)
 	{
 		$options_xml = "<value id=\"\">".I18n::locale("select-value")."</value>\n";
 		$options_xml .= "<value id=\"-1\">".I18n::locale('root-catalog')."</value>\n";
@@ -591,7 +591,7 @@ class Model extends ModelBase
 		return $options_xml;
 	}
 	
-	public function getParentsForMultiAutocomplete($request, $ids)
+	public function getParentsForMultiAutocomplete(string $request, array $ids)
 	{
 		//Autocomplete for parent type if long list option is on
 		$request_re = Service::prepareRegularExpression(trim($request));
@@ -666,7 +666,7 @@ class Model extends ModelBase
 			}
 	}
 	
-	public function prepareElementValue($object)
+	public function prepareElementValue(object $object)
 	{
 		$type = $object -> getType();
 	
@@ -1157,7 +1157,7 @@ class Model extends ModelBase
 		return $fields_groups ? [$html, $tabs_html] : $html;
 	}
 	
-	static public function processErrorText($error, $object)
+	static public function processErrorText(string|array $error, ?object $object)
 	{
 		//Preparing for operations
 		$registry = Registry::instance();
@@ -1249,10 +1249,10 @@ class Model extends ModelBase
 		return preg_replace("/'([^']+)'/", "&laquo;$1&raquo;", $text);
 	}
 	
-	public function displayFormErrors()
+	public function displayFormErrors(): string
 	{
 		if(!count($this -> errors)) 
-			return;
+			return '';
 		
 		$html = "<div class=\"form-errors\">\n";
 		
@@ -1265,7 +1265,7 @@ class Model extends ModelBase
 		return $html."</div>\n";
 	}
 		
-	private function createComplexSql($type, $name, $group_by)
+	private function createComplexSql(string $type, string $name)
 	{
 		if($type == 'many_to_many') //If we need to count m2m values
 		{
@@ -1352,7 +1352,7 @@ class Model extends ModelBase
 		$sorter_params = $this -> sorter -> getParamsForSQL();
 				
 		if($sort_field_type == 'many_to_many' || $sort_field_type == 'many_to_one')
-			$query = $this -> createComplexSql($sort_field_type , $sort_field_name, false);
+			$query = $this -> createComplexSql($sort_field_type , $sort_field_name);
 		else if($sort_field_type == 'enum' && $this -> elements[$sort_field_name] -> getProperty('foreign_key'))
 		{
 			//In case of foreign key sorting we need to put the real names of foreign key fields from other table
@@ -1763,7 +1763,7 @@ class Model extends ModelBase
 		return $html;
 	}
 	
-	public function checkModelRedirect($row)
+	public function checkModelRedirect(array $row)
 	{
 		if(isset($this -> display_params["redirects_to_models"]) && count($this -> display_params["redirects_to_models"]))
 			foreach($row as $field => $value)
@@ -1774,10 +1774,10 @@ class Model extends ModelBase
 		return false;
 	}
 	
-	public function displayAdminImage($path)
+	public function displayAdminImage(string $path)
 	{
 		if(!$path || !is_file($path))
-			return "-";
+			return '-';
 		
 		$imager = new Imager();
 		$src = $imager -> compress($path, 'admin', 150, 150);
@@ -1785,7 +1785,7 @@ class Model extends ModelBase
 		return "<img class=\"in-table\" src=\"".$src."\" alt=\"".basename($path)."\" />";
 	}
 	
-	public function uploadMultiImages($name)
+	public function uploadMultiImages(string $name)
 	{
 		if(!isset($this -> elements[$name]) || $this -> elements[$name] -> getType() != 'multi_images')
 			return [];
@@ -1849,12 +1849,13 @@ class Model extends ModelBase
 		];
 	}
 		
-	public function makeAdminLink($id, $action_type, $name)
+	public function makeAdminLink(int $id, string $action_type, string $name)
 	{
 		$has_right = ($action_type == 'delete') ? 'delete' : 'update';
 		$has_right = $this -> user -> checkModelRights($this -> getModelClass(), $has_right);
 		$name = str_replace(["&quot;", "&#039;", "&lt;script&gt;", "<script>"], '', $name); //Fix js message bug
 		$token = $this -> generateSingleActionToken($id);
+		$html = '';
 		
 		if($action_type == 'delete' || $action_type == 'restore')
 		{
@@ -1882,7 +1883,7 @@ class Model extends ModelBase
 		return $html;
 	}
 	
-	public function generateSingleActionToken($id)
+	public function generateSingleActionToken(int $id)
 	{
 	    $token = $this -> registry -> getSetting("AdminPanelCSRFToken").$this -> getName();
 	    $token = Service::createHash($_SERVER["HTTP_USER_AGENT"].$token.$id.$_SERVER["REMOTE_ADDR"]);
@@ -1890,7 +1891,7 @@ class Model extends ModelBase
 	    return $token;
 	}
 	
-	public function displayParentsPath($start_id)
+	public function displayParentsPath(int $start_id)
 	{
 		$html = "<span>".I18n::locale('root-catalog')."</span>";
 		
@@ -1915,7 +1916,7 @@ class Model extends ModelBase
 		return $html;
 	}
 	
-	public function updateOrderField($field, $data)
+	public function updateOrderField(string $field, array $data)
 	{
 		$this -> db -> beginTransaction();
 		
@@ -1931,18 +1932,18 @@ class Model extends ModelBase
 	}
 	
 	//
-	//All next methods are related to app front
+	//All next methods are related to application's front
 	//But can be used also in admin panel addons
 	//
 	
-	public function getFieldProperty($field, $property)
+	public function getFieldProperty(string $field, string $property)
 	{
 		if(isset($this -> elements[$field]))
 			if($this -> elements[$field] -> hasProperty($property))
 				return $this -> elements[$field] -> getProperty($property);
 	}
 	
-	public function setFieldProperty($field, $property, $value)
+	public function setFieldProperty(string $field, string $property, mixed $value)
 	{		
 		if(isset($this -> elements[$field]))
 			if($this -> elements[$field] -> hasProperty($property))
@@ -1995,7 +1996,7 @@ class Model extends ModelBase
 				$this -> sorter -> setParams($default_field, $default_order);
 	}
 	
-	public function runFilter($fields)
+	public function runFilter(array $fields)
 	{
 		$forbidden_types = ['password','many_to_one','group'];
 		$filters_data = [];
@@ -2078,7 +2079,7 @@ class Model extends ModelBase
 		return $this;
 	}
 	
-	public function createRecord($params)
+	public function createRecord(mixed $params)
 	{
 		if(!is_array($params) || !count($params))
 			return null;
@@ -2125,7 +2126,7 @@ class Model extends ModelBase
 		return $new_id;
 	}	
 	
-	public function updateRecord($id, $fields)
+	public function updateRecord(int $id, mixed $fields)
 	{
 		if(!is_array($fields) || !count($fields))
 			return;
@@ -2171,7 +2172,7 @@ class Model extends ModelBase
 		return $this;
 	}
 		
-	public function deleteRecord($id)
+	public function deleteRecord(int $id)
 	{
 		if(method_exists(Database::$pdo, "inTransaction"))
 			$in_transaction = Database::$pdo -> inTransaction();
@@ -2225,7 +2226,7 @@ class Model extends ModelBase
 			return $this -> enum_values[$field][$key];
 	}
 	
-	public function getEnumValues($field)
+	public function getEnumValues(string $field)
 	{
 		if(!$object = $this -> getElement($field))
 			return [];
@@ -2233,7 +2234,7 @@ class Model extends ModelBase
 		return $object -> getValuesList();
 	}
 	
-	public function displayEnumOptions($field)
+	public function displayEnumOptions(string $field)
 	{
 		$html = '';
 		
@@ -2293,10 +2294,11 @@ class Model extends ModelBase
 		return $records;
 	}
 	
-	public function displayBreadcrumbs(int $id, string $url_first = '', $url_field = '')
+	public function displayBreadcrumbs(int $row_id, string $url_first = '', string $url_field = '')
 	{
 		$parents = [];
 		$linked_tree = false;
+		$related_object = null;
 		
 		if($object = $this -> findElementByProperty("is_parent", true)) //If its related model
 		{
@@ -2306,16 +2308,14 @@ class Model extends ModelBase
 			
 			if($related_object_element) //If models are linked we get the parents
 			{
-				$parent_row = $this -> db -> getRow("SELECT * 
-													 FROM `".$this -> table."` 
-													 WHERE `id`='".$id."'");
+				$parent_row = $this -> db -> getRow("SELECT * FROM `".$this -> table."` WHERE `id`='".$row_id."'");
 				
 				$parents = $related_object -> getParents($parent_row[$object -> getName()]); //Takes parent from related model
 				$linked_tree = true;
 			}			
 		}
 		else
-			$parents = $this -> getParents($id); //Single model with parent field
+			$parents = $this -> getParents($row_id); //Single model with parent field
 		
 		$length = count($parents);
 		$url = $this -> root_path;
@@ -2383,28 +2383,17 @@ class Model extends ModelBase
 		return $this -> auth_settings ?? null;
 	}
 		
-	public function __call($method, $arguments)
+	public function __call(string $method, array $arguments)
 	{		
 		if($method == "countTotal")
-		{
-			if(isset($arguments[0]) && $arguments[0])
-				return $this -> countRecords($arguments[0]);
-			else
-				return $this -> countRecords();
-		}
+			return $this -> countRecords(...$arguments);
 		else if($method == "runPager")
-			return $this -> runPaginator($arguments[0], $arguments[1], $arguments[2] ?? null);
+			return $this -> runPaginator(...$arguments);
 		else if($method == "findContent")
-			return $this -> findRecord($arguments[0]);
+			return $this -> findRecord(...$arguments);
 		else if($method == "findContentById")
-			return $this -> findRecordById($arguments[0]);
+			return $this -> findRecordById(...$arguments);
 		else
-		{
-			$trace = debug_backtrace();
-			$message = "Call to undefiend method '".$method."' of model '".get_class($this)."'";
-			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
-
-			Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);
-		}
+			Debug::handleCallMagicMethod($method, self::class, debug_backtrace());
 	}
 }

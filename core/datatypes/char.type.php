@@ -4,21 +4,21 @@
  */
 class CharModelElement extends ModelElement
 {
-	protected $length;
+	protected ?int $length = null;
 	
-	protected $min_max_length;
+	protected string $min_max_length = '';
 	
-	protected $regexp;
+	protected ?string $regexp = null;
 	
-	protected $captcha;
+	protected ?string $captcha = null;
 	
-	protected $hidden = false;
+	protected bool $hidden = false;
 
-	protected $rules = [];
+	protected array $rules = [];
 
-	protected $allowed_rules = [];
+	protected array $allowed_rules = [];
 
-	protected $placeholder = '';
+	protected string $placeholder = '';
 
 	public function setValue(mixed $value)
 	{
@@ -94,35 +94,32 @@ class CharModelElement extends ModelElement
 		return "<input type=\"".$type."\" name=\"".$this -> name."\"".$css." value=\"".$value."\" />\n".$this -> addHelpText();
 	}
 	
-	public function checkUniqueValue($class_name, $id)
+	public function checkUniqueValue(string $class_name, int $id = 0)
 	{
 		$object = new $class_name(); //Object of module
 		
 		$query = "SELECT COUNT(*) FROM `".$object -> getTable()."` 
 				  WHERE `".$this -> name."`=".$object -> db -> secure($this -> value)."";
 		
-		if($id) //If we update the element
+		if($id) //If we update the element in database
 			$query .= " AND `id`!='".$id."'";
 			
 		return (bool) $object -> db -> getCell($query);
 	}
 	
-	protected function setCaptchaSource($source)
+	protected function setCaptchaSource(string $source)
 	{
-		$registry = Registry :: instance();
-		$this -> captcha = $registry -> getSetting("MainPath").$source;
+		$this -> captcha = Registry::get('MainPath').$source;
 	}
 	
-	public function setRule($rule)
+	public function setRule(mixed $rule)
 	{
-		if(!count($rule) || !isset($rule[0]) || !in_array($rule[0], $this -> allowed_rules))
+		if(!is_array($rule) || !isset($rule[0]) || !in_array($rule[0], $this -> allowed_rules))
 			return $this;
 			
 		if($rule[0] == 'unique')
 		{
-			if(!isset($rule[1]))
-				$message = '{error-unique-value}';
-			
+			$message = $rule[1] ?? '{error-unique-value}';			
 			$this -> rules[] = ['type' => 'unique', 'message' => $message];
 			
 			return $this;

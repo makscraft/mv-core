@@ -424,19 +424,13 @@ class Record extends Content
 		return $this;
 	}
 	
-	public function __call(string $method, $arguments)
+	public function __call(string $method, array $arguments)
 	{
 		if($method === 'getContent')
 			return $this -> getValues();
 		else if($method === 'getEnumValue')
-			return $this -> getEnumTitle($arguments[0]);
+			return $this -> getEnumTitle(...$arguments);
 		else
-		{
-			$trace = debug_backtrace();
-			$message = "Call to undefiend method '".$method."' of Record object of model '".get_class($this -> model)."'";
-			$message .= ', in line '.$trace[0]['line'].' of file ~'.Service::removeDocumentRoot($trace[0]['file']);
-
-			Debug::displayError($message, $trace[0]['file'], $trace[0]['line']);
-		}
+			Debug::handleCallMagicMethod($method, self::class, debug_backtrace());
 	}
 }

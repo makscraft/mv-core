@@ -4,25 +4,25 @@
  */ 
 class ManyToManyModelElement extends ModelElement
 {
-	protected $related_model = '';
+	protected string $related_model = '';
 
-	protected $self_model = '';
+	protected string $self_model = '';
 	
-	protected $linking_table = '';
+	protected string $linking_table = '';
 	
-	protected $related_id;
+	protected ?int $related_id = null;
 	
-	protected $all_ids_and_names;
+	protected ?array $all_ids_and_names = null;
 	
-	protected $selected_ids = [];
+	protected array $selected_ids = [];
 	
-	protected $name_field = 'name';
+	protected string $name_field = 'name';
 	
-	protected $display_table = false;
+	protected bool $display_table = false;
 	
-	protected $long_list = false;
+	protected bool $long_list = false;
 
-	protected $empty_value = '';
+	protected string $empty_value = '';
 
 	public function setSelfModel(string $class_name)
 	{
@@ -187,7 +187,7 @@ class ManyToManyModelElement extends ModelElement
 	public function displayAsSelect()
 	{
 		if(!is_array($this -> all_ids_and_names))
-			$options = $this -> all_ids_and_names = $this -> getDataOfManyToMany(); 
+			$this -> all_ids_and_names = $this -> getDataOfManyToMany(); 
 
 		$empty_value = $this -> empty_value === '' ? I18n :: locale('not-defined') : $this -> empty_value;
 		$selected = $this -> selected_ids[0] ?? '';
@@ -195,7 +195,7 @@ class ManyToManyModelElement extends ModelElement
 		$html = "<select name=\"".$this -> name."\">\n";
 		$html .= "<option value=\"\">".$empty_value."</option>\n";
 		
-		foreach($options as $value => $name)
+		foreach($this -> all_ids_and_names as $value => $name)
 		{
 			$html .= "<option value=\"".$value."\"";
 			

@@ -10,43 +10,43 @@ class Filemanager
 	 * Paginator object to split list of files into single pages.
 	 * @var Paginator
 	 */ 
-	public $pagination;
+	public ?Paginator $pagination;
 		
 	/**
 	 * Current user object of admin panel to check the rights to manage files.
 	 * @var User
 	 */ 
-	public $user;
+	public ?User $user;
 
 	/**
 	 * Current filesystem path we show the files from.
 	 * @var string
 	 */ 
-	protected $path;
+	protected ?string $path = null;
+	
+	/**
+	 * CSRF token from AdminPanel core class.
+	 * @var string
+	 */ 
+	private ?string $token = null;
 
 	/**
 	 * Total number of items in the current directory, including directories and '..' (but not '.').
 	 * @var int
 	 */ 
-	protected $total;
+	protected int $total = 0;
 
 	/**
 	 * Limit of files to process during the one run of cleanup.
 	 * @var int
 	 */ 
-	private static $cleanup_limit = 10000;
+	private static int $cleanup_limit = 10000;
 
 	/**
 	 * Processed files of current cleanup step.
 	 * @var mixed can have int or string value
 	 */
-	private static $cleanup_count;
-
-	/**
-	 * CSRF token from System core class.
-	 * @var string
-	 */ 
-	private $token;
+	private static int|string $cleanup_count = 0;
 
 	/**
 	 * Files and directories to protect.
@@ -58,7 +58,7 @@ class Filemanager
 	 * Shows if we are currently at the root allowed derectory.
 	 * @var bool
 	 */
-	private $in_root = true;
+	private bool $in_root = true;
 
 	public function __construct()
 	{
@@ -120,7 +120,7 @@ class Filemanager
 		return self::$cleanup_limit;
 	}
 
-	private function getCacheDataForDirectory($directory)
+	private function getCacheDataForDirectory(string $directory)
 	{
 		if(!is_dir($directory))
 			return null;
@@ -465,7 +465,7 @@ class Filemanager
 	/**
 	 * Creates a new folder (directory) in current directory.
 	 */
-	public function createFolder($name): array
+	public function createFolder(string $name): array
 	{
 		$name = trim(strval($name));
 		$result = ['success' => false, 'message' => ''];
@@ -674,7 +674,7 @@ class Filemanager
 			Registry::setDatabaseSetting("admin_cleanup_step", 0);
 	}
 	
-	static public function deleteOldFiles($path)
+	static public function deleteOldFiles(string $path)
 	{
 		if(!is_dir($path))
 			return;
@@ -693,7 +693,7 @@ class Filemanager
 			}
 	}
 
-	static public function deleteResizedCopiesOfOneImage($image_path)
+	static public function deleteResizedCopiesOfOneImage(string $image_path)
 	{
 		if(!is_file($image_path))
 			return;
@@ -830,4 +830,108 @@ class Filemanager
 
 		return $files;
 	}
+
+	/**
+	 * Saves passed content into file according to current OS.
+	 * @return bool if success
+	 */
+	static public function saveContentIntoFile(string $file_path, string $content): bool
+	{
+		$temp_file = $file_path.'.'.bin2hex(random_bytes(8)).'.tmp';
+
+		try{
+
+			if(file_put_contents($temp_file, $content, LOCK_EX) === false)
+        		return false;
+
+			chmod($temp_file, 0664);
+
+			if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && file_exists($file_path))
+				@unlink($file_path);
+
+			if(@rename($temp_file, $file_path))
+        		return true;
+
+			throw new Exception('Unable to save content into file: '.$file_path);
+		}
+		catch(Throwable $error)
+		{
+			Filemanager::deleteFile($temp_file);
+
+			return false;
+		}
+	}
+
+	/**
+     * Removes directory recursively.
+     */
+    static public function removeDirectory(string $directory): bool
+    {
+        if(!is_dir($directory) || $directory == '/' || strpos($directory, '..') !== false)
+            return false;
+
+		$objects = scandir($directory);
+
+		foreach($objects as $object)
+		{
+			if($object != '.' && $object != '..')
+			{ 
+				if(is_dir($directory.DIRECTORY_SEPARATOR.$object) && !is_link($directory.DIRECTORY_SEPARATOR.$object))
+					self::removeDirectory($directory.DIRECTORY_SEPARATOR.$object);
+				else
+					unlink($directory. DIRECTORY_SEPARATOR.$object); 
+			} 
+		}
+		
+		rmdir($directory);
+
+		return !is_dir($directory);
+    }
+
+    /**
+     * Removes all directory contents recursively.
+     */
+    static public function emptyDirectory(string $directory): bool
+    {
+        if($directory == '/' || strpos($directory, '..') !== false || !is_dir($directory))
+            return false;
+
+        $root = realpath($directory).DIRECTORY_SEPARATOR;
+
+        foreach(scandir($root) as $file)
+            if($file !== '.' && $file !== '..')
+                if(is_file($root.$file))
+                    unlink($root.$file);
+                else
+                    self::removeDirectory($root.$file);
+
+        return count(scandir($root)) === 2;
+    }
+
+    /**
+     * Copies the directory recursively.
+     */
+    static public function copyDirectory(string $from, string $to)
+    {
+        if($from == '/' || strpos($from, '..') !== false || strpos($to, '..') !== false)
+            return;
+
+        self::createDirectory($to);
+
+        $objects = scandir($from);
+
+        foreach($objects as $object)
+        {
+            if($object != '.' && $object != '..')
+            {
+                $one_from = $from.DIRECTORY_SEPARATOR.$object;
+                $one_to = $to.DIRECTORY_SEPARATOR.$object;
+
+                if(is_dir($one_from))
+                    self::copyDirectory($one_from, $one_to);
+                else
+                    copy($one_from, $one_to);
+            }
+        }
+    }	
 }

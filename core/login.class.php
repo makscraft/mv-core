@@ -16,19 +16,19 @@ class Login
 	 * Settings manager singleton object
 	 * @var object Registry
 	 */
-	private $registry;
+	private ?Registry $registry = null;
 	
 	/**
 	 * Database manager singleton object
 	 * @var object Database
 	 */
-	private $db;
+	private ?Database $db = null;
 	
 	/**
 	 * Internationlization manager object
 	 * @var object I18n
 	 */
-	private $i18n;
+	private ?I18n $i18n = null;
 
 	/**
 	 * Login attemps befor showing captcha

@@ -11,13 +11,13 @@ class Session
      * Label of current container.
      * @var string
      */
-    private static $current = null;
+    private static ?string $current = null;
 
     /**
      * Data and parameters of current container, loaded on Session::start().
      * @var array
      */
-    private static $container = null;
+    private static ?array $container = null;
 
     /**
      * Disabled constructor.
@@ -158,7 +158,7 @@ class Session
     /**
      * Checks if the current session data has passed keys.
      */
-    static public function has(...$keys): bool
+    static public function has(string ...$keys): bool
     {
         if(!isset(self::$container['data']) || !count($keys))
             return false;

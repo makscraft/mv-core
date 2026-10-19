@@ -4,7 +4,7 @@
  */
 class Menu 
 {
-	private $active_models = [];
+	private array $active_models = [];
 
 	public function __construct()
 	{
@@ -51,7 +51,7 @@ class Menu
 		
 	}
 	
-	public function displayMultiActionMenu($model_object, User $user_object)
+	public function displayMultiActionMenu(object $model_object, User $user_object)
 	{
 		$model_data = $model_object -> getDataForActionsMenu();
 		
@@ -95,7 +95,7 @@ class Menu
 		return $html."</ul>\n</div>\n";
 	}
 	
-	public function displayTableFields($model_object)
+	public function displayTableFields(object $model_object)
 	{
 		$html = [
 			'selected' => '',

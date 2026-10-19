@@ -8,25 +8,25 @@ class Content
 	 * Id of current record in db.
 	 * @var int
 	 */
-	protected $id;
+	protected ?int $id = null;
 	
 	/**
 	 * Array of fields with their values from database row.
 	 * @var array
 	 */
-	protected $content = [];
+	protected array $content = [];
 	
 	/**
 	 * Cache of enum fields captions for method getEnumTitle().
 	 * @var array
 	 */
-	protected $enum_values = [];
+	protected array $enum_values = [];
 	
 	/**
 	 * Object of model which this record belongs to.
 	 * @var object
 	 */
-	protected $model;
+	protected ?object $model = null;
 
 	public function __construct(array $content = [])
 	{
@@ -105,7 +105,7 @@ class Content
 				$result_images = $images;
 			else
 				foreach($images as $image => $comment)
-					$result_images[] = $comment ? $image."(*".preg_replace("/(\r)?\n/", "", $comment)."*)" : $image;
+					$result_images[] = $comment ? $image.'(*'.preg_replace('/(\r)?\n/', '', $comment).'*)' : $image;
 		
 		if(isset($this -> content[$field]))
 			$this -> content[$field] = implode("-*//*-", $result_images);

@@ -6,25 +6,24 @@
 class Users extends Model
 {
 	protected $name = '{users}';
-
-	/**
-	 * List of application's models to manage user's rights.
-	 */
-	private $models_list = [];
 	
 	protected $model_elements = [
 		['{active}', 'bool', 'active', ['on_create' => true]],
 		['{name-person}', 'char', 'name', ['required' => true, 'unique' => true]],
 		['{email}', 'email', 'email', ['required' => true, 'unique' => true]],
 		['{login}', 'char', 'login', ['required' => true, 'unique' => true]],
-		['{password}', 'password', 'password', ['required' => true,
-												'letters_required' => true, 
-												'digits_required' => true]],
-				
-		['{password-repeat}', 'password', 'password_repeat', ['required' => true, 
-															  'letters_required' => true, 
-														 	  'digits_required' => true]],
-			
+		['{password}', 'password', 'password', [
+				'required' => true,
+				'letters_required' => true, 
+				'digits_required' => true
+			]
+		],
+		['{password-repeat}', 'password', 'password_repeat', [
+				'required' => true, 
+				'letters_required' => true, 
+				'digits_required' => true
+			]
+		],	
 		['{date-registered}', 'date_time', 'date_registered'],
 		['{date-last-visit}', 'date_time', 'date_last_visit'],
 		['{operations}', 'many_to_one', 'operations', ['related_model' => 'Log']]
@@ -33,10 +32,15 @@ class Users extends Model
 	protected $model_display_params = [		
 		'not_editable_fields' => ['date_registered', 'date_last_visit']
 	];
-			
-	private $rights_table = 'users_rights';
+
+	/**
+	 * List of application's models to manage user's rights.
+	 */
+	private array $models_list = [];	
+
+	private string $rights_table = 'users_rights';
 	
-	private $users_rights = false;
+	private ?array $users_rights = null;
 			
 	public function __construct()
 	{
@@ -89,7 +93,7 @@ class Users extends Model
 		else
 			$arguments[0] = false;
 		
-		if($this -> users_rights === false)
+		if($this -> users_rights === null)
 			$this -> getUsersRights();
 
 		return parent::read($arguments[0]);
@@ -131,7 +135,7 @@ class Users extends Model
 		return $this;
 	}
 		
-	public function afterFinalDelete($id)
+	public function afterFinalDelete(int $id)
 	{
 		$this -> setId($id) -> updateRights([]);
 	}
@@ -155,8 +159,7 @@ class Users extends Model
 		//Displays module name and right (set rights are checked)
 		foreach($models_names as $model => $name) 
 		{
-			if($model != 'file_manager')
-				$model_object = new $model();
+			$model_object = $model != 'file_manager' ? new $model() : 'file_manager';
 			
 			$html .= "<tr>\n";
 			$html .= "<td class=\"model-name\">".$name."</td>\n";
@@ -200,7 +203,7 @@ class Users extends Model
 			return (bool) $this -> users_rights[$model][$right];
 	}
 	
-	public function updateRights($all_rights)
+	public function updateRights(array $all_rights)
 	{
 		//Deletes all old rights
 		$this -> db -> query("DELETE FROM `".$this -> rights_table."` 
@@ -238,18 +241,17 @@ class Users extends Model
 		return $all_rights;
 	}
 	
-	public function packRights($rights)
+	public function packRights(array $rights)
 	{
 		$packed_rights = [];
 		
 		foreach($rights as $key => $val)
-			$packed_rights[] = $key."->"."create-".$val['create']."_read-".$val['read'].
-									 "_update-".$val['update']."_delete-".$val['delete'];
+			$packed_rights[] = $key."->"."create-".$val['create']."_read-".$val['read']."_update-".$val['update']."_delete-".$val['delete'];
 		
 		return implode("-*//*-", $packed_rights);		
 	}
 	
-	public function unpackRights($rights)
+	public function unpackRights(string $rights)
 	{
 		$users_rights = [];
 		
@@ -288,7 +290,7 @@ class Users extends Model
 		return $this -> users_rights;
 	}
 	
-	static public function arrangeRights($data)
+	static public function arrangeRights(array $data)
 	{
 		$models = array_merge(array_keys(Registry::get('ModelsLower')), ["users", "log", "garbage"]);
 		$rights = [];
@@ -301,7 +303,7 @@ class Users extends Model
 		return $rights;
 	}
 	
-	public function sendUserInfo($type)
+	public function sendUserInfo(string $type)
 	{
 		$email = $this -> elements["email"] -> getValue();
 		$email = $this -> elements["name"] -> getValue()." <".$email.">";

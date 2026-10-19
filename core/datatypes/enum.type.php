@@ -4,29 +4,29 @@
  */
 class EnumModelElement extends ModelElement
 {
-	protected $foreign_key;
+	protected ?string $foreign_key = null;
 	
-	protected $is_parent = false;
+	protected bool $is_parent = false;
 	
-	protected $values_list = [];
+	protected array $values_list = [];
 	
-	protected $empty_value = true;
+	protected bool $empty_value = true;
 	
-	protected $name_field = 'name';
+	protected string $name_field = 'name';
 	
-	protected $name_field_extra = '';
+	protected string $name_field_extra = '';
 	
-	protected $display_radio = false;
+	protected bool $display_radio = false;
 	
-	protected $long_list = false;
+	protected bool $long_list = false;
 	
-	protected $show_parent = false;
+	protected bool $show_parent = false;
 	
-	protected $multiple_choice = false;
+	protected bool $multiple_choice = false;
 	
-	protected $order_asc = false;
+	protected bool $order_asc = false;
 	
-	protected $order_desc = false;
+	protected bool $order_desc = false;
 	
 	public function prepareValue()
 	{

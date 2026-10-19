@@ -8,27 +8,27 @@ class Migrations
 	 * Object with settings and configurations of the system.
 	 * @var Registry
 	 */
-	private $registry;
+	private ?Registry $registry = null;
 	
 	/**
 	 * Database manager object.
 	 * @var Database
 	 */
-	private $db;
+	private ?Database $db = null;
 	
 	/**
 	 * List of currently found migrations.
 	 * @var array
 	 */
-	private $migrations_list = [];
+	private array $migrations_list = [];
 
 	/**
 	 * Marks if we run migrations in the CLI.
 	 * @var bool
 	 */
-	private $in_console = false;
+	private bool $in_console = false;
 	
-	public function __construct($in_console = false)
+	public function __construct(bool $in_console = false)
 	{
 		$this -> registry = Registry::instance();
 		$this -> db = Database::instance();
@@ -221,7 +221,7 @@ class Migrations
 		return $html;
 	}
 	
-	public function checkMigrationKeyToken($token)
+	public function checkMigrationKeyToken(string $token)
 	{
 		foreach($this -> migrations_list as $key => $sql)
 			if(md5($key) == $token)
@@ -235,7 +235,7 @@ class Migrations
 		return md5($token);
 	}
 	
-	public function runMigrations($key)
+	public function runMigrations(string $key)
 	{
 		$data = ($key == "all") ? array_values($this -> migrations_list) : array($this -> migrations_list[$key]);
 		$sql_list = [];

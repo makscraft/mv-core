@@ -9,7 +9,7 @@ class ModelSimple extends Model
 	 * Lazy loading, true if we got the data from DB already.
 	 * @var bool
 	 */
-	protected $data_loaded = false;
+	protected bool $data_loaded = false;
 	
 	/**
 	 * Runs the model, checking its fields for errors.
@@ -32,7 +32,7 @@ class ModelSimple extends Model
 	/**
 	 * Getter to retreive fields values.
 	 */
-	public function __get($key)
+	public function __get(string $key)
 	{
 		return $this -> getValue($key);
 	}
@@ -40,7 +40,7 @@ class ModelSimple extends Model
 	/**
 	 * Setter to set fieldes values.
 	 */
-	public function __set($key, $value)
+	public function __set(string $key, mixed $value)
 	{
 		return $this -> setValue($key, $value);	
 	}
@@ -334,13 +334,13 @@ class ModelSimple extends Model
 		return implode(', ', array_unique($emails));
 	}
 	
-	public function __call($method, $arguments)
+	public function __call(string $method, array $arguments)
 	{
 		if($method == "loadContent")
 			return $this -> loadIntoRecord();		
 		else if($method == "updateData")
-			return $this -> update();
+			return $this -> update(...$arguments);
 		else
-			Debug::displayError("Call to undefiend method '".$method."' of simple model '".get_class($this)."'.");			
+			Debug::handleCallMagicMethod($method, self::class, debug_backtrace());
 	}
 }

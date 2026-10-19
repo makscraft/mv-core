@@ -9,7 +9,7 @@ class Installation
     /**
      * Current instance of the class.
      */
-    protected static $instance;
+    protected static ?array $instance = null;
 
     /**
      * Creates the current installation instance for directory.
@@ -134,80 +134,6 @@ class Installation
         $env = preg_replace('/'.$key.'=[\/\w\-\.:]*/ui', $key.'='.trim($value), $env);
         file_put_contents($env_file, $env);
     }
-
-    /**
-     * Removes directory recursively.
-     */
-    static public function removeDirectory(string $directory)
-    {
-        if($directory == '/' || strpos($directory, '..') !== false)
-            return;
-
-        if(is_dir($directory))
-        { 
-            $objects = scandir($directory);
-
-            foreach($objects as $object)
-            {
-                if($object != '.' && $object != '..')
-                { 
-                    if(is_dir($directory.DIRECTORY_SEPARATOR.$object) && !is_link($directory.DIRECTORY_SEPARATOR.$object))
-                        self::removeDirectory($directory.DIRECTORY_SEPARATOR.$object);
-                    else
-                        unlink($directory. DIRECTORY_SEPARATOR.$object); 
-                } 
-            }
-          
-            rmdir($directory);
-        } 
-    }
-
-    /**
-     * Removes all directory contents recursively.
-     */
-    static public function emptyDirectory(string $directory): bool
-    {
-        if($directory == '/' || strpos($directory, '..') !== false || !is_dir($directory))
-            return false;
-
-        $root = realpath($directory).DIRECTORY_SEPARATOR;
-
-        foreach(scandir($root) as $file)
-            if($file !== '.' && $file !== '..')
-                if(is_file($root.$file))
-                    unlink($root.$file);
-                else
-                    Installation::removeDirectory($root.$file);
-
-        return count(scandir($root)) === 2;
-    }    
-
-    /**
-     * Copies the directory recursively.
-     */
-    static public function copyDirectory(string $from, string $to)
-    {
-        if($from == '/' || strpos($from, '..') !== false || strpos($to, '..') !== false)
-            return;
-
-        Filemanager::createDirectory($to);
-
-        $objects = scandir($from);
-
-        foreach($objects as $object)
-        {
-            if($object != '.' && $object != '..')
-            {
-                $one_from = $from.DIRECTORY_SEPARATOR.$object;
-                $one_to = $to.DIRECTORY_SEPARATOR.$object;
-
-                if(is_dir($one_from))
-                    self::copyDirectory($one_from, $one_to);
-                else
-                    copy($one_from, $one_to);
-            }
-        }
-    }    
 
     //Installation process
 
@@ -936,5 +862,13 @@ class Installation
 
             return $value;
         }
+    }
+
+    public function __call(string $method, array $arguments)
+    {
+        if(in_array($method, ['removeDirectory', 'emptyDirectory', 'copyDirectory']))
+            return Filemanager::$method(...$arguments);
+
+        Debug::handleCallMagicMethod($method, self::class, debug_backtrace());
     }
 }

@@ -1,5 +1,5 @@
 <?php
-include_once "../../../config/autoload.php";
+include_once '../../../config/autoload.php';
 Session::start('admin_panel_login');
 
 $captcha = '';
@@ -7,7 +7,7 @@ $image = imagecreate(120, 30);
 imagecolorallocate($image, 255, 255, 255);
 
 $symbols_color = imagecolorallocate($image, 17, 17, 17);
-$font = dirname(__FILE__)."/font.ttf";     
+$font = dirname(__FILE__).'/font.ttf';     
 $symbols = mt_rand(5, 7);
 
 for($i = 0; $i < $symbols; $i++) 
@@ -18,17 +18,16 @@ for($i = 0; $i < $symbols; $i++)
     imagettftext($image, 19, $angle, 8 + 15 * $i, 23, $symbols_color, $font, $number);
 }
 
-$coordinates = ["x1" => 0, "y1" => mt_rand(0, 30), "x2" => 120, "y2" => mt_rand(0, 30)];
-imageline($image, $coordinates["x1"], $coordinates["y1"], $coordinates["x2"], $coordinates["y2"], $symbols_color);
+$coordinates = ['x1' => 0, 'y1' => mt_rand(0, 30), 'x2' => 120, 'y2' => mt_rand(0, 30)];
+imageline($image, $coordinates['x1'], $coordinates['y1'], $coordinates['x2'], $coordinates['y2'], $symbols_color);
 
 Session::set('captcha', $captcha);
 
-header("Expires: Wed, 1 Jan 1997 00:00:00 GMT");
-header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-header("Cache-Control: no-store, no-cache, must-revalidate");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
-header("Content-type: image/png");
+header('Expires: Wed, 1 Jan 1997 00:00:00 GMT');
+header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+header('Content-type: image/png');
 	
 imagepng($image);
-imagedestroy($image);

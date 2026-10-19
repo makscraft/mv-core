@@ -4,9 +4,9 @@
  */ 
 class ImageModelElement extends FileModelElement
 {	
-	protected $form_preview_width;
+	protected ?int $form_preview_width = null;
 	
-	protected $form_preview_height;
+	protected ?int $form_preview_height = null;
 	
 	public function displayHtml()
 	{
