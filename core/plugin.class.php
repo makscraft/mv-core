@@ -48,7 +48,9 @@ abstract class Plugin extends ModelInitial
 
 		if(is_numeric($current))
 			$this -> paginator -> definePage(intval($current));
-	}	
+	}
+
+	public function getElement(string $name) {}
 
 	public function __get(string $name)
 	{
