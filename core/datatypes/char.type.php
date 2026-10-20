@@ -94,7 +94,7 @@ class CharModelElement extends ModelElement
 		return "<input type=\"".$type."\" name=\"".$this -> name."\"".$css." value=\"".$value."\" />\n".$this -> addHelpText();
 	}
 	
-	public function checkUniqueValue(string $class_name, int $id = 0)
+	public function checkUniqueValue(string $class_name, ?int $id = null)
 	{
 		$object = new $class_name(); //Object of module
 		

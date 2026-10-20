@@ -864,7 +864,7 @@ class Installation
         }
     }
 
-    public function __call(string $method, array $arguments)
+    public static function __callStatic(string $method, array $arguments)
     {
         if(in_array($method, ['removeDirectory', 'emptyDirectory', 'copyDirectory']))
             return Filemanager::$method(...$arguments);
