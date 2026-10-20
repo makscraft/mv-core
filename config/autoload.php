@@ -108,11 +108,7 @@ if(isset($mvSetupSettings['Build']))
 
 //Creating settings list if cache has not being found
 if(!isset($mvSetupSettings['LoadedFromCache']))
-{
-	require_once $mvIncludePath.'config/settings.php';
-	require_once $mvIncludePath.'config/models.php';
-	require_once $mvIncludePath.'config/plugins.php';
-	
+{	
 	$mvSetupSettings['Models'] = Registry::loadConfigurationFileData($mvConfigFiles['models']);
 	$mvSetupSettings['Plugins'] = Registry::loadConfigurationFileData($mvConfigFiles['plugins']);
 	$mvSetupSettings['IncludePath'] = $mvIncludePath;
@@ -128,8 +124,7 @@ if(!isset($mvSetupSettings['LoadedFromCache']))
 	Registry::generateSettings($mvSetupSettings);
 	
 	$registry -> loadSettings($mvSetupSettings);
-	$registry -> loadSettings($mvMainSettings);
-	
+	$registry -> loadSettings(Registry::loadConfigurationFileData($mvConfigFiles['settings']));	
 	$registry -> loadEnvironmentSettings() -> lowerCaseConfigNames() -> checkSettingsValues();
 }
 else
