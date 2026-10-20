@@ -35,7 +35,6 @@ if(version_compare(phpversion(), '8.0', '<'))
 //Main front http exception class to catch 404 errors and others
 class FrontHttpStatusException extends Exception{}
 
-require_once $mvIncludePath.'config/setup.php';
 require_once $mvCorePath.'datatypes/base.type.php';
 require_once $mvCorePath.'datatypes/bool.type.php';
 require_once $mvCorePath.'datatypes/char.type.php';
@@ -72,11 +71,13 @@ require_once $mvCorePath.'admin_panel.class.php';
 require_once $mvCorePath.'flash_messages.class.php';
 
 $mvConfigFiles = [
-	$mvIncludePath.'config/setup.php',
-	$mvIncludePath.'config/settings.php',
-	$mvIncludePath.'config/models.php',
-	$mvIncludePath.'config/plugins.php'
+	'setup' => $mvIncludePath.'config/setup.php',
+	'settings' => $mvIncludePath.'config/settings.php',
+	'models' => $mvIncludePath.'config/models.php',
+	'plugins' => $mvIncludePath.'config/plugins.php'
 ];
+
+$mvSetupSettings = Registry::loadConfigurationFileData($mvConfigFiles['setup']);
 
 //Trys to get all settings at one time from cache file
 if(isset($mvSetupSettings['Build']))
@@ -112,8 +113,8 @@ if(!isset($mvSetupSettings['LoadedFromCache']))
 	require_once $mvIncludePath.'config/models.php';
 	require_once $mvIncludePath.'config/plugins.php';
 	
-	$mvSetupSettings['Models'] = $mvActiveModels;
-	$mvSetupSettings['Plugins'] = $mvActivePlugins;
+	$mvSetupSettings['Models'] = Registry::loadConfigurationFileData($mvConfigFiles['models']);
+	$mvSetupSettings['Plugins'] = Registry::loadConfigurationFileData($mvConfigFiles['plugins']);
 	$mvSetupSettings['IncludePath'] = $mvIncludePath;
 	$mvSetupSettings['CorePath'] = $mvCorePath;
 }
@@ -136,43 +137,43 @@ else
 
 $registry -> createClassesAliases();
 
-$mvAutoloadData = [
+$__mvAutoloadData = [
 	'models' => $mvSetupSettings['Models'],
 	'models_lower' => Registry::get('ModelsLower'),
 	'plugins' => $mvSetupSettings['Plugins'],
 	'plugins_lower' => Registry::get('PluginsLower'),
-	'datatypes_lower' => Registry::get('DataTypesLower')
+	'datatypes_lower' => Registry::get('DataTypesLower'),
+	'include_path' => $mvSetupSettings['IncludePath'],
+	'core_path' => $mvSetupSettings['CorePath']
 ];
 
-$GLOBALS['mvAutoloadData'] = $mvAutoloadData;
-$GLOBALS['mvSetupSettings'] = $mvSetupSettings;
+$GLOBALS['__mvAutoloadData'] = $__mvAutoloadData;
 
 //Defines class auto loader
 spl_autoload_register(function($class_name)
 {	
-	$mvAutoloadData = $GLOBALS['mvAutoloadData'];
-	$mvSetupSettings = $GLOBALS['mvSetupSettings'];
+	$__mvAutoloadData = $GLOBALS['__mvAutoloadData'];
 	$class_lower = strtolower($class_name);
 	
 	if(strpos($class_name, 'ModelElement') !== false || strpos($class_lower, '_model_element') !== false)
 	{
 		$class_name = str_replace(['modelelement', '_model_element'], '', $class_lower);
 
-		if(array_key_exists($class_name, $mvAutoloadData['datatypes_lower']))
-			$class_name = $mvAutoloadData['datatypes_lower'][$class_name];
+		if(array_key_exists($class_name, $__mvAutoloadData['datatypes_lower']))
+			$class_name = $__mvAutoloadData['datatypes_lower'][$class_name];
 		
-		require_once $mvSetupSettings['CorePath'].'datatypes/'.$class_name.'.type.php';
+		require_once $__mvAutoloadData['core_path'].'datatypes/'.$class_name.'.type.php';
 	}
-	else if(in_array($class_lower, $mvAutoloadData['models_lower']))
-		require_once $mvSetupSettings['IncludePath'].'models/'.$class_lower.'.model.php';
-	else if(array_key_exists($class_lower, $mvAutoloadData['models_lower']))
-		require_once $mvSetupSettings['IncludePath'].'models/'.$mvAutoloadData['models_lower'][$class_lower].'.model.php';
-	else if(in_array($class_lower, $mvAutoloadData['plugins_lower']))
-		require_once $mvSetupSettings['IncludePath'].'plugins/'.$class_lower.'.plugin.php';
-	else if(array_key_exists($class_lower, $mvAutoloadData['plugins_lower']))
-		require_once $mvSetupSettings['IncludePath'].'plugins/'.$mvAutoloadData['plugins_lower'][$class_lower].'.plugin.php';
-	else if(is_file($mvSetupSettings['CorePath'].''.$class_lower.'.class.php'))
-		require_once $mvSetupSettings['CorePath'].''.$class_lower.'.class.php';
+	else if(in_array($class_lower, $__mvAutoloadData['models_lower']))
+		require_once $__mvAutoloadData['include_path'].'models/'.$class_lower.'.model.php';
+	else if(array_key_exists($class_lower, $__mvAutoloadData['models_lower']))
+		require_once $__mvAutoloadData['include_path'].'models/'.$__mvAutoloadData['models_lower'][$class_lower].'.model.php';
+	else if(in_array($class_lower, $__mvAutoloadData['plugins_lower']))
+		require_once $__mvAutoloadData['include_path'].'plugins/'.$class_lower.'.plugin.php';
+	else if(array_key_exists($class_lower, $__mvAutoloadData['plugins_lower']))
+		require_once $__mvAutoloadData['include_path'].'plugins/'.$__mvAutoloadData['plugins_lower'][$class_lower].'.plugin.php';
+	else if(is_file($__mvAutoloadData['core_path'].''.$class_lower.'.class.php'))
+		require_once $__mvAutoloadData['core_path'].''.$class_lower.'.class.php';
 });
 
 //Sets up current localization region of the application
@@ -228,6 +229,7 @@ if(isset($mvSetupSettings['HttpOnlyCookie']) && $mvSetupSettings['HttpOnlyCookie
 	ini_set('session.cookie_httponly', 1);
 
 session_set_cookie_params(0, $mvSetupSettings['MainPath']);
+unset($mvSetupSettings);
 
 ini_set('session.use_only_cookies', 1);
 ini_set('session.use_trans_sid', 0);

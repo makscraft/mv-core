@@ -164,7 +164,8 @@ class Router
 		//Tries to get routes map from cache, or creates new one
 		if(null === $map = Cache::getRoutesMapFromCache())
 		{
-			require_once Registry::get('IncludePath').'config/routes.php';
+			$routes_file = Registry::get('IncludePath').'config/routes.php';
+			$mvFrontendRoutes = Registry::loadConfigurationFileData($routes_file);
 			$map = $this -> analyzeRoutesList($mvFrontendRoutes) -> createRoutesMap($mvFrontendRoutes);
 		}
 
@@ -279,7 +280,8 @@ class Router
 	 */
    	public function defineRouteOldVersions()
    	{
-		require_once Registry::get('IncludePath').'config/routes.php';
+		$routes_file = Registry::get('IncludePath').'config/routes.php';
+		$mvFrontendRoutes = Registry::loadConfigurationFileData($routes_file);		
 		
 		$this -> route_404 = $mvFrontendRoutes['404'];
 		

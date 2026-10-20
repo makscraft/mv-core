@@ -38,6 +38,32 @@ class Registry
 		return self::$instance;
 	}
 
+	/**
+	 * Loads settings from config file, including legacy code style (as variable).
+	 */
+	static public function loadConfigurationFileData(string $file): array
+	{
+		$data = require($file);
+
+		if(is_array($data))
+			return $data;
+
+		//Legacy approach
+		
+		$files = [
+			'setup.php' => 'mvSetupSettings',
+			'settings.php' => 'mvMainSettings',
+			'models.php' => 'mvActiveModels',
+			'plugins.php' => 'mvActivePlugins',
+			'routes.php' => 'mvFrontendRoutes'
+		];
+
+		$name = $files[basename($file)];
+		require_once $file;
+
+		return $$name;
+	}
+
 	static public function generateSettings(array &$settings_list)
 	{
 		if(isset($settings_list['ProjectFolder']))
