@@ -6,16 +6,10 @@
 class Cache
 {  
 	/**
-	 * ODatabase manager object.
-	 * @var Database
-	 */
-	public ?Database $db;
-
-	/**
 	 * Key of cache fragment to store it in database.
 	 * @var string
 	 */
-	private ?string $current_key = null;
+	private static ?string $current_key = null;
 	
 	/**
 	 * Table name for saved html cached fragments.
@@ -28,11 +22,6 @@ class Cache
 	 * @var string
 	 */
 	private const CLEANUP_TABLE = 'cache_clean';
-
-	public function __construct()
-	{
-      	$this -> db = Database::instance();
-	}
 	
 	/**
 	 * Checks if cache is enabled in config file.
@@ -46,7 +35,7 @@ class Cache
 	 * Saves content into cache table by key with models names for cleanup 
 	 * after action in admin panel and optional lifetime value.
 	 */
-	public function save(string $key, mixed $content, mixed $models = [], int $lifetime = 0)
+	static public function save(string $key, mixed $content, mixed $models = [], int $lifetime = 0)
 	{
 		if(!self::checkIfEnabled())
 			return $content;
@@ -94,25 +83,26 @@ class Cache
 		}
 
 		$lifetime = $lifetime > 0 ? time() + $lifetime : 0;
-				
-		$this -> db -> beginTransaction();
+		
+		$database = Database::instance();
+		$database -> beginTransaction();
 
-		$this -> cleanByKey($key); //Deletes old cache with such key
+		self::cleanByKey($key); //Deletes old cache with such key
 
 		if(Registry::getInitialVersion() < 3.0 && $lifetime === 0)
 			$query = "INSERT INTO `".self::CONTENT_TABLE."` (`key`,`content`)
-					  VALUES(".$this -> db -> secure($key).",".$this -> db -> secure($content).")";
+					  VALUES(".$database -> secure($key).",".$database -> secure($content).")";
 		else
 			$query = "INSERT INTO `".self::CONTENT_TABLE."` (`key`,`content`,`until`)
-					  VALUES(".$this -> db -> secure($key).",".$this -> db -> secure($content).", ".$lifetime.")";
+					  VALUES(".$database -> secure($key).",".$database -> secure($content).", ".$lifetime.")";
 
-		$this -> db -> query($query);
+		$database -> query($query);
 		
 		foreach($checked_models as $model) //Adds links for cache cleaning
-			$this -> db -> query("INSERT INTO `".self::CLEANUP_TABLE."` (`key`,`model`)
-								  VALUES(".$this -> db -> secure($key).",".$this -> db -> secure($model).")");
+			$database -> query("INSERT INTO `".self::CLEANUP_TABLE."` (`key`,`model`)
+								  VALUES(".$database -> secure($key).",".$database -> secure($model).")");
 				
-		$this -> db -> commitTransaction();
+		$database -> commitTransaction();
 		
 		return $content;
 	}
@@ -120,9 +110,9 @@ class Cache
 	/**
 	 * Saves the content in cache and returns it,
 	 */
-	public function saveAndDisplay(string $key, mixed $content, mixed $models = [], int $lifetime = 0)
+	static public function saveAndDisplay(string $key, mixed $content, mixed $models = [], int $lifetime = 0)
 	{
-		$this -> save($key, $content, $models, $lifetime);
+		self::save($key, $content, $models, $lifetime);
 		
 		echo $content;
 	}
@@ -130,13 +120,12 @@ class Cache
 	/**
 	 * Looks for and returns the content in cache by key.
 	 */
-	public function find(string $key)
+	static public function find(string $key)
 	{
 		if(!self::checkIfEnabled())
 			return;
 		
-		$value = $this -> db -> getRow("SELECT * FROM `".self::CONTENT_TABLE."` 
-									   	WHERE `key`=".$this -> db -> secure($key));
+		$value = Database::instance() -> getRow("SELECT * FROM `".self::CONTENT_TABLE."` WHERE `key`=".Database::secure($key));
 
 		if(is_array($value))
 			if(Registry::getInitialVersion() < 3.0 && !isset($value['until']))
@@ -148,9 +137,9 @@ class Cache
 	/**
 	 * Looks for and outputs the content in cache by key.
 	 */
-	public function findAndDisplay(string $key)
+	static public function findAndDisplay(string $key)
 	{
-		if($content = $this -> find($key))
+		if($content = self::find($key))
 			echo $content;
 		
 		return $content ? true : false;
@@ -164,10 +153,10 @@ class Cache
 		if(!self::checkIfEnabled())
 			return;
 		
-		$db = Database::instance();
+		$database = Database::instance();
 		
-		$db -> query("DELETE FROM `".self::CONTENT_TABLE."` WHERE `key`=".$db -> secure($key));
-		$db -> query("DELETE FROM `".self::CLEANUP_TABLE."` WHERE `key`=".$db -> secure($key));
+		$database -> query("DELETE FROM `".self::CONTENT_TABLE."` WHERE `key`=".$database -> secure($key));
+		$database -> query("DELETE FROM `".self::CLEANUP_TABLE."` WHERE `key`=".$database -> secure($key));
 	}
 	
 	/**
@@ -205,6 +194,7 @@ class Cache
 		if(!self::checkIfEnabled())
 			return;
 		
+		Database::instance();
 		Database::$adapter -> clearTable(self::CONTENT_TABLE);
 		Database::$adapter -> clearTable(self::CLEANUP_TABLE);
 	}
@@ -213,9 +203,9 @@ class Cache
 	 * Looks for the cache by key, if found return it, if not - starts buffering to get content.
 	 * @return bool true if cache found and displyed
 	 */
-	public function displayOrStart(string $key)
+	static public function displayOrStart(string $key)
 	{
-		if($content = $this -> find($key)) //We found cache by current key
+		if($content = self::find($key)) //We found cache by current key
 		{
 			echo $content;
 
@@ -223,7 +213,7 @@ class Cache
 		}
 		else //We have no cache with current key so we start the caching process
 		{
-			$this -> current_key = $key; //Saves the key name
+			self::$current_key = $key; //Saves the key name
 			ob_start();
 
 			return false;
@@ -233,17 +223,17 @@ class Cache
 	/**
 	 * Stops buffering, takes data and saves it according to models and lifetime.
 	 */
-	public function stopAndSave(mixed $models = [], $lifetime = 0)
+	static public function stopAndSave(mixed $models = [], $lifetime = 0)
 	{
-		if(!$this -> current_key)
+		if(!self::$current_key)
 			return;
 		
 		$content = ob_get_flush(); //Getting cache data form buffer		
 				
 		if($content) //Save data if it's not empty
-			$this -> save($this -> current_key, $content, $models, $lifetime);
+			self::save(self::$current_key, $content, $models, $lifetime);
 		
-		$this -> current_key = null;
+		self::$current_key = null;
 	}
 
 	/**
