@@ -561,15 +561,15 @@ abstract class ModelBase extends ModelInitial
 					$result_values = $this -> beforeUpdate($id, $old_fields, $version_dump);
 					
 					if(is_array($result_values) && count($result_values)) //If some values were changed
-						foreach($result_values as $name => $_)
+						foreach($result_values as $name => $field_value)
 						{
 							$changed_field = $this -> getElement($name);
 							
 							if($changed_field && $changed_field -> getType() != "many_to_many" && 
 							   $changed_field -> getType() != "group")
 							{
-								$value = Service::cleanHtmlSpecialChars(htmlspecialchars($value, ENT_QUOTES));
-								$version_dump[$name] = $updated_fields[$name] = $value;
+								$field_value = Service::cleanHtmlSpecialChars(htmlspecialchars($field_value, ENT_QUOTES));
+								$version_dump[$name] = $updated_fields[$name] = $field_value;
 							}
 						}
 				}
@@ -578,8 +578,8 @@ abstract class ModelBase extends ModelInitial
 				{
 					$query = [];
 					
-					foreach($updated_fields as $name => $_)
-						$query[] = "`".$name."`=".$this -> db -> secure($value);
+					foreach($updated_fields as $name => $field_value)
+						$query[] = "`".$name."`=".$this -> db -> secure($field_value);
 						
 					$this -> db -> query("UPDATE `".$this -> table."` 
 							  			  SET ".implode(",", $query)." 
@@ -601,8 +601,8 @@ abstract class ModelBase extends ModelInitial
 					else if($current_m2m_condition == "remove" && array_search($current_value, $m2m_values) !== false)
 						unset($m2m_values[array_search($current_value, $m2m_values)]); //Removes value if needed
 						
-					foreach($m2m_values as $key => $_) //Filters empty values
-						if(empty($value))
+					foreach($m2m_values as $key => $field_value) //Filters empty values
+						if(empty($field_value))
 							unset($m2m_values[$key]);
 						
 					if($current_type == "group") //Group type update
