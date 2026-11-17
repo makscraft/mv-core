@@ -339,7 +339,7 @@ class MultiImagesModelElement extends CharModelElement
 		if(is_array($value))
 			return $value;
 
-		$value = trim(strval($value));
+		$value = trim(htmlspecialchars_decode(strval($value)));
 
 		if($value === '[]' || $value === '')
 			return [];

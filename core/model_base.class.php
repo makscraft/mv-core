@@ -763,6 +763,9 @@ abstract class ModelBase extends ModelInitial
 	{
 		$this -> errors[] = $error;
 
+		if(is_array($error) && isset($error[1], $error[2]) && $object = $this -> getElement($error[2]))
+			$object -> setError($error[1]);
+		
 		return $this;
 	}
 	

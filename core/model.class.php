@@ -1258,7 +1258,7 @@ class Model extends ModelBase
 		
 		foreach($this -> errors as $error)
 		{
-			$object = is_array($error) && isset($error[2], $this -> elements[$error[2]]) ? $this -> elements[$error[2]] : false;
+			$object = is_array($error) && isset($error[2], $this -> elements[$error[2]]) ? $this -> elements[$error[2]] : null;
 			$html .= "<p>".Model::processErrorText($error, $object)."</p>\n";
 		}
 		

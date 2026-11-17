@@ -305,9 +305,10 @@ $(document).ready(function()
 			result.push(one);
 		});
 
-		result = btoa(JSON.stringify(result));
-		
-		$(object).parents("div.images-area").find("input[type='hidden']").val(result);
+		let bytes = new TextEncoder().encode(JSON.stringify(result));
+		let binary = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join('');
+				
+		$(object).parents("div.images-area").find("input[type='hidden']").val(btoa(binary));
 	}
 	
 	//Moves image to the first position in list

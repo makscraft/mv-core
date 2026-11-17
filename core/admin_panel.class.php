@@ -82,7 +82,7 @@ class AdminPanel
     {
         $view = '';
 
-        if(empty($_GET))
+        if(empty($_GET) || $_SERVER['QUERY_STRING'] === 'attempt=1')
         {
             $view = 'view-index.php';
             $this -> view = 'index';
