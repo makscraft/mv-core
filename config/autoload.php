@@ -220,11 +220,4 @@ if(!isset($mvSetupSettings['LoadedFromCache']))
 	Cache::createMainConfigFile($mvConfigFiles);
 }
 
-if(isset($mvSetupSettings['HttpOnlyCookie']) && $mvSetupSettings['HttpOnlyCookie'])
-	ini_set('session.cookie_httponly', 1);
-
-session_set_cookie_params(0, $mvSetupSettings['MainPath']);
 unset($mvSetupSettings);
-
-ini_set('session.use_only_cookies', 1);
-ini_set('session.use_trans_sid', 0);

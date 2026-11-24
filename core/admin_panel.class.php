@@ -32,10 +32,6 @@ class AdminPanel
         ob_start();
         
         Registry::set('AdminPanelEnvironment', true);
-        
-        if(!Service::sessionIsStarted())
-            session_start();
-
         Session::start('admin_panel');
         
         if(Session::get('settings') === null)

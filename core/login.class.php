@@ -45,10 +45,7 @@ class Login
 		
 		if($time_zone)
 			date_default_timezone_set($time_zone);
-
-		if(!Service::sessionIsStarted())
-			session_start();
-
+		
 		Session::start('admin_panel_login');
 		
 		if(!Session::get('token'))

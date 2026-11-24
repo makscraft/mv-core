@@ -34,7 +34,15 @@ class Session
             return;
 
         if(!Service::sessionIsStarted())
-            session_start();
+            session_start([
+                'cookie_lifetime' => 0,
+                'cookie_path' => Registry::get('MainPath'),
+                'cookie_httponly' => Registry::get('HttpOnlyCookie', true),
+                'cookie_secure' => Http::isHttps(),
+                'cookie_samesite' => 'Lax',
+                'use_strict_mode' => true,
+                'use_only_cookies' => true
+            ]);
         
         $key = self::generateKey($container);
         
