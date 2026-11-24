@@ -51,14 +51,12 @@ if(Http::requestHas('login', 'password'))
 			$errors[] = I18n::locale('error-wrong-token');
 			$result['action'] = 'reload';
 		}
-
-		if(Http::fromPost('js_token') != Login::getJavaScriptToken())
+		else if(Http::fromPost('js_token') != Login::getJavaScriptToken())
 		{
 			$errors[] = I18n::locale('error-wrong-token');
 			$result['action'] = 'reload';
 		}
-
-		if(Http::fromPost('admin_login_csrf_token') != Login::getTokenCSRF())
+		else if(Http::fromPost('admin_login_csrf_token') != Login::getTokenCSRF())
 		{
 			$errors[] = I18n::locale('error-wrong-token');
 			$result['action'] = 'reload';
