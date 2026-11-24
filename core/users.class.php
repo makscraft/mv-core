@@ -147,10 +147,7 @@ class Users extends Model
 		$rights = ['create', 'read', 'update', 'delete'];
 		
 		foreach($this -> models_list as $model)
-		{
-			$model_object = new $model();
-			$models_names[$model] = $model_object -> getName();
-		}
+			$models_names[$model] = (new $model) -> getName();
 		
 		$models_names['file_manager'] = I18n::locale('file-manager');
 		
@@ -170,9 +167,9 @@ class Users extends Model
 
 				$html .= "<td>\n";
 				
-				if(get_parent_class($model_object) == 'ModelSimple' && ($right == 'delete' || $right == 'create'))
+				if(is_object($model_object) && get_parent_class($model_object) == 'ModelSimple' && ($right == 'delete' || $right == 'create'))
 					$html .= "<span>-</span>";
-				else if($name == 'file_manager' || $right == 'read' || $model_object -> checkDisplayParam($right.'_actions'))
+				else if($model == 'file_manager' || $right == 'read' || $model_object -> checkDisplayParam($right.'_actions'))
 				{
 					$html .= "<input data=\"".$model.'_'.$right."\" ";
 					$html .= "type=\"checkbox\"".($this -> checkRight($model, $right) ? ' checked="checked"' : '').">\n";
